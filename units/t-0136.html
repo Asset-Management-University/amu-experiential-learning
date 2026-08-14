@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The model says so</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The model says so</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and your team has built something good. A predictive-maintenance model - trained on the sensor and work-order data - that flags which pumps are heading for failure. On the test data it is 94% accurate. You are proud of it, and you should be.</p>
+<p>You take it to the maintenance manager. It flags Pump 7 for an urgent overhaul. He asks the only question that matters: <em>"Why? What do I actually fix?"</em></p>
+<p>And all you can say is: "the model calculated a high probability." He looks at you, and he refuses - he will not pull a working pump offline on the word of a black box, and he is completely right not to. Worse, as you stand there, you realise you cannot answer the question for yourself either. You do not know whether the model flagged Pump 7 for a real physical reason - a failing bearing, a climbing vibration - or because of some accident buried in the data. The model is accurate and utterly unpersuasive.</p>
+<blockquote><h2>My model is accurate and nobody will act on it, because "the model says so" is not a reason. How do I open the box - so I can say why it made this call, whether it can be trusted, and what to actually do about it?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The model's record is good and nobody disputes it. It has flagged Pump 7 at <strong>0.72</strong> against an action threshold of 0.50, and acting means pulling a pump out of service and spending real money. The manager has said no — not rudely, and not stupidly: she cannot defend an action she cannot explain, and &ldquo;the model says so&rdquo; is not a reason she can give to anybody above her. And then it gets worse, because standing there you realise <strong>you cannot answer it either</strong>. You do not know whether it flagged Pump 7 for a real physical reason or because of some accident buried in the data. Write down what you would do — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why she is right to refuse</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Show her the accuracy figures — the track record speaks for itself.&rdquo;</strong> Accuracy tells her the model is usually right in aggregate. It says nothing about <em>this</em> pump, and she is being asked to act on this pump.</p>
+<p>&bull; <strong>&ldquo;Escalate — get authority to act on model outputs.&rdquo;</strong> Forces an action nobody can explain, which works exactly once and poisons the model's standing the first time it is wrong.</p>
+<p>&bull; <strong>&ldquo;Use a simpler model she can understand.&rdquo;</strong> Trades away accuracy to buy explanation, when the two are not actually in conflict here. It also concedes the wrong premise — that explanation is a property of simplicity rather than something you can add.</p>
+<p>&bull; <strong>&ldquo;She is resistant to new technology.&rdquo;</strong> She is not. An unexplained instruction cannot be defended by the person who follows it, so refusing is the <em>correct</em> behaviour, and reading it as resistance means you will never fix the actual problem.</p>
+<p>&bull; <strong>&ldquo;Wait for a failure to prove the model right.&rdquo;</strong> Wins the argument by letting the pump fail, which costs you the thing the model existed to prevent and teaches everybody that the model's value is retrospective.</p>
+<p>&bull; What you need is not a simpler model but <strong>a layer that explains this particular prediction</strong>. It works by splitting the gap between the model's typical output and this one across the contributing factors — and the contributions <strong>account for the prediction exactly</strong>: a baseline of 0.20 plus contributions totalling 0.52 gives 0.72, precisely. That exactness is what makes it an explanation rather than a story. Three things come from it. Locally, you can say <strong>what drove this call</strong>, which is what a manager can act on. Aggregated across every pump, you can see what the model relies on <strong>overall</strong> and check it against what an engineer expects — agreement is real reassurance, and disagreement is a finding about the model. And because the biggest driver comes with a magnitude, you get a <strong>counterfactual</strong>: take the 0.24 from vibration off and the risk falls to 0.48, below the threshold — so the output stops being a warning and becomes an instruction to balance and align it. One honesty must survive all of this: you are reading <strong>the relationships the model learned</strong>, not laws of the world.</p>
+</div>
+</details>
+<p>There is a layer that does exactly this. Here it is, on one page, for Pump 7.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the interpretability brief that turns "the model says so" into something the manager can act on.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Why THIS prediction? (SHAP, local)</div><p class="cb-demo">The model&#039;s average predicted failure risk (its baseline) is 0.20. Pump 7 is flagged at 0.72, above the 0.50 action threshold. SHAP splits that gap into each feature&#039;s fair contribution: high vibration +0.24, hours since last overhaul +0.16, rising bearing-temperature trend +0.07, recent heavy duty +0.05. They sum to 0.52, and 0.20 + 0.52 = 0.72 exactly - that additivity is the point. Now I can say WHAT drove the flag, not just that it was flagged.</p></div><div class="canvas-box"><div class="cb-label">2. What does the model rely on overall? (SHAP global + PDP)</div><p class="cb-demo">Aggregating SHAP across all pumps: vibration is the model&#039;s top driver overall, then hours-since-overhaul, then bearing-temperature trend. A partial dependence plot for vibration shows the shape: predicted risk is flat and low until vibration passes a threshold band, then climbs steeply. That matches the physics an engineer expects - which is reassuring. But read it honestly: the PDP shows the relationship the MODEL LEARNED, not a causal law of the world.</p></div><div class="canvas-box"><div class="cb-label">3. What would have to change to flip it? (counterfactual)</div><p class="cb-demo">Vibration is the dominant driver at +0.24. If Pump 7&#039;s vibration were brought back into its normal band - by balancing and re-aligning it - that +0.24 comes off, and the predicted risk falls to 0.48, below the 0.50 threshold. So the counterfactual is not just a number game: it points at a real, doable action that both clears the flag AND fixes a genuine physical cause. Contrast a useless counterfactual - &#039;if the pump were five years younger&#039; - which flips the number but nobody can do.</p></div><div class="canvas-box"><div class="cb-label">4. Is it leaning on something it should not? (fairness / soundness)</div><p class="cb-demo">The global importance list also shows &#039;recording depot&#039; contributing meaningfully - and that has no physical link to whether a pump fails. Investigate: it turns out one depot under-records its maintenance, so the model learned &#039;pumps logged by that depot look riskier&#039; - an accident of the DATA, not the pumps. That is a proxy, and it would have quietly mis-ranked every pump in that depot. Action: remove the feature and retrain. The interpretability lens that made the model trustworthy is the same lens that caught it cheating.</p></div><div class="canvas-box"><div class="cb-label">5. The one honest sentence (for a non-technical decision-maker)</div><p class="cb-demo">To the maintenance manager: &#039;Pump 7 is flagged mainly because its vibration has climbed well above its normal band, made worse by long hours since its last overhaul; balancing and aligning it should bring the vibration back into band and clear the flag - but this tells you what the model saw, not proof the pump will fail, so confirm it on the machine before you act.&#039; That is an answer he can question, act on, and check. Nobody pulls a pump on &#039;the model says so&#039;; everybody acts on that sentence.</p></div></div>
+
+<p>Look at what happened. The same accurate model, now with a glass top on the box: <em>why</em> this pump, <em>what</em> the model relies on, <em>what would change it</em>, whether it is <em>cheating</em> - and one honest sentence a manager can act on. And notice box 4, because it is the quiet hero: the very lens that made the model trustworthy is the one that caught it leaning on something it should not. Let us name the tools.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You built the model in the data-science workflow. This unit puts a dashboard on it. Five moves, each a question:</p>
+<ul>
+<li><strong>Why THIS prediction?</strong> <strong>SHAP</strong> - built on <strong>Shapley values</strong> from game theory - splits a single prediction into each feature's fair share, its push up or down from the model's baseline. And the pushes <em>sum exactly to the prediction</em>: baseline plus the SHAP values equals the number the model produced. That additivity is what makes it a fair, honest attribution rather than a guess. Reading one prediction this way is a <strong>local explanation</strong>.</li>
+<li><strong>What does it rely on overall?</strong> Aggregate the SHAP values across every pump and you get the <strong>global</strong> picture - the model's overall feature importance. Then a <strong>partial dependence plot</strong> (PDP) shows the <em>shape</em> of one feature's effect on average: predicted risk flat until vibration crosses a band, then climbing steeply. Read it with one discipline: a PDP shows the relationship the <em>model learned</em>, not a causal law of the world. It is an association, not a proof of cause.</li>
+<li><strong>What would flip it?</strong> A <strong>counterfactual explanation</strong> - the smallest <em>actionable</em> change that moves the prediction across the threshold. "Bring the vibration back into band" clears the flag and fixes a real cause; "if the pump were younger" flips the number and helps no one. The word that matters is <em>actionable</em>: a counterfactual nobody can act on is trivia.</li>
+<li><strong>Is it leaning on something it should not?</strong> The same SHAP lens that earns trust catches cheating. A feature that predicts well but has <em>no physical mechanism</em> - a depot code, an ID prefix, a leaked variable - is a <strong>proxy</strong>, and it means the model learned an accident of the data rather than the physics. Interpretability is how you find it before it quietly mis-ranks half your fleet. This is the fairness and soundness check.</li>
+<li><strong>How do I say it in one honest sentence?</strong> Translate all of it for the person who has to decide - the cause, the action, and the limit - in language with no jargon and no over-claim. A waterfall chart is not an explanation; a sentence a manager can act on is.</li>
+</ul>
+<p>Now the one limit that governs everything above, and you must never lose it: <strong>interpretability explains what the model DOES, not whether the model is RIGHT.</strong> SHAP will explain a wrong model with total confidence, in beautiful detail. It builds trust, enables action, and catches bias - it does not tell you the model is correct. That remains the job of validation, done when the model was built, on data it never saw.</p>
+<p>One honest boundary, then. You are here to put a glass top on the box - to install the dashboard that says what the engine is doing, so a manager can trust it, act on it, and diagnose it. You are <em>not</em> building the engine (that is the data-science workflow) and you are <em>not</em> validating it here. You explain and interrogate.</p>
+<p>Does it scale? A model without interpretability is a doctor saying only "the scan looks bad", leaving you with fear and nothing to do; a model with it is a doctor pointing to the exact shadow, naming it, and telling you what happens next.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different model: it predicts which water mains will burst next winter. A section of main, Main 14, is flagged high-risk. The SHAP local explanation shows the pushes from the baseline: <em>pipe age +0.19, previous burst count +0.14, soil-corrosivity index +0.09</em> - and one more, <em>"survey contractor" +0.11</em>.</p>
+<ol>
+<li><strong>Read the local explanation into plain words.</strong> Why is Main 14 flagged? Which factors are doing the work?</li>
+<li><strong>Propose one counterfactual.</strong> What actionable change would most reduce Main 14's predicted risk - and is it something anyone could actually do?</li>
+<li><strong>Spot the problem.</strong> One of those four features should make you uneasy. Which, and why is it a fairness/soundness problem rather than a real cause?</li>
+<li><strong>Write the one honest sentence</strong> for the network manager - naming the real causes, the action, and the limit.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> your step 3 must name "survey contractor" and explain that it has no physical mechanism for making a pipe burst - it is a proxy (perhaps one contractor inspects the oldest areas, or records differently). If you left it in as a real cause, the model just taught you to distrust pipes for who looked at them.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-local">1. Why THIS prediction? (SHAP, local)</label><textarea id="cb-local" data-key="t-0136:local" placeholder="For the one prediction in question, break it into each feature&#039;s push from the baseline. The pushes sum exactly to the prediction."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-global">2. What does the model rely on overall? (SHAP global + PDP)</label><textarea id="cb-global" data-key="t-0136:global" placeholder="Aggregate the SHAP values across every pump for the overall importance ranking; then plot one key feature to see the shape of the relationship the model learned."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-counterfactual">3. What would have to change to flip it? (counterfactual)</label><textarea id="cb-counterfactual" data-key="t-0136:counterfactual" placeholder="Find the smallest ACTIONABLE change to the inputs that moves the prediction across the threshold. It must be something someone could actually do."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-fairness">4. Is it leaning on something it should not? (fairness / soundness)</label><textarea id="cb-fairness" data-key="t-0136:fairness" placeholder="Scan the important features for any that predict well but have no physical mechanism - a proxy or a leaked variable. The same lens that earns trust catches the cheat."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-sentence">5. The one honest sentence (for a non-technical decision-maker)</label><textarea id="cb-sentence" data-key="t-0136:sentence" placeholder="Translate all of it into a single sentence a manager can act on - naming the cause, the action, and the honest limit."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now take any model's prediction and make it something a person will trust, act on, and check.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Interpretability is powerful precisely because it is persuasive - which is exactly how it gets misused. Read these before you trust an explanation.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Treating an explanation as proof the model is right.</strong> The one that undoes everyone. A confident, detailed SHAP explanation of a wrong model is still wrong. Interpretability explains behaviour, not correctness - validation is a separate job you do not get to skip.</p>
+<p>&bull; <strong>Reading a PDP as causation.</strong> The plot shows the association the model learned, not a law of physics. "Risk rises with vibration in the model" is not "vibration causes failure" - it usually aligns with the physics, but you must not assume it.</p>
+<p>&bull; <strong>Showing SHAP numbers to a non-technical audience.</strong> A waterfall chart handed to a manager is not an explanation; it is homework. Your job is the one honest sentence, in their language, that they can act on.</p>
+<p>&bull; <strong>A counterfactual nobody can act on.</strong> "If the asset were newer" flips the prediction and changes nothing. A useful counterfactual names something a person could actually do this month.</p>
+<p>&bull; <strong>Missing the proxy because the explanation looked plausible.</strong> A feature with predictive power and no mechanism is a warning, not a discovery. Ask of every important feature: could this physically cause the outcome, or is it an accident of how the data was collected?</p>
+<p>&bull; <strong>Laundering an unvalidated model.</strong> Wrapping a model you never tested in a beautiful explanation does not make it trustworthy - it makes it dangerous, because now it is also persuasive. Explain models you have validated, not instead of validating them.</p>
+</div>
+</details>
+<p>Onalenna had an accurate model and a manager who would not act on it, because "the model says so" is not a reason anyone can stand on. Now you can open the box: say why this prediction, show what the model relies on, name what would change it, catch it leaning on the wrong thing, and hand over one honest sentence - while never once mistaking a good explanation for a correct model. That is the difference between a black box on a shelf and a tool a plant actually runs on. If you are working with an AMU Facilitator, bring a real model's output and write its one honest sentence together.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can open the black box now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

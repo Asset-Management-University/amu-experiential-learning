@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The benchmark that comforts you</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The benchmark that comforts you</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and this month you are not running Corathyl Water Treatment Works. You are sitting in an industry benchmarking consortium, where operators of very different plants pool their turnaround data anonymously and review one another's events, because none of them can learn enough from their own.</p>
+<p>On the table is the closeout report for a recently completed turnaround at one of the member sites - a large process plant, twenty-eight days planned. The report's headline sentence reads: <em>the turnaround was delivered at 3.9 per cent of total replacement value, in line with industry norms.</em></p>
+<p>Everyone in the room relaxes at that sentence. It is a real number, honestly calculated, against a genuine industry band.</p>
+<p>And you cannot make it sit right, because you have read the rest of the pack. The turnaround ran <strong>thirty-four days</strong>, not twenty-eight. It cost <strong>thirty per cent more</strong> than its own budget. More than a fifth of the work actually executed had never been planned at all. And three people were hurt badly enough to need a doctor.</p>
+<p>So you have one number telling you the event was normal, and four facts telling you it was not. They cannot both be the whole truth, and you have no way to say which is - because in twenty years nobody has taught you how to compare a turnaround against anything except itself.</p>
+<blockquote><h2>One benchmark says this turnaround was ordinary and everything I know about it says otherwise. How do I benchmark a TAR properly - so the assessment reveals performance instead of reassuring the room?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The closeout report leads with one number: the turnaround cost <strong>R109.2m</strong> against a plant replacement value of <strong>R2,800m</strong>, which is <strong>3.9 per cent</strong> — inside the industry band of two to four. On that measure it was an entirely ordinary event, and the number is honest; nobody has manipulated anything. Against it: a fifth of the planned scope was deferred to next time, a large piece of work appeared that had never been planned at all, the restart slipped, and <strong>three people were hurt badly enough to need a doctor</strong>. One number says ordinary. Four facts say otherwise. Write down how you would benchmark this properly — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why the comfortable measure wins</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;The number is from a credible industry study — trust it.&rdquo;</strong> It is credible, and it is one measure. A cost ratio is silent about scope, about safety and about whether the deferred work was pushed into somebody else's future — those things are not <em>absent</em>, they are <strong>invisible</strong> to it.</p>
+<p>&bull; <strong>&ldquo;Compare against our own last turnaround.&rdquo;</strong> Comparing an event against yourself tells you whether you are consistent, not whether you are any good. If the last one was also poor, you will be reassured twice.</p>
+<p>&bull; <strong>&ldquo;Report both — the number and the concerns.&rdquo;</strong> Better, and in practice the number wins: it is quantified and external, and the concerns read as anecdotes beside it. That is exactly what happened in the room.</p>
+<p>&bull; <strong>&ldquo;Drop the benchmark and just describe what happened.&rdquo;</strong> Throws away the one thing that could locate you against anybody else, and leaves you back where you started — with an event that can only be compared to itself.</p>
+<p>&bull; <strong>&ldquo;Investigate the injuries separately.&rdquo;</strong> Necessary and it is not benchmarking. Handled apart, the harm never enters the assessment of whether the event went well, which is how an event with three injuries gets recorded as normal.</p>
+<p>&bull; Start before any comparison at all, with <strong>definitions</strong> — because the same event yields materially different figures depending on where the measurement starts and stops and what it includes. Duration from feed-out or from mobilisation? Cost with or without the capital work done because the plant was open, and the lost production? Harm counted at which threshold? <strong>If the reference and your record define a measure differently, every conclusion drawn from the comparison is decoration</strong> — the definitions <em>are</em> the comparison; the rest is arithmetic. Then <strong>normalise</strong>, since a bigger plant always has a bigger turnaround, so raw figures compare sizes rather than performance — which your 3.9 per cent does correctly. And then the discipline that settles this: <strong>compare on several normalised measures rather than one</strong>. Any single measure can sit comfortably while the event failed on dimensions it cannot see. <strong>A benchmark that reassures you is doing the opposite of its job.</strong></p>
+</div>
+</details>
+<p>You do not benchmark it once. Here is the assessment.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the benchmark assessment - the same turnaround, compared properly.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What exactly does each measure mean? (definitions before comparison)</div><p class="cb-demo">Before comparing anything, pin down what each measure MEANS - on both sides. DURATION from what to what? Feed-out to feed-in, or first isolation to full rate, or the contractor&#039;s mobilisation to demobilisation? Those are different numbers for the same event and can differ by days. COST including what? Execution only, or also contractor mobilisation, capital work done in the window because the plant was open, the owner&#039;s team, and lost production? SAFETY counting what - recordables only, or first aid and near misses too? If the study defines duration as shutdown-to-startup and your closeout report measures mobilisation-to-demobilisation, then every conclusion drawn from the comparison is decoration. THE DEFINITIONS ARE THE COMPARISON; everything after them is arithmetic.</p></div><div class="canvas-box"><div class="cb-label">2. Normalise, or you are just comparing sizes</div><p class="cb-demo">A bigger plant always has a bigger turnaround, so raw figures compare SIZES rather than PERFORMANCE. Normalise. The standard normaliser for cost is TAR COST AS A PERCENTAGE OF TOTAL REPLACEMENT VALUE, and industry data puts typical turnarounds in a 2 TO 4 PER CENT OF TRV band. The TAR under review cost R109.2m against a plant TRV of R2,800m, which is 3.9 PER CENT - at the high end of the band. On this measure the event looks entirely NORMAL, and this is the number the closeout report leads with. Normalise duration and effort too (days or man-hours per unit of work or per unit of capacity) so that scale is removed there as well. Normalisation is what makes comparison legitimate - and, as the next boxes show, it is also what can make a bad turnaround look ordinary.</p></div><div class="canvas-box"><div class="cb-label">3. Four reference points, not one (and expect them to disagree)</div><p class="cb-demo">Never benchmark against a single reference, because a flattering one always exists. Use FOUR: the INDUSTRY AVERAGE, YOUR OWN HISTORY, SPECIFIC PEERS of similar type, and TOP PERFORMERS - because comparing yourself to the average tells you if you are ordinary, while comparing yourself to the best tells you what is possible. Then expect them to DISAGREE, because THE DISAGREEMENT IS THE FINDING. Here: against the industry cost band, 3.9 per cent of TRV says normal. Against its OWN PLAN, the same TAR ran 34 days instead of 28 (+21.4 per cent) and cost R109.2m against R84m (+30 PER CENT). Both statements are true. One says the event was unremarkable and the other says it was out of control, and an assessment that reports only the first is not wrong - it is incomplete in a way that is indistinguishable from dishonest.</p></div><div class="canvas-box"><div class="cb-label">4. The full KPI set - including the ones that embarrass</div><p class="cb-demo">Report the whole set, especially the uncomfortable members. SCHEDULE and COST performance against plan. SCOPE COMPLETION - planned work done versus deferred. DISCOVERY WORK, the percentage of executed man-hours that was never planned: 22 PER CENT here, which is the honest measure of how well the scope was ever known. CRITICAL PATH ADHERENCE. SAFETY as TRIR - Total Recordable Incident Rate - which is recordables x 200,000 divided by hours worked, the 200,000 representing 100 full-time workers at 2,000 hours a year: 3 recordables in 186,000 hours gives TRIR = 3.23, against a refining sector average around 1.2, so ROUGHLY 2.7 TIMES WORSE. And LOST PRODUCTION, almost always omitted: 6 extra days at R4.5m a day is R27.0m, which never appeared in the TAR budget and exceeds the R25.2m cost overrun. The real cost of the overrun was R52.2m.</p></div><div class="canvas-box"><div class="cb-label">5. A benchmark is a pointer, never a diagnosis</div><p class="cb-demo">A benchmark tells you WHERE you differ. It never tells you WHY. It is a pointer to an investigation, not the conclusion of one - and a report that leaps from a number to a cause has invented the cause. So state each difference and what it POINTS AT: 22 per cent discovery work points at inspection and scoping before the event, not at the crews who found the work. A TRIR of 3.23 against 1.2 points at how the work was done - and here the two findings are probably one finding, because compressed timelines correlate consistently with cost overruns, schedule delays AND safety incidents, all through inadequate preparation. That is a HYPOTHESIS worth investigating, not a conclusion. AND ON THE SAFETY NUMBER: a TRIR is an industry standard, but it is NOT A SCORE. Behind this TAR&#039;s 3.23 are three specific people who were injured badly enough to need medical treatment beyond first aid. Benchmarking safety is about discovering whether your system protects people as well as the industry&#039;s best does. A benchmark used to reassure management that a high injury rate is an acceptable deviation is an act of profound organisational negligence.</p></div></div>
+
+<p>Box 3 holds the whole lesson. Both statements about this turnaround are true: it was industry-normal on cost per unit of asset, and it was thirty per cent over its own plan. The closeout report contained one of them. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A benchmark assessment is a <strong>forensic tool</strong> that uses multiple normalised comparisons to reveal a turnaround's true performance - because any single measure can be used to hide failure. Five questions:</p>
+<ul>
+<li><strong>What does each measure mean?</strong> <strong>Definitional consistency</strong> on both sides - duration from what to what, cost including what, safety counting what. A measure defined differently at each end is not a comparison.</li>
+<li><strong>How do you remove size?</strong> <strong>Normalisation.</strong> Cost as a percentage of <strong>total replacement value</strong> (typically 2 to 4 per cent), effort and duration per unit of work or capacity. Without it you are comparing plants, not performance.</li>
+<li><strong>Against what?</strong> Four reference points - <strong>industry average</strong>, <strong>your own history</strong>, <strong>peers</strong>, and <strong>top performers</strong>. The average tells you whether you are ordinary; the best tells you what is possible. Expect them to disagree, because the disagreement is the finding.</li>
+<li><strong>Which measures?</strong> The full set: schedule, cost, scope completion, <strong>discovery work percentage</strong>, critical path adherence, <strong>TRIR</strong>, and <strong>lost production</strong> - which is routinely larger than the cost overrun and routinely absent.</li>
+<li><strong>What does it prove?</strong> Nothing. A benchmark shows <em>where</em> you differ, never <em>why</em>. It is a pointer to an investigation, not a diagnosis.</li>
+</ul>
+<p><strong>On the safety number, which is not a number.</strong> A Total Recordable Incident Rate is an industry standard, but it is not a score. Behind this turnaround's TRIR of 3.23 are three specific people who were injured badly enough to require medical treatment beyond first aid. Benchmarking safety is not about grading performance; it is about discovering whether your system is protecting people as well as the industry's best. A benchmark used to reassure management that a high injury rate is an acceptable deviation is an act of profound organisational negligence.</p>
+<p>One honest boundary. You are <em>evaluating</em> a completed turnaround against external reference points. You are not running one, freezing its worklist, building its schedule, or writing its safety plan - those are separate techniques. This is the difference between being the chef and being the critic: one executes, the other judges, and an organisation that never does the second keeps repeating the first.</p>
+<p>Does it scale? It is the difference between a single blood test result and a full panel. One marker inside its reference range is genuinely reassuring and genuinely meaningless on its own - and a doctor who reported only the normal result, from a panel containing three abnormal ones, would not be practising medicine. The panel matters because the markers disagree, and the disagreement is where the diagnosis begins.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>The consortium hands you a second closeout report, from a different member site:</p>
+<table>
+<tr><th>Measure</th><th>Value</th></tr>
+<tr><td>Duration</td><td>Planned 18 days; actual 18 days</td></tr>
+<tr><td>Cost</td><td>Budget R60m; actual R61.2m</td></tr>
+<tr><td>Plant total replacement value</td><td>R1,200m</td></tr>
+<tr><td>Discovery work</td><td>8 per cent of executed man-hours</td></tr>
+<tr><td>Safety</td><td>1 recordable incident; 96,000 hours worked</td></tr>
+<tr><td>Scope completion</td><td>All planned work completed; nothing deferred</td></tr>
+</table>
+<ol>
+<li><strong>Plan versus actual.</strong> Calculate schedule and cost performance against plan. What do these two measures say?</li>
+<li><strong>Normalise.</strong> Calculate the cost as a percentage of total replacement value and compare it with the typical band. What does <em>this</em> measure say?</li>
+<li><strong>Safety.</strong> Calculate the TRIR and compare it against a sector average of 1.2.</li>
+<li><strong>Reconcile.</strong> The measures disagree. Say what each one is actually measuring, and what the disagreement points at.</li>
+<li><strong>Report it.</strong> Write the two-sentence headline you would put on this assessment - the one the first report should have had.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> this turnaround is the mirror image of the one in the demonstration, and if you have taken a rule of thumb from that example it will fail you here.</p>
+<p>This TAR hit its schedule exactly and came in two per cent over budget - outstanding predictability, and any organisation would be pleased. But normalise it and the cost is <em>5.1 per cent</em> of replacement value, well above the typical band. Both are true again, and the reconciliation is the point: <strong>plan-versus-actual measures predictability, while normalised comparison measures efficiency.</strong> Hitting your plan tells you nothing whatever about whether the plan was right. This site may be over-maintaining, over-scoping, or estimating generously and then delivering to the generous estimate - which looks like excellent control and is expensive.</p>
+<p>And do not walk past the single recordable because it is only one. Run the number.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-define_measure">1. What exactly does each measure mean? (definitions before comparison)</label><textarea id="cb-define_measure" data-key="t-0166:define_measure" placeholder="Pin down what each metric includes and excludes on BOTH sides of the comparison - a measure defined differently at each end is not a comparison at all."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-normalise">2. Normalise, or you are just comparing sizes</label><textarea id="cb-normalise" data-key="t-0166:normalise" placeholder="Convert raw figures into measures that are independent of plant size - otherwise a bigger plant simply produces bigger numbers and the comparison says nothing."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-four_references">3. Four reference points, not one (and expect them to disagree)</label><textarea id="cb-four_references" data-key="t-0166:four_references" placeholder="Compare against the industry average, your own history, named peers and top performers - the disagreement between them is the finding."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-full_kpi_set">4. The full KPI set - including the ones that embarrass</label><textarea id="cb-full_kpi_set" data-key="t-0166:full_kpi_set" placeholder="Report schedule, cost, safety, scope completion, discovery work and critical path adherence - plus lost production, which is usually larger than the cost overrun and usually missing."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-pointer_not_diagnosis">5. A benchmark is a pointer, never a diagnosis</label><textarea id="cb-pointer_not_diagnosis" data-key="t-0166:pointer_not_diagnosis" placeholder="State where you differ and by how much, then say what each difference points at - and stop before claiming to know why."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now tell a room what a turnaround actually did, not what one measure of it says.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Benchmarking fails in ways that all look like rigour.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Comparing raw numbers across differently sized plants.</strong> A bigger plant has a bigger turnaround. Without normalisation you have measured size.</p>
+<p>&bull; <strong>Comparing measures defined differently at each end.</strong> Duration, cost and even "recordable" mean different things in different reports. Establish the definitions first or the arithmetic is decoration.</p>
+<p>&bull; <strong>Using one benchmark.</strong> A flattering measure always exists. One comparison is a quotation, not an assessment.</p>
+<p>&bull; <strong>Choosing the benchmark that flatters.</strong> The most dangerous version, because it is done with real numbers and can be defended line by line.</p>
+<p>&bull; <strong>Omitting lost production.</strong> Usually larger than the cost overrun, and usually absent from the TAR budget entirely, so the event looks cheaper than it was.</p>
+<p>&bull; <strong>Ignoring discovery work.</strong> It is the honest measure of how well the scope was ever known, and the one most likely to explain everything else.</p>
+<p>&bull; <strong>Treating TRIR as the whole safety picture.</strong> It counts recordables. It does not see near misses, first aid cases, or process safety events - and a low TRIR has coexisted with catastrophic process safety failures.</p>
+<p>&bull; <strong>Concluding causes from a benchmark.</strong> It shows difference, never reason. A report that names a cause has left the evidence behind.</p>
+<p>&bull; <strong>Benchmarking to defend rather than to learn.</strong> This is how organisations produce genuinely accurate, entirely honest reports that reassure everyone about events in which people were hurt.</p>
+</div>
+</details>
+<p>Onalenna had one number saying ordinary and four facts saying otherwise. Establish what each measure means on both sides before comparing anything; normalise so you are comparing performance rather than plant size; use four reference points and treat their disagreement as the finding rather than as noise; report the full set including discovery work and lost production, which are the two that embarrass; and remember that a benchmark points at where to look and never at why. A single measure can always be found that comforts the room. The purpose of an assessment is not comfort - and behind a safety rate there are always specific people. If you are working with an AMU Facilitator, take your organisation's last major shutdown and calculate just two things: its cost as a percentage of replacement value, and its discovery work percentage.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can benchmark without being comforted now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

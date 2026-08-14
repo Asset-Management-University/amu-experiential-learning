@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A rumour with a total</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A rumour with a total</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are the practitioner, and the monthly maintenance cost report for the pump section is due before the budget meeting in an hour. You run the extract from the system, and the headline is wonderful: the section is <strong>40 per cent under budget</strong> - R300,000 spent against a R500,000 budget. Your manager needs good news for that meeting, and here it is, in black and white, straight from a system that cost millions.</p>
+<p>Submitting it would make you the hero of the morning. And yet something stops your hand. Forty per cent under, in a month you know had three big pump overhauls in it? That is not a triumph - that is a number too good to be true, and a number too good to be true almost always is.</p>
+<p>Because the total will add up perfectly, and it will still be a lie - and once it is in the meeting, a decision will be made on it before anyone thinks to ask what is missing from underneath.</p>
+<blockquote><h2>The system gave me a precise, tidy total that says we are doing brilliantly - so why don't I trust it enough to submit it? How do I turn a raw extract into a number I can stand behind?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The extract is beautiful. Neat columns, a precise total, and the pump section <strong>twenty per cent under budget</strong> — in a month you personally watched contain <strong>three major pump overhauls.</strong> You know the contractor bills quarterly. You know one purchase order has not been drawn against yet. The budget meeting is on Thursday and somebody will make a decision on this figure. It will add up perfectly. Nobody in that room will be able to see what is missing underneath it. Write down what you would do before submitting it — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what a report actually is</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Submit it — it is what the system says.&rdquo;</strong> The system reported what it was told, accurately. Passing it on transfers a figure you already disbelieve to somebody who has no way of disbelieving it.</p>
+<p>&bull; <strong>&ldquo;Submit it with a caveat that it may be incomplete.&rdquo;</strong> Better, and a caveat beside a precise number loses every time. The total is quantified and the warning is not, so the meeting will use the total.</p>
+<p>&bull; <strong>&ldquo;Adjust the number to what it feels like it should be.&rdquo;</strong> Replaces a wrong figure you can trace with a wrong figure you cannot. Now nobody, including you, can reconstruct where it came from.</p>
+<p>&bull; <strong>&ldquo;Wait until the invoices arrive and report late.&rdquo;</strong> The decision happens Thursday with or without you. Being right a month later is being absent from the decision.</p>
+<p>&bull; <strong>&ldquo;Report it and explain the variance if anybody asks.&rdquo;</strong> Nobody will ask, because a favourable variance never gets challenged. That is precisely why an implausibly good number is more dangerous than an implausibly bad one.</p>
+<p>&bull; The reframe that changes the job: <strong>this is not an output you run off and pass on — it is a claim about reality</strong>, and the moment you submit it somebody believes it and acts on it. They cannot see the errors under a tidy total, because a figure from an expensive system <strong>looks exactly as authoritative when it is wrong as when it is right</strong>: the confidence is in the formatting, not the figure. Which makes a wrong report worse than no report — with none you go and find out, and with a wrong one you confidently decide the wrong thing and never learn why it failed. So your actual job is not running the extract, which takes a second. It is <strong>making the claim true before you make it</strong> — and that means <strong>reconciling it against reality from more than one direction</strong>: against what was committed, against what was physically done, against what you know happened, because each catches errors the others cannot. And notice the specific cause here: this is <strong>timing rather than performance.</strong> The work was done and the cost exists; the invoices simply have not landed. Including what has been <strong>incurred but not yet billed</strong> is what turns an accidental snapshot into a period figure somebody can compare.</p>
+</div>
+</details>
+<p>Here is how you produce a report you can trust.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you turn an extract into a cost report a decision-maker can act on - treating it as a claim, knowing what feeds it, extracting the right data, reconciling it against reality, and presenting it so it is read right.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. The report is a claim - make it true before you make it</div><p class="cb-demo">START HERE, BECAUSE IT CHANGES THE WHOLE JOB FROM A CLERICAL TASK INTO A PROFESSIONAL RESPONSIBILITY. A COST REPORT IS NOT AN OUTPUT YOU RUN OFF AND PASS ON. IT IS A CLAIM ABOUT REALITY - &#039;THE PUMP SECTION COST THIS MUCH THIS MONTH&#039; - AND THE MOMENT YOU SUBMIT IT, SOMEONE WILL BELIEVE IT AND ACT ON IT. A manager will carry it into a budget meeting, defend a position on the strength of it, cut or approve on the strength of it - and here is the trap: THEY CANNOT SEE THE ERRORS UNDERNEATH A TIDY TOTAL, because a total from a system that cost millions looks exactly as authoritative when it is wrong as when it is right. The confidence is in the formatting, not the figure. SO A WRONG REPORT IS WORSE THAN NO REPORT: with no report you go and find out; with a wrong report you confidently decide the wrong thing and never know why it failed. THIS REFRAMES YOUR ACTUAL JOB. It is not to run the extract - the system does that in a second. It is to MAKE THE CLAIM TRUE BEFORE YOU MAKE IT, and that takes a discipline of four parts, which are the rest of this unit: KNOW WHAT FEEDS THE REPORT, EXTRACT THE RIGHT DATA, RECONCILE IT AGAINST REALITY, and PRESENT IT SO IT IS READ CORRECTLY. THE SINGLE HARDEST TRUTH OF THE UNIT: A COST REPORT IS NOT THE OUTPUT OF A SYSTEM; IT IS A VERIFIABLE CLAIM ABOUT REALITY THAT A PROFESSIONAL STANDS BEHIND.</p></div><div class="canvas-box"><div class="cb-label">2. Know what feeds the number</div><p class="cb-demo">YOU CANNOT TRUST A TOTAL WHOSE INGREDIENTS YOU CANNOT NAME, SO KNOW THE STREAMS THAT FEED A MAINTENANCE COST REPORT - because knowing what SHOULD be in it is the only way you will ever notice when something is missing. There are a few, and they all flow through the ERP charged against a cost centre, a work order, or an asset number. LABOUR: the hours booked to work orders, valued at a labour rate. MATERIALS AND SPARES: issues from the store, plus items bought directly for a job. CONTRACTORS AND SERVICES: outside work, which travels a specific path - a PURCHASE ORDER is raised, a GOODS RECEIPT confirms the work or delivery, and finally an INVOICE posts - and it is NOT a real, actual cost in your report until that invoice posts, which is the source of a great deal of trouble. And sometimes ALLOCATIONS OR OVERHEADS charged in from elsewhere (workshop time, stores handling). These costs also sit in a HIERARCHY that rolls upward - equipment into cost centre, cost centre into department, department into plant - so the same cost can be viewed at several levels. Two reasons this matters concretely: first, if you do not know a stream exists, you will not notice when it is absent (the missing contractor invoice); second, the hierarchy means you must later extract at the RIGHT level, because pulling too high sweeps in other sections and pulling too low misses charges. Name the streams, and you have a checklist of what a true report must contain.</p></div><div class="canvas-box"><div class="cb-label">3. Extract the right data - the silent errors live here</div><p class="cb-demo">PULLING THE FIGURES FROM THE ERP IS NOT ONE BUTTON - IT IS A SET OF CHOICES, AND THE WRONG CHOICE RETURNS A WRONG NUMBER THAT LOOKS EXACTLY AS CLEAN AS A RIGHT ONE. This is where the silent errors live, the ones that throw no error message and simply hand you a confident, wrong total. You must set THREE things correctly. THE DIMENSION: which cost centre, asset class, project, or work-order type you are reporting - and at which LEVEL of the hierarchy (too high sweeps in other sections, too low misses charges). THE PERIOD: the months you are reporting. And - THE ONE THAT CATCHES EVERYONE - THE DATE BASIS: the POSTING date, the DOCUMENT date, and the date the WORK WAS ACTUALLY DONE are three different dates, and choosing the wrong one mis-assigns cost between periods, so a cost belonging to March lands in April. You must also never confuse COMMITTED cost - a purchase order raised, money promised - with ACTUAL cost - an invoice posted, money spent - because treating a commitment as a cost overstates, and ignoring it can understate a forecast. THE COMMON EXTRACTION ERRORS ARE ALL OF THIS SHAPE, AND NONE OF THEM THROWS AN ERROR: the wrong date basis (timing); committed-versus-actual confusion; a missing cost element or GL account (a whole category left out); a double-counted allocation; extracting at the wrong cost-centre node; and open or incomplete postings caught mid-flight. Learn to distrust the extract at exactly this step, because a report is only ever as right as the parameters that pulled it, and the parameters are invisible in the output.</p></div><div class="canvas-box"><div class="cb-label">4. Reconcile - the step that catches the lie</div><p class="cb-demo">THIS IS THE HEART OF THE UNIT AND THE STEP EVERYONE SKIPS, SO HOLD THE CRUCIAL TRUTH FIRST: THE DANGEROUS ERROR IN A COST REPORT IS ALMOST NEVER AN ARITHMETIC MISTAKE - THE TOTALS ALWAYS ADD UP. It is a TIMING, CODING, OR COMPLETENESS error in the SOURCE DATA that the report faithfully totals into a confident, precise, wrong number: the invoice not yet posted, the overhaul miscoded to the wrong cost centre, the stores issue that never reached the report. The extract ran, so it was trusted. RECONCILIATION IS THE ONE STEP THAT CATCHES ALL OF THESE, and there are THREE, each asking a different question of the number. BUDGET VERSUS ACTUAL: is this variance REAL, or is it a timing artefact - a missing accrual, an invoice not yet in? A variance too large to be plausible is a data flag, not a result. ERP VERSUS PHYSICAL ACTIVITY: does the money match the WORK THAT ACTUALLY HAPPENED - the work orders closed, the spares issued - or has cost appeared with no work behind it, or has real work happened with no cost yet booked? For the second case you ACCRUE: you put the cost of work done but not yet invoiced into the period the work happened, because that is where it honestly belongs. PERIOD ON PERIOD: does this month make sense against last month, because A SUDDEN DROP IS FAR MORE OFTEN MISSING DATA THAN A REAL SAVING - the pleasant surprise is usually the loudest alarm. Run all three, resolve what they surface (re-code the miscoding, accrue the unposted, chase the missing), and only THEN do you have a number instead of a rumour with a total. A COST REPORT WITHOUT RECONCILIATION IS A RUMOUR WITH A TOTAL.</p></div><div class="canvas-box"><div class="cb-label">5. Present in the standard template - and a variance is a question</div><p class="cb-demo">FINALLY, PRESENT THE RECONCILED TRUTH IN A FORM THAT IS READ CORRECTLY, BECAUSE A TRUE NUMBER IN A CONFUSING SHAPE CAN STILL MISLEAD. USE THE STANDARD TEMPLATES, the ones the reader already knows how to read. THE PERIOD COST REPORT: cost by cost centre and by element (labour, materials, contractors) for the period - what was spent, and on what. THE BUDGET-VERSUS-ACTUAL REPORT: budget, actual, the variance and its percentage, WITH a line of commentary explaining the variance - the most-used report in the budget meeting. THE ASSET LIFECYCLE-COST SUMMARY: the cumulative cost of an asset across its whole life, for repair-versus-replace and end-of-life decisions. Why standard forms matter beyond neatness: A TEMPLATE THE READER KNOWS LETS THEM SPOT THE ANOMALY THEMSELVES - a figure in the wrong place, a variance that does not look right - so the familiar format is part of the accuracy, not just the presentation. NOW THE DIGNITY THAT MUST TRAVEL WITH EVERY REPORT, AND IT IS NON-NEGOTIABLE. FIRST, ABOUT THE WORK: A WRONG FIRST-PASS REPORT IS NOT THE ANALYST BEING CARELESS - TIMING LAGS, POSTING DELAYS AND CODING SLIPS ARE HOW ERPS ACTUALLY BEHAVE, AND RECONCILIATION IS PRECISELY THE DISCIPLINED THING A PROFESSIONAL DOES BECAUSE THEY KNOW THE RAW EXTRACT LIES; the skilled reporter is not the one whose extract is never wrong, but the one who never submits it unreconciled. SECOND, ABOUT THE READER: A VARIANCE IS A QUESTION, NOT A VERDICT. &#039;Under budget&#039; can mean missing invoices as easily as good management; &#039;over budget&#039; can mean necessary work was done - so a cost report must never be used to judge a person before it is reconciled and understood. The report exists to help someone act on reality, not to catch anyone out. Write the commentary to open an inquiry, not to close a case.</p></div></div>
+
+<p>Box 4 is the step that catches the lie the total is hiding. Box 5 is the line that stops a variance being used as a weapon. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A cost report is not the output of a system; it is a verifiable claim about reality that a professional stands behind. A cost report without reconciliation is a rumour with a total.</strong> Five questions:</p>
+<ul>
+<li><strong>What am I actually producing?</strong> <strong>A claim, not an extract.</strong> A wrong report is worse than no report, because it is believed and acted on. Make the claim true before you make it.</li>
+<li><strong>What feeds the number?</strong> <strong>Labour, materials and spares, contractors and services, allocations</strong> - flowing through the ERP against cost centres, work orders and assets. You cannot trust a total whose sources you cannot name.</li>
+<li><strong>Did I extract the right thing?</strong> <strong>The right dimension, period and date basis.</strong> Committed is not actual; the wrong date or the wrong cost-centre node silently returns the wrong number.</li>
+<li><strong>Does it match reality?</strong> <strong>Reconcile three ways</strong> - budget vs actual, ERP vs the physical work, and period-on-period - and accrue for work done but not yet invoiced.</li>
+<li><strong>Will it be read correctly?</strong> <strong>Use the standard template</strong> - and remember a variance is a question, not a verdict.</li>
+</ul>
+<p><strong>The report is a claim - make it true before you make it.</strong> Start here, because it changes the whole job. A cost report is not a clerical output you run off and pass on; it is a <em>claim about reality</em> - "the pump section cost this much this month" - and the moment you submit it, someone will believe it and act on it. A manager will carry it into a budget meeting, defend a number on the strength of it, cut or approve on the strength of it - and they <em>cannot see the errors underneath a tidy total</em>, because a total from a big system looks authoritative whether it is right or wrong. So <strong>a wrong report is worse than no report</strong>: no report and you go and find out; a wrong report and you confidently decide the wrong thing. Your real job is not to run the extract - it is to make the claim <em>true</em> before you make it, through a discipline of four parts: know what feeds it, extract the right data, reconcile it against reality, and present it so it is read correctly.</p>
+<p><strong>Know what feeds the number.</strong> You cannot trust a total whose ingredients you cannot name. A maintenance cost report is fed by a few streams, all flowing through the ERP and charged against a cost centre, a work order, or an asset: <em>labour</em> (work-order hours at a labour rate), <em>materials and spares</em> (issues from the store plus direct purchases), <em>contractors and services</em> (which travel from a purchase order, to a goods receipt, to an invoice - and are not a real cost until the invoice posts), and sometimes <em>allocations or overheads</em> charged in from elsewhere. And these costs sit in a <em>hierarchy</em> - plant, department, cost centre, equipment - that rolls upward. Knowing the streams tells you what <em>should</em> be in the report, which is the only way you will notice when something is missing.</p>
+<p><strong>Extract the right data - the silent errors live here.</strong> Pulling the figures from the ERP is not one button; it is a set of choices, and the wrong choice returns a wrong number that looks exactly as clean as a right one. You must set the <em>dimension</em> (which cost centre, asset class, project or work-order type), the <em>period</em>, and - the one that catches everyone - the <em>date basis</em>: posting date, document date, or the date the work was actually done are all different, and choosing the wrong one mis-assigns cost between months. You must not confuse <em>committed</em> cost (a purchase order raised) with <em>actual</em> cost (an invoice posted), or you will over- or under-state. The common silent errors are all of this shape: wrong date basis, committed-versus-actual confusion, a missing cost element, a double-counted allocation, extracting at the wrong node of the cost-centre hierarchy (too high sweeps in other sections; too low misses charges), and open or incomplete postings. None of these throws an error. They just quietly hand you the wrong total.</p>
+<p><strong>Reconcile - the step that catches the lie.</strong> This is the heart of the unit, and the step people skip. Here is the crucial truth: <em>the dangerous error in a cost report is almost never an arithmetic mistake - the totals always add up.</em> It is a <strong>timing, coding, or completeness error in the source data</strong> that the report faithfully totals into a confident, precise, wrong number - the invoice not yet posted, the overhaul miscoded to the wrong cost centre, the stores issue that never reached the report. The extract ran, so it was trusted. Reconciliation is the one step that catches all of these, and there are three, each asking a different question. <em>Budget versus actual:</em> is this variance <strong>real</strong>, or is it a timing artefact - a missing accrual, an invoice not yet in? <em>ERP versus physical activity:</em> does the money match the <strong>work that actually happened</strong> - the work orders closed, the spares issued - or has cost appeared with no work, or has work happened with no cost yet booked (which you <em>accrue</em>)? <em>Period on period:</em> does this month make sense against the last, because <strong>a sudden drop is far more often missing data than a real saving</strong>. Run the three, resolve what they surface, and only then do you have a number instead of a rumour with a total.</p>
+<p>One honest boundary. Do not carry the shape of these errors as a charge against the person who ran the first extract. <strong>A wrong first-pass report is not the analyst being careless - timing lags, posting delays and coding slips are how ERPs actually behave, and reconciliation is precisely the disciplined thing a professional does because they know the raw extract lies.</strong> The skilled reporter is not the one whose extract is never wrong - it always is, at first - but the one who never submits it <em>unreconciled</em>. And when the reconciled number reaches the meeting, hold the second line just as hard: <strong>a variance is a question, not a verdict.</strong> "Under budget" can mean missing invoices as easily as good management, and "over budget" can mean necessary work was done - so a cost report must never be used to judge a person before it is reconciled and understood. The report exists to help someone act on reality, not to catch anyone out.</p>
+<p>Does it scale? A student checks their banking app and sees far more money than they expected, and feels rich for a day - until they remember the rent debit order and the loan repayment have not gone off yet. The balance was a real number and a false picture, for exactly the reason the cost report was: the costs already incurred had not yet posted. Reconcile the balance against what you know is coming, and you have the truth; act on the raw figure, and you overspend. A plant and a bank account are read the same way.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is the very report from your desk. The pump section, this month:</p>
+<table>
+<tr><th>Item</th><th>Figure</th></tr>
+<tr><td>Budget for the month</td><td>R500,000</td></tr>
+<tr><td>Raw extract "actual"</td><td>R300,000 (shown as 40% under budget)</td></tr>
+</table>
+<p>You know three facts the extract does not show: (i) three large overhaul work orders were <em>completed</em> this month; (ii) the stores issues for those overhauls - R120,000 of spares - were booked to the <em>wrong</em> cost centre and are missing from this report; (iii) the biggest contractor's invoice, R90,000 for work already done, has <em>not yet posted</em>.</p>
+<ol>
+<li><strong>Why is the headline suspect?</strong> In one sentence, say why "40% under budget" is a red flag, not good news.</li>
+<li><strong>Run the three reconciliations.</strong> Name what each one (budget-vs-actual, ERP-vs-physical, period-on-period) tells you here.</li>
+<li><strong>The accrual.</strong> State the one accrual you would make, and why an accrual is the honest thing to do.</li>
+<li><strong>The corrected figure.</strong> Give the true actual for the pump section this month, and the variance against budget.</li>
+<li><strong>The commentary.</strong> Write the one line you would put on the budget-versus-actual template - phrasing the variance as a <em>question</em>, not a verdict.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> five things.</p>
+<p>First, the suspicion: 40 per cent under budget in a month with three major overhauls is implausible - real work costs real money, so a big underspend almost certainly means cost is <em>missing</em> from the report, not saved.</p>
+<p>Second, the three reconciliations. <em>Budget-vs-actual:</em> the 40 per cent gap is too large to be real - a timing/completeness flag. <em>ERP-vs-physical:</em> three overhauls were completed, yet almost no material cost appears - the money does not match the work, so cost is miscoded or unbooked. <em>Period-on-period:</em> last month, with similar work, was near budget, so a sudden drop signals missing data, not a saving. All three point the same way: the report is incomplete.</p>
+<p>Third, the accrual: <strong>accrue the R90,000 contractor invoice</strong>, because the work was done <em>this</em> month and the cost belongs to this month even though the invoice has not posted yet - leaving it out would understate this period and overstate the next. Accruing puts the cost where the work happened.</p>
+<p>Fourth, the corrected figure: restore the miscoded R120,000 of spares and add the R90,000 accrual: R300,000 + R120,000 + R90,000 = <strong>R510,000</strong>, which against a R500,000 budget is <strong>R10,000, or about 2 per cent, over</strong> - a plausible, honest result for a heavy-overhaul month, and the exact opposite of the story the raw extract told.</p>
+<p>Fifth, the commentary reports the truth and opens an inquiry. For example: <em>"Pump section 2% over budget for the month, driven by three planned overhauls; is the overhaul programme running to plan, or is this the start of a trend we should look at?"</em> This phrasing reports the fact and poses a question for management, rather than either hiding behind a false underspend or landing a blame for the overspend.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-the_report_is_a_claim">1. The report is a claim - make it true before you make it</label><textarea id="cb-the_report_is_a_claim" data-key="t-0213:the_report_is_a_claim" placeholder="A cost report is not a clerical output you run off and pass on; it is a claim about reality that will be believed and acted on. A wrong report is worse than no report, because it makes someone confidently decide the wrong thing. Your job is not to run the extract - it is to make the claim true first, through a four-part discipline: know the sources, extract right, reconcile, present."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-know_what_feeds_it">2. Know what feeds the number</label><textarea id="cb-know_what_feeds_it" data-key="t-0213:know_what_feeds_it" placeholder="You cannot trust a total whose ingredients you cannot name. A maintenance cost report is fed by labour (work-order hours at a rate), materials and spares (stores issues + direct purchases), contractors and services (PO to goods receipt to invoice - not a cost until it posts), and allocations/overheads - all charged against a cost centre, work order or asset, and rolling up a hierarchy of plant, department, cost centre, equipment."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-extract_the_right_data">3. Extract the right data - the silent errors live here</label><textarea id="cb-extract_the_right_data" data-key="t-0213:extract_the_right_data" placeholder="Pulling the figures is a set of choices, and the wrong choice returns a wrong number that looks as clean as a right one. Set the dimension (cost centre / asset class / project), the period, and the date basis (posting vs document vs work date - the one that catches everyone). Do not confuse committed cost (a PO raised) with actual (an invoice posted). The silent errors: wrong date basis, committed-vs-actual, a missing cost element, a double-counted allocation, the wrong cost-centre node, open postings."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-reconcile">4. Reconcile - the step that catches the lie</label><textarea id="cb-reconcile" data-key="t-0213:reconcile" placeholder="The dangerous error is almost never arithmetic (the totals always add up); it is a timing, coding or completeness error in the source that the report faithfully totals into a confident wrong number. Reconcile three ways: budget vs actual (is the variance real or a timing artefact?), ERP vs physical activity (does the money match the work that actually happened? - accrue for work done but not yet invoiced), and period-on-period (a sudden drop is usually missing data, not a saving)."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-present_in_the_standard_template">5. Present in the standard template - and a variance is a question</label><textarea id="cb-present_in_the_standard_template" data-key="t-0213:present_in_the_standard_template" placeholder="Present the reconciled truth in the standard template the reader already knows: the period cost report (cost by centre and element), the budget-versus-actual report (budget, actual, variance, %, with commentary), the asset lifecycle-cost summary (cumulative cost over the asset life). A familiar shape lets the reader spot the anomaly. And hold the line: a variance is a question, not a verdict - never a stick to judge a person before it is reconciled and understood."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When the report tells the truth and the variance reads as a question, <strong>download or save it</strong> - it is yours. You can now hand over a number a manager can safely stand on.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The total always adds up. That is exactly why the total is not the thing to check. A cost report without reconciliation is a rumour with a total.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Submitting the raw extract.</strong> The extract is a first draft, not a report. It is always incomplete at first - posting lags and coding slips are how ERPs behave. Reconcile before you submit.</p>
+<p>&bull; <strong>Trusting a tidy total.</strong> A precise number from a big system looks authoritative whether it is right or wrong. The confidence is in the formatting, not the figure.</p>
+<p>&bull; <strong>The wrong date basis.</strong> Posting date, document date and work date are different, and choosing wrong mis-assigns cost between months. Know which date your extract used.</p>
+<p>&bull; <strong>Committed mistaken for actual.</strong> A purchase order raised is not a cost incurred. Mixing committed and actual over- or under-states the report.</p>
+<p>&bull; <strong>Extracting at the wrong cost-centre node.</strong> Too high in the hierarchy sweeps in other sections; too low misses charges. Pull at the level that matches the report.</p>
+<p>&bull; <strong>Missing an accrual.</strong> Work done but not yet invoiced still belongs to the period it happened in. Accrue it, or this month looks cheap and next month looks dear.</p>
+<p>&bull; <strong>Reading a too-good variance as good news.</strong> A large underspend in a busy month is usually missing cost, not saved cost. Treat the pleasant surprise as the loudest alarm.</p>
+<p>&bull; <strong>Using a variance as a stick.</strong> A variance is a question, not a verdict. Over budget can mean necessary work; under budget can mean unposted invoices. Reconcile and understand before anyone is judged.</p>
+<p>&bull; <strong>A non-standard template.</strong> A report in an unfamiliar shape hides its own anomalies. The standard template lets the reader spot what is wrong, which is part of the accuracy.</p>
+</div>
+</details>
+<p>The extract said the pump section was 40 per cent under budget, and it was tidy, precise, and false - because the biggest invoice had not posted and R120,000 of spares were miscoded away. Treat a cost report as a claim about reality and make it true before you make it: know the streams that feed it - labour, materials, contractors, allocations - so you notice what is missing; extract the right data, minding the dimension, the period, the date basis, and committed-versus-actual, because the silent errors live there; reconcile three ways - budget against actual, the money against the physical work, this period against the last - and accrue for work done but not yet invoiced; and present the reconciled truth in the standard template. <strong>A cost report without reconciliation is a rumour with a total - and a variance is a question, not a verdict, never a stick.</strong> The next time a number too good to be true lands on your screen an hour before the meeting, do not submit it and do not re-add it - reconcile it, and hand over a figure your manager can safely stand on.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can produce a cost report you can trust now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

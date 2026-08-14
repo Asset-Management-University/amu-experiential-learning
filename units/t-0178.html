@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The controller was not badly tuned. It was blind.</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The controller was not badly tuned. It was blind.</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The chlorine residual will not hold.</p>
+<p>You are Onalenna, and the loop has been retuned three times by three competent people. Each time it is better for a fortnight, and then it oscillates again. The operators have quietly put it in manual, because manual is more predictable than a controller that surprises them - and they are not wrong.</p>
+<p>You have been treating this as a tuning problem for a year.</p>
+<p>Then you work out the transport time through the contact tank, and the whole thing turns over. The tank holds 900 cubic metres. At normal flow, chlorine dosed <em>now</em> reaches the residual analyser in about <strong>seventy-two minutes</strong>.</p>
+<p>So when the flow changes, the controller does not respond badly. It does not respond <em>at all</em> - not for the better part of an hour - because it cannot see what has happened until the water carrying the consequence finally arrives at the instrument.</p>
+<p>The loop is not badly tuned. There is no set of numbers that fixes this. The controller is <strong>blind</strong>, and you have spent a year adjusting how hard a blind man is allowed to grab.</p>
+<blockquote><h2>My loop has been tuned three times and still oscillates, because it cannot see the disturbance until an hour after it happens. How do I design a control scheme that acts on what it knows rather than on what it is finally told?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Three tunings, three competent people, and the residual still swings. Here is the plant: the contact tank holds <strong>900 cubic metres</strong>, and at today's <strong>750 cubic metres an hour</strong> the water carrying the consequence of any dosing change takes the better part of an hour to reach the analyser. The mixing itself settles in minutes. And the flow driving all of this is <strong>already measured continuously</strong>, upstream, on an instrument nobody has connected to anything. Write down how you would design a scheme that actually controls this — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why no numbers can fix it</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Tune it again, more carefully — slower gains.&rdquo;</strong> Detuning trades oscillation for sluggishness: the loop stops hunting and stops responding. You have spent a year adjusting <strong>how hard a blind man is allowed to grab</strong>, and there is no setting that gives him sight.</p>
+<p>&bull; <strong>&ldquo;Move the analyser closer to the dosing point.&rdquo;</strong> Genuinely attacks the real problem, and it measures the wrong thing — the point of that analyser is the residual after contact, which is what the town receives. You would gain a fast loop controlling something that is not the requirement.</p>
+<p>&bull; <strong>&ldquo;Fit a better controller — something modern.&rdquo;</strong> A more sophisticated algorithm reading the same late information. The limitation is not in the arithmetic; it is in when the information arrives.</p>
+<p>&bull; <strong>&ldquo;Put it on manual and let the operators handle it.&rdquo;</strong> They will do better, because they watch the inlet flow and act on it — which is the answer, executed by hand, unrecorded, and only while somebody is watching.</p>
+<p>&bull; <strong>&ldquo;Add a second analyser and average them.&rdquo;</strong> Two late measurements instead of one. Averaging reduces noise and does nothing whatever about the delay.</p>
+<p>&bull; The reframe: <strong>the loop is not badly tuned, it is blind.</strong> So <strong>diagnose before selecting</strong>, because each cause has a different structural answer and choosing an architecture first is exactly how the wrong one gets installed. Ask what kind of difficulty this is. Does the delay between acting and seeing <strong>dominate</strong> the process's own response time — here, most of an hour against a few minutes, so plainly yes. Is there a large disturbance that could be <strong>measured directly</strong> — yes, and it already is. Is there a faster intermediate quantity you could control instead? Is the loop hitting a limit? Do several variables interact? Those answers, not a preference, choose the remedy. And the principle beneath them is worth more than any architecture: <strong>a controller acting only on the consequence of a disturbance cannot respond until that consequence has happened</strong> — so where the disturbance itself is measurable, act on it directly and the loop stops waiting to be told. Two cautions: take <strong>the simplest structure that answers the diagnosis</strong>, and <strong>document and bound it</strong>, because a clever scheme nobody understands is a hazard rather than an improvement.</p>
+</div>
+</details>
+<p>You stop tuning and start diagnosing. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the advanced control scheme - diagnosed, selected, documented and bounded.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Diagnose WHY the loop struggles (before choosing anything)</div><p class="cb-demo">Diagnose before you select, because each cause has a DIFFERENT architectural answer and choosing first is how the wrong scheme gets installed. Ask five questions. IS THE LOOP DEADTIME DOMINANT - is the total loop deadtime greater than the open-loop time constant? IS THERE A MAJOR MEASURABLE DISTURBANCE arriving at the input? IS THERE A FASTER INTERMEDIATE VARIABLE you could control instead? IS THE LOOP HITTING A CONSTRAINT? DO MULTIPLE VARIABLES INTERACT? For the chlorine residual loop: the contact tank holds 900 m3, so at 750 m3/h the transport deadtime to the residual analyser is 900/750 = 1.2 hours = 72 MINUTES, and at 1000 m3/h it is 54 MINUTES - against a mixing time constant of a few minutes. THE LOOP IS DEADTIME DOMINANT, and flow is a large, measurable input disturbance. That diagnosis, not a preference, selects what comes next.</p></div><div class="canvas-box"><div class="cb-label">2. Select the architecture that matches the cause</div><p class="cb-demo">Match architecture to diagnosis. CASCADE absorbs disturbances on an INTERMEDIATE variable, using a hierarchy in which the outer loop sets the setpoint of a faster inner loop. FEEDFORWARD addresses a KNOWN, MEASURABLE INPUT disturbance by acting BEFORE it reaches the controlled variable, and needs no secondary feedback loop - appropriate when the disturbance can be measured accurately and its effect is well understood. RATIO holds a proportion between streams. OVERRIDE or SELECT handles a CONSTRAINT. MPC uses a DYNAMIC model to predict future behaviour and optimise over a horizon, handling multiple interacting variables and constraints simultaneously - where feedforward uses only a STATIC model. Here the answer is FEEDFORWARD: dose = flow x target concentration, scaled the instant flow changes. AND THE DISCIPLINE: DEADTIME DOMINANCE IS NOT A JUSTIFICATION FOR MPC. The simplest architecture that addresses the diagnosed cause is the one still running in five years.</p></div><div class="canvas-box"><div class="cb-label">3. Keep feedback as the trim (models are never exact)</div><p class="cb-demo">The complementary architecture, stated properly: CASCADE absorbs disturbances on an intermediate variable, FEEDFORWARD addresses measurable input disturbances, and FEEDBACK TRIMS THE RESIDUAL ERROR. Keep the feedback controller - its job is now much easier, and it is what makes the scheme honest, because FEEDFORWARD ACTS ON A MODEL AND A MODEL IS NEVER EXACT. Without the trim, a small error in the dose-to-flow relationship becomes a permanent offset that nothing corrects. See what the pairing buys here: with feedback alone, a step from 750 to 1000 m3/h leaves the dose mass rate unchanged, so the residual falls to 0.8 x 750/1000 = 0.60 mg/L AND THE CONTROLLER CANNOT SEE IT FOR 54 MINUTES. With feedforward the residual holds at 0.8 and feedback corrects only the small model error. ONE CAUTION: deadtime compensators and MPC are EXTREMELY SENSITIVE TO MODEL MISMATCH - overestimating the deadtime by as little as 25 PER CENT can cause a large rise in integrated error and an erratic response.</p></div><div class="canvas-box"><div class="cb-label">4. The control narrative AND the logic diagram</div><p class="cb-demo">Two deliverables, and they decide whether the scheme survives. THE CONTROL NARRATIVE, in plain language: what the scheme does in NORMAL operation; what it does on each DISTURBANCE; WHAT IT DOES WHEN EACH MEASUREMENT FAILS - if the flow meter fails, does the feedforward freeze at its last value, fall back to a fixed dose, or hand over to feedback alone, and what is the operator told; how it behaves on MODE CHANGE and at STARTUP; and what the OPERATOR SHOULD DO in each case. THE LOGIC DIAGRAM sits beside it: the unambiguous visual map of instruments, signals, calculation blocks and controllers, showing what feeds what, so that anybody can build, commission and troubleshoot the scheme without inferring it from the narrative. A narrative without a diagram is incomplete, and a diagram without a narrative cannot be operated. And understand what these documents actually prevent: A SCHEME NOBODY UNDERSTANDS GETS SWITCHED TO MANUAL, which is the real failure mode of advanced control.</p></div><div class="canvas-box"><div class="cb-label">5. The safety boundary and graceful degradation</div><p class="cb-demo">Three non-negotiable design rules. FIRST: THE BASIC PROCESS CONTROL SYSTEM, INCLUDING ANY ADVANCED CONTROL SCHEME, EXISTS TO ENHANCE PERFORMANCE AND QUALITY. IT DOES NOT PROVIDE SAFETY. SECOND: THE SAFETY INSTRUMENTED SYSTEM EXISTS TO PROVIDE SAFETY. IT MUST BE INDEPENDENT OF THE BASIC PROCESS CONTROL SYSTEM, USING SEPARATE SENSORS, LOGIC SOLVERS AND FINAL ELEMENTS WHERE PRACTICABLE, TO PREVENT COMMON-CAUSE FAILURES. THIRD: YOUR CONTROL SCHEME MUST BE DESIGNED TO DEGRADE GRACEFULLY - ON THE FAILURE OF ANY SINGLE COMPONENT, SUCH AS A MEASUREMENT, THE SCHEME MUST AUTOMATICALLY REVERT TO A SIMPLER, PREDICTABLE, KNOWN-SAFE STATE WITHOUT REQUIRING IMMEDIATE OPERATOR INTERVENTION. Say it in one line to test your own design: an advanced control scheme should be a PERFORMANCE ENHANCER, NOT A SINGLE POINT OF FAILURE for quality or safety. If your scheme&#039;s failure would put unsafe water into the town, you have not designed a control scheme - you have designed a protection layer, badly, in the wrong place.</p></div></div>
+
+<p>Box 1 does the work that box 2 usually gets credit for. Once you have measured the deadtime and named the disturbance, the architecture chooses itself - and notice in box 2 that it chooses the <em>simplest</em> thing that addresses the cause, not the most impressive. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>The answer to a loop that will not behave is rarely a <em>better-tuned</em> controller. It is a <strong>better-informed</strong> one. Five questions:</p>
+<ul>
+<li><strong>Why does this loop struggle?</strong> Compare the total loop <strong>deadtime</strong> with the open-loop <strong>time constant</strong> - if deadtime dominates, no tuning will fix it. Then look for a measurable input <strong>disturbance</strong>, a faster <strong>intermediate variable</strong>, a <strong>constraint</strong>, or <strong>interacting</strong> variables. Each points somewhere different.</li>
+<li><strong>Which architecture matches?</strong> <strong>Cascade</strong> for an intermediate variable; <strong>feedforward</strong> for a measurable input disturbance, acting before it arrives; <strong>ratio</strong> for a proportion; <strong>override</strong> or <strong>select</strong> for a constraint; <strong>MPC</strong> where variables interact and constraints must be honoured together, using a <em>dynamic</em> model where feedforward uses only a <em>static</em> one.</li>
+<li><strong>What does feedback still do?</strong> It <strong>trims the residual error</strong>. Cascade absorbs the intermediate disturbance, feedforward handles the measured input, feedback keeps them honest - because a feedforward acts on a model and a model is never exact.</li>
+<li><strong>How will anyone operate it?</strong> The <strong>control narrative</strong> and the <strong>logic diagram</strong>, together. Neither is sufficient alone.</li>
+<li><strong>Where does it stop?</strong> The safety boundary, and how the scheme <strong>degrades gracefully</strong>.</li>
+</ul>
+<p><strong>Two cautions that experienced engineers get wrong.</strong> First, <em>deadtime dominance is not a justification for MPC</em> - it is a justification for measuring the disturbance, and reaching for the most complex available tool is a characteristic engineering error. Second, deadtime compensators and MPC are <em>extremely sensitive to model mismatch</em>: overestimating the deadtime by as little as twenty-five per cent can cause a large increase in integrated error and an erratic response. A sophisticated scheme built on a casually-measured model performs worse than the simple loop it replaced.</p>
+<p><strong>The three safety rules, which are not negotiable.</strong> One: the basic process control system, including any advanced control scheme, exists to enhance performance and quality - <em>it does not provide safety</em>. Two: the safety instrumented system exists to provide safety, and must be independent of the basic process control system, using separate sensors, logic solvers and final elements where practicable, to prevent common-cause failures. Three: your control scheme must be designed to <strong>degrade gracefully</strong> - on the failure of any single component, such as a measurement, it must automatically revert to a simpler, predictable, known-safe state without requiring immediate operator intervention.</p>
+<p>One honest boundary. You are selecting and documenting the <em>scheme</em>. You are not tuning the loops, not designing the safety instrumented system, and not configuring a control platform. Basic loop design and control theory come before this; the safety system is a separate discipline with its own standard - and the whole point of the boundary is that these two things must not quietly merge into one.</p>
+<p>Does it scale? A driver who keeps stalling on a hill does not need a firmer grip on the wheel. They need to see the hill coming. Every tuning session on a deadtime-dominant loop is an argument about grip, conducted by people who have not noticed that the windscreen is fogged - and the fix is not strength, it is information, delivered early enough to be worth having.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A filter backwash water heater at a treatment works. The loop controls <strong>outlet water temperature</strong> by throttling steam to a heat exchanger.</p>
+<ul>
+<li>The <strong>inlet water flow</strong> varies widely and unpredictably with backwash demand, and is <strong>measured</strong>.</li>
+<li>The <strong>steam supply pressure</strong> drifts through the day as other users draw on the header, so the same valve position delivers different steam energy at different times.</li>
+<li>Loop deadtime is about <strong>40 seconds</strong>; the open-loop time constant is about <strong>6 minutes</strong>.</li>
+<li>There is a hard constraint: the outlet must <strong>never exceed 60 degrees Celsius</strong>, for downstream equipment protection.</li>
+</ul>
+<ol>
+<li><strong>Diagnose.</strong> Is this loop deadtime dominant? Show the comparison. Then list every distinct control problem present.</li>
+<li><strong>Select.</strong> Choose an architecture for each problem you identified, and justify each against the alternatives.</li>
+<li><strong>Reject.</strong> Say why you would not simply use MPC here.</li>
+<li><strong>Narrate.</strong> Write three clauses of the control narrative, one of which must be a measurement-failure case.</li>
+<li><strong>Bound it.</strong> State how the 60 degree limit is handled in your scheme - and then say whether that is sufficient protection, and why.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things, and the last is the one that matters most.</p>
+<p>First, in step 1, do the comparison rather than assuming. Forty seconds against six minutes is <em>not</em> deadtime dominant - the time constant is roughly nine times the deadtime - so the reflex "add a deadtime compensator" is wrong here, and a well-tuned feedback loop can do real work. Diagnosis protects you from your own habits.</p>
+<p>Second, there are three separate problems in this loop and they have three different answers: a measurable input disturbance (the water flow), a disturbance on an intermediate variable (steam pressure affecting delivered energy), and a constraint (60 degrees). Feedforward, cascade and override respectively. A single architecture will not do, and that is normal.</p>
+<p>Third, step 5. If your answer is that the override controller handles the 60 degree limit, read the three safety rules again and ask what happens when the temperature transmitter fails. An override sits <em>in the control layer</em>. If exceeding 60 degrees genuinely damages equipment or endangers anyone, the protection belongs in an independent layer with its own sensor and final element - and your control scheme's job is to stay away from the limit, not to be the thing preventing the harm.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-diagnose_cause">1. Diagnose WHY the loop struggles (before choosing anything)</label><textarea id="cb-diagnose_cause" data-key="t-0178:diagnose_cause" placeholder="Measure the deadtime against the time constant and identify measurable disturbances, intermediate variables, constraints and interactions - each points to a different architecture."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-select_architecture">2. Select the architecture that matches the cause</label><textarea id="cb-select_architecture" data-key="t-0178:select_architecture" placeholder="Cascade for an intermediate variable, feedforward for a measurable input disturbance, ratio for a proportion, override for a constraint, MPC for interacting variables and constraints - simplest that solves the diagnosed problem."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-feedback_trim">3. Keep feedback as the trim (models are never exact)</label><textarea id="cb-feedback_trim" data-key="t-0178:feedback_trim" placeholder="Let the advanced element do the heavy lifting and leave feedback to correct the residual error, because every feedforward acts on a model that is only approximately right."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-narrative_and_diagram">4. The control narrative AND the logic diagram</label><textarea id="cb-narrative_and_diagram" data-key="t-0178:narrative_and_diagram" placeholder="Write what the scheme does normally, on each disturbance, on each measurement failure and on mode change - and draw the unambiguous signal map alongside it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-safety_boundary">5. The safety boundary and graceful degradation</label><textarea id="cb-safety_boundary" data-key="t-0178:safety_boundary" placeholder="State plainly that the scheme is for performance and not protection, keep the safety system independent, and specify how the scheme falls back to a known-safe simpler mode."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now fix the loop that tuning cannot.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Advanced control fails in ways that end, almost always, with the scheme in manual.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Tuning harder instead of diagnosing.</strong> Three retunes by three competent people is not a tuning problem. Measure the deadtime.</p>
+<p>&bull; <strong>Choosing the architecture before the diagnosis.</strong> Every cause has a different answer, and a scheme aimed at the wrong cause performs worse than the loop it replaced.</p>
+<p>&bull; <strong>Reaching for MPC by default.</strong> Deadtime dominance is not a justification for it. The simplest architecture that addresses the cause is the one still running in five years.</p>
+<p>&bull; <strong>Casually measured models.</strong> A deadtime overestimate of twenty-five per cent can produce erratic response. The model deserves as much care as the controller.</p>
+<p>&bull; <strong>Feedforward with no feedback trim.</strong> A model error then becomes a permanent offset that nothing corrects, and the scheme is blamed for the bias it was never allowed to fix.</p>
+<p>&bull; <strong>No control narrative.</strong> Nobody can operate what nobody can explain, and the first confusing shift ends in manual.</p>
+<p>&bull; <strong>No logic diagram.</strong> The narrative describes intent; the diagram is what someone builds, commissions and troubleshoots from.</p>
+<p>&bull; <strong>No measurement-failure behaviour.</strong> The one case that guarantees the scheme is abandoned, because it will happen and nobody will know what the scheme did.</p>
+<p>&bull; <strong>No graceful degradation.</strong> A scheme that fails into a state requiring diagnosis has handed the operator a puzzle at the worst moment.</p>
+<p>&bull; <strong>Relying on the control layer for protection.</strong> The control system is for performance. Protection is independent, with its own sensors and final elements.</p>
+<p>&bull; <strong>A scheme in manual with its benefits still in the business case.</strong> The outcome all of the above converge on, and it is usually discovered years later.</p>
+</div>
+</details>
+<p>Onalenna spent a year adjusting how hard a blind controller was allowed to grab. Diagnose why the loop struggles before selecting anything - compare deadtime with the time constant, and look for measurable disturbances, intermediate variables, constraints and interactions; match the architecture to the cause, choosing the simplest thing that addresses it rather than the most impressive; keep feedback as the trim, because every feedforward acts on a model and no model is exact; write both the narrative and the logic diagram, including what happens when each measurement fails; and hold the safety boundary, because the control system enhances performance while protection is independent, and your scheme must degrade gracefully to a known-safe state on its own. A scheme nobody understands ends up in manual, which is where advanced control goes to die. If you are working with an AMU Facilitator, take a loop your operators run in manual and ask them why - the answer is usually a diagnosis nobody ever wrote down.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can fix what tuning cannot now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

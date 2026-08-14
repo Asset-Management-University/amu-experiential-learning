@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The bearing was the last thing to break</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The bearing was the last thing to break</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The raw-water pump has had <strong>four bearing failures in two years</strong>.</p>
+<p>You are Onalenna, and each time the bearing was replaced with the same part, correctly fitted, by people who know what they are doing. Each time it lasted a few months. Nobody has been careless. There is no story here about a bad artisan or a cheap component.</p>
+<p>So you have the calculation done properly, and the numbers say the bearing is adequately rated for the load.</p>
+<p>Which somehow makes it worse - because now <em>nothing</em> explains it.</p>
+<p>Then you stop reading and go and look at the pump. It runs in a wet, gritty pit. The suction pipework pulls the casing very slightly out of line when the system is cold. And the seal is a simple lip seal that has been weeping for months, and is nobody's job in particular.</p>
+<p>And you understand what you have been doing for two years. You have been replacing the <em>consequence</em>. The bearing was never the problem. It was the last thing to break.</p>
+<blockquote><h2>My bearing is correctly rated, correctly fitted, and it keeps failing in months. How do I specify a bearing and a seal that suit the duty and the environment this machine actually lives in?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Two years of this. The bearing is correctly rated for the load, correctly fitted every time, and it fails within months — so often that replacing it is now a budgeted routine. Standing at the pump today you notice two things you have walked past for two years. The suction pipework pulls the casing very slightly out of line <strong>when the system is cold</strong>. And the lip seal has been weeping for months, into a wet and gritty pit, and is nobody's job in particular. Write down how you would specify this properly — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the order the selection has to run in</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Fit a higher-rated bearing.&rdquo;</strong> More capacity against a load that was never the problem. A better bearing in the same conditions fails the same way, slightly later, at more cost — which is how a two-year cycle survives being noticed.</p>
+<p>&bull; <strong>&ldquo;Improve the fitting procedure and the fitters' training.&rdquo;</strong> Worth doing in general and irrelevant here: the fitting has been good throughout. You would be correcting the one part of this that has never gone wrong.</p>
+<p>&bull; <strong>&ldquo;Shorten the replacement interval — change it before it fails.&rdquo;</strong> Converts an unplanned failure into a planned one and accepts the cause permanently. It also makes the problem invisible in the reliability figures.</p>
+<p>&bull; <strong>&ldquo;Fix the pipe strain.&rdquo;</strong> Genuinely one of the two causes, and on its own it leaves a degraded barrier admitting grit and water to a bearing in a wet pit.</p>
+<p>&bull; <strong>&ldquo;Replace the seal — it has been weeping for months.&rdquo;</strong> The other cause, and the same objection reversed. Notice why both were missed: <em>each is somebody else's item</em>, and neither is the part that keeps failing.</p>
+<p>&bull; What you have been doing is <strong>replacing the consequence.</strong> The bearing was never the problem; it was <strong>the last thing to break</strong>. So stop selecting a component and select a <strong>system</strong> — which changes what you establish first. Not the catalogue rating, but <strong>the duty this machine actually lives</strong> rather than the one on its nameplate: load with its direction, the shocks that come from starts and upsets rather than steady running, the misalignment that genuinely exists — named honestly, including thermal growth, pipe strain, settlement, and alignment done once and never again — and the dirt, water and temperature it sits in. Two consequences. <strong>Direction and misalignment eliminate whole families before any capacity calculation</strong>, so doing the arithmetic first means analysing candidates that were never eligible — your cold-condition misalignment rules some out on its own. And <strong>the barrier decides the life</strong>: a correctly chosen bearing in an environment its seal cannot exclude will fail on schedule, every time. Treat that seal as an accessory rather than as the part of the specification that determines the outcome, and you get exactly the two years you have had.</p>
+</div>
+</details>
+<p>You stop selecting a component and start selecting a system. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the documented selection - the duty, the families, the check, the seal, and the reasons.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Characterise the REAL duty (not the nameplate one)</div><p class="cb-demo">Everything downstream depends on this, and it is where selections go wrong before any calculation begins - because designers characterise the NAMEPLATE duty and the machine lives the REAL one. Establish: LOAD MAGNITUDE AND DIRECTION - radial, axial or combined - plus any SHOCK from starts, upsets or check-valve slam. SPEED. EXPECTED MISALIGNMENT, and be honest about its sources: thermal growth, pipe strain pulling the casing when the system is cold, foundation settlement, a coupling that is aligned once and never again. And THE ENVIRONMENT: contamination, moisture, temperature, washdown. For this raw-water pump: 8 kN radial at 1,450 rpm, minimal axial, occasional start-up shock, a wet and gritty pit, and suction pipework that pulls the casing slightly out of line when cold. Note that last item. It is not a detail; it eliminates entire bearing families in the next box.</p></div><div class="canvas-box"><div class="cb-label">2. Let load DIRECTION and misalignment eliminate families first</div><p class="cb-demo">Direction and misalignment eliminate FAMILIES; capacity only chooses within them - so do this first or you will spend the analysis on bearings that were never candidates. PREDOMINANTLY RADIAL points to deep groove ball or cylindrical roller. COMBINED radial and axial points to angular contact ball or tapered roller. PREDOMINANTLY AXIAL points to a thrust bearing, an angular contact ball, a tapered roller or a paired arrangement - the choice turning on the size and direction of the thrust, the speed, the stiffness required, the space available and whether a radial load is also present. AND WHERE MISALIGNMENT IS LIKELY, spherical roller or self-aligning ball bearings provide the necessary angular flexibility, because USING A RIGID BEARING IN A MISALIGNED APPLICATION ACCELERATES WEAR DRAMATICALLY. That single sentence explains a great many repeat failures in which the bearing was correctly rated and correctly fitted.</p></div><div class="canvas-box"><div class="cb-label">3. Check the speed limit - a bearing that survives the load can fail on heat</div><p class="cb-demo">A type that comfortably satisfies the load can still be the wrong answer, because SPEED DIRECTLY INFLUENCES HEAT GENERATION AND LUBRICATION FILM FORMATION, and EACH BEARING TYPE HAS A DEFINED SPEED LIMIT BEYOND WHICH HEAT BUILD-UP BECOMES PROBLEMATIC. So check the duty speed against the limiting speed for the type and arrangement, and think about what the heat does: it thins the lubricant, which thins the film, which brings the surfaces closer, which generates more heat. At 1,450 rpm this pump is undemanding and every candidate family clears the limit comfortably - which is exactly why this check gets skipped, and exactly why it surprises people on the machine where it matters. Do it every time, and record that you did, because the next engineer cannot tell the difference between a check that passed and a check that was never made.</p></div><div class="canvas-box"><div class="cb-label">4. The ISO 281 check - and why TYPE beats size</div><p class="cb-demo">ISO 281 gives the BASIC RATING LIFE: L10 = (C/P)^p x 10^6 revolutions, where C is the basic dynamic load rating, P the equivalent dynamic load, and p = 3 FOR BALL bearings but 10/3 FOR ROLLER bearings. In hours, L10h = (C/P)^p x 10^6 / (60n). Run both surviving candidates at P = 8 kN and n = 1,450 rpm. A DEEP GROOVE BALL bearing with C = 52 kN: C/P = 6.50, and 6.50^3 = 274.6, so L10 = 3,157 HOURS - about four months. A CYLINDRICAL ROLLER bearing with C = 93 kN: C/P = 11.625, and 11.625^(10/3) = 3,559, so L10 = 40,906 HOURS - about 4.7 YEARS. THAT IS A THIRTEEN-FOLD DIFFERENCE IN LIFE, on the same shaft and the same duty, from choosing the TYPE - the exponent and the rating together - and not from spending more money. Reach for a different type before you reach for a bigger one.</p></div><div class="canvas-box"><div class="cb-label">5. Select the seal against the environment - then document the whole selection</div><p class="cb-demo">Now the part that usually decides the outcome. SPECIFYING A BEARING WITH INADEQUATE SEALING FOR A CONTAMINATED ENVIRONMENT IS A COMMON OVERSIGHT - and bearings that already incorporate appropriate seals can eliminate the need for external sealing arrangements altogether. Choose against the environment: CONTACT seals exclude contamination well and add friction and heat, so they suit lower speeds and dirty duty; NON-CONTACT seals add almost no friction and suit higher speeds and cleaner service. Remember the failure list - contamination, poor lubrication, misalignment, wrong fit, incorrect clearance, excessive preload, installation damage, shock, corrosion, overheating - and note how many are things a seal governs. Note too that BOTH OVER- AND UNDER-LUBRICATION cause failure. THEN DOCUMENT IT: the duty assumptions, the type chosen, THE ALTERNATIVES REJECTED AND WHY, the seal, the lubrication regime and the life calculation. And match the rigour to the consequence - on this pump a failure costs availability, while on a ventilation fan, a hoist or a steering system it threatens life, and the conservatism of your assumptions must rise accordingly.</p></div></div>
+
+<p>Look at box 4 before anything else. Same shaft, same duty, same load - and thirteen times the life, from choosing a different <em>type</em> rather than a bigger one or a dearer one. Then look at box 5, which is what would have decided this pump's fate regardless. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You do not select a bearing. You select a <strong>bearing-and-seal system</strong> for a duty and an environment - and the seal usually decides how long any of it lasts. Five questions:</p>
+<ul>
+<li><strong>What is the real duty?</strong> Load magnitude <em>and direction</em>, shock, speed, expected <strong>misalignment</strong> (thermal growth, pipe strain, settlement), and the environment. Designers characterise the nameplate duty; the machine lives the real one.</li>
+<li><strong>Which families survive?</strong> Direction and misalignment <em>eliminate families</em>; capacity only chooses within them. Radial to deep groove ball or cylindrical roller; combined to angular contact or tapered roller; axial to thrust or paired arrangements. And where misalignment is likely, <strong>spherical roller or self-aligning ball</strong> - because a rigid bearing in a misaligned application accelerates wear dramatically.</li>
+<li><strong>Can it run at that speed?</strong> Speed governs <strong>heat generation and film formation</strong>, and every type has a defined speed limit beyond which heat build-up becomes problematic.</li>
+<li><strong>What does ISO 281 say?</strong> <strong>L10 = (C/P)<sup>p</sup> x 10<sup>6</sup></strong> revolutions, with <em>p = 3 for ball</em> and <em>10/3 for roller</em>. Compare <em>types</em>, not just sizes - the exponent alone changes the answer enormously.</li>
+<li><strong>What keeps the dirt out?</strong> Contact or non-contact sealing chosen against the environment - and then the <strong>documented selection</strong>, including the alternatives you rejected and why.</li>
+</ul>
+<p><strong>Why the seal deserves equal billing.</strong> Read the list of what actually kills bearings prematurely: contamination, poor lubrication, misalignment, wrong shaft or housing fit, incorrect internal clearance, excessive preload, installation damage, shock loading, corrosion, overheating. Count how many of those a seal governs, directly or indirectly. Specifying a bearing with inadequate sealing for a contaminated environment is a common oversight - and bearings that already incorporate appropriate seals can eliminate the need for external sealing arrangements entirely. Note also that <em>both</em> over-lubrication and under-lubrication cause failures: excess grease generates heat and churning losses, while too little allows metal-to-metal contact.</p>
+<p><strong>And match the rigour to the consequence.</strong> On this raw-water pump, a bearing failure costs availability and money. On a ventilation fan, a crane hoist or a steering system, the same failure threatens life. The depth of your analysis, the conservatism of your assumptions and the quality of your documentation must rise with the severity of what failure would do - that is not perfectionism, it is proportion, and it is a professional obligation rather than a preference.</p>
+<p>One honest boundary. You are specifying the <em>types</em> - bearing and seal - and documenting the selection. You are not performing detailed life analysis beyond this selection check, not choosing the lubricant grade, and not diagnosing an existing failure. Any competent engineer can run the ISO 281 calculation; the skill being taught here is asking the right questions <em>before</em> reaching for the calculator, so that whatever you choose has a fighting chance in the place it will actually live.</p>
+<p>Does it scale? It is choosing footwear for a journey rather than for a shoe size. The size question is real and it is the easy part; the journey - how far, how fast, over what ground, in what weather - decides the type, and no amount of getting the size right rescues a choice made for the wrong terrain.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A works is refurbishing the drive end of a <strong>belt-driven sludge conveyor</strong>. The duty:</p>
+<ul>
+<li><strong>Load:</strong> 14 kN radial from belt tension, plus a small axial component; noticeable shock at start-up under a loaded belt.</li>
+<li><strong>Speed:</strong> 320 rpm.</li>
+<li><strong>Installation:</strong> the drive is mounted on a fabricated frame that flexes under load, and the two plummer blocks have never held alignment between overhauls.</li>
+<li><strong>Environment:</strong> open to the atmosphere, sludge splash, hosed down weekly, ambient 5 to 40 degrees Celsius.</li>
+<li><strong>Candidates:</strong> a deep groove ball bearing with C = 62 kN, or a spherical roller bearing with C = 190 kN.</li>
+</ul>
+<ol>
+<li><strong>Characterise.</strong> Restate the duty in the terms of box 1, and identify which single feature of this installation most constrains the choice.</li>
+<li><strong>Eliminate.</strong> Say which family survives and why, before doing any arithmetic.</li>
+<li><strong>Calculate.</strong> Compute L10 in hours for both candidates. Use p = 3 for the ball bearing and 10/3 for the spherical roller.</li>
+<li><strong>Seal it.</strong> Choose contact or non-contact sealing and justify it against this environment.</li>
+<li><strong>Document.</strong> Write the four lines of your selection record - duty, choice, rejected alternative and reason, seal.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, do step 2 before step 3 and notice what happens. The frame flexes and the plummer blocks do not hold alignment - so misalignment is not a risk here, it is a <em>guarantee</em>, and that alone rules out the rigid deep groove ball bearing however the arithmetic turns out. If you calculated first, you will have been tempted by a number for a bearing that was never a candidate.</p>
+<p>Second, run the numbers anyway and then think about what they did and did not tell you. Here the arithmetic happens to agree with you - the ball bearing comes out at roughly four and a half thousand hours, about six months, while the spherical roller comes out enormous - so a learner who calculated first would probably have arrived somewhere sensible by luck. That is the danger. The misalignment ruled the ball bearing out regardless of its life figure, and on the next machine the arithmetic will look comfortable and the installation will still destroy it, exactly as it destroyed Onalenna's correctly-rated pump bearing four times. A calculation that agrees with the right answer is not the same as a calculation that found it.</p>
+<p>Third, the environment in step 4 is sludge splash and weekly hosing. Ask yourself honestly what a low-friction non-contact arrangement is going to do about a pressure washer, and what the friction penalty of a contact seal actually costs at 320 rpm. Slow, dirty, wet duty is the easiest sealing decision in engineering, and it is still routinely got wrong.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-characterise_duty">1. Characterise the REAL duty (not the nameplate one)</label><textarea id="cb-characterise_duty" data-key="t-0174:characterise_duty" placeholder="Establish load magnitude and direction, shock, speed, expected misalignment and the environment the machine actually lives in."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-eliminate_families">2. Let load DIRECTION and misalignment eliminate families first</label><textarea id="cb-eliminate_families" data-key="t-0174:eliminate_families" placeholder="Use direction of load and tolerance of misalignment to rule whole bearing families in or out before considering any capacity number."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-speed_and_heat">3. Check the speed limit - a bearing that survives the load can fail on heat</label><textarea id="cb-speed_and_heat" data-key="t-0174:speed_and_heat" placeholder="Confirm the type can run at the duty speed, remembering that speed governs heat generation and whether a lubricant film forms at all."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-iso281_check">4. The ISO 281 check - and why TYPE beats size</label><textarea id="cb-iso281_check" data-key="t-0174:iso281_check" placeholder="Run the basic rating life for the surviving candidates and compare types, not just sizes."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-seal_and_document">5. Select the seal against the environment - then document the whole selection</label><textarea id="cb-seal_and_document" data-key="t-0174:seal_and_document" placeholder="Choose contact or non-contact sealing for the environment, then record the duty, the choice, the rejected alternatives and the reasons."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now specify a machine element that survives where it is going.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Bearing selections fail in ways the calculation never sees.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Characterising the nameplate duty.</strong> The machine lives the real one - with the starts, the upsets, the pipe strain and the thermal growth nobody wrote down.</p>
+<p>&bull; <strong>Selecting on load magnitude and ignoring direction.</strong> Direction decides the family. Magnitude only chooses within it.</p>
+<p>&bull; <strong>Ignoring misalignment.</strong> Then fitting a rigid bearing into a machine that guarantees it, which accelerates wear dramatically and produces exactly the repeat failure that has no apparent cause.</p>
+<p>&bull; <strong>Skipping the speed check.</strong> A type that satisfies the load can still fail on heat, and the check is cheap.</p>
+<p>&bull; <strong>Reaching for a bigger bearing of the same type.</strong> A different type is often the answer, and the exponent alone can be worth more than any amount of extra capacity.</p>
+<p>&bull; <strong>Treating the seal as an accessory.</strong> Count how many of the standard failure causes a seal governs. In dirty service the seal decides the outcome and the bearing merely records it.</p>
+<p>&bull; <strong>Inadequate sealing for a contaminated environment.</strong> A common oversight with a long history, and often avoidable by choosing a bearing that incorporates appropriate seals in the first place.</p>
+<p>&bull; <strong>Assuming more lubricant is safer.</strong> Both over- and under-lubrication cause failures - excess grease generates heat and churning losses.</p>
+<p>&bull; <strong>Documenting the choice without the rejected alternatives.</strong> The next engineer then repeats your analysis, or repeats the mistake you avoided and never recorded.</p>
+<p>&bull; <strong>Applying the same rigour regardless of consequence.</strong> A conveyor bearing and a hoist bearing deserve different depths of analysis, and knowing which is which is part of the job.</p>
+</div>
+</details>
+<p>Onalenna replaced the same bearing four times in two years and it was never the problem. Characterise the duty the machine actually lives, including the misalignment its installation guarantees; let load direction and misalignment eliminate whole families before any capacity is considered; check the speed, because heat kills bearings that the load never would; run ISO 281 across TYPES rather than sizes, since a different type gave thirteen times the life on the same shaft; and choose the seal against the environment, because in dirty service the seal decides how long the bearing lasts and the bearing merely records the verdict. Then document it - including what you rejected and why - and match your rigour to what failure would cost. If you are working with an AMU Facilitator, take a machine at your works with a repeat bearing failure and go and look at it: at the alignment, at the environment, and at the seal.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can specify something that survives where it is going now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

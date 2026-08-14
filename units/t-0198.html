@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everyone knew, and nobody moved</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Everyone knew, and nobody moved</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna. The change is decided - the works is moving to a new maintenance management system - and the communications plan is approved. It is a professional piece of work: a schedule of emails, two newsletters, a launch town hall, all on-brand, all on time. Nobody could object to a line of it.</p>
+<p>Six weeks in, the pulse survey lands. <strong>Ninety per cent of the workforce know the change is coming. Just over half can say what it will mean for their own Monday morning. A third think it is worth doing. Barely a fifth have touched the new system.</strong></p>
+<p>You read the plan again, and this time you see it. <em>Every single item on it is a version of the same announcement.</em> Four more emails and two more newsletters, all telling people something they already know.</p>
+<blockquote><h2>Almost everyone knows this is happening and most people do not know what to do about it. How do I write a plan that moves people, instead of one that tells them the same thing until they stop reading?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The survey came back. <strong>Nearly everyone</strong> knows the change is coming. <strong>Just over half</strong> can say what it will mean for their own Monday morning. <strong>A third</strong> think it is worth doing. <strong>Barely a fifth</strong> have touched the new system. Then you read your own plan for the next three months and see it: <strong>every single item on it is a version of the same announcement.</strong> Four more emails and two more newsletters, all telling people something they already know. And the night shift and the outstation crews have not been in a room with anybody about this at all. Write down what a plan that moves people looks like — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what information can and cannot do</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Communicate more — clearly the message is not landing.&rdquo;</strong> It landed. Nearly everyone knows. More of the thing that produced your best number will not move the numbers that are poor.</p>
+<p>&bull; <strong>&ldquo;Make it mandatory and set a deadline.&rdquo;</strong> Can produce use and cannot produce the last stage — people doing it when nobody is watching — and it will be resented by the two-thirds who have not yet been given a reason.</p>
+<p>&bull; <strong>&ldquo;Improve the training.&rdquo;</strong> Addresses <em>able</em>, which is a real gap at a fifth. It will not help the two-thirds who do not yet think it worth doing, and training people who see no point is how you get attendance without adoption.</p>
+<p>&bull; <strong>&ldquo;Get the general manager to send a strong message.&rdquo;</strong> Authority on a broadcast channel, which is the right tool for awareness — the stage you have already won — and a poor one for acceptance, which is a conversation.</p>
+<p>&bull; <strong>&ldquo;They are resistant — some people always are.&rdquo;</strong> A third think it is worth doing, which means two-thirds have not been persuaded rather than refused. Reading that as resistance is how you stop looking for the reason.</p>
+<p>&bull; The mistake is treating this as an information problem: <strong>information changes what people know and does not change what they do.</strong> So map people not by the organisation chart but by <strong>where they are on the journey</strong> — knowing it is coming, understanding what it means for their own Monday, accepting it is worth doing, being able to do it, and being committed enough to keep doing it unwatched. Different groups sit in different places, and <strong>the distance between where a group is and where it needs to be is the only thing the plan is for.</strong> Read your four numbers that way and they stop being a disappointment and become a diagnosis: you have been solving, four more times, the stage everybody had already passed. Two disciplines follow. <strong>Match the channel to the stage</strong> — broadcast is fine for awareness and useless for acceptance, which needs somebody credible, in person, answering the question actually being asked. And build in <strong>a listening half</strong>, because the gaps left by silence get filled by rumour, and what people are actually saying is the only measurement that tells you which stage they are in — which is also how you will find that the night shift is nowhere on your map.</p>
+</div>
+</details>
+<p>Here is the plan that answers it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the change communications plan - the groups mapped by journey, the message each needs next, stage matched to channel, transitions with a listening half, and the gaps rumour fills.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Map the groups by where they are on the journey, not by the org chart</div><p class="cb-demo">A CHANGE COMMUNICATIONS PLAN IS NOT AN INFORMATION-DISTRIBUTION PLAN, AND EVERYTHING GOES WRONG THE MOMENT IT IS TREATED AS ONE. INFORMATION CHANGES WHAT PEOPLE KNOW; IT DOES NOT CHANGE WHAT THEY DO. So do not start from a list of who to email. Start from a map of where people actually are on the journey every human being makes through a change: AWARE that it is coming, then UNDERSTAND what it means for their own job, then ACCEPT that it is worth doing, then ABLE to do the new thing, then COMMITTED enough to keep doing it when nobody is watching. These are plain descriptions of how people change, and each stage is a DIFFERENT PLACE with a DIFFERENT NEED. Take the stakeholder groups you already identified - and if you have not, that mapping is a technique of its own and you do the register and the power-interest analysis there first, not here - and re-plot each group by which stage it has reached and which stage it needs to reach. THE DISTANCE BETWEEN THOSE TWO IS THE ONLY THING THE PLAN IS FOR. At Corathyl the workforce of 140 rolling onto the new maintenance system splits into control-room operators, field technicians, planners and stores, and the night-shift and outstation crews. At week six a pulse survey puts 90 PER CENT AWARE, 52 PER CENT ABLE TO SAY WHAT CHANGES FOR THEIR OWN JOB, 38 PER CENT BELIEVING IT WORTH DOING, AND 22 PER CENT HAVING ACTUALLY PRACTISED IT. Look at the shape of that: almost everyone is at the first stage and the numbers fall away fast after it. THE PLAN&#039;S JOB IS THE FALLING-AWAY, NOT THE FIRST NUMBER - and you cannot even see the falling-away if your map is the org chart, because the org chart tells you who reports to whom and nothing about who is stuck where. AND KNOW THAT THE JOURNEY IS NOT ALWAYS A STRAIGHT LINE - PEOPLE CAN SLIP BACK A STAGE, AND SOMEONE CAN BE ABLE WITHOUT BEING COMMITTED OR COMMITTED WITHOUT BEING FULLY ABLE. THE MAP IS A SNAPSHOT OF WHERE THEY ARE NOW, NOT A CLAIM THAT THEY MARCH THROUGH THE STAGES IN ORDER.</p></div><div class="canvas-box"><div class="cb-label">2. Write the one message each group needs NEXT - honestly, including the bad news</div><p class="cb-demo">NOW WRITE THE MESSAGES, ONE PER GROUP, AND WRITE ONLY THE ONE THAT MOVES THAT GROUP TO ITS NEXT STAGE. A group that is aware but does not understand does not need to be told again that the change is coming - it needs to be told, in concrete terms, WHAT WILL BE DIFFERENT ABOUT ITS OWN MONDAY MORNING. THE SINGLE STRONGEST DRIVER OF RESISTANCE IS AN UNANSWERED &#039;WHAT IS IN IT FOR ME&#039; - the person cannot see why the change is needed or what it means for them personally - AND HERE IS THE THING MOST PLANS GET EXACTLY BACKWARDS: THE MESSAGE THAT ACTUALLY GOVERNS SOMEONE&#039;S BEHAVIOUR IS NOT THE ONE YOU SENT. IT IS THE &#039;WHAT DOES THIS MEAN FOR ME&#039; THEY CONSTRUCTED WHEN YOURS WAS ABSENT OR VAGUE. SILENCE IS NOT NEUTRAL. People fill it, and they fill it with the worst plausible reading, because the worst reading is the safe one to prepare for. In one documented case a workforce heard a vague efficiency message and concluded the robots were taking their jobs, when the actual plan was to reduce their workload and cut nobody - and by the time the real message arrived, it was arguing with a story that had a six-week head start. SO WRITE THE HONEST &#039;WHAT THIS MEANS FOR YOU&#039;, AND PUT THE BAD NEWS IN IT. If a role is changing, say how. If some tasks are going, say which. YOU ARE NOT BROADCASTING INTO A VACUUM, YOU ARE COMPETING WITH A STORY PEOPLE HAVE ALREADY WRITTEN, and the only message that beats a frightening rumour is a true one that is less frightening BECAUSE it is specific. A message that hides the bad news does not remove the fear; it removes your credibility and leaves the fear exactly where it was.</p></div><div class="canvas-box"><div class="cb-label">3. Match each stage to the right channel and the right messenger</div><p class="cb-demo">THE STAGE DECIDES THE CHANNEL AND THE MESSENGER, AND GETTING THIS WRONG IS WHY BEAUTIFUL PLANS FAIL. AWARENESS IS MOVED BY BROADCAST - email, newsletter, a notice, a town hall. Broadcast is cheap, fast and reaches everyone, and for the single job of making people aware that something is coming, it is exactly right. BUT ACCEPTANCE IS NOT RELIABLY MOVED BY BROADCAST. No email has ever changed anyone&#039;s mind about whether a change is worth doing, because acceptance is built by a TRUSTED PERSON ANSWERING A REAL QUESTION IN A SMALL ROOM - and the trusted person is almost always the immediate line manager, not the programme director and not the chief executive, because people accept change from the person who will still be there on Monday. ABILITY IS MOVED BY DOING - hands-on practice, a sandbox, someone at your elbow the first time. AND REINFORCEMENT, THE LAST STAGE, IS MOVED BY WHAT LEADERS NOTICE AND REWARD, not by what they announce. SO THE COMMONEST AND MOST EXPENSIVE ERROR IN THE WHOLE DISCIPLINE IS USING AN EMAIL TO DO A CONVERSATION&#039;S JOB - trying to move a stalled, sceptical group to acceptance by sending them a better-written version of the announcement they already ignored. It cannot work, because the channel is wrong for the stage, and no amount of polish fixes a channel mismatch. THIS ALSO MEANS THE PLAN CANNOT BE DELIVERED BY THE COMMUNICATIONS FUNCTION ALONE. The line managers are the channel for the most important stage, which means the plan has to EQUIP THEM - give them the honest answers, including the answers to the hard questions, before their people ask - or they will improvise, and half of them will improvise badly, and the other half will say &#039;I don&#039;t know either&#039;, which is the single most corrosive sentence a manager can say during a change.</p></div><div class="canvas-box"><div class="cb-label">4. Schedule by what must be true by when - and build the two-way channel</div><p class="cb-demo">NOW BUILD THE SCHEDULE, AND BUILD IT AS STAGE-TRANSITIONS WITH DATES RATHER THAN AS A LIST OF THINGS TO SEND. Not &#039;week 7, all-staff email&#039;, but &#039;by week 8, the night-shift crews can each state what changes for their own role&#039; - a condition that must be TRUE, with the message, channel and messenger chosen to make it true, and a way to check whether it happened. This is where the approved Corathyl plan falls apart on inspection. ITS NEXT SIX WEEKS ARE FOUR MORE ALL-STAFF EMAILS AND TWO NEWSLETTERS - SIX BROADCAST INSTRUMENTS, EVERY ONE OF THEM AN AWARENESS-STAGE TOOL. But awareness is already at 90 per cent; there are only FOURTEEN people left to make aware. SO THE PLAN SENDS SIX MESSAGES TO 140 PEOPLE - 840 MESSAGE-TOUCHES - EFFECTIVELY AIMED AT THE FOURTEEN NOT YET AWARE, WHICH IS SIXTY TOUCHES PER UNAWARE PERSON, WHILE THE FIFTY-THREE PEOPLE WHO ARE AWARE BUT CANNOT SAY WHAT CHANGES FOR THEIR JOB GET NOTHING NEW. The plan is busiest exactly where the work is already done. AND NOW THE HALF OF THE PLAN THAT MOST PLANS DO NOT HAVE AT ALL: THE LISTENING HALF. You do not know which interpretation has formed in people&#039;s heads unless you build a way to hear it. TWO-WAY COMMUNICATION IS NOT A COURTESY THAT IMPROVES BUY-IN; IT IS THE ONLY INSTRUMENT THAT TELLS YOU WHETHER THE PLAN IS WORKING. The pulse survey is one channel. The line managers reporting back what their people actually asked is a better one, because it carries the questions in the words people used. A PLAN WITH NO LISTENING MECHANISM IS FLYING BLIND, and it will keep broadcasting confidently into a silence it cannot hear filling up.</p></div><div class="canvas-box"><div class="cb-label">5. Find the gaps rumour is filling - and measure arrival, never dispatch</div><p class="cb-demo">TWO LAST DISCIPLINES, AND THEY ARE THE ONES THAT SEPARATE A PLAN THAT WORKS FROM ONE THAT LOOKS BUSY. FIRST, GO LOOKING FOR THE GAPS RUMOUR IS ALREADY FILLING. Make an explicit list of the questions people are certainly asking each other that the plan has not answered: is anyone losing their job, is anyone losing overtime, will the new system be used to monitor us, what happens to the people who cannot pick it up. THE UNASKED-BUT-UNIVERSAL QUESTIONS ARE WHERE RUMOUR LIVES, and every one you leave open is a gap a frightening story will fill for free. Close the worst ones first, by name. Even when a full answer cannot be given yet for legal or commercial reasons, ACKNOWLEDGING THE QUESTION AND SAYING WHAT YOU CAN SAY IS BETTER THAN SILENCE, because a specific, bounded truth - even an uncomfortable one - is less corrosive than an unbounded fear. And notice WHO the plan has been missing: at Corathyl the night-shift and outstation group of 40 sits at 78 PER CENT AWARE AND 30 PER CENT UNDERSTAND - 31 aware, only 12 who understand - because every briefing was held in daytime at the main works. THE PEOPLE WHOSE JOBS CHANGE MOST WERE THE ONES THE PLAN REACHED LEAST, for the plainest of reasons: nobody scheduled a session when they were awake and present. SECOND, MEASURE THE RIGHT THING. THE MEASURE OF A CHANGE COMMUNICATIONS PLAN IS MOVEMENT ALONG THE JOURNEY, NEVER MESSAGES SENT. &#039;We issued twelve communications&#039; is a report of activity, not of effect; &#039;acceptance in the field crews went from 30 to 55 per cent&#039; is the only kind of sentence that means anything. Count arrival, not dispatch. AND HOLD ON TO WHY YOU ARE DOING ANY OF THIS: A CHANGE COMMUNICATIONS PLAN IS AN ACT OF SERVICE TO THE PEOPLE NAVIGATING THE CHANGE, NOT A TOOL TO MANAGE THEIR RESISTANCE. The moment it becomes the second thing, people feel it, and you have handed the last of your credibility to the rumour.</p></div></div>
+
+<p>Box 3 is where most plans use an email to do a conversation's job. Box 5 is where you measure the only thing that matters. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>Your job is not to broadcast a message. It is to help each person complete their journey from uncertainty to capability.</strong> Five questions:</p>
+<ul>
+<li><strong>Where is each group on the journey?</strong> <strong>Aware, understand, accept, able, committed</strong> - re-plot the stakeholder map by stage, not by department. The distance between where a group is and where it needs to be is the whole plan.</li>
+<li><strong>What message does each group need next?</strong> <strong>The honest "what does this mean for you", bad news included</strong> - because you are competing with a story people have already written.</li>
+<li><strong>Who carries it, and how?</strong> <strong>Broadcast for awareness; the line manager in a small room for acceptance; hands-on for ability.</strong> Do not use an email to do a conversation's job.</li>
+<li><strong>What must be true by when?</strong> <strong>Stage-transitions with dates, and a listening half</strong> - how you will hear which interpretation actually formed.</li>
+<li><strong>What is rumour filling, and are we counting the right thing?</strong> <strong>Close the unasked questions; measure movement, never messages sent.</strong></li>
+</ul>
+<p><strong>The arithmetic of a plan that is busiest where the work is already done.</strong> Corathyl's 140 affected staff, at week six: <strong>126 aware (90%), 73 who understand (52%), 53 who accept (38%), 31 who have practised (22%)</strong>. The numbers fall away fast after the first stage, and the falling-away is the plan's entire job. Yet the next six weeks are <strong>four more all-staff emails and two newsletters - six broadcast instruments, every one an awareness-stage tool</strong>. Awareness is already at 90 per cent; there are <strong>fourteen people left to make aware</strong>. So the plan sends six messages to 140 people - <strong>840 message-touches - effectively aimed at those fourteen, which is sixty touches per unaware person</strong>, while the fifty-three who are aware but cannot say what changes for their job get nothing new. And the stall is not even: the night-shift and outstation group of 40 sits at <strong>78 per cent aware and 30 per cent understand</strong>, because every briefing was held in daytime at the main works. <em>The people whose jobs change most were the ones the plan reached least.</em></p>
+<p><strong>Why the second duty is the cost of failing the first.</strong> The message that actually governs someone's behaviour is not the one you sent. It is the "what does this mean for me" they built when yours was absent or vague. <em>Silence is not neutral</em> - people fill it, with the worst plausible reading, because the worst reading is the safe one to prepare for. A workforce given a vague efficiency message concluded the robots were taking their jobs, when the plan was to cut their workload and nobody's post - and by the time the true message arrived it was arguing with a story that had a six-week head start. So the honest, specific "what this means for you", bad news included, is not a nicety. <strong>The only message that beats a frightening rumour is a true one that is less frightening because it is specific</strong>, and a message that hides the bad news does not remove the fear - it removes your credibility and leaves the fear where it was.</p>
+<p><strong>And the ethical spine, which is not optional.</strong> <em>A change communications plan is an act of service to the people navigating the change, not a tool to manage their resistance.</em> People are not resistance to be overcome; their questions are the agenda, not the obstacle. Trust is the currency of change, and a plan that leans on spin, half-truths or hidden bad news is not a communications plan - it is an act of self-sabotage that hands every last scrap of credibility to the rumour. Two-way communication is not a courtesy that improves buy-in; it is the only instrument that tells you whether any of this is working.</p>
+<p>One honest boundary. You plan and enable the communication; you did not decide the change and you must not spin it. <em>Your plan must survive contact with the truth</em> - if it only works while people are misled, it is not a communications plan, it is the rumour's ally.</p>
+<p>Does it scale? Telling someone a fact and changing what they do on Monday are two different acts, and everyone knows it from their own life - you have been told a hundred true things this year that changed nothing you did. The bridge is not from uninformed to informed. It is from "what does this mean for me" to "I know what to do, and I believe it is worth doing", built one honest conversation at a time.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Another organisation, a year into a depot modernisation, hands you its change communications plan for review. It is <strong>beautifully produced</strong>.</p>
+<table>
+<tr><th>The plan</th><th>What it contains</th></tr>
+<tr><td>Title</td><td>"Our Journey to a Brighter Tomorrow: A Communications Roadmap"</td></tr>
+<tr><td>Vision statement</td><td>Three paragraphs on "embracing transformation" and "unlocking synergies"</td></tr>
+<tr><td>Channels</td><td>Monthly all-staff email, a branded intranet page, digital screens in the canteen, a quarterly newsletter, a launch event with the chief executive</td></tr>
+<tr><td>Message</td><td>One core message, "consistent across all channels": that the change is exciting and everyone is on the journey together</td></tr>
+<tr><td>Audience</td><td>"All employees"</td></tr>
+<tr><td>Two-way channels</td><td>An email inbox, "monitored by the project team"</td></tr>
+<tr><td>Measures of success</td><td>Emails sent, intranet page views, event attendance, newsletter open rate</td></tr>
+<tr><td>What the depot fitters are actually saying</td><td>That the new system will be used to track how long each job takes and dock the slow ones</td></tr>
+<tr><td>What the plan says about that</td><td>Nothing. It is not mentioned</td></tr>
+</table>
+<ol>
+<li><strong>Score it.</strong> Against the five boxes, where does this plan pass and where does it fail? Be precise about the difference between how it looks and what it does.</li>
+<li><strong>Name the one thing it never does.</strong> Every channel in it shares one property. What is it, and why is it fatal for a change that is a year in?</li>
+<li><strong>The fitters' story.</strong> Where did it come from, and what does the plan's silence about it cost?</li>
+<li><strong>The measures.</strong> What is wrong with all four of them, and what would you measure instead?</li>
+<li><strong>Rebuild the next month.</strong> Name the actual instruments you would use, who delivers them, and what must be true by the end.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> five things.</p>
+<p>First, the scoring should be uncomfortable, because the plan passes every check a reviewer usually applies - consistent message, multiple channels, senior sponsorship, a feedback inbox, a dashboard of measures. <em>Every one of those is a virtue at the awareness stage and useless at every stage after it.</em> A learner who praises the consistency and professionalism has been fooled by exactly what the plan was designed to do.</p>
+<p>Second, every channel in it is a <strong>broadcast</strong> - email, intranet, screens, newsletter, a launch event. A year in, the workforce is not short of awareness; it is stalled at acceptance, and <em>not one instrument in the plan can move a single person to acceptance</em>, because acceptance is built by a trusted person answering a real question in a small room, and there is no such instrument anywhere in the document.</p>
+<p>Third, the fitters' story - that the system will time their jobs and punish the slow - came from <strong>the gap where the honest answer should have been</strong>. Somebody noticed the new system records job durations, nobody said what that data would and would not be used for, and the silence got filled with the worst plausible reading. The plan's cost for not mentioning it is total: every cheerful "brighter tomorrow" message now reads, to a fitter, as confirmation that management is hiding something. <em>The plan is not competing with the rumour. It is feeding it.</em></p>
+<p>Fourth, all four measures count <strong>dispatch, not arrival</strong>. Emails sent, page views, attendance and open rates measure whether the organisation was busy, not whether anyone moved. The right measure is movement along the journey - by group - and the fastest way to get it is to ask the line managers what their people actually said, and to run a short pulse survey that reports understanding and acceptance, not satisfaction.</p>
+<p>Fifth, the rebuilt month has almost no broadcasts in it. It has the <strong>line managers equipped with honest answers</strong> - including a plain, specific, written answer about the job-timing data and what it will and will not be used for. <em>If the real answer is one the organisation is not willing to state, the principle still holds</em>: the plan must name the question and provide the official, survivable answer, because a lie cedes all credibility to the rumour while a difficult truth or a constrained "this is what we can say for now" forces the conversation onto real ground. Those managers hold small-group conversations with their own teams; a session scheduled <em>when the night and outstation crews are actually present</em>; hands-on practice for the groups approaching ability; and a listening channel that carries the questions back in the words people used. What must be true by the end is not "twelve communications issued". It is "acceptance in the fitter group has started to move, and the job-timing question is no longer the first thing anyone raises".</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-map_the_groups_by_journey">1. Map the groups by where they are on the journey, not by the org chart</label><textarea id="cb-map_the_groups_by_journey" data-key="t-0198:map_the_groups_by_journey" placeholder="Take the stakeholder map you already have and re-plot it by change stage: who is aware, who understands, who accepts, who is able. The gap between two groups is the plan."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-write_the_message_each_group_needs_next">2. Write the one message each group needs NEXT - honestly, including the bad news</label><textarea id="cb-write_the_message_each_group_needs_next" data-key="t-0198:write_the_message_each_group_needs_next" placeholder="For each group, write the single message that moves it to the next stage. It must answer the real &#039;what does this mean for me&#039;, bad news included, or rumour will answer it first."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-match_stage_to_channel_and_messenger">3. Match each stage to the right channel and the right messenger</label><textarea id="cb-match_stage_to_channel_and_messenger" data-key="t-0198:match_stage_to_channel_and_messenger" placeholder="Awareness moves by broadcast. Acceptance never does - only a trusted person answering a real question in a small room. Do not use an email to do a conversation&#039;s job."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-schedule_transitions_and_build_the_listening_half">4. Schedule by what must be true by when - and build the two-way channel</label><textarea id="cb-schedule_transitions_and_build_the_listening_half" data-key="t-0198:schedule_transitions_and_build_the_listening_half" placeholder="The plan is a set of stage-transitions with dates, not a list of sends. And half of it is listening: how you will hear which interpretation has actually formed."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-find_the_rumour_gaps_and_measure_arrival">5. Find the gaps rumour is filling - and measure arrival, never dispatch</label><textarea id="cb-find_the_rumour_gaps_and_measure_arrival" data-key="t-0198:find_the_rumour_gaps_and_measure_arrival" placeholder="List what has NOT been said that people are guessing at, and close those gaps first. Then measure the plan by movement along the journey, never by messages sent."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now plan communication that moves people, not just informs them.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The most dangerous change communications plan is the one that looks finished.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>A schedule of broadcasts mistaken for a plan.</strong> A list of sends is not a plan. A set of stage-transitions with dates is.</p>
+<p>&bull; <strong>The same message to everyone, forever.</strong> Repetition moves nobody past the stage they are already at. Each group needs the one message that moves it next.</p>
+<p>&bull; <strong>An email doing a conversation's job.</strong> Acceptance is built by a trusted person in a small room. Broadcast alone rarely changes a mind about whether a change is worth doing.</p>
+<p>&bull; <strong>Line managers left to improvise.</strong> They are the channel for the most important stage. Unequipped, half improvise badly and the rest say "I don't know either", which is the most corrosive sentence in a change.</p>
+<p>&bull; <strong>Measuring sends, not movement.</strong> "We issued twelve communications" is activity. "Acceptance went from 30 to 55 per cent" is effect.</p>
+<p>&bull; <strong>No listening half.</strong> Without a way to hear which interpretation formed, the plan is flying blind and broadcasting confidently into a silence it cannot hear filling.</p>
+<p>&bull; <strong>Leaving the "what does it mean for me" gap open.</strong> Rumour fills it for free, with the worst plausible reading. Close the worst questions first, by name.</p>
+<p>&bull; <strong>Forgetting the people the daytime sessions never reached.</strong> The night and outstation crews are often the most affected and the least reached, for the plainest scheduling reason.</p>
+<p>&bull; <strong>Hiding the bad news.</strong> It does not remove the fear. It removes your credibility and leaves the fear where it was.</p>
+<p>&bull; <strong>Spin.</strong> It buys a week and costs all the trust, and hands the rumour the last of your credibility. A plan that only works while people are misled is the rumour's ally.</p>
+</div>
+</details>
+<p>Onalenna had a plan where everyone knew and nobody moved. Map the groups by where they are on the journey rather than by the org chart, because the distance between the stage a group has reached and the stage it needs is the only thing the plan is for; write the one message each group needs next, honestly and with the bad news in it, because you are competing with a story people have already written and only a specific truth beats a frightening rumour; match each stage to its channel and its messenger, since acceptance is built by a trusted person in a small room and never by a better email; schedule the plan as stage-transitions with dates and build the listening half, because two-way communication is the only instrument that tells you whether any of it is working; and find the gaps rumour is filling, close the worst by name, and measure arrival rather than dispatch. <strong>A change communications plan is an act of service to the people navigating the change, not a tool to manage their resistance.</strong> The moment it becomes the second thing, people feel it, and you have handed your credibility to the rumour. Take a change your organisation is living through now and ask, for one group, which stage they are actually at - and whether the next thing planned for them is aimed at that stage or the one they left weeks ago.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build a change communications plan now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

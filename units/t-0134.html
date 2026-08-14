@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I mapped the pipes, not the people</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>I mapped the pipes, not the people</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and you have the Stellaford takeover solved. The technical due diligence is done, the engineering is sound, the financing is arranged, the numbers check. You walk into the meeting expecting a nod.</p>
+<p>Instead you are blindsided. A local councillor you have never met has denounced "the Corathyl takeover" in the press. The Stellaford community - the very people the upgrade is meant to help - have heard third-hand that outsiders are coming for their water, and they are frightened and angry. And the regional water board, whom you had quietly treated as a rubber stamp, now wants assurances you did not come prepared to give.</p>
+<p>Nothing is wrong with your plan. Everything is wrong with the fact that the first any of these people heard of it was <em>after</em> you had decided. You sit there and realise something that had never occurred to you: you can map pumps, and pipes, and money, and risk - and you have never once mapped <strong>people</strong>. And a decision that the people it affects were not prepared for is a decision that does not happen.</p>
+<blockquote><h2>My plan is technically perfect and it is dead on arrival. How do I find, before I act, everyone this decision touches - and work out who to engage, how, and above all when?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The plan is technically perfect and it is dead. The community whose water it is heard about it from a rumour. The councillor found out from the community and is now hostile in public. The regional board, which holds the approvals, learned of it at the same meeting as everyone else. And your own artisans, who will have to run the absorbed plant, heard it as an announcement. Not one of them objects to the engineering. Every single one of them first heard of it <strong>after</strong> you had decided. Write down how you would find, before acting, everyone a decision touches — and what you would do about each — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the group the sorting will betray</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Explain it better — hold a public meeting now.&rdquo;</strong> Now you are defending a decision rather than shaping one, and everyone in the room knows it. The meeting you needed was the one that could still have changed something.</p>
+<p>&bull; <strong>&ldquo;Go to the board first — get the approval and the rest follows.&rdquo;</strong> Sequencing by power, which is exactly what produced this. The board approves; it does not make the community willing, and an approved plan a town resents is still dead.</p>
+<p>&bull; <strong>&ldquo;Handle the councillor — the noise is the problem.&rdquo;</strong> The noise is a symptom. The councillor is hostile because their constituents were surprised, so quieting the councillor without addressing that leaves the cause intact and buys you a truce.</p>
+<p>&bull; <strong>&ldquo;Consult everyone on everything.&rdquo;</strong> Generous and unworkable. Attention is finite, and a consultation with no priorities dilutes into a process that satisfies nobody and delays the decision past the point of usefulness.</p>
+<p>&bull; <strong>&ldquo;The engineering is right — they will come round.&rdquo;</strong> They will not, and the flat fact underneath is worth holding: a decision the affected people were not prepared for <strong>is a decision that does not happen</strong>, however good it is.</p>
+<p>&bull; Here is the uncomfortable realisation. You can map pumps, pipes, money and risk — and you have <strong>never once mapped people</strong>, so a whole class of what determines the outcome sat outside your analysis. Treat them as a mappable object. Start with an <strong>honest list</strong> of everyone affected by the decision or able to affect it, with their stake, their sway and where their view sits — a list, not a judgement, because sorting while you list is how inconvenient parties quietly vanish. Then <strong>sort by how much sway and how much interest</strong> each has, which is how finite attention gets allocated and is a good first cut. But now the move that rescues it, and watch what your sort just did to the community: low power, high interest, filed under &ldquo;keep informed&rdquo; — the people with <em>everything</em> at stake and no formal say. So <strong>check whether a low-power claim is nonetheless legitimate and urgent</strong>, because a claim's legitimacy is not the same thing as its holder's power. And then the part that makes it a plan rather than a chart: <strong>every engagement is timed, and every timing says &ldquo;before&rdquo;.</strong></p>
+</div>
+</details>
+<p>There is a one-page tool for exactly this. Here it is, filled in for the takeover.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the stakeholder map and engagement plan Onalenna should have built <em>before</em> she walked into that room.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. The register - who is affected, or can affect this?</div><p class="cb-demo">The Stellaford takeover, stakeholder by stakeholder. THE STELLAFORD COMMUNITY - stake: it is their water; power: low (no formal say); legitimacy: high; urgency: high; attitude: anxious, hearing rumours. THE REGIONAL WATER BOARD - stake: regional service stability; power: high; legitimacy: high; urgency: medium; attitude: conditional. A LOCAL COUNCILLOR - stake: their constituency; power: medium (public and political voice); urgency: high; attitude: turning hostile. THE CORATHYL ARTISANS - stake: they will run the absorbed plant; power: low-medium; legitimacy: high; attitude: uncertain. The register is just the honest list. Everything else is made from it.</p></div><div class="canvas-box"><div class="cb-label">2. The power/interest grid (Mendelow) - so where do I put my energy?</div><p class="cb-demo">Mendelow&#039;s four quadrants. HIGH power + HIGH interest = MANAGE CLOSELY: the councillor (loud, political, invested). HIGH power + LOW interest = KEEP SATISFIED: the regional water board (powerful, wants it done cleanly, not in the detail). LOW power + HIGH interest = KEEP INFORMED: the grid puts the Stellaford community here - and this is exactly where the grid is about to get me into trouble. LOW power + LOW interest = MONITOR. The grid is a good first cut. It is not the whole truth.</p></div><div class="canvas-box"><div class="cb-label">3. The salience check - is a low-power claim still legitimate and urgent?</div><p class="cb-demo">The grid told me to &#039;keep the Stellaford community informed&#039; - send a leaflet. Run the salience check (Mitchell, Agle and Wood): POWER low, LEGITIMACY high (it is their water, a wholly valid claim), URGENCY high (supply continuity, now). That is a DEPENDENT stakeholder - two strong attributes, no power - and it is the classic derailer. They depend on ME to meet a legitimate, urgent need the power grid cannot see. If I do not, they will MANUFACTURE power - protest, media, the councillor - and the project stops. Corrected strategy: proactive, early, two-way engagement, not a leaflet.</p></div><div class="canvas-box"><div class="cb-label">4. The engagement plan - what will I tell each, when, how, and who owns it?</div><p class="cb-demo">STELLAFORD COMMUNITY - message: what changes, what stays, how their supply is secured and local jobs are protected, and we want your input; method: a public meeting plus standing local forums; timing: BEFORE the recommendation goes to the board; owner: Onalenna. REGIONAL WATER BOARD - message: the assurances, evidenced; method: formal briefing; timing: before the decision; owner: Onalenna. THE COUNCILLOR - message: the full picture, in person, before it is public; method: one-to-one; timing: early; owner: Onalenna with a director. THE ARTISANS - message: what the takeover means for their work; method: internal briefing; timing: early. Every timing says BEFORE. Engagement after a decision is not engagement - it is notification.</p></div><div class="canvas-box"><div class="cb-label">5. The watch - what has changed since I last looked?</div><p class="cb-demo">Nothing on this map is permanent. Re-map at every gate. A &#039;keep satisfied&#039; board that feels blindsided becomes a &#039;manage closely&#039; blocker overnight. The councillor, engaged early, may move from hostile to neutral - or, if ignored, from neutral to the project&#039;s loudest opponent. The community, engaged honestly and before the fact, moves from rumour-driven fear to a partner with a stake in it working. The map is a photograph of a moving thing; take a new one often.</p></div></div>
+
+<p>Follow the flow, because the order is the method. A plain list of who is affected. A grid that says where to spend energy. Then a gut-check that catches the group the grid gets dangerously wrong. Then a plan whose every timing says the same word - <em>before</em>. And a note that none of it stays still. She walked in with pipes and money. This is the map she was missing.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>What you felt in T1 was a <strong>stakeholder gap</strong> - the knot in the stomach when a perfect plan hits a wall of people you never saw. You close it with four moves, each a question:</p>
+<ul>
+<li><strong>Who is affected by this, or can affect it?</strong> Write the <strong>stakeholder register</strong>: for every person or group, their stake, their power, whether their claim is legitimate and urgent, and their attitude right now. It is only an honest list, and everything else is built from it. Do not skip the ones inside your own organisation - your artisans and operators are stakeholders too.</li>
+<li><strong>Where do I spend my energy?</strong> Plot each on <strong>Mendelow's power/interest grid</strong> (Aubrey Mendelow, 1991): power up the side, interest across. The quadrant names the strategy. High power and high interest - <em>manage closely</em>. High power, low interest - <em>keep satisfied</em>. Low power, high interest - <em>keep informed</em>. Low power, low interest - <em>monitor</em>. It is a genuinely useful first cut, and you must not mistake it for the whole truth.</li>
+<li><strong>For the contested ones, is the claim legitimate and urgent even without power?</strong> Here is the move that would have saved Onalenna. The grid put the Stellaford community in "keep informed" - send a leaflet. Run the <strong>salience model</strong> (Mitchell, Agle and Wood, 1997) over them instead: three attributes - <em>power</em>, <em>legitimacy</em>, <em>urgency</em>. One attribute makes a group <em>latent</em>; two, <em>expectant</em>; all three, <em>definitive</em>. The community has low power but high legitimacy (it is their water) and high urgency (their supply, now). Two strong attributes, no power: a <strong>dependent</strong> stakeholder. The name is exact - they <em>depend on you</em> to see a legitimate, urgent need the power grid is blind to. Ignore them and they will not stay ignored; they will manufacture power - protest, media, a councillor - and your project stops. That is not a small group to keep informed. It is the group most likely to end you.</li>
+<li><strong>So what will I actually do?</strong> The <strong>engagement plan</strong>: one row per group - the message (framed so they can give you meaningful input, not just receive yours), the method, the timing, and the named owner. And the timing, for everyone who matters, is <em>before the decision</em>. This scheduled set of actions is the engagement plan; the whole map together with it is the <strong>stakeholder management plan</strong> - the strategic document you take into the room.</li>
+</ul>
+<p>Then keep watching, because positions move. Re-map at every gate: a "keep satisfied" board that feels blindsided is a "manage closely" blocker by morning.</p>
+<p>One honest boundary. This teaches you to <em>map</em> stakeholders and <em>plan</em> honest engagement so a sound decision can actually land. It does not make you a public-relations officer, a community-liaison specialist, or a negotiator - those are real, separate professions. And it is emphatically not manipulation. Hold the line exactly here: <em>manipulation is managing people to get your pre-decided answer approved; engagement is managing a process so the best possible decision can be made and carried out, together.</em> The goal is an honest, early dialogue that makes the project better - not a polished way to sell a finished one.</p>
+<p>Does it scale? It is reading the room before you speak, not after - the difference between building on alignment you found and managing opposition you created.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different decision. Corathyl must take a primary treatment line offline for three weeks for a critical R 15m upgrade. It will squeeze the water supply to a large industrial user, and the work must pass the environmental regulator. Build the map before you act.</p>
+<ol>
+<li><strong>Register.</strong> List four stakeholders - include the major industrial user, the environmental regulator, the municipal finance department, and your own Corathyl artisans. For each: stake, power, and attitude.</li>
+<li><strong>Grid.</strong> Plot all four on the power/interest matrix and name each one's quadrant strategy.</li>
+<li><strong>Salience check.</strong> Run power/legitimacy/urgency on the <em>artisans</em> - low power, but is their claim legitimate and urgent? What class are they, and does the grid under-weight them?</li>
+<li><strong>Engagement plan.</strong> Write two rows: one for the industrial user (manage closely) and one for the artisans (beyond "keep informed"). For each, give the message framed so they can give you meaningful input, the timing, and the owner.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> every timing you wrote should say <em>before</em>. If any of your engagement happens after the decision is made, you did not plan engagement - you planned an announcement.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-register">1. The register - who is affected, or can affect this?</label><textarea id="cb-register" data-key="t-0134:register" placeholder="List every stakeholder or group. For each: their stake, their power, whether their claim is legitimate and urgent, and their current attitude."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-grid">2. The power/interest grid (Mendelow) - so where do I put my energy?</label><textarea id="cb-grid" data-key="t-0134:grid" placeholder="Plot each stakeholder on power (up) against interest (across). The quadrant sets the strategy: Manage Closely / Keep Satisfied / Keep Informed / Monitor."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-salience">3. The salience check - is a low-power claim still legitimate and urgent?</label><textarea id="cb-salience" data-key="t-0134:salience" placeholder="For any contested low-power group, score three attributes: power, legitimacy, urgency. One = latent, two = expectant, three = definitive. A group with legitimacy and urgency but no power is DEPENDENT - it depends on you to see it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-plan">4. The engagement plan - what will I tell each, when, how, and who owns it?</label><textarea id="cb-plan" data-key="t-0134:plan" placeholder="One row per group: the message (framed so they can give meaningful input), the method, the timing (BEFORE the decision), and the named owner. This scheduled set of actions is the engagement plan; the whole map plus this plan is the management plan."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-watch">5. The watch - what has changed since I last looked?</label><textarea id="cb-watch" data-key="t-0134:watch" placeholder="Positions move. Re-map at every project gate; a group&#039;s attitude, not just its power, decides where it sits."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now bring the people-map into the room alongside the asset-map, which is the only way a hard decision actually gets made.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Stakeholder work goes wrong in a handful of very human ways. Read these before you trust your own map.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Mistaking loud for powerful, or silent for content.</strong> The noisiest voice is not always the most powerful, and a quiet stakeholder is not agreeing - they may simply not have heard yet. Judge power and interest on evidence, not volume.</p>
+<p>&bull; <strong>Treating the map as permanent.</strong> Attitudes move faster than power does. A "keep satisfied" regulator handled carelessly becomes a "manage closely" blocker overnight. Re-map at every gate.</p>
+<p>&bull; <strong>Using "keep informed" as an excuse to tell an affected community last.</strong> The quadrant is a guide to effort, not permission to broadcast one-way at the end. Informed late is the same as ignored.</p>
+<p>&bull; <strong>The salience blind spot.</strong> Dismissing a group because it has no formal power, when its claim is legitimate and its need urgent. That dependent stakeholder is precisely the one that stops "technically sound" projects - and precisely the one your ethics exist to protect.</p>
+<p>&bull; <strong>Confusing mapping with manipulation.</strong> If the plan is designed to get a decision you have already made past people, you have crossed the line. Engagement changes the project; manipulation only changes the messaging.</p>
+<p>&bull; <strong>Forgetting the people inside your own walls.</strong> Your artisans, operators and planners have to live with the decision and make it work. An internal stakeholder ignored is an implementation that quietly fails.</p>
+</div>
+</details>
+<p>Onalenna had a perfect plan and no map of the people it would land on, and the plan died in the room. Now you can build both maps. Find everyone affected, place them by power and interest, catch the legitimate urgent voice the grid would miss, and plan honest engagement that happens <em>before</em> you decide - then keep watching, because people move. A decision the affected were part of is a decision that holds. If you are working with an AMU Facilitator, bring a real decision and map its people out loud - you will almost always find one you had forgotten.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can map the people now, not just the pipes.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The number that sounded good</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The number that sounded good</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and the board asks you a simple question: "how reliable are our pumps?" You have a CMMS full of work orders and, when it comes to it, no actual answer. So you reach for the number everyone reaches for and tell them the main pumps run about 1,400 hours between failures. It sounds excellent. Heads nod.</p>
+<p>And it does not match reality at all. The plant manager keeps raising production losses from pump downtime - real interruptions, real lost water - and you cannot explain why a pump you just called reliable is causing so much pain. You have a number that sounds good and a plant that feels bad, and no way to reconcile the two.</p>
+<p>The problem is that the number you quoted is the flattering one. "Time between failures" says nothing about how long each failure keeps the pump down - and that, it turns out, is exactly what has been hurting you. You have data, and no metrics; and the one metric you reached for is the one that hides the thing that matters.</p>
+<blockquote><h2>I quoted a reliability number that sounds good while the plant keeps losing production - so the number must be hiding something. What are the metrics that actually tell me, and the board, how reliable an asset really is?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> You told the board the pump runs about <strong>1,440 hours between failures</strong> — six failures in a year, and that is true. The operations manager then asked why, if it is that reliable, the plant keeps losing production. And she is right: those six failures cost you <strong>120 hours</strong> of downtime between them. The number you quoted has nothing to say about that, and you picked it because it was the one you had and it happened to sound good. Write down what actually tells you, and the board, how reliable this pump is — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what one number cannot hold</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Quote the failure count instead — six a year is clearer.&rdquo;</strong> Same information in plainer words, and the same silence about the thing that is hurting you. Six short stops and six long ones look identical here.</p>
+<p>&bull; <strong>&ldquo;Report the cost of the lost production.&rdquo;</strong> Gets the board's attention, and it tells them how much it hurt without telling anybody what to fix. Cost is a consequence, not a diagnosis.</p>
+<p>&bull; <strong>&ldquo;Compare it against last year.&rdquo;</strong> A trend in a number that hides the mechanism is a trend that hides the mechanism. If repairs got slower and failures got rarer, this comparison would look like an improvement.</p>
+<p>&bull; <strong>&ldquo;The number is honest — the manager has misunderstood it.&rdquo;</strong> The number is honest and she has understood it perfectly. She asked how reliable the pump is; you answered a narrower question and let it stand for hers.</p>
+<p>&bull; <strong>&ldquo;Get better data before quoting anything.&rdquo;</strong> A real prerequisite rather than an answer, and worth holding on to: these are all computed from work orders, so a duplicated record inflates one and a mislabelled service deflates another. <strong>A metric on dirty data is a confident wrong answer.</strong></p>
+<p>&bull; The trouble is structural rather than dishonest. <strong>How often something fails says nothing about how long it is out of action each time</strong>, and when the pain lives in the second, the first looks excellent throughout — a machine that fails rarely and takes days to recover can hurt far more than one that fails weekly and is back in minutes. No single number holds both, because two independent facts are involved. So reliability takes <strong>three numbers read together</strong>: how often it fails, how long it is down each time, and what those two produce — the proportion of time it is actually available, which is the question the operations manager was really asking. Two disciplines keep them honest. <strong>Define what counts as a failure before you count anything</strong> — a planned service is not one, a trip reset in two minutes might be — and apply that consistently, because the answer moves materially with the choice. And do the arithmetic on <strong>the time the pump was actually running</strong>, not on the calendar: it was not operating while it was down.</p>
+</div>
+</details>
+<p>There are three headline numbers, not one, and together they fit on a single page. Here they are, worked for the pump.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the one-page reliability summary that turns a CMMS full of work orders into an answer the board can act on.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Is my data clean, and are my failures defined? (get the work history right)</div><p class="cb-demo">From the pump&#039;s work history over one year (8,760 hours): count the FAILURES (events where it stopped doing its job) - 6 - and sum the DOWNTIME across those events - 120 hours. Define &#039;failure&#039; before you count: a planned service is not a failure; a trip that was reset in two minutes may or may not be, but decide and be consistent. Dirty data poisons everything after this - a duplicated work order inflates the failure count, a mislabelled service deflates it. Clean first, then count.</p></div><div class="canvas-box"><div class="cb-label">2. How often does it fail? (MTBF)</div><p class="cb-demo">MTBF - Mean Time Between Failures, for a repairable item like this pump. Operating time = 8,760 - 120 downtime = 8,640 hours. MTBF = 8,640 / 6 = 1,440 hours. So on average the pump runs 1,440 hours between failures. (For a non-repairable item you would speak of MTTF, mean time to failure - same idea, but you replace it rather than repair it.) Note: it is operating time divided by failures, not calendar time - the pump was not running while it was down.</p></div><div class="canvas-box"><div class="cb-label">3. How long is it down each time? (MTTR)</div><p class="cb-demo">MTTR - Mean Time To Repair. Total downtime 120 hours across 6 repairs: MTTR = 120 / 6 = 20 hours. This is the number MTBF says nothing about, and it is often where the real pain lives. A pump that fails rarely but takes days to fix can hurt the plant far more than one that fails often and is back in an hour. MTBF tells you how often; only MTTR tells you how long.</p></div><div class="canvas-box"><div class="cb-label">4. What fraction of time is it actually available? (availability - the honest number)</div><p class="cb-demo">Operational availability = MTBF / (MTBF + MTTR) = 1,440 / (1,440 + 20) = 98.63% (same as uptime/total, 8,640/8,760). Now the lesson: another pump fails the same 6 times a year but each repair takes 80 hours, not 20 - MTBF barely changes (1,380 h, &#039;about the same&#039;), but downtime is 480 hours and availability drops to 94.5%. Same failure frequency, FOUR TIMES the lost time. MTBF looked identical; availability told the truth, because it combines how often it fails with how long it stays down. Availability is what the plant actually feels.</p></div><div class="canvas-box"><div class="cb-label">5. What does it cost, and which lever do I pull? (the management summary)</div><p class="cb-demo">The one-page summary the board can act on: MTBF 1,440 h, MTTR 20 h, availability 98.6% - and the impact: 120 hours of lost pumping this year, and at the value of the water and power that is, say, R X of lost output. Then the diagnosis, which decides what to fix: if MTBF is low, the problem is FREQUENCY - improve reliability (design, condition monitoring). If MTTR is high, the problem is REPAIR TIME - improve maintainability (spares, access, planning). For our second pump, the fix is repair time, not the pump. Numbers without this last step are trivia; with it, they are a decision.</p></div></div>
+
+<p>Box 4 is where the ache resolves. The pump Onalenna called reliable and the one causing pain can have almost the same MTBF - the number she quoted - and completely different availability, because one takes far longer to fix. MTBF flattered; availability told the truth. And box 5 turns the truth into a decision. Let us name the three numbers.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Reliability has three headline numbers, and the whole skill is computing them honestly from a work history and reading them together. Five questions:</p>
+<ul>
+<li><strong>Is my data clean, and are my failures defined?</strong> Every number below is only as good as the work history behind it. Count the failures, sum the downtime, and <em>define</em> what counts as a failure before you start - a duplicated work order inflates the count, a service mislabelled as a breakdown poisons the lot. Clean first, then count.</li>
+<li><strong>How often does it fail?</strong> <strong>MTBF</strong> - Mean Time Between Failures, for a repairable item - is total <em>operating</em> time divided by the number of failures. Operating time, not calendar time: the pump was not running while it was down. (A non-repairable item uses <strong>MTTF</strong>, mean time to failure - the same idea, but you replace rather than repair it.)</li>
+<li><strong>How long is it down each time?</strong> <strong>MTTR</strong> - Mean Time To Repair - is total downtime divided by the number of repairs. This is the number MTBF is silent about, and it is often where the pain actually lives. A rare failure that strands the plant for days can hurt far more than a frequent one fixed in an hour.</li>
+<li><strong>What fraction of time is it actually available?</strong> <strong>Availability</strong> = MTBF / (MTBF + MTTR), which is the same as uptime over total time. This is the honest number, because it combines <em>how often</em> it fails with <em>how long</em> it stays down - and it is the only one the business actually feels, as output it did or did not get. Teach the <em>operational</em> availability, from the real work history, because that includes the waiting and logistics time the plant really loses. This is where MTBF alone is exposed: two pumps with the same MTBF can sit at 98.6% and 94.5% availability because one takes four times as long to fix.</li>
+<li><strong>What does it cost, and which lever do I pull?</strong> The <strong>management summary</strong>: the three numbers, the business impact in rand of the downtime, and the diagnosis. If MTBF is low, the problem is <em>frequency</em> - improve reliability. If MTTR is high, the problem is <em>repair time</em> - improve maintainability: spares, access, planning. The metric points at the lever.</li>
+</ul>
+<p>One honest boundary. You compute and interpret the three headline metrics from a work history. You are not doing advanced reliability modelling - Weibull life-data fitting and reliability block diagrams are the next level, a different tool. Your numbers are only as good as the cleaned data they came from. And a metric with no business impact and no recommendation is a number nobody acts on - the summary, not the calculation, is the deliverable.</p>
+<p>Does it scale? A car with an impressive "miles between breakdowns" - a high MTBF - is useless if each breakdown takes a week to fix - a high MTTR; availability is the number that tells you whether you can actually depend on it, and it is the one MTBF alone will never show you.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A backwash blower ran for a year (8,760 hours). Its work history shows <strong>8 failures</strong> and <strong>200 hours</strong> of total downtime.</p>
+<ol>
+<li><strong>MTBF.</strong> Compute it from the operating time. (Operating time = 8,760 - 200.)</li>
+<li><strong>MTTR.</strong> Compute it.</li>
+<li><strong>Availability.</strong> Compute it, and state it as a percentage.</li>
+<li><strong>The comparison.</strong> A second blower has the same MTBF but double the MTTR. Which blower would you rather rely on, and is its weaker sibling's problem one of failure frequency or repair time?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 4, notice that the two blowers have the <em>same</em> MTBF. If you picked between them on MTBF alone you could not tell them apart - it is availability, driven by MTTR, that separates them. If your reasoning did not reach for MTTR, re-read box 4.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-data">1. Is my data clean, and are my failures defined? (get the work history right)</label><textarea id="cb-data" data-key="t-0144:data" placeholder="From the work history: count the failures, sum the downtime, and define exactly what counts as a failure. Every metric below is only as good as this."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-mtbf">2. How often does it fail? (MTBF)</label><textarea id="cb-mtbf" data-key="t-0144:mtbf" placeholder="MTBF = total OPERATING time / number of failures. Use operating time, not calendar time."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-mttr">3. How long is it down each time? (MTTR)</label><textarea id="cb-mttr" data-key="t-0144:mttr" placeholder="MTTR = total downtime / number of repairs. This is the metric MTBF hides."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-availability">4. What fraction of time is it actually available? (availability - the honest number)</label><textarea id="cb-availability" data-key="t-0144:availability" placeholder="Availability = MTBF / (MTBF + MTTR) = uptime / total time. This is the number the business feels. Show why MTBF alone misleads."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-summary">5. What does it cost, and which lever do I pull? (the management summary)</label><textarea id="cb-summary" data-key="t-0144:summary" placeholder="One page: the three numbers, the business impact in rand, and the diagnosis - is the problem failure FREQUENCY or repair TIME? A metric with no business impact and no recommendation is a number nobody acts on."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now answer "how reliable is it?" with the number that is honest, and say what it costs and what to fix.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Reliability metrics are simple to compute and easy to misuse, almost always by quoting one number and hiding the rest.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Quoting MTBF alone.</strong> The flattering-number trap, and the one that started the ache. MTBF says how often, never how long. Report it beside MTTR and availability or it misleads by omission.</p>
+<p>&bull; <strong>Confusing MTBF with MTTF.</strong> MTBF is for repairable items (time <em>between</em> failures); MTTF is for those you replace (time <em>to</em> failure). Using the wrong one signals you have not thought about what happens after the failure.</p>
+<p>&bull; <strong>Computing on dirty data.</strong> A duplicated work order inflates the failure count; a service logged as a breakdown ruins the downtime. Clean and define your failures first - every metric inherits the quality of the data beneath it.</p>
+<p>&bull; <strong>Using calendar time for MTBF.</strong> The asset was not operating while it was down. MTBF divides <em>operating</em> time by failures, or the number is quietly wrong.</p>
+<p>&bull; <strong>Forgetting that availability is what the business feels.</strong> Nobody in operations experiences MTBF; they experience the hours the asset was not there when they needed it. That is availability, and it is the number to lead with.</p>
+<p>&bull; <strong>A summary with no impact and no diagnosis.</strong> Three numbers on a page are trivia until you say what the downtime cost and whether the fix is reliability or maintainability. The recommendation is the point.</p>
+<p>&bull; <strong>Reading too much into too few events.</strong> Two failures do not make a trend. With small numbers, say so - a metric from thin data is an estimate, not a verdict.</p>
+</div>
+</details>
+<p>Onalenna quoted a good-sounding number to a board while her plant bled production, because she reached for the metric that flatters. Now she can do better: clean the work history, compute how often it fails and how long it stays down, combine them into the availability the business actually feels, and put it on one page with what it costs and what to fix. Three numbers, honestly read, are the difference between sounding reliable and being able to prove whether you are. If you are working with an AMU Facilitator, take one asset's real work history and compute all three - then check which number you would have quoted before this unit.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can tell the honest reliability number now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

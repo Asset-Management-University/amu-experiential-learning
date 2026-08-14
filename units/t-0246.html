@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The approach, not the software</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The approach, not the software</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>Your projects fail in opposite ways. The well-understood one - the pump swap you have done a dozen times - drifts over budget and past its date, because you ran it loose and let it wander. And the genuinely new one - the thing nobody had done before - became a death-march, because you fixed a detailed plan up front and then defended it, month after month, as reality kept proving it wrong.</p>
+<p>Here is what stings: you reached for the same way of running a project both times, out of habit. You picked a scheduling tool and called that your method. And your team paid for the mismatch - drifting on the one, crunched to exhaustion on the other.</p>
+<blockquote><h2>My projects keep failing in opposite ways - the known one drifts and the unknown one becomes a death-march - because I run them all the same way out of habit. How do I choose the right project-management system for the work in front of me?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Two projects, both finished, both bad. The pump replacement was completely understood — you had done four like it — and it <strong>drifted</strong>: the plan stopped matching reality in month two and you spent four months defending it rather than replanning, finishing eleven weeks late. The telemetry upgrade was full of unknowns nobody could have scoped, and you ran it to a fixed plan against a fixed date: it became a march, your two best people worked six weekends, and one of them has since left. You ran both the same way, because that is how projects are run here — and if asked what your project-management system is, you would name the scheduling package. Write down how you would choose — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the confusion at the root</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Plan more thoroughly next time.&rdquo;</strong> Would have helped neither. The pump job was thoroughly planned and drifted anyway; the telemetry job could not be planned in advance because the information did not exist yet.</p>
+<p>&bull; <strong>&ldquo;Get better software.&rdquo;</strong> The package drew exactly what you gave it, both times. <strong>The software is not the system</strong> — it is a tool that renders whatever plan you hand it.</p>
+<p>&bull; <strong>&ldquo;Add more contingency.&rdquo;</strong> Buys slack and changes nothing about how requirements are handled. On the telemetry job the problem was not that you were short of time but that the method could not absorb what you kept learning.</p>
+<p>&bull; <strong>&ldquo;Manage the team harder.&rdquo;</strong> Six weekends and a resignation is what the mismatch already cost. More pressure on people compensating for the wrong method is how you lose the other one.</p>
+<p>&bull; <strong>&ldquo;Use the flexible approach for everything — it is more modern.&rdquo;</strong> Would have made the pump replacement worse: well-understood work with a hard date is precisely where a firm plan is a real map rather than a cage.</p>
+<p>&bull; Clear the confusion first: <strong>the software is not the system.</strong> A package draws whatever plan it is given; <strong>the system is the approach you choose</strong> — how you handle changing requirements, and how you schedule and protect the work. Two projects on identical software with different systems get entirely different results, so the question is never <em>which tool</em> but <strong>which approach fits this work.</strong> And the answer is set by <strong>how much is genuinely known in advance.</strong> Where the work is well understood and stable, fixing the scope and delivering to a detailed plan is powerful, because the plan is a real map — and brittle when requirements change, since it becomes a thing to defend. Where much is uncertain, delivering in increments and learning as you go keeps the work honest, at the cost of the up-front certainty some stakeholders want. <strong>Neither is superior</strong>, which is exactly why running everything one way fails in <em>both</em> directions rather than one — and your two projects are the two failure modes: a plan defended past its usefulness, and an open-ended method meeting a fixed date.</p>
+</div>
+</details>
+<p>The system is the approach, not the software - and there is no single best one, only the one that fits how much your project is known in advance. Let us learn to choose it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you analyse and evaluate the project-management systems and choose among them - separating the approach from the software, making the two real choices, diagnosing your project, and matching the system to the work instead of your habit.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. The system is the approach, not the software</div><p class="cb-demo">The first thing to un-learn is the commonest confusion in the field: THAT THE SCHEDULING PACKAGE YOU USE IS YOUR PROJECT-MANAGEMENT SYSTEM. IT IS NOT. The software is a tool that draws whatever plan you give it; THE SYSTEM IS THE APPROACH you choose for running the project - how you handle changing requirements, and how you schedule and protect the work. Two projects can be run on the very same software with completely different systems, and get completely different results. So the question is never &#039;which tool?&#039; but &#039;WHICH APPROACH FITS THIS WORK?&#039; - and there is no single best answer, because every approach is right for some projects and wrong for others.</p></div><div class="canvas-box"><div class="cb-label">2. First choice - predictive, adaptive, or hybrid (the requirements)</div><p class="cb-demo">A PREDICTIVE (plan-driven, linear) approach fixes the scope, cost and time up front and delivers to the plan. It is powerful when the work is WELL UNDERSTOOD AND STABLE - a pump replacement, a tank refurbishment, a construction package - where a detailed plan is a real map. It is BRITTLE when requirements change, because the plan becomes a thing to defend. An ADAPTIVE (iterative, incremental) approach delivers in small cycles with feedback and expects the requirements to EVOLVE as you learn. It is powerful under HIGH UNCERTAINTY or novelty, and wasteful and loose when the scope was actually well known. A HYBRID uses predictive for the parts that are well understood and adaptive for the parts that are genuinely uncertain. The driver is simple: HOW MUCH IS KNOWN IN ADVANCE - low uncertainty favours predictive, high favours adaptive, a mix favours hybrid.</p></div><div class="canvas-box"><div class="cb-label">3. Second choice - critical path or critical chain (the schedule)</div><p class="cb-demo">This choice is INDEPENDENT of the first. The CRITICAL PATH method manages the sequence of dependent tasks whose total duration sets the project length, and builds safety time into individual tasks. It is clear and standard when the scope and the resources are known and available. The CRITICAL CHAIN method additionally accounts for RESOURCE CONTENTION - the fact that the same scarce crew or single crane is needed by several tasks - and it POOLS THE SAFETY TIME INTO ONE PROJECT BUFFER at the end instead of padding every task. It is stronger when shared or scarce resources are the binding constraint, and when hidden task-by-task padding has been quietly eroding your schedules. The driver: WHETHER RESOURCES ARE THE BINDING CONSTRAINT.</p></div><div class="canvas-box"><div class="cb-label">4. Diagnose the project - not your habit</div><p class="cb-demo">You choose by reading THREE honest things. The UNCERTAINTY of the requirements: well-understood, stable asset work leans predictive; novel, evolving, research-like work leans adaptive; a mix leans hybrid. The RESOURCE CONSTRAINT: if shared specialists or scarce equipment gate the project, critical chain and its pooled buffer protect it far better than task-by-task padding. And the CONSEQUENCE OF BEING WRONG about the plan. Then the human truth. THE COST OF A MISMATCHED PROJECT SYSTEM IS ALWAYS PAID BY PEOPLE. FORCING A RIGID, PREDICTIVE PLAN ONTO UNCERTAIN WORK CREATES THE DEATH-MARCH: BURNOUT, WASTED EFFORT, AND THE QUIET DESPAIR OF DEFENDING A PLAN EVERYONE KNOWS IS WRONG. And its opposite is real too: a loose adaptive cycle over well-known work invites drift. CHOOSING THE RIGHT SYSTEM FOR THE WORK IS AN ACT OF RESPECT FOR THE PEOPLE WHO MUST EXECUTE IT. IT GIVES THEM A FRAMEWORK THAT FITS REALITY, NOT ONE THAT FIGHTS IT.</p></div><div class="canvas-box"><div class="cb-label">5. Match the system - and do not defend a disproven plan</div><p class="cb-demo">The whole craft comes down to matching the approach to the work and then having the honesty to adjust when the work speaks. If a predictive plan on genuinely uncertain work turns out wrong, YOU ADAPT IT - you do not crunch the team to defend a date that was never real. And there is a quieter honesty in the second choice too. CRITICAL CHAIN&#039;S POOLED PROJECT BUFFER IS AN ACT OF HONESTY. INSTEAD OF HIDING SAFETY TIME IN EVERY TASK, IT PUTS THE BUFFER WHERE IT PROTECTS THE WHOLE PROJECT, MAKING THE TRADE-OFFS VISIBLE AND THE COMMITMENT REAL. A system chosen to fit the work, run with the honesty to change when reality changes, is how you escape both the drift and the death-march. Choose the project system that fits the project&#039;s reality, not the one you used last time.</p></div></div>
+
+<p>Box 2 is the first choice, driven by uncertainty. Box 3 is the second, driven by your binding constraint. Box 4 is how you diagnose which way to set them. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>The system is the approach, not the software - so choose the approach that fits how much the project is known and what constrains it, and never defend a plan the work has already disproved.</strong> Choose the project system that fits the project's reality, not the one you used last time. Five questions:</p>
+<ul>
+<li><strong>What is a project-management system?</strong> <strong>The approach, not the software.</strong> The scheduling tool merely implements whichever approach you choose; it is never the method itself, and there is no single best approach.</li>
+<li><strong>How do I handle the requirements?</strong> <strong>Predictive, adaptive, or hybrid.</strong> Fix the whole plan up front, deliver in small learning cycles, or mix the two - driven by how much is known in advance.</li>
+<li><strong>How do I schedule and protect it?</strong> <strong>Critical path or critical chain.</strong> Manage the sequence of dependent tasks, or manage the shared resources and pool the safety time - driven by the binding constraint.</li>
+<li><strong>How do I choose?</strong> <strong>Diagnose the project.</strong> Read its uncertainty, its resource constraint, and the consequence of being wrong about the plan.</li>
+<li><strong>What must I never do?</strong> <strong>Defend a disproven plan.</strong> When the work proves the plan wrong, adapt it - do not crunch the team to hit a date that was never real.</li>
+</ul>
+<p><strong>The system is the approach, not the software.</strong> The first thing to un-learn is the commonest confusion in the field: that the scheduling package you use is your project-management system. It is not. The software is a tool that draws whatever plan you give it; the <em>system</em> is the approach you choose for running the project - how you handle changing requirements, and how you schedule and protect the work. Two projects can be run on the very same software with completely different systems, and get completely different results. So the question is never "which tool?" but "which approach fits this work?" - and there is no single best answer, because every approach is right for some projects and wrong for others.</p>
+<p><strong>The first choice - predictive, adaptive, or hybrid: how you handle the requirements.</strong> A <em>predictive</em> (plan-driven) approach fixes the scope, cost and time up front and delivers to the plan. It is powerful when the work is well understood and stable - a pump replacement, a tank refurbishment, a construction package - where a detailed plan is a real map. It is brittle when the requirements change, because the plan becomes a thing to defend rather than a guide. An <em>adaptive</em> (iterative, incremental) approach delivers in small cycles with feedback and expects the requirements to evolve as you learn. It is powerful when there is high uncertainty or novelty - a pilot of something no one has done here before - and wasteful and loose when the scope was actually well known all along. A <em>hybrid</em> uses predictive for the parts that are well understood and adaptive for the parts that are genuinely uncertain. The driver is simple: <strong>how much is known in advance</strong> - low uncertainty favours predictive, high uncertainty favours adaptive, a mix favours hybrid.</p>
+<p><strong>The second choice - critical path or critical chain: how you schedule and protect the plan.</strong> This choice is independent of the first. The <em>critical path</em> method manages the sequence of dependent tasks whose total duration sets the project length, and builds safety time into individual tasks. It is clear and standard when the scope and the resources are known and available. The <em>critical chain</em> method additionally accounts for <em>resource</em> contention - the fact that the same scarce crew or single crane is needed by several tasks - and it pools the safety time into one project buffer at the end instead of padding every task. It is stronger when shared or scarce resources are the binding constraint, and when hidden task-by-task padding has been quietly eroding your schedules. The driver here: <strong>whether resources are the binding constraint</strong>.</p>
+<p><strong>Diagnose the project - not your habit.</strong> You choose by reading three honest things. The <em>uncertainty of the requirements</em>: well-understood, stable asset work leans predictive; novel, evolving, research-like work leans adaptive; a mix leans hybrid. The <em>resource constraint</em>: if shared specialists or scarce equipment gate the project - a shutdown competing for the same crews - critical chain and its pooled buffer protect it far better than task-by-task padding. And the <em>consequence of being wrong</em> about the plan. Then two honest points that are really about people. <strong>The cost of a mismatched project system is always paid by people. Forcing a rigid, predictive plan onto uncertain work creates the death-march: burnout, wasted effort, and the quiet despair of defending a plan everyone knows is wrong.</strong> And its opposite is real too: running a loose adaptive cycle over well-known work invites drift and cost you never needed to bear. <strong>Choosing the right system for the work is an act of respect for the people who must execute it. It gives them a framework that fits reality, not one that fights it.</strong></p>
+<p><strong>Weigh the impact on the organisation and the environment.</strong> There is one more criterion that the habit-driven choice always forgets: the delivery approach itself has consequences beyond the project. Compare a predictive big-bang cutover - everything changes on one date - with an adaptive phased rollout: the first lands a heavy shock of disruption, retraining and risk on the organisation all at once, while the second spreads the load and lets people absorb the change, but stretches the disturbance over a longer period. And the approaches differ in their environmental footprint too - a plan that tears out and replaces in one pass versus one that reuses, phases, and adapts can mean very different waste, energy and emissions from the delivery itself. So when you compare the systems, compare them not only on cost and time but on their <em>impact on the organisation</em> (how much disruption, learning and strain they impose on the people, and whether the organisation can actually absorb it) and their <em>impact on the environment</em> (the waste and emissions of the approach). The right system is often the one whose impact the organisation and its surroundings can bear, not the one that looks fastest on paper.</p>
+<p><strong>Match the system - and do not defend a disproven plan.</strong> The whole craft comes down to matching the approach to the work and then having the honesty to adjust when the work speaks. If a predictive plan on genuinely uncertain work turns out wrong, you adapt it - you do not crunch the team to defend a date that was never real. And there is a quieter honesty in the second choice too. <strong>Critical chain's pooled project buffer is an act of honesty. Instead of hiding safety time in every task, it puts the buffer where it protects the whole project, making the trade-offs visible and the commitment real.</strong> A system chosen to fit the work, run with the honesty to change when reality changes, is how you escape both the drift and the death-march.</p>
+<p>Does it scale? This is how you take on any piece of work with a shape and a deadline - a study, a home renovation, a career move. Ask first "how much of this do I actually know in advance?" - and plan it fully if you know it, or take it in learning cycles if you do not; then ask "what is the one scarce thing everything competes for?" - and protect that, honestly, rather than padding every step. And whatever you chose, when the work tells you the plan is wrong, believe the work, not the plan. The method is never the software; it is the honest choice of how to run the thing in front of you.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Onalenna has two new projects at Corathyl. Your job is to choose a project-management system for each - proving the craft is diagnosis, not one habitual method.</p>
+<p><strong>Project A - the clarifier refurbishment.</strong> Refurbishing a well-documented clarifier: the scope is fixed and well understood, but the work needs a specialist rigging team that is also scheduled for three other critical jobs this quarter.</p>
+<p><strong>Project B - the experimental recycling process.</strong> Developing a new water-recycling process: the science is promising, but the exact steps and the final design will only become clear after the first few pilot runs.</p>
+<ol>
+<li><strong>Choose the approach.</strong> For A and for B, predictive, adaptive, or hybrid? Justify from the project's <em>uncertainty</em>.</li>
+<li><strong>Choose the scheduling method.</strong> For each, critical path or critical chain? Justify from the project's <em>constraint</em>.</li>
+<li><strong>Name the human cost.</strong> For each, describe the death-march or the drift that would follow from choosing the <em>wrong</em> system.</li>
+<li><strong>Separate the system from the tool.</strong> Explain why your choices in (1) and (2) are not the same as choosing a scheduling software product.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the approaches: <em>Project A</em> is <strong>predictive</strong> - the scope is fixed and well understood, so a full up-front plan is a real map, not a fiction. <em>Project B</em> is <strong>adaptive</strong> - the requirements genuinely will not be known until the pilots reveal them, so you deliver in learning cycles rather than pretending to a fixed design. (A hybrid is defensible for B if a stable outer frame surrounds an uncertain core.)</p>
+<p>Second, the scheduling: <em>Project A</em> is <strong>critical chain</strong> - the binding constraint is the shared rigging team competing across four jobs, so you protect that resource and pool the buffer rather than padding each task. <em>Project B</em> - scheduling is secondary while the scope is still unknown; you schedule each short cycle simply, and critical-chain thinking only earns its place once B has a stable, resource-constrained build phase.</p>
+<p>Third, the human cost: run <em>A</em> as a loose adaptive cycle and it drifts - a known job wandering over budget for no reason. Run <em>B</em> as a rigid predictive plan and it becomes a death-march - the team crunched to defend a detailed design that every pilot disproves, morale and trust bleeding out to protect a date that was never real. Each wrong choice is paid for by the people.</p>
+<p>Fourth, the system versus the tool: predictive-versus-adaptive and critical-path-versus-critical-chain are <em>decisions about how to run the project</em>. A scheduling software product is just where you draw the resulting plan - the same tool can hold either system, and choosing the tool decides nothing about the approach. The system is the approach; the software only implements it.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-system_not_software">1. The system is the approach, not the software</label><textarea id="cb-system_not_software" data-key="t-0246:system_not_software" placeholder="The commonest confusion in the field: that the scheduling package you use is your project-management system. It is not. The software draws whatever plan you give it; the SYSTEM is the approach you choose - how you handle changing requirements, and how you schedule and protect the work. Two projects can run on the same software with completely different systems and get completely different results. So the question is never &#039;which tool?&#039; but &#039;which approach fits this work?&#039; - and there is no single best answer."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-predictive_adaptive_hybrid">2. First choice - predictive, adaptive, or hybrid (the requirements)</label><textarea id="cb-predictive_adaptive_hybrid" data-key="t-0246:predictive_adaptive_hybrid" placeholder="A PREDICTIVE (plan-driven) approach fixes scope, cost and time up front and delivers to the plan - powerful when the work is well understood and stable (a pump swap, a tank refurbishment), brittle when requirements change. An ADAPTIVE (iterative, incremental) approach delivers in small cycles with feedback and expects requirements to evolve - powerful under high uncertainty or novelty, wasteful and loose when the scope was well known. A HYBRID uses predictive for the understood parts and adaptive for the uncertain. The driver: HOW MUCH IS KNOWN IN ADVANCE."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-path_or_chain">3. Second choice - critical path or critical chain (the schedule)</label><textarea id="cb-path_or_chain" data-key="t-0246:path_or_chain" placeholder="Independent of the first choice. CRITICAL PATH manages the sequence of dependent tasks whose total duration sets the project length, and builds safety time into individual tasks - clear and standard when scope and resources are known and available. CRITICAL CHAIN additionally accounts for RESOURCE contention (the same scarce crew or single crane needed by several tasks) and pools the safety time into one project buffer at the end instead of padding every task - stronger when shared/scarce resources are the binding constraint. The driver: WHETHER RESOURCES ARE THE BINDING CONSTRAINT."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-diagnose_the_project">4. Diagnose the project - not your habit</label><textarea id="cb-diagnose_the_project" data-key="t-0246:diagnose_the_project" placeholder="Choose by reading these things. UNCERTAINTY of the requirements: stable, well-understood work leans predictive; novel, evolving work leans adaptive; a mix leans hybrid. RESOURCE CONSTRAINT: if shared specialists or scarce equipment gate the project, critical chain and its pooled buffer protect it better than task padding. CONSEQUENCE of being wrong about the plan. IMPACT ON THE ORGANISATION AND ENVIRONMENT: a big-bang cutover shocks the organisation and can waste more than a phased, adaptive rollout - choose a system whose impact the people and surroundings can bear. And the human truth: the cost of a mismatched system is always paid by people - a rigid plan on uncertain work is a death-march; a loose cycle on known work is drift."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-match_do_not_defend">5. Match the system - and do not defend a disproven plan</label><textarea id="cb-match_do_not_defend" data-key="t-0246:match_do_not_defend" placeholder="The craft comes down to matching the approach to the work and then having the honesty to adjust when the work speaks. If a predictive plan on uncertain work turns out wrong, you adapt it - you do not crunch the team to defend a date that was never real. And critical chain&#039;s pooled buffer is an act of honesty: instead of hiding safety time in every task, it puts the buffer where it protects the whole project, making the trade-offs visible and the commitment real. A system chosen to fit the work, run with the honesty to change, escapes both the drift and the death-march."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you can diagnose a project and choose both dials from it - and separate the approach from the tool - <strong>save it</strong>. You can now match the project-management system to the work, and spare your team the drift and the death-march.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The system is the approach, not the software - so choose the approach that fits how much the project is known and what constrains it, and never defend a plan the work has already disproved.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Confusing the software with the system.</strong> The scheduling package draws whatever plan you give it; it is not your method. Choose the approach first, then use the tool to implement it.</p>
+<p>&bull; <strong>One approach by habit.</strong> Running every project the way you ran the last one guarantees a mismatch. Diagnose this project - its uncertainty and its constraint - and choose for it.</p>
+<p>&bull; <strong>A rigid plan on uncertain work.</strong> Forcing a fixed predictive plan onto genuinely novel work creates the death-march. High uncertainty needs an adaptive, learn-as-you-go approach.</p>
+<p>&bull; <strong>A loose cycle on known work.</strong> Running well-understood work in open-ended cycles invites drift and needless cost. Known scope deserves a plan.</p>
+<p>&bull; <strong>Task-by-task padding.</strong> Hiding safety time in every task hides the real schedule and gets wasted anyway. Where resources are the constraint, pool the buffer where it protects the whole - the honest way.</p>
+<p>&bull; <strong>Ignoring the resource constraint.</strong> If a shared crew or a single machine gates the project, task-focused scheduling misses the real bottleneck. Manage the resource, not just the sequence.</p>
+<p>&bull; <strong>Defending a plan the work has disproved.</strong> A plan is a guide, not a promise to reality. When the work proves it wrong, adapt it - and never treat the crunch as a normal cost of doing projects.</p>
+<p>&bull; <strong>Ignoring the impact on the organisation and the environment.</strong> The fastest-looking approach can land a shock of disruption the organisation cannot absorb, or a wasteful delivery footprint. Compare the systems on their impact on the people and the surroundings, not only on cost and time.</p>
+</div>
+</details>
+<p>Your projects failed in opposite ways because you ran them the same way, and called a tool a method. Now you can choose. Separate the system from the software; read how much the project is known and set predictive, adaptive, or hybrid; read what everything competes for and set critical path or critical chain; and when the work disproves the plan, adapt it rather than crunch the people to defend it. <strong>The system is the approach, not the software - so choose the project system that fits the project's reality, not the one you used last time, and spare your team the drift and the death-march.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can choose a project-management system now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

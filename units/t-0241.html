@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No single best way</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>No single best way</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You announced the new culture. You wrote the plan - a good one. You held the kickoff meeting, put the posters up, sent the memo. And nothing changed. People nodded, complied where you were watching, and went back to exactly how they always did things the moment you turned around.</p>
+<p>Here is what stings: your goal was right, and your plan was sound. What broke it was the <em>method</em>. You reached for the wrong approach - you decreed a change that people had to genuinely believe in, and got public compliance without private belief; or, another time, you tried to gently involve everyone in a crisis that needed a firm and immediate hand, and it drifted. The failure was not in the what. It was in the how you tried to make it happen.</p>
+<blockquote><h2>I know what culture we need and I can write the plan - but the moment I try to make it real it stalls, because I keep choosing the wrong way to bring it about. How do I choose the right approach to changing a culture?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> You know exactly what has to change and the plan is sound — nobody disputes the diagnosis. It stalls every time. Look at the two attempts behind you. The reporting culture needed people to genuinely believe that raising a problem was safe, and you <strong>announced it</strong>: from Monday, all near-misses to be reported. You got compliance, and not one person told you anything that mattered. Then the effluent breach needed a firm hand within a week, and you <strong>consulted everybody</strong> — three workshops, wide input, and it drifted for two months. Both times you were competent and well-meaning. This change is different again in what it asks of people. Write down how you would choose your approach — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the two axes underneath</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Find the method that actually works and use it.&rdquo;</strong> The search that will keep failing. <strong>A method that transforms one organisation fails in the next</strong> — not because it is bad, but because it was the wrong fit, which is precisely what your own two attempts demonstrate.</p>
+<p>&bull; <strong>&ldquo;Be firmer — I was too soft the second time.&rdquo;</strong> Half the lesson, taken as the whole. Applied to the reporting culture, more firmness would have produced more compliance and even less truth.</p>
+<p>&bull; <strong>&ldquo;Involve people more — that is what went wrong the first time.&rdquo;</strong> The opposite half, equally partial. Applied to the effluent breach it is what already drifted for two months while a real problem continued.</p>
+<p>&bull; <strong>&ldquo;Get better at communicating it.&rdquo;</strong> Both attempts were communicated clearly. People understood exactly what was being asked in each case; what differed was whether the way of asking suited what was being asked.</p>
+<p>&bull; <strong>&ldquo;Bring in someone who does this professionally.&rdquo;</strong> They will ask you which approach fits here — and if they do not, they will apply their favourite one, which is the same error with an invoice attached.</p>
+<p>&bull; The thing to un-learn is the search for the one correct method. <strong>This is not a discipline with a single true path</strong>; it is a set of choices, each right in some situations and wrong in others. So stop asking what the best way is and ask <strong>what the right way is here — for this change, this urgency, these people.</strong> The choice runs on <strong>two independent axes.</strong> First, <strong>who drives it</strong>: imposed from the top by authority, which is fast and takes no account of the views of those affected — so it misses what they know and buys <strong>compliance rather than belief</strong>, which is exactly what your near-miss announcement bought; or worked out with the people who must live it, which is slower and produces genuine ownership. Second, <strong>how it unfolds</strong>: laid out in advance as a defined sequence, or allowed to develop as understanding grows. Neither end of either axis is correct, and the effluent breach shows the cost of choosing wrongly in the other direction. And in practice the answer is usually <strong>a blend</strong> — some things held firm because they are genuinely not negotiable, and much left open because the people doing the work know things your plan cannot.</p>
+</div>
+</details>
+<p>There is no single best way - only the right fit. Let us learn to choose it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you compare the approaches to culture change and choose the right one - reading the two axes of choice, diagnosing your situation, and blending them to fit the change and the people who must live it.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. No single best way - the approach matters as much as the change</div><p class="cb-demo">The first thing to un-learn is the search for the one correct method. CHANGE MANAGEMENT IS NOT A RELIGION WITH A SINGLE TRUE PATH; it is a set of choices, each right in some situations and wrong in others. A method that transforms one organisation FAILS in the next - not because it was a bad method, but because it was the wrong FIT. So stop asking &#039;what is the best way to change a culture?&#039; and start asking &#039;WHAT IS THE RIGHT WAY HERE - for this change, this urgency, these people?&#039; THE APPROACH YOU CHOOSE WILL MAKE OR BREAK A PLAN THAT IS OTHERWISE SOUND. There is no single best way; there is only the right fit for the situation and for the people who must live the change - and the craft is not having the best plan, but choosing the right approach.</p></div><div class="canvas-box"><div class="cb-label">2. Axis one - directive or participative (who drives it)</div><p class="cb-demo">The first choice is WHO OWNS THE CHANGE. A DIRECTIVE approach imposes it from the top by authority - &#039;this is how it will be from Monday.&#039; Its strength is SPEED: change can be pushed through quickly. Its costs are heavy and predictable - it takes no account of the views of the people affected, so it MISSES THE KNOWLEDGE AND IDEAS THEY HOLD, and it commonly breeds RESENTMENT, because change done TO people rather than WITH them is resisted. A PARTICIPATIVE approach involves the people who are affected in shaping the change. It is SLOWER and less controlled from the top, but it earns genuine BUY-IN and surfaces information the people on the ground can see and the managers cannot. The trade-off on this axis is stark and simple: SPEED VERSUS BUY-IN.</p></div><div class="canvas-box"><div class="cb-label">3. Axis two - planned or emergent (how it unfolds)</div><p class="cb-demo">The second choice is the SHAPE of the journey. A PLANNED approach treats change as a top-down sequence of DEFINED STEPS, laid out in advance - predictable, orderly, and well suited to a STABLE environment where you can see the path. An EMERGENT approach treats change as a continuous, bottom-up process of EXPERIMENT, LEARN, AND ADAPT - less tidy, but far better suited to a TURBULENT environment where the path keeps shifting and a rigid plan would shatter on contact with reality. The trade-off here is PREDICTABILITY VERSUS ADAPTABILITY. And these two axes are NOT four rival doctrines to pick between - they are TWO DIALS you set, independently, to match your situation: who drives it (directive/participative) and how it unfolds (planned/emergent).</p></div><div class="canvas-box"><div class="cb-label">4. Choose by diagnosing the situation - a culture cannot be commanded</div><p class="cb-demo">You set the dials by reading THREE honest things. URGENCY: a genuine crisis or a hard, non-negotiable deadline pushes you more directive and more planned - there is no time for slow consensus when the plant is unsafe today. THE DEPTH OF BUY-IN THE CHANGE NEEDS: and this is decisive for culture, because A CULTURE IS WHAT PEOPLE ACTUALLY DO WHEN NO ONE IS WATCHING, and that cannot be ordered into existence; a change people must believe in and live daily leans strongly participative. THE STABILITY OF THE ENVIRONMENT: stable favours planned, turbulent favours emergent. And hold this at the centre: THE CHOICE OF APPROACH IS AN ACT OF ACCEPTANCE. A PURELY DIRECTIVE APPROACH THAT TREATS PEOPLE AS INSTRUMENTS TO BE COMMANDED, OR AS OBSTACLES TO BE OVERCOME, VIOLATES THE STANDARD OF ACCEPTING PEOPLE AS THEY ARE. A PARTICIPATIVE APPROACH IS NOT SOFTNESS; IT IS THE RECOGNITION THAT THE PEOPLE WHO MUST LIVE THE CHANGE ARE WHOLE AND WELCOME, THE HOLDERS OF THE CURRENT CULTURE AND THE ONLY SOURCE OF THE NEW ONE. YOU CANNOT COMMAND A CULTURE INTO BEING BECAUSE A CULTURE IS WHAT PEOPLE CHOOSE TO DO WHEN NO ONE IS WATCHING. YOUR ROLE IS TO CREATE THE CONDITIONS IN WHICH THEY MAKE THE RIGHT CHOICE.</p></div><div class="canvas-box"><div class="cb-label">5. Blend loose-tight - and match the approach to the change</div><p class="cb-demo">In practice the best change is rarely all one thing. The seasoned answer is LOOSE-TIGHT: be TIGHT - firm, directive, non-negotiable - on the FEW THINGS THAT MUST BE TRUE (the safety-critical standard, the direction of travel, the outcomes that matter), and LOOSE - participative, adaptive, emergent - on HOW PEOPLE GET THERE. Firm on the WHAT; open on the HOW. This gives people a clear and steady direction while letting them OWN THE PATH, which is exactly the combination that earns belief without losing control. And it names the classic, expensive failure for what it is: USING A FAST DIRECTIVE APPROACH TO FORCE A DEEP CULTURE CHANGE THAT COULD ONLY EVER HAVE BEEN EARNED - the change is announced, complied with in public, quietly ignored in private, and the gap between what people say and what they do only widens. Match the approach to the change: the deepest changes are never installed, they are chosen by the people who live them.</p></div></div>
+
+<p>Boxes 2 and 3 are the two axes you set. Box 4 is how you diagnose which way to set them. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>There is no single best way to change a culture; there is only the right fit for the situation and for the people who must live it.</strong> The craft is not in having the best plan, but in choosing the right approach. Five questions:</p>
+<ul>
+<li><strong>Is there a best method?</strong> <strong>No - only the right fit.</strong> The approach you choose matters as much as the change itself; every approach is right somewhere and wrong somewhere else.</li>
+<li><strong>Who drives it?</strong> <strong>Directive or participative.</strong> Imposed from the top (fast, but resented and blind to what people know) versus shaped with the people (slower, but real buy-in). Speed against buy-in.</li>
+<li><strong>How does it unfold?</strong> <strong>Planned or emergent.</strong> A staged, top-down sequence (predictable, suits a stable world) versus a continuous, learn-as-you-go process (adaptive, suits a turbulent one). Predictability against adaptability.</li>
+<li><strong>How do I choose?</strong> <strong>Diagnose the situation.</strong> Set the dials from urgency, the depth of buy-in the change needs, and how stable your environment is - and remember a culture cannot be commanded.</li>
+<li><strong>What does the mature version look like?</strong> <strong>Blend - loose-tight.</strong> Tight on the few non-negotiables, loose on how people get there. Firm on the what, participative on the how.</li>
+</ul>
+<p><strong>No single best way - the approach matters as much as the change.</strong> The first thing to un-learn is the search for the one correct method. Change management is not a religion with a single true path; it is a set of choices, each right in some situations and wrong in others. A method that transforms one organisation fails in the next, not because it was a bad method, but because it was the wrong <em>fit</em>. So stop asking "what is the best way to change a culture?" and start asking "what is the right way <em>here</em> - for this change, this urgency, these people?" The approach you choose will make or break a plan that is otherwise sound.</p>
+<p><strong>Axis one - directive or participative: who drives the change.</strong> The first choice is who owns the change. A <em>directive</em> approach imposes it from the top by authority - "this is how it will be from Monday." Its strength is speed: change can be pushed through quickly. Its costs are heavy and predictable - it takes no account of the views of the people affected, so it misses the knowledge and ideas they hold, and it commonly breeds resentment, because change done <em>to</em> people rather than <em>with</em> them is resisted. A <em>participative</em> approach involves the people who are affected in shaping the change. It is slower and less controlled from the top, but it earns genuine buy-in and surfaces information and ideas that the people on the ground can see and the managers cannot. The trade-off on this axis is stark and simple: <strong>speed versus buy-in.</strong></p>
+<p><strong>Axis two - planned or emergent: how the change unfolds.</strong> The second choice is the shape of the journey. A <em>planned</em> approach treats change as a top-down sequence of defined steps, laid out in advance - predictable, orderly, and well suited to a <em>stable</em> environment where you can see the path. An <em>emergent</em> approach treats change as a continuous, bottom-up process of experiment, learn, and adapt - less tidy, but far better suited to a <em>turbulent</em> environment where the path keeps shifting and a rigid plan would shatter on contact with reality. The trade-off here is <strong>predictability versus adaptability.</strong> These two axes are not four rival doctrines to pick between - they are two dials you set, independently, to match your situation.</p>
+<p><strong>Choose by diagnosing the situation - and a culture cannot be commanded.</strong> You set the dials by reading three honest things. <em>Urgency:</em> a genuine crisis or a hard, non-negotiable deadline pushes you more directive and more planned - there is no time for slow consensus when the plant is unsafe today. <em>The depth of buy-in the change needs:</em> and this is the decisive one for culture, because a culture is not a procedure you can enforce - <strong>a culture is what people actually do when no one is watching</strong>, and that cannot be ordered into existence; a change people must believe in and live daily leans strongly participative. <em>The stability of the environment:</em> stable favours planned, turbulent favours emergent. And hold this at the centre of it all: <strong>the choice of approach is an act of acceptance. A purely directive approach that treats people as instruments to be commanded, or as obstacles to be overcome, violates the standard of accepting people as they are. A participative approach is not softness; it is the recognition that the people who must live the change are whole and welcome, the holders of the current culture and the only source of the new one. You cannot command a culture into being because a culture is what people choose to do when no one is watching. Your role is to create the conditions in which they make the right choice.</strong></p>
+<p><strong>The mature version is a blend - loose-tight.</strong> In practice the best change is rarely all one thing. The seasoned answer is <em>loose-tight</em>: be <strong>tight</strong> - firm, directive, non-negotiable - on the few things that must be true (the safety-critical standard, the direction of travel, the outcomes that matter), and <strong>loose</strong> - participative, adaptive, emergent - on how people get there. Firm on the <em>what</em>; open on the <em>how</em>. This gives people a clear and steady direction while letting them own the path, which is exactly the combination that earns belief without losing control. And it names the classic, expensive failure for what it is: using a fast directive approach to force a deep culture change that could only ever have been earned - the change is announced, complied with in public, quietly ignored in private, and the gap between what people say and what they do only widens.</p>
+<p>Does it scale? This is how you approach changing anything that lives in people - a team's habits, a family's patterns, your own. Ask not "what is the one right method?" but "who needs to own this, and how much can be planned versus discovered?" - and set your two dials from the real urgency, the real need for belief, and the real stability of the ground. Then hold firm on the few things that must be true and open on the rest. The deepest changes are never installed; they are chosen by the people who live them, and your craft is to choose the approach that lets them choose well.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here are two changes at Corathyl. Your job is to set the dials differently for each - proving the craft is diagnosis, not one favourite method.</p>
+<p><strong>Scenario A - the crisis.</strong> A serious safety near-miss has revealed that a specific isolation procedure is being done wrong. It must change immediately, exactly, and without exception - lives depend on it.</p>
+<p><strong>Scenario B - the improvement.</strong> Onalenna wants to shift the plant's culture from "run to failure and fix it heroically" to "catch problems early and prevent them" - a change people must believe in and live every day.</p>
+<ol>
+<li><strong>Place each change on the two axes.</strong> For A and for B, where do you set directive-vs-participative and planned-vs-emergent?</li>
+<li><strong>Justify from the diagnosis.</strong> For each, say which of urgency, depth-of-buy-in, and environment drove your setting.</li>
+<li><strong>Name tight and loose.</strong> For the change you would blend, say what you would hold tight (non-negotiable) and what you would leave loose (theirs to shape).</li>
+<li><strong>Spot the failure.</strong> For Scenario B, describe what would happen if you ran it the way you should run Scenario A.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the placements: <em>Scenario A</em> is strongly <strong>directive and planned</strong> - the procedure is fixed, mandated, and rolled out as defined steps; there is no negotiating a safety-critical isolation. <em>Scenario B</em> is strongly <strong>participative</strong> and blended toward <strong>emergent</strong> - a prevention culture only exists if the technicians choose it, and how it takes root will be learned area by area.</p>
+<p>Second, the diagnosis: A is driven by <em>urgency</em> and non-negotiable safety (no time, no discretion). B is driven by the <em>depth of buy-in</em> a culture requires (belief cannot be commanded) and a relatively stable environment that still needs room to adapt.</p>
+<p>Third, tight and loose for B: <strong>tight</strong> on the non-negotiables (safety-critical checks are mandatory; the condition data will be looked at and acted on; prevention is the direction, full stop), and <strong>loose</strong> on the how (each team designs its own rounds, chooses its own early-warning signs, adapts as it learns). Firm on the what, open on the how.</p>
+<p>Fourth, the failure: if B were run like A - imposed by memo, "from Monday everyone does preventive rounds, no discussion" - you would get ticked boxes and no belief. People would perform prevention when watched and revert the moment they were not, the say-do gap would widen, and the culture would not move, because you tried to command what could only be earned.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-no_single_best_way">1. No single best way - the approach matters as much as the change</label><textarea id="cb-no_single_best_way" data-key="t-0241:no_single_best_way" placeholder="Change management is not a religion with one true path; it is a set of choices, each right in some situations and wrong in others. A method that transforms one organisation fails in the next - not because it was bad, but because it was the wrong FIT. So stop asking &#039;what is the best way to change a culture?&#039; and ask &#039;what is the right way HERE - for this change, this urgency, these people?&#039; The approach you choose will make or break a plan that is otherwise sound."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-directive_or_participative">2. Axis one - directive or participative (who drives it)</label><textarea id="cb-directive_or_participative" data-key="t-0241:directive_or_participative" placeholder="A DIRECTIVE approach imposes the change from the top by authority (&#039;this is how it will be from Monday&#039;) - FAST, but it takes no account of the people affected, misses their knowledge, and breeds resentment, because change done TO people is resisted. A PARTICIPATIVE approach involves the affected people in shaping the change - SLOWER and less top-down, but it earns real buy-in and surfaces ideas the managers cannot see. The trade-off: SPEED versus BUY-IN."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-planned_or_emergent">3. Axis two - planned or emergent (how it unfolds)</label><textarea id="cb-planned_or_emergent" data-key="t-0241:planned_or_emergent" placeholder="A PLANNED approach treats change as a top-down sequence of defined steps laid out in advance - predictable, orderly, suited to a STABLE environment where you can see the path. An EMERGENT approach treats change as a continuous, bottom-up process of experiment-learn-adapt - less tidy, but far better suited to a TURBULENT environment where a rigid plan would shatter on contact with reality. The trade-off: PREDICTABILITY versus ADAPTABILITY. These two axes are two dials you set independently, not four doctrines to pick between."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-choose_by_diagnosing">4. Choose by diagnosing the situation - a culture cannot be commanded</label><textarea id="cb-choose_by_diagnosing" data-key="t-0241:choose_by_diagnosing" placeholder="Set the dials by reading three things. URGENCY: a genuine crisis or hard deadline pushes you directive and planned. THE DEPTH OF BUY-IN THE CHANGE NEEDS: decisive for culture, because a culture is what people do when no one is watching and cannot be ordered - deep change leans participative. THE STABILITY OF THE ENVIRONMENT: stable favours planned, turbulent favours emergent. The choice of approach is an act of acceptance: a directive-only approach treats people as instruments; a participative one recognises them as the holders of the current culture and the only source of the new."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-blend_loose_tight">5. Blend loose-tight - and match the approach to the change</label><textarea id="cb-blend_loose_tight" data-key="t-0241:blend_loose_tight" placeholder="The best change is rarely all one thing. The mature answer is LOOSE-TIGHT: be TIGHT (firm, directive, non-negotiable) on the few things that must be true - the safety-critical standard, the direction of travel, the outcomes that matter - and LOOSE (participative, adaptive, emergent) on how people get there. Firm on the WHAT, open on the HOW. The classic expensive failure: using a fast directive approach to force a deep culture change that could only be earned - announced, complied with in public, ignored in private, and the say-do gap widens."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you can set both dials from an honest read of the situation - and know what to hold tight and what to leave loose - <strong>save it</strong>. You can now choose the right way to change a culture, not just the fastest.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>There is no single best way to change a culture; there is only the right fit for the situation and for the people who must live it - and you cannot command a culture into being.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Believing one approach is always best.</strong> The method that transformed one organisation fails in the next. Ask not "what is the best way?" but "what is the right way here?"</p>
+<p>&bull; <strong>Imposing a change that needs belief.</strong> A culture is what people do unwatched; it cannot be decreed. For deep change, lean participative - you earn a culture, you do not order it.</p>
+<p>&bull; <strong>Endless participation in a crisis.</strong> When the plant is unsafe today, a firm directive hand is not disrespect - it is responsibility. Urgency earns the right to be directive.</p>
+<p>&bull; <strong>A rigid plan in a turbulent world.</strong> A fixed sequence shatters on shifting ground. When the path keeps moving, go emergent - experiment, learn, adapt.</p>
+<p>&bull; <strong>Drifting emergently against an entrenched habit.</strong> Pure bottom-up drift never overcomes a deep old habit. Be tight on the direction so the drift has something to gather around.</p>
+<p>&bull; <strong>Confusing compliance with change.</strong> Public nodding is not private belief. If people revert the moment you look away, you chose the wrong approach, not the wrong people.</p>
+<p>&bull; <strong>Treating people as obstacles.</strong> The holders of the current culture are the only source of the new one. Respect for them is not softness; it is how culture actually changes.</p>
+<p>&bull; <strong>Being loose on the non-negotiables.</strong> Openness is not the absence of direction. Hold the few things that must be true firmly tight, and leave the rest genuinely loose.</p>
+</div>
+</details>
+<p>Your plan was sound and your goal was right; what stalled it was reaching for the wrong way to bring it about. Now you can choose. Read the two axes - who drives it, and how it unfolds - and set them from the real urgency, the real need for belief, and the real stability of the ground; hold tight on the few things that must be true and leave the rest loose for the people to shape; and never try to command a culture, because a culture is only ever chosen by the people who live it. <strong>There is no single best way to change a culture - only the right fit for the situation and the people - and your craft is not the best plan, but the right approach for those who must live the change.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can choose a culture-change approach now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

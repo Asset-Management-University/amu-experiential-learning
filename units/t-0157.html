@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I assessed the chain for accidents, never for intent</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>I assessed the chain for accidents, never for intent</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>A consignment of critical pump spares reaches Corathyl Water Treatment Works short. The manifest says four drums were loaded. Three came off the truck. The fourth was signed for at a transit depot, by a signature nobody can turn into a person, at the exact point where custody passed from one party to another and each assumed the other was counting.</p>
+<p>You are Onalenna, and you already have a supply-chain risk register. You open it. Supplier insolvency. Lead-time overrun. Price escalation. Wrong part supplied. Shipping delay. It is a good register, carefully kept - and every single line in it assumes the chain will fail by <em>accident</em>.</p>
+<p>Not one line assumes that somebody <strong>wants</strong> what you are moving.</p>
+<p>So you cannot answer the two questions the board will ask tomorrow morning. Was this bad luck, or was it a rehearsal? And where else, tonight, could exactly this happen? You have assessed your supply chain the way an engineer assesses a machine - looking for the part most likely to break - and the thing that took your drum was not a failure. It was a choice, made by someone who looked at your chain and saw the same weak point you had never thought to look for.</p>
+<blockquote><h2>My supply chain is assessed for things going wrong, not for someone making them go wrong. How do I assess it for deliberate acts, and produce a security risk register that shows where I am actually exposed?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> You assessed that supply chain properly. Supplier financial stability, lead-time reliability, damage in transit, what happens if the manufacturer stops making the part — all of it, documented. Then a drum went missing between the transit depot and the final leg. Not damaged, not delayed, not mislaid: <strong>taken</strong>. Between the supplier and your store that consignment passes through a road carrier, a third-party depot and a second carrier, and your assessment had no reason to look at any of them, because none of them is likely to <em>break</em>. Write down how you would assess a chain for deliberate acts — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the question that changes the map</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Change carriers — this one clearly cannot be trusted.&rdquo;</strong> You do not know it was the carrier, and the next one will have the same seams in the same places. You would be replacing a party rather than closing a gap.</p>
+<p>&bull; <strong>&ldquo;Add security — seals, cameras, tracking.&rdquo;</strong> Possibly right, and applied without knowing where you are exposed it is expensive decoration. Measures spread evenly across a chain are thin everywhere, and the seam that matters stays as thin as before.</p>
+<p>&bull; <strong>&ldquo;Insure the consignments.&rdquo;</strong> Recovers the money and does nothing about the exposure. It also does nothing at all for the failure mode where something is not taken but <em>swapped</em>, since you would never claim for a loss you never noticed.</p>
+<p>&bull; <strong>&ldquo;Tighten receipt checks at the store.&rdquo;</strong> Catches it later, at the last possible point, after the item has passed through every hand that might have acted — by which time attributing anything is impossible.</p>
+<p>&bull; <strong>&ldquo;Rerun the risk assessment more thoroughly.&rdquo;</strong> More of an analysis that asks the wrong question. Looking harder for what is likely to break will find you more fragile components, and the drum was not a fragile component.</p>
+<p>&bull; The two analyses ask different questions and draw <strong>different maps</strong>. Looking for what is most likely to break finds the fragile part; looking for <strong>who wants what is moving</strong> finds wherever the valuable thing is least watched — and those are rarely the same place. So walk the chain that way, with two disciplines. Draw it as <strong>custody rather than geography</strong> — the moments responsibility passes from one party to another — and count those by <strong>hands rather than by places</strong>, because counting locations quietly omits the carriers, which is exactly where a load spends its unwatched hours. Yours has five custodians, and therefore <strong>four handovers</strong>. Loss concentrates there for a reason worth saying plainly: <strong>each party believes the other was responsible</strong>, so an adversary need not defeat anybody's security — only act in the gap between two people's idea of it. Second, consider <strong>the whole range of deliberate acts</strong> rather than writing theft four times: substitution, tampering, diversion, interference with the information. The ones that <em>remove</em> nothing are the ones a loss-focused eye never sees at all. And that is why this is not just a different checklist — an accident has no intent to anticipate, while an adversary <strong>chooses</strong> the seam.</p>
+</div>
+</details>
+<p>There is a standard for exactly this, and a way to work it in an afternoon. Here it is, for the spares flow.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the supply-chain security assessment - the same chain, walked by someone asking who might want what is on it.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Where does the item change hands? (draw the chain as custody)</div><p class="cb-demo">Draw the actual physical journey - every NODE (supplier, port, transit depot, site store) and every LEG (each transport movement between them) - for one critical flow. Then mark the CUSTODY TRANSFERS: the moments responsibility passes from one party to another. Count them by counting HANDS, not places: the spares pass through five custodians - the supplier, the road carrier that collects the load, the third-party transit depot, the second carrier that runs the final leg, and the Corathyl store - and five custodians means FOUR custody transfers between them. Count places instead of custodians and you will miss the carriers entirely, which is precisely where a load spends its unwatched hours. This is not a process map drawn for efficiency; it is a map drawn to find where control is WEAKEST. Loss concentrates at handovers, because that is where each party believes the other was responsible - and an adversary does not need to defeat your security, only to act in the gap between two people&#039;s idea of it.</p></div><div class="canvas-box"><div class="cb-label">2. What could be done to it, deliberately? (the four ISO 28000 categories)</div><p class="cb-demo">ISO 28000 requires the assessment to consider the likelihood AND all the consequences of events across FOUR categories, and the discipline is to fill all four rather than write theft four times. (i) PHYSICAL - functional failure, incidental damage, malicious damage, criminal action: a sealed drum opened and part-emptied in the depot. (ii) OPERATIONAL - the control of security, human factors, the way work is actually done: a custody handover signed without anyone counting the load. (iii) NATURAL ENVIRONMENTAL EVENTS THAT RENDER SECURITY MEASURES INEFFECTIVE: the seasonal flood that cuts the access road and drops the gate, the lighting and the cameras for two days - the flood is not the security risk, the UNWATCHED PERIMETER it creates is. (iv) OUTSIDE YOUR CONTROL - failures in externally supplied equipment and services: the depot&#039;s own alarm contract lapses and nobody tells you.</p></div><div class="canvas-box"><div class="cb-label">3. Are we actually exposed, and how badly? (vulnerability, then rate)</div><p class="cb-demo">Work in the order the standard sets: identify the THREAT, then assess the VULNERABILITY that would let it succeed, then rate. This ordering matters, because a threat with no vulnerability is not a risk (a sealed, counted, signed-for load is a poor target) and a vulnerability nobody is positioned to exploit is not one either. You rate the PAIRS, not the fears. Using a 5 x 5 scale aligned to ISO 31000: theft of high-value spares at the transit depot - vulnerability being an uncounted handover into an unsupervised bay - rates LIKELIHOOD 4 x CONSEQUENCE 4 = 16, high. The flooded access road disabling the gate and cameras rates 3 x 3 = 9. Now the register is ordered by exposure rather than by anxiety.</p></div><div class="canvas-box"><div class="cb-label">4. What do we do about it? (layered controls, an owner, a date, a residual)</div><p class="cb-demo">Treat in LAYERS, because any single control fails: DETER (numbered, tamper-evident seals visible at every handover), DETECT (a signed custody handover naming an individual, and a count against the manifest), DELAY (high-value items in a locked cage, not loose in the bay), RESPOND (a discrepancy reported within one hour, to a named person). Each layer gets an OWNER and a DATE, or it is a wish. Then re-rate honestly: likelihood falls from 4 to 2, so the RESIDUAL is 2 x 4 = 8. Notice what did NOT move. The consequence is still 4 - because a stolen critical spare still stops a pump either way. Nearly all operational security controls (deter, detect, delay, respond) reduce LIKELIHOOD; the things that reduce CONSEQUENCE come from business continuity or finance - a second source, a spare held on site, insurance.</p></div><div class="canvas-box"><div class="cb-label">5. The register, and what reopens it (a living document)</div><p class="cb-demo">The deliverable is the SECURITY RISK REGISTER: a row per threat carrying its category, the custody point it attacks, the vulnerability, the likelihood and consequence rating, the layered controls, the owner and date, and the residual. Then write the REVIEW TRIGGERS, because ISO 28000 treats assessment as ongoing rather than as a document: a new route, a new supplier or depot, a new custody transfer, a changed threat picture, or an actual incident or near-miss - any one reopens the register. A security assessment filed once is a snapshot of a chain that has since changed shape, and an adversary only has to notice that before you do.</p></div></div>
+
+<p>Look at what box 2 forces. Left alone, almost everyone writes theft four times. The four categories exist to drag the sweep wider - and category three is the one that surprises people, because a flood is not a security threat until you notice it takes your gate, your lights and your cameras with it. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Reliability risk is about things breaking. <strong>Security risk is about things being broken, by an adversary who attacks the weakest point in your chain of custody.</strong> That difference drives everything. Five questions:</p>
+<ul>
+<li><strong>Where does the item change hands?</strong> Draw the flow as a <strong>chain of custody</strong> - every node, every leg - and mark each <strong>custody transfer</strong>, the handover where responsibility passes between parties. Loss concentrates there, because that is where each party believes the other was watching.</li>
+<li><strong>What could be done to it, deliberately?</strong> Sweep the <strong>four threat categories ISO 28000 requires</strong>: <em>physical</em> (functional failure, incidental damage, malicious damage, criminal action); <em>operational</em> (the control of security, human factors, how the work is really done); <em>natural environmental events that render security measures and equipment ineffective</em>; and <em>factors outside your control</em>, such as an externally supplied service or piece of equipment failing.</li>
+<li><strong>Are we actually exposed, and how badly?</strong> The standard's order is <strong>threat identification, then vulnerability assessment, then risk analysis and evaluation</strong>, aligned with ISO 31000. A threat with no vulnerability is not a risk; a vulnerability nobody is positioned to exploit is not one either. Rate the pairs on <strong>likelihood x consequence</strong>.</li>
+<li><strong>What do we do about it?</strong> <strong>Layered controls</strong> - deter, detect, delay, respond - because any single control fails; each with an owner and a date; then the <strong>residual risk</strong>, recorded honestly. Nearly all operational security controls move <em>likelihood</em>; what moves <em>consequence</em> comes from business continuity or finance - a second source, a spare held on site, insurance.</li>
+<li><strong>What reopens the register?</strong> ISO 28000 treats assessment as <strong>ongoing</strong>, not as a document: a new route, supplier, depot or custody transfer, a changed threat picture, an incident or near-miss.</li>
+</ul>
+<p>A word on the standard itself, so you are not surprised by it. <strong>ISO 28000:2022</strong> is the security management system standard for the supply chain. The 2022 revision moved it onto ISO's <em>harmonized structure</em> - requirements in clauses 4 to 10, sharing core text and definitions with other management system standards, so it integrates with the systems you already run - and widened its scope so it applies to organisations of any type, size or industry, not only those that think of themselves as supply-chain businesses. Clause 4 sets out eight principles for security management, aligning it with ISO 31000. It carries virtually no new requirements over the 2007 version.</p>
+<p>One honest boundary. You are assessing the <em>physical</em> flow for <em>deliberate</em> acts, and producing a security risk register. You are not optimising the chain for cost or lead time; you are not writing the counterfeit-mitigation control plan, which asks a different question - <em>is this part what it claims to be?</em> - and belongs to its own technique; and you are not securing the information system that holds your asset data, which is a separate domain with its own standard and controls. Product integrity, information security and physical custody are three different walls of the same building.</p>
+<p>Does it scale? A reliability assessment walks the chain looking for the oldest link, because that is what breaks first. A security assessment walks the same chain looking for the weakest <em>custody</em> link, because that is where an adversary will act - nobody picks the strongest wall. You are learning to walk your own chain the way someone who wanted your cargo would walk it, and the two walks almost never stop at the same place.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A replacement transformer - long lead time, and the pump station cannot run without it - must move from the port at Meeubaai, by road to a third-party contractor's lay-down yard where it waits about a week for a crane, then by road to a remote Corathyl pump station.</p>
+<ol>
+<li><strong>Map the custody.</strong> Draw the nodes and legs, and mark every custody transfer.</li>
+<li><strong>Walk it as an adversary.</strong> If you wanted to steal, strip, divert or sabotage this transformer, where along this chain would be easiest? Start your assessment there.</li>
+<li><strong>Sweep all four.</strong> Name one credible threat in <em>each</em> of the four ISO 28000 categories. For the natural-environmental one, do not stop at the weather: state which specific control it would disable - fence, gate, lighting, camera, patrol - and what new vulnerability that creates.</li>
+<li><strong>Rate and treat.</strong> Rate the risk of theft or stripping at the contractor's yard on likelihood x consequence, propose a layered control with a named owner, and give the residual rating.</li>
+<li><strong>Reopen it.</strong> State one change that would trigger a review of this register.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 3, check whether your four threats are genuinely four <em>categories</em> or the same threat wearing four hats. Most first attempts read theft, theft, theft, theft. The categories are not a formatting rule - they are there because your imagination has a favourite failure and will happily fill the page with it. And in step 4, when you write the residual, check whether your consequence rating moved. If you claim your seals and signatures reduced the consequence of losing the transformer, ask yourself what actually happens to the pump station when it is gone.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-custody_chain">1. Where does the item change hands? (draw the chain as custody)</label><textarea id="cb-custody_chain" data-key="t-0157:custody_chain" placeholder="Draw the physical flow node by node and leg by leg from source to point of use, and mark every custody transfer - the handovers where responsibility passes from one party to another."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-four_threats">2. What could be done to it, deliberately? (the four ISO 28000 categories)</label><textarea id="cb-four_threats" data-key="t-0157:four_threats" placeholder="Sweep all four threat categories the standard requires, not just the one that comes to mind."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-vulnerability_rate">3. Are we actually exposed, and how badly? (vulnerability, then rate)</label><textarea id="cb-vulnerability_rate" data-key="t-0157:vulnerability_rate" placeholder="Pair each threat with the vulnerability that would let it succeed, then rate likelihood x consequence. A threat with no vulnerability is not a risk."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-treat_layers">4. What do we do about it? (layered controls, an owner, a date, a residual)</label><textarea id="cb-treat_layers" data-key="t-0157:treat_layers" placeholder="Treat in layers - deter, detect, delay, respond - each with a named owner and a date, and record the residual risk honestly."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-register_review">5. The register, and what reopens it (a living document)</label><textarea id="cb-register_review" data-key="t-0157:register_review" placeholder="The documented deliverable - threats, vulnerabilities, ratings, controls, owners, residuals - plus the triggers that reopen it, because the assessment is a standing activity."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now show a board not just what might break, but where someone could take it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Security assessments fail in a small number of ways, and one of them is a failure of decency as well as of method.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Assessing for failure and never for intent.</strong> The original sin. A reliability register and a security register look similar and answer completely different questions.</p>
+<p>&bull; <strong>Calling a threat a risk.</strong> A threat with no vulnerability is not a risk, and a vulnerability nobody can exploit is not one either. Rate the pairs, not the fears, or the register fills with alarm and loses its ordering power.</p>
+<p>&bull; <strong>Treating the natural-environmental category as an odd bolt-on.</strong> A flood is not a security risk. A flood that takes out your cameras and lets someone cross the perimeter unseen <em>is</em> a security risk. The category is there because weather disables controls.</p>
+<p>&bull; <strong>Ignoring the custody transfers.</strong> Assessing nodes and forgetting handovers misses where loss actually concentrates - the gap between two parties' idea of who was responsible.</p>
+<p>&bull; <strong>Single-layer controls.</strong> One seal, one signature, one camera. Every control fails sometimes; deter, detect, delay and respond are four chances, not four synonyms.</p>
+<p>&bull; <strong>Controls with no owner and no date.</strong> Then it is not a treatment plan, it is a list of good intentions.</p>
+<p>&bull; <strong>Claiming a residual you have not earned.</strong> And in particular, assuming controls reduce consequence. Nearly all operational security controls reduce only <em>likelihood</em>; consequence moves through redundancy, a second source, a spare on site, or insurance.</p>
+<p>&bull; <strong>Writing it once and filing it.</strong> The chain changes shape - new depot, new route, new contractor - and an adversary only has to notice before you do.</p>
+<p>&bull; <strong>Letting insider-threat work slide into suspicion.</strong> This one is not negotiable. When assessing insider threats, you assess vulnerabilities in access control, separation of duties, accountability and verification - things that could be exploited by <em>any</em> person in a position of trust. You control ACCESS and ACCOUNTABILITY, you do not profile your workforce. Profiling people by category is wrong, and it is also useless: it tells you nothing about where your uncounted handover is.</p>
+</div>
+</details>
+<p>Onalenna lost a drum because she had never walked her own chain as an adversary would. Map the flow as custody and mark every handover; sweep all four threat categories rather than writing your favourite one four times; pair each threat with the vulnerability that would let it succeed and rate what is left; treat in layers with an owner, a date and an honest residual; and set the triggers that reopen the register, because the chain will change. Reliability asks what might break. Security asks who might want this, and where you have made it easy. If you are working with an AMU Facilitator, take one critical flow of your own and walk it - and count the custody transfers you did not know you had.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can assess a chain for intent now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

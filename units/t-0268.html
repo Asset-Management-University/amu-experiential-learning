@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The drawing is a known lie</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The drawing is a known lie</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You watch a fitter open a drawing, glance at it, and then go and measure the thing anyway.</p>
+<p>You ask why, not as a criticism. He says, without any particular feeling about it, that the drawings are usually about right.</p>
+<p>Usually about right.</p>
+<p>So every job on this site begins with a tax nobody has ever costed: the ten minutes of doubt, the walk to the machine, the re-measurement of something that is written down twelve metres away in a document the organisation believes it maintains. Multiply that by every job, every shift, for years.</p>
+<p>And the exhausting part is not that the documents are wrong. It is that everybody knows they are wrong, and works around it, and has stopped mentioning it - because a system you cannot trust and cannot fix stops being a problem and becomes weather.</p>
+<blockquote><h2>Every drawing on this site is treated as a rumour, and everybody has quietly accepted that. How do I build a record people would rather consult than re-measure?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> A man with a tape measure on the machine, establishing a dimension that is written down <strong>twelve metres away</strong> in a document this organisation believes it maintains. Every job. Every shift. For years. And the part that should bother you most is not that the drawings are wrong &mdash; it is that <strong>everybody knows they are wrong, works around it, and has stopped mentioning it.</strong> Write down what you would do to build a record people would rather consult than re-measure &mdash; your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five answers, and why four of them have been tried here</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Re-survey the site and correct every drawing.&rdquo;</strong> Expensive, satisfying, and it buys you an accurate set of documents that begins decaying the same afternoon. <strong>The drawings did not become wrong by accident &mdash; they became wrong through a process that is still running.</strong> Correct the documents without touching that and you have paid for a snapshot.</p>
+<p>&bull; <strong>&ldquo;Put everything under proper document control.&rdquo;</strong> The generous answer, and the commonest way this dies. <strong>Control is a tax on every change</strong> &mdash; a form, an assessment, a propagation, a reissue. Levy it on everything and people route around it, quietly, because they have work to do; and then the handful of items that genuinely mattered are not controlled either. <strong>A narrow boundary that holds beats a wide one that is ignored</strong>, and choosing narrow feels like giving up.</p>
+<p>&bull; <strong>&ldquo;Issue an instruction that all changes must be recorded.&rdquo;</strong> Already true here, in writing, and not happening. Look at how change actually reaches this plant: <strong>more than one route in</strong>, none of them dishonest, each of them a place where the plant and the paper part company. An instruction addresses none of them.</p>
+<p>&bull; <strong>&ldquo;Mark the drawings as unverified until we check them.&rdquo;</strong> Closer than it looks &mdash; but done to everything at once it is indistinguishable from what people already believe, which is that none of it can be trusted. <strong>The useful version says which parts are measured, which are inherited, and which are believed</strong>, so that trust has somewhere to land instead of being withdrawn wholesale.</p>
+<p>&bull; <strong>&ldquo;Accept it &mdash; the men know the plant, they manage.&rdquo;</strong> They do manage, and that is precisely the cost you are looking at. <strong>A record you cannot trust and cannot fix stops being a problem and becomes weather</strong> &mdash; and weather is not complained about, not budgeted for, and not fixed. The silence is not acceptance of a small problem. It is what a large one looks like once people have given up.</p>
+<p>You are not repairing documents. You are repairing whether anybody believes them &mdash; and one of those is measurable.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the baseline - deciding what is genuinely under control, establishing a state you can defend, giving change one door, measuring the divergence, and being honest about what is not yet trustworthy.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Decide what is actually under configuration control - and be ruthless, because controlling everything controls nothing</div><p class="cb-demo">&lt;strong&gt;The first decision is what is under control, and getting it wrong in the generous direction is the commonest way configuration management dies.&lt;/strong&gt; &lt;strong&gt;Apply one test to every candidate: if this changed and nobody recorded it, would it cost somebody something?&lt;/strong&gt; &lt;strong&gt;My register offered 1,240 candidate items. Three hundred and ten passed.&lt;/strong&gt; &lt;strong&gt;What passed:&lt;/strong&gt; anything whose dimensions or rating another document depends on, anything a spare is held for, anything a procedure names, anything a model represents, anything with a statutory or licence condition attached. &lt;strong&gt;What did not:&lt;/strong&gt; nine hundred and thirty items that can change without any other document becoming untrue. &lt;strong&gt;Now understand why the ruthlessness matters, because generosity here feels responsible.&lt;/strong&gt; &lt;strong&gt;Configuration control is a tax on every change&lt;/strong&gt; - a form, an assessment, a propagation, a reissue. &lt;strong&gt;Levy it on 1,240 items and people will route around it, which means the 310 that mattered are now uncontrolled AND the process is discredited.&lt;/strong&gt; &lt;strong&gt;Levy it on 310 and it can actually be complied with.&lt;/strong&gt; &lt;strong&gt;Write down what you excluded and why&lt;/strong&gt;, because the exclusion is a decision somebody may need to challenge - and an item excluded deliberately is a different thing from an item nobody thought of.</p></div><div class="canvas-box"><div class="cb-label">2. Establish the baseline - the agreed state of each item, and how you know it is true</div><p class="cb-demo">&lt;strong&gt;A baseline is a claim about physical reality, and the temptation is to build it from documents - which is how you baseline the lie.&lt;/strong&gt; &lt;strong&gt;For each of the 310, record the state AND how you know it.&lt;/strong&gt; &lt;strong&gt;Three grades of knowing, and keep them apart:&lt;/strong&gt; &lt;strong&gt;verified&lt;/strong&gt; - somebody went and looked, with a date and a name; &lt;strong&gt;documented&lt;/strong&gt; - it is what the drawing says and nobody has checked; &lt;strong&gt;inferred&lt;/strong&gt; - it is what the purchase order says was bought. &lt;strong&gt;Do not collapse these into one column.&lt;/strong&gt; An organisation that cannot tell verified from documented has a baseline that looks complete and is a restatement of the drawings it was supposed to correct. &lt;strong&gt;You will not verify all 310 at once and should not try.&lt;/strong&gt; Verify by consequence: the items where being wrong is expensive, the items a model depends on, and the items where somebody has already expressed doubt. &lt;strong&gt;Then publish the baseline with the grades visible&lt;/strong&gt;, so a person reading it can see that the impeller diameter is verified and the coupling type is documented, and can decide how much weight to put on each. &lt;strong&gt;A baseline that admits what it does not know is trusted. One that presents everything with equal confidence is discovered to be wrong once, and then trusted about nothing.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. Give change one door - and make the door easier than going round it</div><p class="cb-demo">&lt;strong&gt;Every configuration failure is somebody making a correct change through the wrong door, and the reason is nearly always that the right door was slower.&lt;/strong&gt; &lt;strong&gt;Define the route: raised, assessed for what else it touches, approved, executed, and every affected document reissued before it closes.&lt;/strong&gt; &lt;strong&gt;Then do the thing most organisations skip, which is to test the route against the reality of the person using it.&lt;/strong&gt; &lt;strong&gt;Picture an impeller trimmed on a night shift by a competent fitter solving a real problem.&lt;/strong&gt; If the route requires a form that can only be raised from a desktop in an office that is locked at night, &lt;strong&gt;the route has designed itself out of exactly the situation it exists for.&lt;/strong&gt; &lt;strong&gt;So make the raise trivial and the assessment thorough.&lt;/strong&gt; A photograph and three fields from a phone at two in the morning is a raise; the assessment happens in daylight by somebody whose job it is. &lt;strong&gt;What must never be optional is the propagation&lt;/strong&gt; - the change is not closed until the drawing, the model, the spare, the procedure and the register all say the same thing. &lt;strong&gt;Count the propagation targets when the change is raised, not when it is finished&lt;/strong&gt;, because a change that turns out to touch six documents is a different decision from one that touches one, and the person approving it is entitled to know which they are approving.</p></div><div class="canvas-box"><div class="cb-label">4. Sample the record against reality, and publish the divergence as a number</div><p class="cb-demo">&lt;strong&gt;A baseline decays from the day it is set, and the only thing that tells you how fast is going to look.&lt;/strong&gt; &lt;strong&gt;Sample physically and report the divergence rate as a number, because a number is arguable and an impression is not.&lt;/strong&gt; &lt;strong&gt;My audit: forty items sampled, eleven diverged from the record. Twenty-seven and a half per cent.&lt;/strong&gt; &lt;strong&gt;Now the part that turns a rate into a repair - for each divergence, record at which step the record broke.&lt;/strong&gt; &lt;strong&gt;Six were modifications never recorded at all&lt;/strong&gt; - the raise did not happen. &lt;strong&gt;Three were recorded but never propagated&lt;/strong&gt; - the change closed with the register updated and the drawing untouched. &lt;strong&gt;Two were recorded and propagated, and the drawing was not reissued&lt;/strong&gt; to the workshop, so the correct drawing exists and the wrong one is in the folder people actually use. &lt;strong&gt;Three different failures needing three different fixes, and a single figure of twenty-seven per cent would have prompted a general exhortation to be more careful.&lt;/strong&gt; &lt;strong&gt;Publish the rate every time you measure it, including when it is bad.&lt;/strong&gt; A configuration system whose divergence rate is known and falling is trustworthy. One that has never been measured is trusted right up until somebody discovers it was wrong.</p></div><div class="canvas-box"><div class="cb-label">5. Make the baseline more trustworthy than memory - and say plainly when it is not yet</div><p class="cb-demo">&lt;strong&gt;The purpose of all of this is a plant where a person opening a drawing does not have to start by doubting it - and until you get there, every job carries a tax of re-measurement that nobody has ever costed.&lt;/strong&gt; &lt;strong&gt;Three things make a baseline preferred to memory.&lt;/strong&gt; &lt;strong&gt;It has to be right&lt;/strong&gt;, which is the divergence rate falling and being seen to fall. &lt;strong&gt;It has to be reachable&lt;/strong&gt; - in the workshop, on a phone, at two in the morning, not through a system that times out. &lt;strong&gt;And it has to be faster than asking somebody&lt;/strong&gt;, because the real competitor is not the old drawing, it is the fitter who knows and is standing over there. &lt;strong&gt;Now the hardest part, and the one that decides whether people ever trust it: say plainly that it is not trustworthy yet.&lt;/strong&gt; &lt;strong&gt;Publish the grades, publish the divergence rate, and tell people which classes of item are verified and which are not.&lt;/strong&gt; &lt;strong&gt;An organisation that announces a new configuration system as authoritative on day one, when it is a restatement of the old drawings, has spent the only credibility it had.&lt;/strong&gt; &lt;strong&gt;An organisation that says these two hundred items are verified and these hundred and ten are not yet, and here is the rate, and here is when we will have finished - is believed about the two hundred immediately.&lt;/strong&gt; &lt;strong&gt;Trust is rebuilt in the size of the claim you make, not the size of the system you install.&lt;/strong&gt;</p></div></div>
+
+<p>Box 1 is where most configuration systems fail before they start, and box 5 is where trust is actually rebuilt. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Configuration management is <strong>not documenting what you have. It is maintaining a claim about physical reality that a person would rather consult than verify for themselves.</strong> Five moves:</p>
+<ul>
+<li><strong>Be ruthless about what is under control.</strong> <strong>1,240 candidates, 310 kept.</strong> A tax levied on everything is routed around.</li>
+<li><strong>Baseline the state AND how you know it.</strong> <strong>Verified, documented, inferred</strong> - three grades, never collapsed into one.</li>
+<li><strong>One door for change, and make it easier than the alternative.</strong> <strong>Trivial to raise, thorough to assess, mandatory to propagate.</strong></li>
+<li><strong>Sample physically and publish the rate.</strong> <strong>Eleven of forty. And where each one broke.</strong></li>
+<li><strong>Say plainly what is not yet trustworthy.</strong></li>
+</ul>
+<p><strong>The arithmetic of the audit, and why the breakdown matters more than the rate.</strong> Forty items sampled, <strong>eleven diverged - 27.5 per cent</strong>. But a single figure would have produced a general exhortation to be more careful. The breakdown produces three different repairs:</p>
+<ul>
+<li><strong>Six</strong> were modifications <em>never recorded at all</em> - the raise did not happen, which is a route problem.</li>
+<li><strong>Three</strong> were recorded but <em>never propagated</em> - the change closed with the register updated and the drawing untouched, which is a closure-definition problem.</li>
+<li><strong>Two</strong> were recorded and propagated, and the drawing was <em>never reissued</em> to the workshop - so the correct drawing exists and the wrong one is in the folder people use. Which is a distribution problem, and the most infuriating of the three.</li>
+</ul>
+<p><strong>Why ruthlessness at box 1 is not laziness.</strong> Configuration control is a tax on every change - a form, an assessment, a propagation, a reissue. Levy it on 1,240 items and people route around it, which means the 310 that mattered are now uncontrolled <em>and</em> the process is discredited. Levy it on 310 and it can be complied with. <em>The generous version of this system is the one that fails.</em></p>
+<p><strong>The competitor you are actually up against.</strong> Not the old drawing. It is the fitter who knows, who is standing over there, and who will answer in four seconds. A record has to be right, reachable at two in the morning, and <em>faster than asking a person</em> - and if it is not the third one, the first two will not save it.</p>
+<p><strong>How trust is rebuilt.</strong> Not by installing a system and declaring it authoritative - that spends the only credibility you had, on day one, on a restatement of the drawings that were already wrong. It is rebuilt by making a smaller claim honestly: <em>these two hundred items are verified, these hundred and ten are not yet, here is the divergence rate, here is when we will have finished.</em> <strong>Trust is rebuilt in the size of the claim, not the size of the system.</strong></p>
+<p><strong>An honest boundary.</strong> This establishes and holds a baseline. It does not create the as-built information that was never captured - where that is genuinely lost, it has to be surveyed, and that is a project with a cost. It is not the same as document control, which manages versions of documents; this manages a claim about the plant that documents describe. And a baseline is only as good as the change route feeding it, which is why box 3 is not optional.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A compressor station. You are setting up configuration control from nothing.</p>
+<table>
+<tr><th>Item</th><th>What is known</th></tr>
+<tr><td>Population</td><td>About 2,900 tagged items across four compressor trains</td></tr>
+<tr><td>Drawings</td><td>Complete set from the 2016 build. Since then: two upgrade projects, one control system replacement, and continuous minor modification</td></tr>
+<tr><td>Records of change</td><td>The two projects have full as-built packages. The control replacement has partial. Minor modifications are in work orders, unstructured</td></tr>
+<tr><td>The digital twin</td><td>Built 2023, agrees with the plant to about 2 per cent on normal running</td></tr>
+<tr><td>Resource</td><td>One engineer, half time, for a year</td></tr>
+<tr><td>The trigger</td><td>A relief valve was found set to the wrong pressure. It had been correct on the drawing</td></tr>
+</table>
+<ol>
+<li><strong>2,900 items and half an engineer.</strong> Apply the box 1 test and describe the classes you would keep. Roughly how many, and why those?</li>
+<li><strong>The digital twin agrees to 2 per cent.</strong> Does that mean the configuration is good? Answer carefully - this is the trap.</li>
+<li><strong>Grade the sources.</strong> Which of the four record sources give you <em>verified</em>, which <em>documented</em>, which <em>inferred</em>?</li>
+<li><strong>The relief valve.</strong> It was correct on the drawing and wrong in the plant. Say which of the three failure types from the audit this most likely is, and what you would sample to find out.</li>
+<li><strong>Sequence a year.</strong> Half an engineer. What is done first, and what is explicitly not done this year?</li>
+<li><strong>The announcement.</strong> Write the two sentences you would say to the site about what this system is and is not, at the point you switch it on.</li>
+</ol>
+<p>Work it before you turn over.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me one way &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: One Way Through</h2>
+<p><strong>1. What to keep.</strong> Not a percentage - <em>classes</em>. Everything with a protective function (relief valves, trips, interlocks, alarms with a safety role). Everything a spare is held for. Everything the twin represents. Everything named in a procedure. Everything with a statutory or insurance condition attached. On a compressor station that is plausibly 300-450 items of 2,900. <em>Everything else changes without making another document untrue, and does not earn the tax.</em></p>
+<p><strong>2. The twin agreeing to 2 per cent. This is the trap and the answer is no.</strong> The twin agrees on <em>normal running</em>, which is where the machine is forgiving and where several wrong configurations produce indistinguishable behaviour. A relief valve set 15 per cent high has <strong>no effect whatsoever</strong> on normal-running agreement - it has an effect exactly once. <em>A twin validates process behaviour; it does not validate configuration.</em> Treating twin agreement as evidence of configuration accuracy is precisely the error that lets a wrong relief-valve setting survive for years underneath a model that agrees to 2 per cent.</p>
+<p><strong>3. Grading the sources.</strong> The two upgrade as-built packages: <em>documented</em> - good quality, and nobody has been back to look. The 2016 drawings: <em>documented</em>, and nine years and three programmes of change stale. The control replacement's partial records: <em>inferred</em> at best; partial as-built is often worse than none, because it is trusted. The twin: <em>inferred</em>, and only about the parameters it models. <strong>Verified is currently an empty column</strong>, and saying so is the first honest thing this system will do.</p>
+<p><strong>4. The relief valve.</strong> Correct on the drawing, wrong in the plant, means the drawing was never the problem. That is most likely <em>the first failure type</em> - a change made and never recorded, someone adjusting a setting during commissioning or a trip investigation without raising anything. <em>What you sample to find out:</em> every protective device setting against its drawing, immediately and before anything else in this programme. It is a small population, it is the highest consequence, and if the relief valve is not unique you need to know this month rather than next year.</p>
+<p><strong>5. Sequencing the year.</strong> <em>First quarter:</em> verify every protective-function setting physically. That is the trigger, the highest consequence and a bounded population. <em>Second:</em> stand up the change route, and make raising trivial - because every week without it adds to the backlog you are working through. <em>Third and fourth:</em> baseline the remaining controlled classes by consequence, and run the first divergence audit. <em>Explicitly not this year:</em> the other ~2,500 items, retrospective as-built reconstruction of the control replacement, and any attempt to make the 2016 drawing set correct. <strong>Say those three exclusions out loud</strong>, because somebody will otherwise assume they are in progress.</p>
+<p><strong>6. The announcement.</strong> "From Monday, the protective-device settings on all four trains are verified and controlled - if the register says a valve is set at 24 bar, somebody has physically confirmed it, and any change goes through one route. Nothing else is verified yet, the 2016 drawings should still be treated as approximately right, and I will publish what we have checked and what we have found every quarter until that is no longer an interesting document."</p>
+<p><em>Two sentences, one real claim, and a public admission of everything the claim does not cover.</em> That is what makes the first claim believable.</p>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Decide what earns configuration control and what does not. Baseline a state together with how you know it. Build a change route people will use at two in the morning. Sample physically and report where the record broke rather than only how often. And rebuild trust by making a small claim honestly instead of a large one loudly.</p>
+<p>The fitter who measures anyway is not being difficult. He is doing the only rational thing available to somebody who has been wrong twice by trusting a drawing.</p>
+<p><strong>You are not building a document system. You are trying to earn back the ten minutes at the start of every job.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

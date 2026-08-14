@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The core and the flex</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The core and the flex</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The work is planned and the schedule is sound. And yet you are always in one of two bad places: paying a skilled crew to stand around waiting for work that has not arrived, or scrambling for bodies you do not have - phoning agencies, begging for overtime, handing a safety-critical job to a contractor you met this morning.</p>
+<p>Here is what stings: the plan was right. What broke was how you set your <em>capacity</em> against it. You resourced a spiky, seasonal workload as if it were flat, so you are forever over- or under-staffed; or you resourced a critical, know-how-heavy job as if it were overflow, and gave away the very knowledge you most needed to keep. The plan was not the problem. Your approach to capacity was.</p>
+<blockquote><h2>My plan is good, but I am always either paying a crew to wait or scrambling for people I do not have - how do I choose the right way to resource the work?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The plan is good and nobody disputes it. In March your fitters had a fortnight with almost nothing on; in September you could not cover the shutdown and paid agency rates for people who did not know the plant. Meanwhile the vibration analysis — the work that requires knowing <em>these</em> machines — was contracted out three years ago as overflow, and the understanding now lives in somebody else's office. Two of your crew have started asking about the quiet spells, because a quiet fortnight makes people wonder whether they are needed. Write down how you would resource this work — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what capacity actually is</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Staff to the average and live with the swings.&rdquo;</strong> This is what you are doing. The average never occurs — you get March and you get September — so staffing to it guarantees both failures rather than avoiding either.</p>
+<p>&bull; <strong>&ldquo;Staff to the peak so we are never caught short.&rdquo;</strong> Buys September at the cost of many idle months, and idleness is not a neutral cost: your crew are already asking what it means, and a fortnight of nothing to do is corrosive to people who take pride in the work.</p>
+<p>&bull; <strong>&ldquo;Contract out more of it — pay only for what we use.&rdquo;</strong> Attractive, and look what it has already cost you: the vibration knowledge is outside the works and will not come back. Contract out the wrong things and you rent your own understanding.</p>
+<p>&bull; <strong>&ldquo;Even out the work so the peaks disappear.&rdquo;</strong> Worth doing where the work genuinely can move, and a shutdown is a shutdown — some of the spikiness is real and cannot be smoothed away by scheduling.</p>
+<p>&bull; <strong>&ldquo;It is a budget problem — we cannot afford more people.&rdquo;</strong> Possibly, and notice you are already paying agency premiums in September. The question is not only how many but <strong>which work is covered which way.</strong></p>
+<p>&bull; Start with one honest definition, because it decides everything downstream. Capacity is everything needed to get work done — tools, spares, contractors, budget — and <strong>the most important part is always the people who do the work.</strong> They are your crew, people with skills and knowledge; not headcount, not labour units. So <strong>a choice about capacity is always a choice about people, their stability and their well-being</strong>, and the cost of chasing demand up and down is a human cost that must be weighed as one. Then un-learn the hunt for the cheapest way to staff work: <strong>an approach that runs one operation beautifully breaks the next</strong>, because it was the wrong fit for the shape of the work. Ask instead <strong>what this work actually demands</strong> — steady or spiky, critical or commodity, and what idleness costs you against what being caught short costs you. From which the shape follows: <strong>a stable in-house core sized to what must be done well and continuously, and flexibility only at the edges</strong> — because the core is where knowledge accumulates and stays, and knowledge given away at the edge does not come back.</p>
+</div>
+</details>
+<p>There is no single best way to resource the work - only the right fit for how your workload behaves. Let us learn to choose it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you compare the approaches to resourcing the work and choose the right one - reading the two axes of choice, diagnosing how your workload behaves, and blending them into a core that stays steady and an edge that flexes.</p>
+<p>First, one honest definition, because it decides everything that follows. Capacity is the combination of everything needed to get work done: the people and their skills, the tools and equipment, the spares and materials, the contractors, and the budget. The most important of these is always the people who do the work. We refer to them as the crew, the team, or simply as people with skills and knowledge. We do not refer to them as "human resources", "headcount", or "labour units". A choice about capacity is always a choice about people, their stability, and their well-being. The cost of a "chase" strategy is not just financial; it is a human cost, and it must be weighed as such.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. No single best way - match the approach to how the work behaves</div><p class="cb-demo">The first thing to un-learn is the hunt for the one cheapest or best way to resource work. AN APPROACH THAT RUNS ONE OPERATION BEAUTIFULLY BREAKS THE NEXT - not because it was a bad approach, but because it was the wrong FIT for the shape of the work. So stop asking &#039;what is the cheapest way to staff this?&#039; and start asking &#039;WHAT DOES THIS WORK ACTUALLY DEMAND - is it steady or spiky, critical or commodity, and what does it cost me to be idle versus caught short?&#039; The approach you choose will make or break a plan that is otherwise sound. And one honest definition frames it all: capacity is people and their skills, tools, spares, contractors and budget - and THE MOST IMPORTANT PART IS ALWAYS THE PEOPLE, who are never &#039;human resources&#039; or &#039;headcount&#039;.</p></div><div class="canvas-box"><div class="cb-label">2. Axis one - level or chase (how you set capacity over time)</div><p class="cb-demo">The first choice is HOW YOU SET CAPACITY AGAINST A VARYING WORKLOAD. A LEVEL approach holds a steady, constant crew: work queues in the busy periods and the crew clears backlog and does improvement in the quiet ones. It is STABLE, calm, easy to manage, and keeps skills and knowledge in-house - but it pays for IDLE TIME in the troughs and cannot surge for a real peak. A CHASE approach flexes capacity up and down to track demand - overtime, contractors, temporary hires. It is RESPONSIVE and wastes no idle time, but it is costly per unit, administratively heavy, and hard on quality and continuity. And it is not a free lever: THE FLEX IN A CHASE STRATEGY FALLS ON PEOPLE - overtime, temporary contracts, uncertainty - a real cost to morale, quality and knowledge that does not appear on a spreadsheet but is paid for in the work. The trade-off: STABILITY VERSUS RESPONSIVENESS.</p></div><div class="canvas-box"><div class="cb-label">3. Axis two - in-house or contract (where capacity comes from)</div><p class="cb-demo">The second choice is WHERE THE CAPACITY COMES FROM. An IN-HOUSE team retains knowledge, control and continuity, and is cheaper per hour at steady volume - but it is a FIXED COST and slow to scale up or down. CONTRACT or outsourced capacity buys flexibility and specialist skill on demand and scales fast - but it costs more per hour, it EXPORTS KNOWLEDGE out of the organisation, and it has to be managed and trusted. The trade-off: CONTROL VERSUS FLEXIBILITY. One more tool-pair belongs here, for smoothing a schedule rather than sizing a crew: RESOURCE SMOOTHING keeps a fixed end date and uses the slack in non-critical tasks to shave peaks and fill troughs; RESOURCE LEVELLING lets the end date move so you can resolve an over-allocation. Smoothing is for a fixed deadline; levelling is for a movable one.</p></div><div class="canvas-box"><div class="cb-label">4. Choose by diagnosing the work - and it is always a choice about people</div><p class="cb-demo">You set the dials by reading THREE honest things. THE SHAPE OF THE WORKLOAD: steady and predictable favours a level, in-house approach; spiky, seasonal or shutdown-driven work favours a chase element and contract capacity for the peaks. THE CRITICALITY AND KNOWLEDGE-CONTENT OF THE WORK: safety-critical, know-how-heavy work you keep in-house and stable, because losing that knowledge is the real risk; commodity or overflow work you can contract without harm. THE COST OF IDLE AGAINST THE COST OF SHORTFALL: if idle time is cheap and a shortfall is catastrophic, lean level with headroom; if idle is expensive and a shortfall is tolerable, lean chase. And hold this at the centre: SIZING A STABLE IN-HOUSE CORE IS AN ACT OF DECIDING WHICH KNOWLEDGE IS TOO CRITICAL TO LOSE AND WHICH PEOPLE ARE TOO VALUABLE TO TREAT AS A FLEXIBLE INPUT. The choice is never just numbers; it is always a choice about people.</p></div><div class="canvas-box"><div class="cb-label">5. Core-and-flex - steady where it matters, flexible at the edges</div><p class="cb-demo">In practice the best answer is rarely all one thing. The seasoned answer is CORE-AND-FLEX: size a stable, in-house CORE to the steady baseline of critical work - kept level, keeping the knowledge - and add a planned FLEX layer (overtime, contract, mutual-aid) for the peaks. You get stability and continuity where it matters and responsiveness at the edges. The one discipline that makes it humane and not just clever: THE FLEX STILL HAS TO BE PLANNED. You forecast the peak, you give notice, you brief the contractors, you keep the safety-critical work inside the core - you do not treat the crew as a lever to yank at the last minute. The classic, expensive failure is the opposite: CHASING EVERY SMALL FLUCTUATION with overtime and agency labour, and being baffled when quality, morale and continuity all erode at once. Match the shape of your capacity to the shape of the work.</p></div></div>
+
+<p>Boxes 2 and 3 are the two axes you set. Box 4 is how you diagnose which way to set them. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>Size a stable, in-house core for the work that must be done well; flex only at the edges for the work that can tolerate it.</strong> The craft of resourcing is not finding the one "best" way, but blending stable and flexible capacity to match the unique shape of your workload. Five questions:</p>
+<ul>
+<li><strong>Is there a best way to resource?</strong> <strong>No - only the right fit.</strong> The right approach depends entirely on how your workload behaves and what the work demands; every approach is right somewhere and wrong somewhere else.</li>
+<li><strong>How do I set capacity over time?</strong> <strong>Level or chase.</strong> Hold a steady crew (stable, calm, keeps knowledge - but idle in the troughs) or flex capacity to track demand (responsive - but costly, and it falls on people). Stability against responsiveness.</li>
+<li><strong>Where does capacity come from?</strong> <strong>In-house or contract.</strong> Your own team (keeps knowledge and control, fixed cost) or bought-in capacity (flexible, specialist - but costs more per hour and exports knowledge). Control against flexibility.</li>
+<li><strong>How do I choose?</strong> <strong>Diagnose the work.</strong> Read the shape of the workload, the criticality and knowledge-content of the job, and the cost of idle against the cost of shortfall.</li>
+<li><strong>What does the mature version look like?</strong> <strong>Core-and-flex.</strong> A stable in-house core sized to the steady, critical baseline, plus a planned flex layer for the peaks. Steady where it matters, flexible at the edges.</li>
+</ul>
+<p><strong>No single best way - match the approach to how the workload behaves.</strong> The first thing to un-learn is the search for the one cheapest or best way to resource work. A resourcing approach that runs one operation beautifully bankrupts or breaks the next, not because it was a bad approach, but because it was the wrong <em>fit</em> for the shape of the work. So stop asking "what is the cheapest way to staff this?" and start asking "what does <em>this</em> work actually demand - is it steady or spiky, critical or commodity, and what does it cost me to be idle versus caught short?" The approach you choose will make or break a plan that is otherwise sound.</p>
+<p><strong>Axis one - level or chase: how you set capacity against a varying workload.</strong> A <em>level</em> approach holds a steady, constant crew and capacity: the work queues in the busy periods and the crew clears backlog and does improvement in the quiet ones. It is stable, calm, and easy to manage, and it keeps skills and knowledge in-house - but it pays for idle time in the troughs and cannot surge for a genuine peak. A <em>chase</em> approach flexes capacity up and down to track demand - overtime, contractors, temporary hires. It is responsive and wastes no idle time, but it is costly per unit, administratively heavy, and hard on quality and continuity. And it is not a free lever: <strong>the "flex" in a chase strategy falls on people. It means overtime, temporary contracts, and uncertainty. This has a real cost to morale, quality, and knowledge retention that does not appear on a spreadsheet but is paid for in the work.</strong> The trade-off on this axis is <strong>stability versus responsiveness.</strong></p>
+<p><strong>Axis two - in-house or contract: where the capacity comes from.</strong> An <em>in-house</em> team retains knowledge, control and continuity, and is cheaper per hour at steady volume - but it is a fixed cost and slow to scale up or down. <em>Contract</em> or outsourced capacity buys flexibility and specialist skill on demand and scales fast - but it costs more per hour, it exports knowledge out of the organisation, and it has to be managed and trusted. The trade-off here is <strong>control versus flexibility.</strong> One more tool-pair belongs on this axis, for when you are smoothing a schedule rather than sizing a crew: <em>resource smoothing</em> keeps a fixed end date and uses the slack in non-critical tasks to shave the peaks and fill the troughs; <em>resource levelling</em> lets the end date move so you can resolve an over-allocation. Smoothing is for a fixed deadline; levelling is for a movable one.</p>
+<p><strong>Choose by diagnosing the work.</strong> You set the dials by reading three honest things. <em>The shape of the workload:</em> steady and predictable favours a level, in-house approach; spiky, seasonal or shutdown-driven work favours a chase element and contract capacity for the peaks. <em>The criticality and knowledge-content of the work:</em> safety-critical, know-how-heavy work you keep in-house and stable, because losing that knowledge is the real risk; commodity or overflow work you can contract without harm. <em>The cost of idle against the cost of shortfall:</em> if idle time is cheap and a shortfall is catastrophic, lean level with headroom; if idle is expensive and a shortfall is tolerable, lean chase. And hold this at the centre: <strong>sizing a stable in-house core is an act of deciding which knowledge is too critical to lose and which people are too valuable to treat as a flexible input.</strong> The choice is never just numbers; it is always a choice about people.</p>
+<p><strong>The mature version is core-and-flex.</strong> In practice the best answer is rarely all one thing. The seasoned answer is <em>core-and-flex</em>: size a stable, in-house <strong>core</strong> to the steady baseline of critical work - kept level, keeping the knowledge - and add a planned <strong>flex</strong> layer (overtime, contract, mutual-aid) for the peaks. You get stability and continuity where it matters and responsiveness at the edges. The one discipline that makes it humane and not just clever: the flex still has to be <em>planned</em>. You forecast the peak, you give notice, you brief the contractors, you keep the safety-critical work inside the core - you do not treat the crew as a lever to yank at the last minute. The classic, expensive failure is the opposite: chasing every small fluctuation with overtime and agency labour, and being baffled when quality, morale and continuity all erode at once.</p>
+<p>Does it scale? This is how you resource anything whose demand rises and falls - a clinic, a workshop, a household with a busy season. Ask not "what is the cheapest way to staff this?" but "what is the steady core of work that must be done well and kept close, and what is the peak I can plan to flex for?" Size the core to the baseline, plan the flex for the edges, keep the critical knowledge in-house, and never pretend that flexing capacity is free - because at the sharp end it is always people who absorb it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here are two resourcing choices at Corathyl. Your job is to set the dials differently for each - proving the craft is diagnosis, not one favourite way to staff a job.</p>
+<p><strong>Scenario A - critical and steady.</strong> The team that performs the daily, safety-critical water-quality testing and chemical-dosing adjustments. The workload is predictable and steady, and the cost of getting it wrong is catastrophic.</p>
+<p><strong>Scenario B - commodity and spiky.</strong> The team that repaints non-critical infrastructure and clears the grounds site-wide once a year, which must be finished inside a three-week dry window.</p>
+<ol>
+<li><strong>Diagnose each workload.</strong> For A and for B, name the shape (steady or spiky), the criticality and knowledge-content, and the cost of idle against the cost of shortfall.</li>
+<li><strong>Choose an approach and justify it.</strong> For each, set level-vs-chase and in-house-vs-contract, and say which of the three reads drove your setting.</li>
+<li><strong>Describe the blend for B.</strong> Say what a core-and-flex approach looks like for Scenario B - and why that same blend would be wrong for Scenario A.</li>
+<li><strong>Spot the human cost.</strong> Name where chasing the wrong way would erode quality, knowledge or morale.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the diagnosis: <em>Scenario A</em> is steady, safety-critical and knowledge-heavy, and the cost of a shortfall is catastrophic while idle time is relatively cheap. <em>Scenario B</em> is spiky (one short annual burst), commodity, low knowledge-content, with a hard fixed deadline and a tolerable cost of imperfection.</p>
+<p>Second, the choice: A is <strong>level and in-house</strong> - a steady, dedicated crew that owns the knowledge and never lets the critical work depend on a stranger; idle capacity here is cheap insurance. B is <strong>chase and contract</strong> at the peak - there is no case for carrying a year-round painting crew for a three-week job. A is driven by criticality and the cost of shortfall; B by the spiky shape and low knowledge-content.</p>
+<p>Third, the blend for B: a very small in-house <strong>core</strong> to plan, supervise and assure the work, plus a large contracted <strong>flex</strong> layer brought in for the three-week window - planned in advance, briefed, and released with notice. That same blend is wrong for A because contracting the safety-critical dosing work would export the one body of knowledge you cannot afford to lose, and a "flex" crew has no continuity on a job where continuity is the safety margin.</p>
+<p>Fourth, the human cost: if you chased Scenario A with overtime and agency labour every time testing volume ticked up, you would burn out and eventually lose the people who hold the plant's deepest safety knowledge, and quality would quietly rot - the say-nothing failure that only shows up when something goes wrong. If you resourced Scenario B with a permanent crew, you would pay eleven months of idle wages for three weeks of work. The flex must be planned and it must fall on people fairly - notice given, the core protected - not yanked at the last minute.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-no_single_best_way">1. No single best way - match the approach to how the work behaves</label><textarea id="cb-no_single_best_way" data-key="t-0242:no_single_best_way" placeholder="There is no cheapest or best way to resource work in general; there is only the right fit for THIS work. A resourcing approach that runs one operation beautifully breaks the next - not because it was bad, but because it was the wrong FIT for the shape of the work. So stop asking &#039;what is the cheapest way to staff this?&#039; and ask &#039;what does this work demand - steady or spiky, critical or commodity, and what does idle cost me versus a shortfall?&#039; The approach you choose will make or break a plan that is otherwise sound."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-level_or_chase">2. Axis one - level or chase (how you set capacity over time)</label><textarea id="cb-level_or_chase" data-key="t-0242:level_or_chase" placeholder="A LEVEL approach holds a steady, constant crew - the work queues in busy periods and the crew clears backlog and improves in quiet ones: stable, calm, keeps knowledge in-house, but pays for idle time and cannot surge for a peak. A CHASE approach flexes capacity up and down to track demand (overtime, contractors, temps): responsive, no idle time, but costly per unit, admin-heavy, hard on quality - and it FALLS ON PEOPLE. The trade-off: STABILITY versus RESPONSIVENESS."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-in_house_or_contract">3. Axis two - in-house or contract (where capacity comes from)</label><textarea id="cb-in_house_or_contract" data-key="t-0242:in_house_or_contract" placeholder="IN-HOUSE keeps knowledge, control and continuity and is cheaper per hour at steady volume - but it is a fixed cost, slow to scale. CONTRACT or outsourced capacity buys flexibility and specialist skill on demand and scales fast - but costs more per hour, exports knowledge, and must be managed. The trade-off: CONTROL versus FLEXIBILITY. (For scheduling: SMOOTHING shaves peaks within a fixed deadline using slack; LEVELLING moves the deadline to resolve over-allocation.)"></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-diagnose_the_work">4. Choose by diagnosing the work - and it is always a choice about people</label><textarea id="cb-diagnose_the_work" data-key="t-0242:diagnose_the_work" placeholder="Set the dials by reading three things. THE SHAPE OF THE WORKLOAD: steady favours level and in-house; spiky or seasonal favours a chase element and contract. THE CRITICALITY AND KNOWLEDGE-CONTENT: safety-critical, know-how-heavy work stays in-house and stable; commodity or overflow work can be contracted. THE COST OF IDLE VS THE COST OF SHORTFALL: cheap idle and catastrophic shortfall means lean level with headroom; expensive idle and tolerable shortfall means lean chase. Sizing the core is deciding whose knowledge is too critical to lose."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-core_and_flex">5. Core-and-flex - steady where it matters, flexible at the edges</label><textarea id="cb-core_and_flex" data-key="t-0242:core_and_flex" placeholder="The best answer is rarely all one thing. The mature answer is CORE-AND-FLEX: size a stable, in-house CORE to the steady baseline of critical work (kept level, keeping the knowledge), and add a planned FLEX layer (overtime, contract, mutual-aid) for the peaks. Steady where it matters, responsive at the edges. The one discipline: the flex must be PLANNED - forecast the peak, give notice, brief the contractors, keep the safety-critical work inside the core. The classic failure: chasing every small fluctuation and being baffled when quality, morale and continuity all erode."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you can diagnose a workload and set both dials from it - steady core for the critical work, planned flex for the peaks - <strong>save it</strong>. You can now choose the right way to resource the work, not just the cheapest-looking one.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Size a stable, in-house core for the work that must be done well; flex only at the edges for the work that can tolerate it - and never pretend that flexing capacity is free, because at the sharp end it is people who absorb it.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Believing one approach is always best.</strong> The way of resourcing that runs one operation beautifully breaks the next. Ask not "what is the cheapest way?" but "what does this work demand?"</p>
+<p>&bull; <strong>Chasing every fluctuation.</strong> Flexing capacity for every small wobble erodes quality, morale and continuity all at once. Hold a steady core; flex only for real, planned peaks.</p>
+<p>&bull; <strong>Contracting safety-critical know-how.</strong> Overflow work you can buy in; the knowledge your plant is safe because of, you keep in-house. Losing critical knowledge is the real risk, not the hourly rate.</p>
+<p>&bull; <strong>A big level crew for a spiky load.</strong> Carrying peak-sized capacity all year pays for months of idle time. Size the core to the baseline, not the peak.</p>
+<p>&bull; <strong>Treating people as a lever.</strong> Capacity is people with skills and lives, not headcount to flex for free. The cost of chasing is partly a human cost - weigh it as one, and plan the flex fairly.</p>
+<p>&bull; <strong>Confusing smoothing with levelling.</strong> Smoothing shaves peaks within a fixed deadline using slack; levelling moves the deadline to resolve over-allocation. Know which one your situation allows.</p>
+<p>&bull; <strong>Forgetting the flex must be managed.</strong> A flex layer is not free capacity that appears on demand. Forecast the peak, give notice, brief and supervise the contractors - an unplanned flex is just a scramble with a nicer name.</p>
+</div>
+</details>
+<p>Your plan was sound; what broke it was setting your capacity as if all work behaved the same. Now you can choose. Diagnose the workload - steady or spiky, critical or commodity, cheap-to-be-idle or catastrophic-to-be-short - and set your two dials from it; hold a steady in-house core around the work that must be done well and keeps the knowledge, and plan an honest flex for the peaks; and never treat the people who do the work as a lever, because the flex always lands on them. <strong>Size a stable, in-house core for the work that must be done well; flex only at the edges for the work that can tolerate it - the craft is not the cheapest plan, but the right shape of capacity for the shape of the work and the people who carry it.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can choose a resourcing approach now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

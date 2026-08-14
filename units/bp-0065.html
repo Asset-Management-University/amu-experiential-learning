@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The board gave me a budget to put the whole pipeline live on a screen, but the moment I price sensors for the off-grid points the cost, power, signal and security all fight each other - where do I even start before I spend a single rand?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The board gave me a budget to put the whole pipeline live on a screen, but the moment I price sensors for the off-grid points the cost, power, signal and security all fight each other - where do I even start before I spend a single rand?</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Felt Problem</h2>
+<p>You are Lubabalo, the asset engineer for a regional water utility - the one that pushes drinking water through 142 kilometres of buried steel pipeline to six small towns. It is just after seven in the morning at the ridge pump station, up on the dry plateau two hours north of town. Through the control-room window you can see the pipeline disappear over the ridge - out there, where you cannot.</p>
+<p>On the desk in front of you is a single sheet: a burst-pipe report. The section near the far crossing failed on Sunday night, and by the time a farmer phoned it in, 1.9 million litres had drained into a field. The repair, the lost water and the three days two towns spent on tankered water cost R480,000. This is the third burst this year. Your manager, Khethiwe, leans in the doorway, coffee going cold. She does not raise her voice: "The board approved monitoring. They want to see the pipeline - pressure, flow, every pump, live on a screen - so we catch the next one before it bursts. They gave you the budget: R650,000. I need your plan by Friday." She taps the doorframe twice and leaves.</p>
+<p>You have wanted this for two years, so you start sketching the dream: a sensor at every point, a screen glowing with green dots, an alarm that wakes you at 2am before a pipe lets go. Just order the sensors and bolt them on - the obvious first move, and it feels good. But then you look at the map, and the dream wobbles. The line runs through 31 monitoring points. Eleven sit beside towns, with mains power and a phone tower in sight. The other twenty are out in the veld: no power lines, and the nearest signal at the far crossing - the very place that just burst - is two bars on a good day and nothing when it rains.</p>
+<p>You start adding numbers in the margin. A good smart sensor is about R9,000; times 31 is R279,000 - and that is only the sensor. The fancy all-in-one units with their own battery, solar panel and cellular link are R34,000 each, and they still need signal the far crossing does not have. Twenty of those is R680,000 - and your whole budget is R650,000. The dream ran out of money before you started. And it is worse than cost: every piece works alone - a sensor, a radio, solar, encryption - but put them together and they fight. The link you can afford does not reach the far crossing; the sensor that reaches it cannot run on the power you have; the power cannot feed the data rate you want; and the cheap path leaves the door open to a faked "all-fine" reading, which is worse than no reading, because you would trust it.</p>
+<blockquote><h2>The board gave me a budget to put the whole pipeline live on a screen, but the moment I price sensors for the off-grid points the cost, power, signal and security all fight each other - where do I even start before I spend a single rand?</h2></blockquote>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>You have R650,000, 31 monitoring points, and 20 of them with no power and poor signal. The temptation is to start ordering boxes. <strong>"Just buy a sensor for every point."</strong> But price it and the budget snaps before you cover the veld - and the all-in-one unit that could survive out there busts the budget AND still cannot reach the far crossing. <strong>"Shop for a cheaper all-in-one box."</strong> But no single box fixes it, because the box bundles four different jobs that each fail differently here - the cheaper box that fits the budget cannot reach the signal, the one that reaches the signal drains the battery. <strong>"Bolt the sensors on now, sort out the data quality later."</strong> But a sensor with a flat battery feeds a stale value, poor signal drops the packet, and nothing flags a sensor that has quietly died - so your screen fills with green dots you cannot believe, which is worse than a blank screen you know to distrust.</p>
+<p>So before you read on: stop asking "which sensor?" Name what a single reading must actually survive on its journey from the pipe to the screen, and which part of that journey breaks first at the far crossing.</p>
+<div class="yardstick-prompt"><label for="yardstick-m2">A quick prediction first: buying per point, shopping for a cheaper box, and bolting-on-now all fail. Name the four things that must happen to one reading from pipe to screen, and the one of them that is tightest at your worst point.</label><textarea id="yardstick-m2" placeholder="e.g., a reading must be sensed, then..., then..., then trusted; and at the far crossing the tightest link is..."></textarea></div>
+<div class="scratchpad"><label for="scratchpad-m2">My working</label><textarea id="scratchpad-m2" placeholder="Design the path not the points? Two paths not one? Let the tightest link lead? Make 'no data' visible? Pilot the worst point first?"></textarea></div>
+<div class="hintbox" data-n="3" data-label-0="I&#039;m stuck - help me think" data-label-1="Another nudge" data-label-2="The clearest way to see it"><button type="button" class="hintbtn" onclick="amuHint(this)">I&#039;m stuck - help me think</button><div class="hintlayers" aria-live="polite"><div class="hint" hidden>I am the asset engineer for a regional water utility that pushes drinking water through 142 km of buried steel pipeline to six small towns. A burst pipe near the far crossing - the third this year - drained 1.9 million litres into a field and cost R480,000 in repair, lost water and three days of tankered supply. The board approved monitoring: they want to SEE the pipeline live, pressure and flow and every pump on a screen, to catch the next one before it bursts, and gave me a total budget of R650,000, plan due Friday. The obvious move is to order smart sensors and bolt them on. But the line runs through 31 monitoring points: 11 sit beside towns with mains power and phone signal, and 20 are out in the veld off-grid - no power lines, poor or no cell signal, the far crossing that just burst worst of all. A good smart sensor is R9,000; the fancy all-in-one units with their own solar and cellular link are R34,000 each and STILL cannot reach the far crossing's signal - twenty of those is R680,000, already over budget. And every piece fights the others: the link I can afford does not reach the far crossing, the sensor that reaches it cannot run on the power I have, the power cannot feed the data rate I want, and the cheap path leaves the door open to faked data - a spoofed 'all-fine' reading is worse than no reading, because I would trust it. Where do I start before I spend a single rand?</div><div class="hint" hidden>The supplier catalogue invites you to ask 'which sensor?' - one box at a time - and that is the trap that explodes the budget. Change the question: not 'which device?' but 'what has to happen to a single reading, from the steel pipe to the trusted dot on the screen?'. That is a CHAIN of four links: SENSE (measure the pressure at the pipe), POWER (keep the sensor alive where there is no mains), MOVE (carry the reading from the veld back to the control room), and TRUST (make sure the reading that arrives is real, complete and unaltered). This end-to-end chain is a data path, and the deep shift is this: you do not BUY devices, you DESIGN A PATH - and you must choose the four links AS A SET, because each one constrains the others (the affordable link does not reach the far crossing; the sensor that reaches it cannot run on the power; the power cannot feed the data rate; the cheap path admits bad data). And the points are not all the same: the 11 connected town points and the 20 remote off-grid points are really TWO different problems, and trying to use one design for both is what made the budget explode. The real question is not 'which sensor do I buy?' but 'for each set of points, which of the four links is tightest here - and how do I design the whole path around that?'</div><div class="hint" hidden>Five moves turn a blind budget into a pipeline on a screen. (1) DESIGN THE PATH, NOT THE POINTS - sense, power, move, trust, chosen as one balanced set; you design a path, you do not buy devices. (2) TWO PATHS, NOT ONE - split the 31 points into the 11 connected (R9,000 sensor + mains + existing fibre = R99,000) and the 20 remote, and design a DIFFERENT path for each, because one size bankrupts you. (3) LET THE TIGHTEST LINK LEAD - at the remote points, power-and-signal is the tightest link, so everything bends to fit it: a simpler R6,000 sensor (slow pipeline pressure needs no fast sampling), a small R3,500 solar-and-battery (works only if the sensor sips power), and instead of 20 costly cellular links a low-power long-range radio (LoRa) that sips power and reaches several km, all reporting to three solar-powered shared gateways at R18,000 each on high ground (the gateways carry the last leg over cellular, so you pay for 3 cellular links, not 20). (4) MAKE 'NO DATA' VISIBLE - a green dot you cannot trust is worse than a red one, so sign every reading (a faked 'all-fine' cannot slip in) and turn a point silent for 20 minutes AMBER, not green; cheap at design time, near-impossible to bolt on later. (5) PILOT THE WORST POINT FIRST - before spending the R553,000 total (under the R650,000 budget), run ONE full path at the far crossing for two weeks against a success line set in advance, and let the field find the hole before you scale. Trustworthy data at scale is not a shopping list, it is a designed path - sense, power, move, trust - chosen as one set against the real limits of the place; order boxes first and you go broke and stay blind.</div></div></div>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">I've worked it out - show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>The breakthrough is a change of question. The supplier catalogue invites you to ask "which sensor?" - one box at a time. Working with a contractor named Sive, you ask instead: "what has to happen to a single reading, from the steel pipe to the trusted dot on the screen?" It is a chain of four links - SENSE, POWER, MOVE, TRUST - and the whole answer is this: you do not buy data devices, you design a path, choosing the four links as one set because each constrains the others. Five moves:</p>
+<ul><li><strong>Design the path, not the points:</strong> the breakthrough is a change of question. The supplier catalogue, with its glossy smart transmitters, invites you to ask 'which sensor?' - one box at a time - and that is exactly how you spend a whole budget and still go blind at the worst point. Ask instead: 'what has to happen to a single reading, from the steel in the ground to the trusted dot on the screen?' The answer is a chain of four links that must all hold: SENSE (measure the pressure or flow at the pipe), POWER (keep the sensor alive where there is no mains), MOVE (carry the reading from the veld back to the control room), and TRUST (make sure the reading that arrives is real, complete and unaltered). This end-to-end chain is a data path, and the whole shift in thinking is this: you do not buy data devices, you DESIGN A PATH - and you choose the four links as ONE SET, because each constrains the others. A sensor works, a radio works, solar works, encryption works - but put them together carelessly and they fight: the link you can afford will not reach the far point, the sensor that reaches it will not run on the power you have, and the cheap path quietly admits bad data. Design the path, and the fight becomes a set of choices you can actually balance.</li><li><strong>Two paths, not one - the points are not the same:</strong> the single biggest cost mistake is treating all 31 points as one problem. They are two. Eleven sit beside the towns, with mains power and a phone tower in sight; twenty are out in the veld, off-grid, with no power lines and poor or no signal. Force one design onto both and the remote conditions drag the whole project's cost up to meet them - which is exactly how the R34,000 all-in-one unit busts the budget (20 of them is R680,000, over the R650,000 you have) AND still cannot reach the far crossing's signal. So split them and design a path for each. The connected eleven are easy: a R9,000 smart sensor, the mains power that is already there, and the towns' existing fibre - eleven times R9,000 is R99,000, and you are done with the easy half for a sixth of the budget. The hard twenty get their own, different path. Recognising that your assets are really two (or three) populations, each with its own binding constraint, is what turns an impossible single bill into two affordable ones.</li><li><strong>Let the tightest link of the place lead:</strong> for the remote twenty, one link is tighter than all the others - power-and-signal in the off-grid veld - so you let that single constraint drive every other choice, instead of fighting it. SENSE: a simpler R6,000 sensor, because pressure in a long pipe changes slowly and you do not need the connected sensor's fast sampling out here. POWER: a small solar panel and battery at R3,500 - but this only works if the sensor sips power, which forces the next choice. MOVE: not a costly cellular link at every point, but a low-power long-range radio (LoRa) that costs almost nothing to run and reaches several kilometres, sending only a small reading every few minutes - perfect for slow pipeline pressure and gentle on the battery; the radios all report to just THREE solar-powered shared gateways at R18,000 each, placed on high ground (including the ridge above the worst point), and the gateways - not the sensors - carry the data the last leg home over cellular, so you pay for three cellular links instead of twenty. The remote sum: 20 x (R6,000 + R3,500) = R190,000 for sensors-and-power, plus 3 x R18,000 = R54,000 for gateways. The skill is to find the tightest link first and bend the path to it - never to pick a sensor you love and then fight the place to feed it.</li><li><strong>Make &#039;no data&#039; visible - trust earned, not assumed:</strong> the board asked for green dots, and the hardest, most valuable insight of the whole design is that a green dot you cannot trust is worse than a red one - because you act on it. So you build the TRUST link in from the very start, when it is almost free, rather than trying to bolt it on later, when it is nearly impossible. Every reading is signed and encrypted at the sensor, so a faked 'all-fine' reading cannot slip in and a tampered one is rejected. And a point that has not reported in 20 minutes turns AMBER, not green - so the system can tell the difference between 'all is fine' and 'I have heard nothing', and a missing reading shows as a visible GAP instead of a comforting lie. This costs almost nothing to design in and changes everything about what the screen MEANS: the 2 a.m. alarm now means something real, because absence and tampering are visible. If any 'Trust' box in your design is blank, you have not finished - a reading you cannot believe is worse than no reading at all.</li><li><strong>Pilot the worst point before you scale:</strong> a clean budget on a whiteboard is still only a guess until reality has had its say, and too many schemes have every number adding up and still fail in the field. So before spending the R553,000, buy ONE remote sensor, ONE R3,500 solar-and-battery kit and ONE gateway, put them at the WORST point on the whole line - the far crossing - and run that single path for two weeks against a success line written down IN ADVANCE so the goalposts cannot move: 'the reading lands on the screen at least every 15 minutes for two weeks, the battery never drops below half, and a reading we deliberately tamper with gets rejected.' For ten days it looks like a triumph - and then a three-day cold front drops over the plateau, the solar makes almost nothing, and the sip-power radio flattens the battery anyway, because the design quietly assumed the radio only wakes to SEND and forgot it also burns power LISTENING for the gateway to confirm each reading. The point goes dark for 19 hours - and under 'always green' thinking nobody would have known; only the amber-dot rule made the failure visible. So you fix the hole inside the contingency (double the battery at +R900 a point, switch the radio to store-and-forward, size the panel for three sunless days), re-run two weeks, watch it hold - and only THEN order the other nineteen. The plan you hand the board is not the whiteboard plan; it is the whiteboard plan with a hole the field found and you closed, still in budget: 'this has already survived its worst week at its worst point.'</li></ul>
+<p>See it land. The honest total comes to R553,000 - connected points R99,000, remote sensors and power R190,000, three shared gateways R54,000, and software, install and contingency R210,000 - safely under the R650,000 budget, with the worst point covered by a gateway on the ridge above it. And because Lubabalo and Sive piloted that worst point first, the plan handed to the board is not the whiteboard plan but the whiteboard plan with a hole the veld found and they closed - still in budget. They could say to Khethiwe with a straight face: "this has already survived its worst week at its worst point." <strong>Trustworthy data at scale is not a shopping list, it is a designed PATH - sense, power, move, trust - chosen as one balanced set against the real limits of the place. Split your points into their real groups, let the tightest link of each place drive the design, make absence and tampering visible (amber, not a green dot you cannot trust), and prove it at your worst point before you scale. Order the boxes first and you go broke and stay blind; design the path first and the budget buys you the whole asset on a screen.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You already know the clean version - off-grid pipeline, no power, no signal, a budget that snaps. Real life rarely announces its hard links so plainly.</p>
+<details><summary>See the same trap on a row of community water taps</summary>
+<div class="reveal-content">
+<p>You help run a community drinking-water scheme: a co-operative that looks after 26 shared standpipes - communal taps where households fill their buckets and pay a few rand per litre through a prepaid token. The committee wants every tap's flow and water sold live on one screen, so a tap that runs dry, leaks all night or is being tampered with gets caught quickly. You look at the map and relax: 17 taps sit inside the township, on the municipal main, beside houses with electricity and a phone tower two streets away; only 9 are scattered on smallholdings beyond the edge of town. You think: the township taps are the easy ones - power's there, signal's there, that's the connected path, buy 17 cheap meters and bolt them on.</p>
+<p>Hold on. You have just waved away three of the four links for the township taps because power and signal are present - and skipped the fourth, Trust, which on a cash-handling tap bites hardest. A cheap meter that reports "120 litres sold today, all fine" can keep showing tidy numbers while someone has fitted a bypass pipe around it, jammed the token reader, or swapped in a unit that quietly under-counts. Out on the lonely pipeline a faked reading was a safety risk; here a faked reading is money walking out the gate - and because the dot stays green, nobody goes to look. The tightest link did not vanish when power and signal got easy; it MOVED - to Trust, where the money and the meddling sit. So the right plan is not 17 cheap meters: it is a meter that signs each reading (so a swapped or tampered unit is caught), flags a flow that does not match the tokens sold, and turns amber when a tap is silent or its numbers stop changing while water clearly still flows. The 9 smallholding taps are your far crossing: out there the tight link really is power-and-signal, so they get the solar-and-radio remote path. Same grid, two different tight links for two different sets. The path and its binding constraint never disappear because a site looks easy - the tightest link only moves, so ask, every time and for each set of points, which of the four links is tightest here, and let that answer, not the catalogue, design the path.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>You have felt one shape of a problem that shows up almost everywhere: you want trustworthy information off your assets, at scale, but the cost, the power, the connection and the security all fight each other - and buying devices one at a time bankrupts you while leaving a blind spot at the worst point. It is not a sensor problem; it is a data-path design problem. Find this same shape in your own world:</p>
+<ol>
+<li><strong>Name your "pipeline".</strong> What asset or fleet do you wish you could see live but currently cannot - a row of machines, a fleet of vehicles, cold-storage units, solar inverters, lifts, water tanks, a network of card machines? What does not seeing it cost you when it fails?</li>
+<li><strong>Find your worst point.</strong> Which point is the furthest, hardest to reach, has no power or signal, or is most easily faked? The plan that does not cover your worst point is not a plan.</li>
+<li><strong>Draw your four links.</strong> For one reading from one asset, sketch the chain SENSE -> POWER -> MOVE -> TRUST. Where does each link cost you money, power or connection? Which link is the tightest, and should it drive the rest?</li>
+<li><strong>Split your points, and test your trust.</strong> Are your assets really one problem, or two or three? And what is the worst thing that could happen if a reading you believed was actually wrong, missing or faked - is it cheaper to make "no data" visible now, or to bolt it on later?</li>
+</ol>
+<div class="goal-setter"><label for="learner-goal-text">Your own 'pipeline' - an asset or fleet you wish you could see live but cannot (machines, vehicles, cold-storage units, solar inverters, lifts, water tanks, card machines) - and the worst, hardest-to-reach or most-easily-faked point in it:</label><input type="text" id="learner-goal-text" class="goal-text" placeholder=""><label for="learner-goal-amount">You have just felt a problem that shows up almost everywhere: you want trustworthy information off your assets, at scale, but the cost, the power, the connection and the security all fight each other - and buying devices one at a time bankrupts you while leaving a blind spot at the worst point. It is not a sensor problem; it is a data-path design problem. Find this shape in your own world. NAME YOUR 'PIPELINE': the asset or fleet you wish you could see live but currently cannot (a row of machines, a fleet of vehicles, cold-storage units, solar inverters, lifts, water tanks, a network of card machines) - and what NOT seeing it costs you when it fails. FIND YOUR WORST POINT: which point is furthest, hardest to reach, has no power or signal, or is most easily faked? The plan that does not cover your worst point is not a plan. DRAW YOUR FOUR LINKS: for one reading from one asset, sketch the chain SENSE -> POWER -> MOVE -> TRUST; where does each link cost you money, power or connection, and which link is the tightest, the one that should drive the rest? SPLIT YOUR POINTS: are your assets really one problem, or two or three - some easy and connected, some hard and remote? What would you stop buying one-size-fits-all once you split them? TEST YOUR TRUST: what is the worst thing that could happen if a reading you BELIEVED was actually wrong, missing or faked - and what would it cost to make 'no data' visible (amber, not silently green) now versus bolting it on later? Your distances, power and signal limits will differ completely from a water pipeline - a delivery fleet, a beehive farm and a building's lifts each tighten a different link, and the tightest link only MOVES, it never vanishes (when power and signal get easy, it often slides to Trust, hiding where the value and the temptation sit). But the problem-type is the same: trustworthy data at scale is a path you design as one balanced set against real limits - sense, power, move, trust - not a pile of devices you buy one at a time. Design the path, let the tightest link lead, make absence visible, and prove it at your worst point before you scale.</label><div class="input-group"><span class="currency-symbol">R</span><input type="number" id="learner-goal-amount" placeholder="1" onchange="updateLearnerGoal()"></div></div>
+<p>Name your pipeline, your worst point, the four links for one reading, and which link is tightest. (Working with an AMU facilitator? Fill in the Data-Path Design Grid for your easy assets and your hard ones, and walk one real reading down all four links together.)</p>
+<p>Your distances, your power and signal limits will be completely different from a water pipeline - a delivery fleet, a beehive farm and a building's lifts each tighten a different link, and the tightest link only moves, it never vanishes. But the problem-type is the same one you just solved: trustworthy data at scale is a path you design as one balanced set against real limits - not a pile of devices you buy one at a time. That pattern is yours to carry.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

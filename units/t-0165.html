@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A plant that works, and an organisation that cannot run it</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A plant that works, and an organisation that cannot run it</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The new treatment module is finished and it looks magnificent. It passed its performance test. The project team's contract ends on Friday, and they would like your signature.</p>
+<p>You are Onalenna, and you walk it with a clipboard, and what you find is a plant that works and an organisation that cannot run it.</p>
+<p>There are no as-built drawings - three changes were made on site and they exist in somebody's memory. The operating and maintenance manuals are a folder of supplier PDFs nobody has opened. There are no spares on site, because the spares list was never converted into stock codes, so nothing can be found or re-ordered. Nothing is loaded in the maintenance system, which means no maintenance will ever be scheduled for this module by anyone, ever, until something breaks. And two of the four operators who will run it have not been trained, because the training was scheduled to happen <em>after</em> handover.</p>
+<p>Every performance test passed. Every technical criterion was met. And the moment you sign, all of it becomes yours.</p>
+<p>The worst part is that you can see exactly how it ends. Something will fail in eight months, at night, and it will be recorded as an operations failure - by people who were not in this room, about operators who were never trained, on a plant whose drawings do not match what is installed.</p>
+<blockquote><h2>The asset passes every test and my organisation cannot actually run it, and they want me to sign on Friday. What does a handover plan have to contain so that this cannot happen?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> It passes everything. Performance test, duty point, all of it — nothing is defective and nobody has cheated. And: <strong>no operator has been trained on it</strong>, the drawings in the handover pack do not match what is actually installed, and not one of the spares exists. They want your signature on <strong>Friday</strong>, and refusing has commercial consequences somebody will make sure you feel. You can see how it ends: something fails in about eight months, at night, and it goes in the record as an operations failure — written by people who were not in this room, about operators nobody trained, on a plant whose drawings never matched. Write down what a handover has to contain so this cannot happen — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the question none of the tests asked</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Sign it — it passed every test, so we have no grounds to refuse.&rdquo;</strong> True on the tests that were set, and that is the trap: they asked whether it was built, whether it runs, and whether it does the job. <strong>Not one of them asked whether anybody here can run it.</strong></p>
+<p>&bull; <strong>&ldquo;Sign with a punch list of outstanding items.&rdquo;</strong> The customary answer and a quiet surrender. Once you have signed, the items become yours to chase with none of the leverage you had before, and the contractor's attention is already on the next job.</p>
+<p>&bull; <strong>&ldquo;Refuse until everything is right.&rdquo;</strong> Defensible and, as stated, unarguable — you have no written criterion to refuse against, so it reads as one manager's reluctance and will be overruled by somebody senior on Friday afternoon.</p>
+<p>&bull; <strong>&ldquo;Sign, and put the training and drawings in next year's budget.&rdquo;</strong> Converts a handover gap into an operating cost you will fight for annually. It also leaves eight months of running before the first item lands.</p>
+<p>&bull; <strong>&ldquo;Get it in writing that the gaps are the contractor's fault.&rdquo;</strong> Allocates blame for the failure you already predicted instead of preventing it — and does nothing for the operator standing in front of it at two in the morning.</p>
+<p>&bull; The tests were honest and they were answering <strong>three questions, none of which was yours</strong>. Is it built as designed. Does it run. Does it do the job it was bought for. The fourth — <strong>can we run and maintain this</strong> — is the one that decides whether the thing survives contact with reality, and it is nobody's test unless somebody makes it one. So separate the handover into <strong>distinct gates, each answering a question the others do not</strong>, and be clear that the early ones transfer responsibility between <em>build</em> teams rather than to the people who will live with it. Custody passes at the last one. Two things make a gate real rather than ceremonial. <strong>Write every gate's criteria before anyone is under pressure</strong> — measurable, evidence named, signatory identified — because <strong>criteria invented at the gate are always the criteria the asset happens to meet</strong>. And build a readiness list you are <strong>genuinely willing to refuse on</strong>: a gate that cannot be failed is a milestone with a ceremony attached.</p>
+</div>
+</details>
+<p>Gates, criteria written in advance, and a readiness list you are willing to refuse on. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the commissioning and handover plan - four gates, each answering a question the others do not.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What are the gates, and what does each one answer?</div><p class="cb-demo">Four gates, four different questions, and confusing them is where the trouble starts. MECHANICAL COMPLETION asks: is it BUILT as designed, installed, inspected and statically verified? Note what it is - the handover from the CONSTRUCTION team to the COMMISSIONING team, and the milestone that STARTS pre-commissioning. IT IS NOT A HANDOVER TO OPERATIONS, and treating it as one is the single most common source of confusion on a project. PRE-COMMISSIONING asks: does it RUN? Static work - cleaning and flushing, pressure and leak testing, then bump-testing the rotating equipment (turning a pump for the first time on site to verify current draw, pressure and flow) and running motors in to check vibration and heating and to catch infant mortality. PERFORMANCE TESTING asks: does it DO THE JOB IT WAS BOUGHT FOR, dynamically, on real duty. And OPERATIONAL ACCEPTANCE asks the question the other three never touch: CAN WE RUN AND MAINTAIN IT? That is where custody transfers.</p></div><div class="canvas-box"><div class="cb-label">2. Write the criteria before the pressure arrives</div><p class="cb-demo">Write every gate&#039;s criteria BEFORE anyone is under pressure, in measurable terms, with the evidence named and the signatory identified. This is the whole discipline in one sentence: CRITERIA INVENTED AT THE GATE ARE ALWAYS THE CRITERIA THE ASSET HAPPENS TO MEET. Six months before, everyone agrees the module must sustain 95 per cent of design with quality in specification. On the day, with a contract ending and a crew demobilising, &#039;it made 96 per cent and the turbidity settled down after a few hours&#039; sounds entirely reasonable - and it is a different, softer criterion, written by the pressure rather than by engineering. So state for each gate what must be demonstrated, how it will be measured, over what period, what evidence will be produced, and WHO SIGNS. Agreed criteria are the only thing that can survive a Friday deadline.</p></div><div class="canvas-box"><div class="cb-label">3. The performance test is ALL-OF, not best-of</div><p class="cb-demo">The module is designed for 24 ML/d. The agreed criterion: SUSTAIN AT LEAST 95 PER CENT OF DESIGN - 22.8 ML/d - FOR 72 CONTINUOUS HOURS WITH PRODUCT QUALITY IN SPECIFICATION THROUGHOUT. The run averages 23.1 ML/d, which is 96.25 per cent of design, so THROUGHPUT PASSES comfortably. But 4 of the 72 hours had turbidity out of specification - 5.6 per cent of the run. QUALITY FAILS. Therefore THE TEST FAILS, and is repeated after correction. Read that again, because under pressure this is the decision people get wrong: acceptance criteria are ALL-OF, NOT BEST-OF, and a partial pass is a fail. A plant that makes volume while occasionally putting out-of-spec water into the town has not passed anything. One more thing that surprises people: performance test DATA typically takes two to three weeks to evaluate, so acceptance is never a handshake at the end of the run.</p></div><div class="canvas-box"><div class="cb-label">4. Which punch items actually block the gate?</div><p class="cb-demo">Every project ends with a punch list, and the only question that matters about each item is whether it PREVENTS THE SAFE, CORRECT AND SUSTAINABLE OPERATION OF THE ASSET. That principle is commonly captured in a simple taxonomy: CATEGORY A items block the gate until they are closed; CATEGORY B items may be completed after the gate is passed. Here 340 items are raised - 28 Category A and 312 Category B. At the gate date, 6 CATEGORY A ITEMS REMAIN OPEN. THE GATE DOES NOT OPEN. Not &#039;opens with conditions&#039;, not &#039;opens because the other 334 are done&#039;. And guard the categorisation itself, because that is where the real pressure lands: an item is Category A because of what it does to safe operation, NOT because of how much time is left or how tired everyone is. Recategorising under deadline is how a blocking defect quietly becomes a snag.</p></div><div class="canvas-box"><div class="cb-label">5. Operational readiness - the handover that is not about the plant</div><p class="cb-demo">The plant can be perfect and the handover still fail, because this gate is about the ORGANISATION. Refuse acceptance without: AS-BUILT DRAWINGS reflecting every site change (or the records diverge from the plant on day one); O&amp;M MANUALS that someone has actually read; SPARES physically on site AND converted into stock codes, since a spares list that never became catalogue entries cannot be found or re-ordered; THE MAINTENANCE PLAN LOADED IN THE CMMS, because work that is not in the system is never scheduled; STATUTORY CERTIFICATES and permits; and TRAINED, COMPETENT OPERATORS AND MAINTAINERS. That last one is where the bill comes due: competence has the longest lead time of any resource, it takes years and cannot be started at handover, so an organisation that first thinks about operator training in the week of acceptance has already failed. HANDOVER IS THE TRANSFER OF A CAPABLE, SUSTAINABLE OPERATION - NOT OF A PIECE OF HARDWARE.</p></div></div>
+
+<p>Notice that boxes 1 to 4 are all about the plant, and box 5 is about the organisation - and that box 5 is the one that was missing on Friday. Every project that produces bp-0090's problem does boxes 1 to 4 well. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Handover is the transfer of a <strong>capable, sustainable operation</strong> - not just a piece of hardware. Five questions:</p>
+<ul>
+<li><strong>What are the gates, and what does each answer?</strong> <strong>Mechanical completion</strong> (built as designed - and note it is the handover from <em>construction</em> to <em>commissioning</em>, not to operations); <strong>pre-commissioning</strong> (static: flushing, pressure and leak testing, bump tests, run-in); <strong>performance testing</strong> (it does the job it was bought for); <strong>operational acceptance</strong> (we can run and maintain it - and custody transfers).</li>
+<li><strong>When are the criteria written?</strong> In advance, measurably, with the evidence and the signatory named. Criteria invented at the gate are always the criteria the asset happens to meet.</li>
+<li><strong>How is the performance test judged?</strong> <strong>All-of, not best-of.</strong> Every criterion, simultaneously, sustained for the stated period. And the data takes two to three weeks to evaluate, so acceptance is not a handshake at the end of the run.</li>
+<li><strong>What blocks a gate?</strong> A punch item is categorised on whether it prevents the safe, correct and sustainable operation of the asset - commonly as <strong>Category A</strong> (blocks the gate until closed) and <strong>Category B</strong> (may be completed afterwards). Any open Category A item holds the gate shut.</li>
+<li><strong>Is the organisation ready?</strong> <strong>Operational readiness</strong>: as-builts, manuals, spares on site under stock codes, the maintenance plan loaded, statutory certificates, and trained competent people.</li>
+</ul>
+<p><strong>This is a safety control, not a schedule control.</strong> Accepting an asset with incomplete as-built drawings, no maintenance plan, and untrained operators is not a schedule risk; it is a <em>safety risk</em>. A robust handover plan is a formal safety control that prevents people from getting hurt by equipment they do not understand.</p>
+<p><strong>And it protects people who are not in the room.</strong> Handing over an unsupportable asset and then blaming "operations" for the first failure is a failure of professional ethics. A handover plan protects the dignity of the frontline operators who must live with the consequences of project decisions they had no part in.</p>
+<p>One honest boundary. You define the <em>gates</em>, the <em>criteria</em> and the <em>readiness deliverables</em>, and you transfer custody. You are not executing the commissioning tests, not writing the verification and validation plan that proves the asset meets its specification, and not writing the maintenance plan itself. Your job is to ensure those things exist, are correct, and are in operations' hands <em>before</em> you sign - because after you sign, every one of them is your problem to create retrospectively.</p>
+<p>Does it scale? It is the difference between being handed the keys to a vehicle and being handed the vehicle. The keys are the moment of transfer; what makes it usable is the service history, the manual, the spare wheel, the tools, and a licence to drive it. Anyone can pass you the keys on a Friday. Whether you can actually run the thing on Monday was decided months earlier by someone who either did or did not plan for it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A district is commissioning a <strong>new pump station</strong> - three pumps (two duty, one standby), a switchboard, a control system and a surge vessel. Design duty is <strong>400 litres per second</strong>. It must run unattended overnight and report faults remotely.</p>
+<ol>
+<li><strong>Name the gates.</strong> Set out the four gates and state, in one line each, the question that gate answers for this pump station.</li>
+<li><strong>Write criteria.</strong> Give one measurable criterion for mechanical completion and one for performance testing, each with the evidence that would satisfy it and the period over which it must hold.</li>
+<li><strong>Categorise.</strong> For each punch item below, say whether it blocks the gate, and why: (a) the switch-room door lock is faulty; (b) painting is incomplete on the surge vessel supports; (c) the standby pump has not been proven to auto-start on duty-pump failure; (d) two pressure gauges are unlabelled; (e) the remote fault alarm has never been tested end to end.</li>
+<li><strong>Readiness.</strong> List the operational readiness deliverables you would refuse to sign without, and say which of them has the longest lead time.</li>
+<li><strong>Refuse well.</strong> Write the two sentences you would say to a project manager whose contract ends on Friday, when one blocking item is open.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> two ways to fail this, and the first is the failure this entire unit exists to prevent.</p>
+<p>If your answer is entirely about the pumps, you have written a <em>commissioning</em> plan, not a <em>handover</em> plan - and you have recreated the exact problem in T1. The plant was never the issue. Check whether your answer contains a single sentence about drawings, manuals, spares, the maintenance system, or people.</p>
+<p>Second, look hard at punch items (c) and (e). Both are invisible on a walk-round; both concern functions that only matter when something else has already gone wrong; and both are exactly the kind of item that gets moved to Category B on a Friday afternoon because the station "runs fine". A standby that has never been proven to start is not a standby, and an alarm that has never been tested end to end is a station that will run unattended overnight with nobody listening. Compare that with the unpainted supports, which genuinely can wait.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-name_gates">1. What are the gates, and what does each one answer?</label><textarea id="cb-name_gates" data-key="t-0165:name_gates" placeholder="Set out the sequence of gates, each answering a different question - built right, runs, performs, and can be operated and maintained."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-criteria_before_pressure">2. Write the criteria before the pressure arrives</label><textarea id="cb-criteria_before_pressure" data-key="t-0165:criteria_before_pressure" placeholder="Each gate gets measurable criteria agreed in advance, with the evidence named - because criteria written at the gate are always the ones the asset happens to meet."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-performance_all_of">3. The performance test is ALL-OF, not best-of</label><textarea id="cb-performance_all_of" data-key="t-0165:performance_all_of" placeholder="Every criterion must be met simultaneously and sustained - a partial pass is a fail - and the data takes weeks to evaluate, so acceptance is not a handshake at the end of the run."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-punch_blocking">4. Which punch items actually block the gate?</label><textarea id="cb-punch_blocking" data-key="t-0165:punch_blocking" placeholder="Categorise every outstanding item by whether it prevents safe, correct and sustainable operation - and hold the gate shut while any blocking item is open."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-operational_readiness">5. Operational readiness - the handover that is not about the plant</label><textarea id="cb-operational_readiness" data-key="t-0165:operational_readiness" placeholder="The deliverables without which acceptance must not happen: as-builts, manuals, spares under stock codes, the CMMS load, certificates - and trained competent operators."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now take custody of an asset you are actually able to run.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Handovers fail in ways that are entirely predictable and almost always driven by the calendar.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Treating mechanical completion as handover to operations.</strong> It is the handover from construction to commissioning. Confusing the two hands operations an untested plant.</p>
+<p>&bull; <strong>Writing criteria at the gate.</strong> They will be exactly the criteria the asset meets. Write them months earlier, when nobody is under pressure and everyone is still honest about what good looks like.</p>
+<p>&bull; <strong>Best-of instead of all-of.</strong> Strong throughput does not offset an out-of-specification excursion. A partial pass is a fail.</p>
+<p>&bull; <strong>A performance test too short to prove anything.</strong> Sustained duty is the point; a two-hour run proves the plant can start, not that it can work.</p>
+<p>&bull; <strong>Recategorising punch items under deadline.</strong> An item blocks because of what it does to safe operation, not because of how much time is left.</p>
+<p>&bull; <strong>Accepting with blocking items open.</strong> "Opens with conditions" is how a blocking defect becomes a permanent feature nobody ever returns to.</p>
+<p>&bull; <strong>No as-builts.</strong> The plant and its records diverge on day one and never reconverge, and every future job is priced and planned against a fiction.</p>
+<p>&bull; <strong>Nothing loaded in the maintenance system.</strong> Work that is not in the system is never scheduled. The asset receives no care at all until it fails.</p>
+<p>&bull; <strong>Spares listed but never turned into stock codes.</strong> They exist on paper, cannot be found in the store, and cannot be re-ordered when used.</p>
+<p>&bull; <strong>Training planned for after handover.</strong> Competence has the longest lead time of any resource. Starting it at acceptance means operating an unfamiliar plant with untrained people, which is a safety issue and not a paperwork one.</p>
+<p>&bull; <strong>Signing because a contract ends on Friday.</strong> That does not transfer an asset. It transfers a liability, to people who were not consulted.</p>
+</div>
+</details>
+<p>Onalenna was handed a plant that worked and an organisation that could not run it, three days before a contract ended. Name the four gates and what each one actually answers; write the criteria in advance with the evidence and the signatory named; judge the performance test all-of and over a period that proves sustained duty; categorise punch items by what they do to safe operation and hold the gate shut while any blocker is open; and refuse acceptance without the readiness deliverables - as-builts, manuals, spares under stock codes, the maintenance plan loaded, certificates, and trained people. Handover is the transfer of a capable, sustainable operation, not of a piece of hardware. If you are working with an AMU Facilitator, take an asset your organisation received in the last two years and check just two things: are its as-builts correct, and is its maintenance plan in the system?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can take custody of something you can actually run now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A bad register nags; a missing one is silent</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A bad register nags; a missing one is silent</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and there is an external audit in six weeks. You decide to start with the registers, because registers are where auditors start.</p>
+<p>You find five. The asset register has 12,400 rows and is in decent order. The risk register has 412 entries and has clearly not been touched in years. The change register has 63 entries against a plant that has been modified far more often than that. The audit schedule exists. The incident register exists.</p>
+<p>You spend most of a day improving the risk register. It is satisfying work.</p>
+<p>Then you sit down to answer what an auditor will ask first - <em>which laws and standards apply to this works, and who checks that they still do</em> - and you cannot answer it. Not because the register is out of date.</p>
+<p>Because there isn't one. There never was.</p>
+<p>And you understand why you never noticed. You had spent the day on the risk register because <em>opening it made you uncomfortable</em>. The legal register had never made you uncomfortable once.</p>
+<blockquote><h2>I have five registers in varying states of neglect and one that does not exist at all. How do I build a register that is actually a controlled system - and how do I find the ones that are missing, when missing things leave no trace?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The auditor asked which laws and standards apply to this works, and who checks that they still do. It is a fair question and it should have an authoritative answer. You cannot give one — <strong>not because the register is out of date, but because there isn't one, and there never was.</strong> And you know exactly how you spent yesterday: on the risk register, because opening it makes you uncomfortable. The legal register has never made you uncomfortable once. Four other registers sit in various states of neglect. Write down how you would build a register that is a controlled system, and how you would find the ones that are missing — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why an inventory cannot find this</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Audit all our registers and see what state they are in.&rdquo;</strong> The instinctive move and it is structurally incapable of finding this. <strong>An inventory returns what exists</strong>, and the register that will hurt you is precisely the one that will not appear in it.</p>
+<p>&bull; <strong>&ldquo;Start the legal register now.&rdquo;</strong> Necessary today, and it fixes the one absence you happened to be asked about. There may be others, found the same way — by somebody asking.</p>
+<p>&bull; <strong>&ldquo;Put all the registers in one system.&rdquo;</strong> Tidier storage for the ones you have. A missing register is equally missing from an excellent system.</p>
+<p>&bull; <strong>&ldquo;Assign an owner to each register.&rdquo;</strong> One of the controls that matters, and applied only to what exists it perpetuates the same blind spot with better accountability.</p>
+<p>&bull; <strong>&ldquo;Copy another works' register list.&rdquo;</strong> Borrows their absences along with their presences, and gives you registers whose purpose here nobody can state.</p>
+<p>&bull; The finding is the asymmetry: <strong>a bad register nags you every time you open it, and a missing one is silent.</strong> Attention follows discomfort, so the neglected-but-present registers absorb all the worry while the absent one generates none — <strong>neglect follows comfort</strong>, and the most dangerous gap is by construction the least felt. Which is why the derivation cannot start from your files. Start from <strong>the questions this organisation must be able to answer</strong>, and let each question name its register: which laws apply and who checks; what are we most exposed to; what has been changed on the plant and was the risk assessed; what will be audited and when; what do we own and where; what went wrong and what did we learn. Absences then surface as <strong>unanswered questions rather than missing files</strong>. Write the question beside each one, because a register whose question you cannot state has no purpose and will not survive the person who built it. Then test each register that does exist against the controls that make it a system rather than a list — owner, review cycle, traceable change, completeness against its own question, actual use, and access for the people who need it. <strong>A register's appearance carries no information about whether it is current</strong>, which is why the test has to be explicit.</p>
+</div>
+</details>
+<p>Here is the diagnosis and the design.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the register control matrix - what should exist, what the six controls say about what does, and the design of the one you are fixing.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. List the registers that SHOULD exist - by question, not by inventory</div><p class="cb-demo">DO NOT START WITH THE FILES YOU HAVE. If you inventory what exists you will find what exists, and the register that will hurt you is the one that does not. START WITH THE QUESTIONS THE ORGANISATION MUST BE ABLE TO ANSWER, and let each question name its register. &#039;WHICH LAWS AND STANDARDS APPLY TO THIS WORKS, AND WHO CHECKS THAT THEY STILL DO?&#039; names a REGISTER OF APPLICABLE STANDARDS, REGULATIONS AND LEGISLATION. &#039;What are we most exposed to?&#039; names a RISK REGISTER. &#039;What has been changed on the plant, by whom, and was the risk assessed?&#039; names a MANAGEMENT OF CHANGE REGISTER. &#039;What will be audited, when, and by whom?&#039; names an AUDIT SCHEDULE. &#039;What do we own, where is it and what is it?&#039; names an ASSET REGISTER. &#039;What went wrong, and what did we learn?&#039; names an INCIDENT REGISTER. Write the question beside every register, because a register whose question you cannot state has no purpose and will not survive the person who built it. AT CORATHYL THE EXERCISE FOUND FIVE REGISTERS AND ONE ABSENCE: THERE IS NO REGISTER OF APPLICABLE STANDARDS AND LEGISLATION AT ALL. Not a poor one. None. And it had gone unnoticed for years, because A BAD REGISTER NAGS YOU EVERY TIME YOU OPEN IT AND A MISSING ONE SAYS NOTHING AT ALL.</p></div><div class="canvas-box"><div class="cb-label">2. Score each register against the six controls</div><p class="cb-demo">A REGISTER IS NOT A LIST. A list records what somebody knew on the day they wrote it. A REGISTER IS A CONTROLLED INFORMATION SYSTEM, and it takes SIX CONTROLS to be one: AN OWNER who is accountable for it; A SCHEMA that defines what a row means; AN ENTRY RULE stating what may go in and who may put it there; A REVIEW CADENCE that forces it to be looked at; AN EXIT RULE saying what leaves, when and on whose authority; and AN AUDIT TRAIL showing what changed. SCORE EVERY REGISTER AGAINST ALL SIX. At Corathyl: the ASSET REGISTER (12,400 rows) has an owner, schema, entry rule, cadence and audit trail but NO exit rule - 5 of 6. The RISK REGISTER (412 entries) has an owner and a schema and nothing else - 2 of 6. The MANAGEMENT OF CHANGE REGISTER (63 entries) has a schema alone - 1 of 6. The AUDIT SCHEDULE (24 entries) has an owner and a cadence - 2 of 6. The INCIDENT RISK REGISTER (88 entries) has a schema - 1 of 6. The LEGAL AND STANDARDS REGISTER does not exist - 0 of 6. ELEVEN OF THIRTY-SIX CONTROLS PRESENT, 30.6 PER CENT. NOW READ THE PATTERN RATHER THAN THE SCORE, because the pattern is the diagnosis: OWNERS AND SCHEMAS ARE COMMON, ENTRY RULES ARE RARE, AND NOT ONE REGISTER ON THE SITE HAS AN EXIT RULE. That is not six separate problems. It is one habit, repeated six times.</p></div><div class="canvas-box"><div class="cb-label">3. Design the schema and the entry rule - the control for what gets in</div><p class="cb-demo">TAKE ONE REGISTER AND DESIGN IT PROPERLY. START FROM ITS PURPOSE, because THE SCHEMA IS THE MINIMUM INFORMATION NEEDED TO SERVE THAT PURPOSE and nothing more. For the legal and standards register the purpose is to answer, at any moment, which obligations apply to this works and whether each is still current. So the schema carries the instrument and its clause, the ASSET OR ACTIVITY IT BINDS, the obligation in plain words, THE PERSON ACCOUNTABLE, the evidence of compliance, the date last verified and the date next due. Note what is NOT in it: no summary of the legislation, no legal opinion. A SCHEMA SO COMPLETE THAT NOBODY CAN COMPLETE IT IS A SCHEMA THAT WILL NOT BE COMPLETED. THEN WRITE THE ENTRY RULE, which is the control for QUALITY IN. What makes an entry valid - here, a named instrument, a named accountable person and a verification date, with no entry accepted without all three. Who may create one, and who may not. What triggers a new entry: a new plant item, a changed process, an amended regulation, a new permit condition. AND STATE WHAT HAPPENS WHEN AN ENTRY IS PROPOSED THAT DOES NOT MEET THE RULE - because if the answer is that it goes in anyway, you do not have an entry rule, you have a preference.</p></div><div class="canvas-box"><div class="cb-label">4. Write the review cadence and the EXIT rule - the control everyone forgets</div><p class="cb-demo">THIS IS THE CONTROL FOR RELEVANCE OVER TIME, AND IT IS THE ONE THAT IS ALWAYS MISSING. Almost every register has some idea of what goes in. Almost none states WHAT LEAVES. So registers grow in one direction only, until nobody reads them - and an unread register is WORSE THAN NO REGISTER, because it produces the appearance of control without the substance. LOOK AT WHAT THAT COSTS AT CORATHYL. Of the risk register&#039;s 412 entries, 147 DESCRIBE RISKS TO ASSETS THAT HAVE SINCE BEEN DISPOSED OF - 35.7 PER CENT OF THE REGISTER IS ABOUT THINGS THAT NO LONGER EXIST. Only 78 entries were reviewed in the last twelve months (18.9 per cent), leaving 334 untouched. Reading it end to end at two minutes an entry takes 13.7 HOURS, WHICH IS WHY NOBODY DOES, and a register nobody reads is not consulted before decisions - which was its entire purpose. SO WRITE BOTH CONTROLS. THE CADENCE: who reviews what, how often, and what the review must produce - a dated confirmation, not a glance. Tie it to something real, such as every entry reviewed at least annually and every high-consequence entry quarterly. THE EXIT RULE: what condition removes an entry (the asset disposed, the obligation repealed, the change completed and verified), who authorises the removal, and WHERE IT GOES. DISPOSITION IS NOT DELETION. The entry moves to an archive with its history intact, because the evidence that a risk once existed and was properly closed is itself worth keeping - and pre-determined, transparent criteria for what is kept and for how long are what make the whole thing defensible.</p></div><div class="canvas-box"><div class="cb-label">5. Make it authoritative - the four characteristics a record must hold</div><p class="cb-demo">A REGISTER IS EVIDENCE. It is how an organisation is held accountable for what it did, and the standard for records management sets FOUR CHARACTERISTICS a record must retain to remain AUTHORITATIVE. Test your register against each, in practice rather than in principle. AUTHENTICITY - it is what it purports to be, made by who it says, when it says: so entries are attributable to a named person and a real time, not to a shared login. RELIABILITY - it is a full and accurate representation of what it records: so the entry rule and the capture route must make the register the EASIEST place to record the thing, or people will record it somewhere else and copy it over later, badly. USABILITY - it can be located, retrieved and INTERPRETED: so it must carry not only the value but whatever a reader needs to understand the value, which is where more registers fail than on any other characteristic. INTEGRITY - it is protected against unauthorised alteration: so changes are logged rather than overwritten, and the audit trail is the control that delivers this one. THEN NAME THE CHARACTERISTIC YOUR REGISTER FAILS, and fix that rather than everything. AND KEEP THE BOUNDARY CLEAR: the wider system this sits inside requires the organisation to have controlled documented information; the records standard is HOW you make that information trustworthy. One tells you that you must. The other tells you what good looks like.</p></div></div>
+
+<p>Box 1 is how you find what is not there, and box 4 is the control almost nobody writes. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A register is not a list. It is a governed system, and it takes six controls to be one.</strong> Five questions:</p>
+<ul>
+<li><strong>Which registers should exist?</strong> <strong>Find them by question, not by inventory.</strong> An inventory of what you have cannot surface what you do not. Write the question each register answers; a register whose question you cannot state has no purpose.</li>
+<li><strong>What state are they in?</strong> <strong>The six controls</strong> - owner, schema, entry rule, review cadence, exit rule, audit trail. Corathyl scores 11 of 36, and the <em>pattern</em> matters more than the score.</li>
+<li><strong>What gets in?</strong> <strong>Schema and entry rule.</strong> The schema is the minimum that serves the purpose. The entry rule says what is valid and who may create it - and what happens when something arrives that does not qualify.</li>
+<li><strong>What gets out?</strong> <strong>Cadence and disposition.</strong> The control everyone forgets, and the reason registers grow until they are unreadable.</li>
+<li><strong>Would it stand as evidence?</strong> <strong>Authenticity, reliability, usability, integrity</strong> - the four characteristics an authoritative record must retain.</li>
+</ul>
+<p><strong>The arithmetic that makes the diagnosis.</strong> Six registers against six controls is 36 cells, and 11 are filled. But look at where the failures sit: <em>owners and schemas are common, entry rules are rare, and not one register on the site has an exit rule</em>. That is not six problems. It is one habit repeated six times, and it means the fix is one design decision applied six times rather than six separate remediation projects.</p>
+<p><strong>What the missing exit rule actually costs.</strong> Of the risk register's 412 entries, <strong>147 describe risks to assets that have since been disposed of</strong> - 35.7 per cent of the register is about things that no longer exist. Only 78 entries were reviewed in the last twelve months, 18.9 per cent, leaving 334 untouched. Reading it end to end at two minutes an entry takes <strong>13.7 hours</strong>, which is why nobody does - and a register nobody reads is not consulted before decisions, which was the whole point of having one. <strong>An unread register is worse than no register, because it produces the appearance of control without the substance.</strong> Meanwhile the change register has captured 63 of the 210 work orders that modified equipment in three years: <strong>30 per cent</strong>. Nobody decided that. It is simply what happens when there is no entry rule and no cadence.</p>
+<p><strong>And the thing that makes absent registers so dangerous.</strong> A bad register nags. Every time you open it you see the mess, and eventually you fix it - which is exactly what Onalenna spent her day doing. <strong>A missing register generates no discomfort at all.</strong> It does not appear in an audit of your registers, it does not appear in a data-quality report, and it does not appear in your own guilty conscience. It appears the first time somebody asks the question it should have answered, and by then the answer is needed rather than requested.</p>
+<p>One honest boundary. You <em>design and govern</em> the register - its purpose, schema, entry rule, cadence, disposition and audit trail. You are not the source of its content: you are not the risk assessor, not the legal adviser, and not the engineer who decides what a change requires. The content comes from people who know things you do not, and your job is to build the thing that holds what they know so it is still true next year.</p>
+<p>Does it scale? A library is not the books. It is the catalogue, the shelving rule, the borrowing record and the withdrawal policy - and a library that only ever acquires, never withdraws, and never records who has what stops being a library and becomes a room full of books. Your register is the catalogue, not the collection.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A food processing facility asks you to review a register that is, by every measure in box 2, exemplary.</p>
+<table>
+<tr><th>Item</th><th>Detail</th></tr>
+<tr><td>The register</td><td>Critical control point monitoring - temperature, pressure and chemical concentration checks required by the facility's food safety plan</td></tr>
+<tr><td>Owner</td><td>The quality assurance manager, named, accountable</td></tr>
+<tr><td>Schema</td><td>Rigid and enforced: control point, reading, timestamp, technician identity</td></tr>
+<tr><td>Entry rule</td><td>Only certified technicians may enter data, through a timestamped tablet</td></tr>
+<tr><td>Review cadence</td><td>Daily</td></tr>
+<tr><td>Exit rule</td><td>Three years active, then archive - documented and followed</td></tr>
+<tr><td>Audit trail</td><td>Complete; no entry can be altered without a logged change</td></tr>
+<tr><td>Volume</td><td>4 control points, 12 checks per shift, 3 shifts - 144 checks a day</td></tr>
+<tr><td>Excursions recorded in 14 months</td><td>Zero</td></tr>
+<tr><td>Process deviations logged in the maintenance system, same period</td><td>31</td></tr>
+<tr><td>Median time between taking a reading and entering it</td><td>3.8 hours, against a design intent of real time</td></tr>
+<tr><td>Observed practice</td><td>Operators write readings on a whiteboard and transcribe at end of shift</td></tr>
+</table>
+<ol>
+<li><strong>Score it.</strong> Run the six controls. What does it score?</li>
+<li><strong>Find the contradiction.</strong> Two systems describe the same plant. What are they each saying, and what does the difference tell you?</li>
+<li><strong>Name the failing characteristic.</strong> Of authenticity, reliability, usability and integrity, which one has failed, and how did a 6-of-6 register manage to fail it?</li>
+<li><strong>Diagnose the schema.</strong> What is missing from it, and why does that omission produce the whiteboard?</li>
+<li><strong>Fix it.</strong> Propose the change, and say why adding a control would not have helped.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, step 1 gives <strong>6 of 6</strong>, and that is the point of the exercise. If your instinct is to reach for the six controls and add whichever is missing, this register has nothing for you to add. <em>Governance is necessary and it is not sufficient.</em></p>
+<p>Second, step 2 is where it breaks open. The register says this plant has not deviated once in fourteen months across roughly 61,000 checks. The maintenance system says it deviated 31 times. <strong>Both cannot be true</strong>, and the register is the one claiming perfection. A register that has never recorded a bad reading is not evidence of a well-run plant; it is evidence that bad readings are going somewhere else.</p>
+<p>Third, steps 3 and 4 together. The failure is <strong>usability</strong> - the register captures the reading but not the acceptable range, and has no field to flag an excursion, so an operator cannot tell from the register whether a reading is good. To know, they must cross-reference a chart on the wall. So they use the whiteboard, which does tell them, and transcribe later - and by then a reading that was out of range is either corrected or quietly omitted. The 3.8-hour median lag is the symptom; the missing range field is the cause. <em>The schema was designed for compliance rather than for the person taking the reading</em>, and a register that is harder to use than the workaround will lose to the workaround every time. Notice what this means for box 5: <strong>usability is not a nicety. It is the characteristic on which reliability actually depends.</strong></p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-required_registers">1. List the registers that SHOULD exist - by question, not by inventory</label><textarea id="cb-required_registers" data-key="t-0185:required_registers" placeholder="Start from the questions the organisation must be able to answer, not from the files it happens to hold. The registers you do not have will not appear in an inventory of the ones you do."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-score_six_controls">2. Score each register against the six controls</label><textarea id="cb-score_six_controls" data-key="t-0185:score_six_controls" placeholder="Owner, schema, entry rule, review cadence, exit rule, audit trail. Score every register, including the ones that do not exist yet - and read the pattern, not the total."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-schema_and_entry">3. Design the schema and the entry rule - the control for what gets in</label><textarea id="cb-schema_and_entry" data-key="t-0185:schema_and_entry" placeholder="State the register&#039;s purpose, then design the minimum structure that serves it, what makes an entry valid, and who has authority to create one."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-cadence_and_exit">4. Write the review cadence and the EXIT rule - the control everyone forgets</label><textarea id="cb-cadence_and_exit" data-key="t-0185:cadence_and_exit" placeholder="State when the register is reviewed and by whom, and then the part almost no register has: what leaves it, when, on whose authority, and where it goes."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-make_it_authoritative">5. Make it authoritative - the four characteristics a record must hold</label><textarea id="cb-make_it_authoritative" data-key="t-0185:make_it_authoritative" placeholder="A register is what the organisation is held accountable by, so test it against authenticity, reliability, usability and integrity - and be honest about which one it fails."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now build a register that is still true in five years.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Registers fail slowly and quietly, which is why they are usually fixed after somebody has asked for them.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Counting rows as evidence of control.</strong> Twelve thousand rows and no exit rule is not a strong register; it is a large one. Score the controls, not the volume.</p>
+<p>&bull; <strong>No exit rule.</strong> The register grows in one direction until it is unreadable, and an unread register produces the appearance of control without the substance.</p>
+<p>&bull; <strong>Finding your registers by inventory.</strong> An inventory of what you have cannot show you what you do not. Start from the questions you must be able to answer.</p>
+<p>&bull; <strong>Treating disposition as deletion.</strong> An entry that leaves the active register goes to an archive with its history intact. The evidence that a risk existed and was properly closed is worth keeping.</p>
+<p>&bull; <strong>A schema so complete nobody can complete it.</strong> The schema is the minimum that serves the purpose. Every additional field is a reason to use the whiteboard instead.</p>
+<p>&bull; <strong>A schema designed for the auditor rather than the user.</strong> If the person taking the reading cannot tell from the register whether the reading is acceptable, they will keep the useful record somewhere else.</p>
+<p>&bull; <strong>An owner with no authority over the contributors.</strong> Accountability without authority produces a person who is blamed for a register they cannot make anyone fill in.</p>
+<p>&bull; <strong>An entry rule that is really a preference.</strong> If an entry that fails the rule goes in anyway, there is no rule. Write what happens to the rejected entry.</p>
+<p>&bull; <strong>Confusing the register with the analysis that feeds it.</strong> The risk register is not the risk assessment; the legal register is not the legal opinion. You govern the container.</p>
+<p>&bull; <strong>A register that has never recorded anything bad.</strong> Not a triumph. A symptom. Find out where the bad readings are going.</p>
+<p>&bull; <strong>Fixing the register that nags instead of the one that is silent.</strong> The uncomfortable register gets the attention; the absent one gets none until somebody asks.</p>
+</div>
+</details>
+<p>Onalenna spent a day improving the register that made her uncomfortable and could not answer the question the missing one existed for. List the registers your organisation should have by asking what it must be able to answer, not by looking at what it holds; score each against the six controls and read the pattern rather than the total; design the schema as the minimum that serves the purpose and write an entry rule that says what happens to what fails it; write the review cadence and the exit rule, because disposition is what keeps a register readable and readable is what keeps it consulted; and test the result against authenticity, reliability, usability and integrity, fixing the one that fails. A register is not a list - it is the system that keeps a list true. And of everything on this page, the piece most likely to be missing from your organisation right now is the register nobody has ever complained about. If you are working with an AMU Facilitator, write down the three questions your organisation must be able to answer and find out which of them has no register behind it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build a register that stays true now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

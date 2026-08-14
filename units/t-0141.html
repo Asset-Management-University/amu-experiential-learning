@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A twin of what, and for what?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A twin of what, and for what?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and the board has caught digital-twin fever. "Get us a digital twin," they said. So here you are in a vendor's demo, and it is genuinely beautiful - a live 3D model of the plant turning gently on the screen, predictive dashboards, alarms that light up, the works. Everyone in the room is dazzled and more or less ready to sign a very large cheque.</p>
+<p>And you feel a pit in your stomach, because you can build twins yourself and you know something the room does not: <em>nobody has said what decision this twin is for.</em> Is it "is the plant running right now", which a simple dashboard answers for a fraction of the price? Or "when will this pump fail", which genuinely needs forecasting? Those are wildly different twins at wildly different costs, and the demo is about to decide it for everyone - by being impressive.</p>
+<p>You are minutes from specifying the most expensive twin in the room instead of the right one, to answer a question nobody has actually asked. Or, left to build it yourself, you would happily engineer a stunning predictive twin for a decision a dashboard could have handled.</p>
+<blockquote><h2>Everyone wants "a digital twin", but nobody has said of what, or for what. How do I specify the twin the decision actually needs - and then choose a platform to fit that, instead of the one that dazzled us?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The board wants &ldquo;a digital twin&rdquo;. Nobody has said of what, or for what. You are sitting in a demonstration that is genuinely impressive — live three-dimensional plant, simulations running, the whole works — and you can feel it quietly becoming the specification, with a large commitment minutes away. Be honest about the other half too: if they handed you the budget instead, you would happily build something beautiful and predictive for a question a plain dashboard could have answered. Meanwhile the thing actually hurting you is that nobody can say when the three high-lift pumps need overhauling. Write down how you would specify what to build — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and where a specification actually starts</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Compare three vendors properly.&rdquo;</strong> A better procurement of an unspecified thing. Without a statement of what it must do, you would be comparing demonstrations, and the best demonstration wins — which is exactly the failure, run more thoroughly.</p>
+<p>&bull; <strong>&ldquo;Buy the most capable platform — we will grow into it.&rdquo;</strong> Organisations rarely grow into unused capability; they pay for it and resent it. Every rung of sophistication you do not need is cost and fragility bought in advance of a purpose.</p>
+<p>&bull; <strong>&ldquo;Start small with a pilot.&rdquo;</strong> Sensible-sounding and it postpones rather than answers. A pilot of what, proving what? Without a decision named, a pilot ends with everybody satisfied and nothing determined.</p>
+<p>&bull; <strong>&ldquo;Write the requirements from what the demo showed.&rdquo;</strong> Naming the failure precisely. You would be reverse-engineering a specification from a product, which guarantees the product meets it.</p>
+<p>&bull; <strong>&ldquo;Build it ourselves — we know our plant.&rdquo;</strong> True and it is the mirror-image trap. You know the plant and you still have not been told what decision this serves, so your own version would be elegant, expensive and aimed at nothing in particular.</p>
+<p>&bull; Start <strong>nowhere near the technology</strong> and name <strong>the decision the thing must support</strong>, in one sentence specific enough to have a cost of being wrong in both directions — here, something like: schedule each high-lift pump's overhaul before it fails, without pulling healthy pumps early. Now everything downstream is determined instead of debated. The <strong>level of sophistication follows from that decision and stops there</strong>: there is a ladder from showing what is happening, to explaining it, to forecasting it, to recommending an action, to acting on its own — and forecasting is what this decision needs, so a rung higher is capability you will pay for and never use. Naming the decision also fixes <strong>what is actually included</strong>: three pumps, not the whole works, because the boundary comes from the question rather than from ambition. And then, <strong>last</strong>, the platform — assessed against the specification rather than allowed to write it. That reversal is the entire discipline: a demonstration should answer a requirement, never become one.</p>
+</div>
+</details>
+<p>There is a specification for exactly this, and it starts nowhere near the technology. Here it is, worked for one real decision.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the specification and platform shortlist Onalenna should have brought <em>into</em> that demo, not left it to write for her.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What decision must it support? (before any technology)</div><p class="cb-demo">Not &#039;we need a digital twin&#039; - that is a slogan, not a specification. The decision: &#039;schedule the overhaul of each of the three high-lift pumps BEFORE it fails, without pulling healthy pumps early.&#039; That is a real decision with a cost of being wrong in both directions. Everything downstream - how clever the twin must be, what it must sense, who uses it - is now determined by this one sentence. The twin is a means to this decision, not an end in itself.</p></div><div class="canvas-box"><div class="cb-label">2. What maturity does that decision need - and no more? (the ladder)</div><p class="cb-demo">The ladder: DESCRIPTIVE (mirror the current state), DIAGNOSTIC (explain why), PREDICTIVE (forecast future state), PRESCRIPTIVE (recommend an action), AUTONOMOUS (act on it). Our decision - overhaul before failure - needs to FORECAST remaining life, so it needs PREDICTIVE. A descriptive dashboard (&#039;the pump is running&#039;) cannot answer &#039;when will it fail&#039;. But we do NOT need prescriptive or autonomous - a human plans the overhaul. So the target is predictive, and one rung higher would be paying for capability the decision never uses.</p></div><div class="canvas-box"><div class="cb-label">3. What exactly is twinned - and what data, model and users? (ISO 23247)</div><p class="cb-demo">ISO 23247&#039;s four entities give the boundary. OBSERVABLE ELEMENT: the three high-lift pumps (not the whole plant - scope tightly). DATA COLLECTION &amp; CONTROL: vibration, bearing temperature and flow, sampled from the existing SCADA. CORE ENTITY: a remaining-useful-life model that turns those signals into a forecast. USER ENTITY: the maintenance planner, who sees &#039;weeks to recommended overhaul&#039; on a dashboard. Now everyone knows what is in the twin and what is not - which is the difference between a scoped build and a sprawling one.</p></div><div class="canvas-box"><div class="cb-label">4. The specification - what I can build or buy against</div><p class="cb-demo">The one-page spec: PURPOSE - forecast remaining life of the three high-lift pumps to schedule overhauls. MATURITY - predictive. SCOPE - the four entities above. DATA/FIDELITY - the model must give at least four weeks&#039; warning of failure with the sensors we already have. ACCEPTANCE CRITERIA - on twelve months of historical data, it would have flagged both past failures early and raised no more than one false alarm. That last line is what makes the spec buildable AND buyable: it says exactly when the twin is good enough, so neither a builder nor a vendor can call &#039;done&#039; on their own terms.</p></div><div class="canvas-box"><div class="cb-label">5. Which platform best fits the spec? (a scorecard, not a demo)</div><p class="cb-demo">Weighted against the spec, not the demo. Criteria and weights: functional fit to PREDICTIVE 40%, interoperability with our SCADA 25%, total cost of ownership 20%, vendor lock-in 15%. Platform A: dazzling live-3D, but descriptive only - fails the predictive requirement outright, so its beauty is irrelevant. Platform B: predictive analytics, integrates with our SCADA, mid-cost - scores highest. Platform C: cheapest, but a closed system that would trap our data - loses on lock-in. Choose B. Notice the flashiest demo (A) could not do the one thing the decision required, and the scorecard caught it where the demo hid it.</p></div></div>
+
+<p>Read it top to bottom and notice that the technology appears last. The first three boxes never mention a platform at all - they nail down the decision, the maturity that decision needs, and exactly what is being twinned. Only then does a platform get chosen, and the flashiest one in the demo turns out to fail the very first requirement. The demo was answering "which is most impressive"; the spec answers "which is right". Let us name the moves.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A digital twin is a means to a decision, not an end - so you specify it in five moves, and the first two happen before any technology is on the table:</p>
+<ul>
+<li><strong>What decision must it support?</strong> Name the specific decision, in plain words, before a single feature is discussed. "Schedule each pump's overhaul before it fails" is a decision; "we need a digital twin" is a slogan. If you cannot state the decision, you are not ready to specify a twin - and everything downstream is determined by this one sentence.</li>
+<li><strong>What maturity does that decision need - and no more?</strong> Digital twins sit on a <strong>maturity ladder</strong>: <em>descriptive</em> (mirror the current state), <em>diagnostic</em> (explain why), <em>predictive</em> (forecast future state), <em>prescriptive</em> (recommend an action), <em>autonomous</em> (act on it). Here is the discipline that saves the money: choose the <em>lowest</em> level that actually answers the question. Our decision needs to forecast remaining life, so it needs <em>predictive</em> - and a descriptive dashboard cannot reach it, while a prescriptive or autonomous twin is capability you would pay for and never use. Higher is not better; higher is more expensive.</li>
+<li><strong>What exactly is twinned - and what data, model and users?</strong> Scope it with the four entities of <strong>ISO 23247</strong> - a digital-twin framework standard scoped to manufacturing, whose four-entity structure is borrowed here as a design pattern, not cited as a manufacturing-compliance claim: the <em>observable element</em> (the physical asset - here, three pumps, not the whole plant), the <em>data collection and control</em> (which signals, from where), the <em>core entity</em> (the digital model that does the computing), and the <em>user entity</em> (who uses the output, and how). These four draw the boundary between a scoped build and a sprawling one.</li>
+<li><strong>What is the specification I can build or buy against?</strong> Assemble it: purpose, maturity level, scope, data and fidelity requirements, and - the line people forget - <strong>acceptance criteria</strong>. "It would have caught both past failures with at least four weeks' warning and no more than one false alarm" is what tells a builder or a vendor exactly when the twin is good enough, so neither can declare victory on their own terms.</li>
+<li><strong>Which platform best fits the spec?</strong> Now, and only now, the platforms - compared on a <strong>weighted scorecard</strong> against the specification: functional fit to the required maturity, interoperability with what you already run, total cost of ownership, vendor lock-in, support. The requirements do the choosing. The platform with the most beautiful demo may fail the one requirement the decision actually needed - and the scorecard is how you catch that before you sign, not after.</li>
+</ul>
+<p>One honest boundary. You <em>scope, specify and select</em> - the requirements front end. You are not building the twin (that is a separate engineering craft) or the physics model inside it; you do not chase maximum fidelity, you specify the <em>minimum maturity the decision needs</em>; and your platform choice is requirements-driven, never demo-driven. Get this front end wrong and the finest build in the world delivers the wrong twin, beautifully.</p>
+<p>Does it scale? It is buying a utility vehicle: you first define the job - what payload, what terrain, what towing - and only then test the vehicles that meet it; you do not buy the biggest, shiniest truck in the showroom and discover later that it cannot pull your load.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different use case. Corathyl's pumping energy bill is climbing, and the board wants to know whether a digital twin could help cut it - by deciding, day to day, which pumps to run and when to shift load off peak tariff.</p>
+<ol>
+<li><strong>The decision.</strong> State the specific decision this twin must support, in one sentence.</li>
+<li><strong>The maturity.</strong> Which rung of the ladder does that decision need - and why not the one above it?</li>
+<li><strong>The scope.</strong> Name the four ISO 23247 entities for this twin: what is twinned, what data, what the model computes, who uses it.</li>
+<li><strong>The scorecard.</strong> Name two criteria on which you would compare platforms - and say which requirement each one protects.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 2, justify why you did <em>not</em> pick a higher rung. If you reached for autonomous or prescriptive without asking whether a human still makes the call, you have chased maturity instead of matching it - the exact trap this unit exists to break.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-decision">1. What decision must it support? (before any technology)</label><textarea id="cb-decision" data-key="t-0141:decision" placeholder="State the specific decision the twin exists to inform - in plain words, before a single feature is discussed. If you cannot name the decision, you are not ready to specify a twin."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-maturity">2. What maturity does that decision need - and no more? (the ladder)</label><textarea id="cb-maturity" data-key="t-0141:maturity" placeholder="Place the decision on the maturity ladder: descriptive, diagnostic, predictive, prescriptive, autonomous. Choose the lowest level that actually answers the question. Higher is not better - it is more expensive."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-scope">3. What exactly is twinned - and what data, model and users? (ISO 23247)</label><textarea id="cb-scope" data-key="t-0141:scope" placeholder="Scope the twin with ISO 23247&#039;s four entities (a manufacturing-scoped standard whose structure is borrowed here as a design pattern, not a compliance claim): the physical element, the data collection and control, the core digital model, and the user entity."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-spec">4. The specification - what I can build or buy against</label><textarea id="cb-spec" data-key="t-0141:spec" placeholder="Assemble the design specification: purpose, maturity level, scope, data and fidelity requirements, and acceptance criteria. This is the document a builder or a vendor is held to."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-select">5. Which platform best fits the spec? (a scorecard, not a demo)</label><textarea id="cb-select" data-key="t-0141:select" placeholder="Score two or three commercial platforms against the spec&#039;s requirements on weighted criteria - functional fit to the required maturity, interoperability, total cost of ownership, lock-in and support. The spec chooses, not the showroom."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now walk into any digital-twin conversation and ask the two questions that change everything: a twin of what, and for what?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Digital-twin projects go wrong far more often in the specifying than in the building, and almost always in the same ways.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Specifying by vendor demo.</strong> Letting the most impressive presentation define what you buy. The demo answers "which is most dazzling"; your spec must answer "which is right", and those are rarely the same platform.</p>
+<p>&bull; <strong>Chasing maximum maturity.</strong> Building predictive or autonomous when the decision only needed descriptive. Every rung above what the decision requires is capability you pay for, maintain, and never use.</p>
+<p>&bull; <strong>A twin with no stated decision.</strong> If nobody can name the decision it supports, the twin can never be judged fit, finished, or worth its cost. "We need a digital twin" is where the waste begins.</p>
+<p>&bull; <strong>Skipping scope.</strong> Without the four entities pinned down, the data and the boundary are undefined, and the build sprawls to cover everything and deliver nothing on time.</p>
+<p>&bull; <strong>Selecting on features and price alone.</strong> The platform that scores well on a feature list but will not talk to your SCADA, or that locks your data in, sends you a far bigger bill later - in integration and in the escape you can no longer afford.</p>
+<p>&bull; <strong>Confusing specifying with building.</strong> This job is the requirements front end. Doing it well is what lets the build - by you or a vendor - deliver the right thing; doing it badly cannot be rescued by any amount of engineering skill downstream.</p>
+<p>&bull; <strong>Forgetting acceptance criteria.</strong> Without a written "good enough" test, nobody can say when the twin is done, and a project with no finish line does not have one.</p>
+</div>
+</details>
+<p>Onalenna nearly bought the most beautiful twin in the room to answer a question nobody had asked. Now she can do the opposite: name the decision, choose the maturity it needs and no more, scope exactly what is twinned, write a spec with a finish line, and let that spec - not a demo - choose the platform. A digital twin is only ever as good as the decision it was built to serve, and the whole of that value is decided before anyone writes a line of code. If you are working with an AMU Facilitator, take one real "we should get a digital twin" idea and force it to answer the two questions first: a twin of what, and for what?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can specify the right twin now, not the shiniest.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

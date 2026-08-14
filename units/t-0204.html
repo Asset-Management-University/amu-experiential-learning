@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The answer you do not give</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The answer you do not give</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and you are the team's best problem-solver. A planner comes to your door: the weekly schedule keeps breaking by Wednesday and he does not know why. You know why. You tell him - fast, correct, kind - and he thanks you and goes.</p>
+<p>Next week he is back with a different scheduling problem. You solve that one too.</p>
+<p>And slowly you notice the shape of it. <em>You are the smartest person on the team, and that is exactly why nobody else on it is growing.</em> Every answer you hand out is a skill they do not build, and every problem you solve makes you the one person the team cannot do without.</p>
+<blockquote><h2>Every answer I give makes them a little more dependent and a little less capable. How do I help someone solve a problem in a way that leaves them able to solve the next one without me?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> He brought you a scheduling problem and you solved it — properly, in ten minutes, and he was grateful. Next week he was back with a different one and you solved that too. Meanwhile the graduate asks you something she could work out herself if she sat with it for an hour, and the new planner is facing a situation he has genuinely never seen and could not reason his way to from anything in his experience. You answer them all, well, because you are the most capable person on this team. And slowly you see the shape of it: <strong>that is exactly why nobody else is growing.</strong> Write down how you would help so they can solve the next one without you — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the question that decides which help to give</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Stop answering — make them work it out.&rdquo;</strong> Right for the graduate and cruel to the new planner, who cannot derive what he needs from anything he has. Withholding help from somebody genuinely lost is not development; it is abandonment with a pedagogical excuse.</p>
+<p>&bull; <strong>&ldquo;Send them on training.&rdquo;</strong> Useful for a known skills gap and irrelevant to the moment in front of you — the question they have is today's, and how you answer it is what teaches them whether to think or to ask.</p>
+<p>&bull; <strong>&ldquo;Write it all down so they can look it up.&rdquo;</strong> Genuinely valuable for the second kind of problem and useless for the first, since a procedure for the graduate's question would hand her the answer in a more durable format.</p>
+<p>&bull; <strong>&ldquo;Always ask questions instead of answering.&rdquo;</strong> A single policy applied to opposite situations. Asking clever questions of somebody truly lost is <strong>withholding help behind a wall of questions</strong>, and it feels to them like a game played at their expense.</p>
+<p>&bull; <strong>&ldquo;I am the fastest route — it is efficient.&rdquo;</strong> True today and compounding against you. Every answer handed out is a skill not built, and you are becoming the one person this team cannot do without, which is a fragility rather than an achievement.</p>
+<p>&bull; The correction is not to withhold help but to <strong>choose between two different kinds of it</strong>, and the first and most important skill is judging which the moment needs. One question settles it: <strong>can this person reach the answer themselves, with help — or do they genuinely need something they cannot derive from where they stand?</strong> Where they can reach it, <strong>draw it out by asking.</strong> Where they truly cannot, <strong>give them the map</strong> from experience they do not have. The two failures are exact opposites and both do real damage. Handing your answer to somebody who could have found their own builds dependence and quietly says <em>I do not think you can</em>. Asking questions of somebody genuinely lost withholds what they need and humiliates them. What decides it is dignity as much as efficiency: <strong>drawing the answer out respects a person's capability, and offering the map respects their time</strong> when the thing needed cannot be reasoned to. Know the edges of both — the first fails when there is genuinely nothing to draw on; the second, made habitual, produces somebody who can follow maps and never read terrain.</p>
+</div>
+</details>
+<p>Here is the answer you do not give.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you grow a person - deciding whether to coach or mentor, drawing the answer out or sharing the map, and knowing the edges of both.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Decide which the moment needs - coach or mentor</div><p class="cb-demo">THE FIRST AND MOST IMPORTANT SKILL IS NOT COACHING OR MENTORING - IT IS JUDGING WHICH ONE THE MOMENT IN FRONT OF YOU NEEDS, because the two developmental acts are opposite and so are the ways they fail. Ask yourself one question about the person and their problem: CAN THEY FIND THIS ANSWER THEMSELVES, WITH HELP - or do they GENUINELY NEED A MAP THEY CANNOT DRAW FROM INSIDE THEIR OWN EXPERIENCE? COACHING is for the first case: the person has, or can reach, the answer, and your job is to draw it out of them by asking. MENTORING is for the second: the person faces something they have never seen, cannot reason their way through from where they stand, and needs a piece of your hard-won experience - a real map. The two classic failures are exact opposites. MENTORING WHEN YOU SHOULD COACH - handing your answer to someone who could and should have found their own - builds dependence and quietly tells them &#039;I do not think you can&#039;. COACHING WHEN YOU SHOULD MENTOR - asking clever questions of someone who is truly lost and needs your experience - is withholding help behind a wall of questions, and it feels to them like a game played at their expense. AND THE DIGNITY OF BOTH, WHICH DECIDES HOW YOU CHOOSE: COACHING IS AN ACT OF RESPECT FOR A PERSON&#039;S CAPABILITY. IT SAYS: &#039;YOU CAN FIND THE ANSWER.&#039; MENTORING IS AN ACT OF RESPECT FOR A PERSON&#039;S GENUINE NEED. IT SAYS: &#039;YOU DO NOT HAVE TO WALK THIS PATH ALONE.&#039; BOTH BEGIN FROM A PLACE OF ACCEPTANCE. BOTH HONOUR THE PERSON&#039;S AGENCY. So the judgement is not about your convenience or your ego; it is about what actually grows this person, on this problem, today.</p></div><div class="canvas-box"><div class="cb-label">2. If coaching, ask - don&#039;t tell - and run the four steps</div><p class="cb-demo">IF THE MOMENT CALLS FOR COACHING, HERE IS THE ONE RULE UNDER WHICH EVERYTHING ELSE SITS: ASK, DO NOT TELL. When someone brings you a problem your instinct is to hand them the answer - you know it, it is faster, and it feels like help. It is not. TELLING SOLVES TODAY&#039;S PROBLEM AND TEACHES NOTHING; the person leaves able to solve THIS problem only, and comes back for the next, because you have made yourself the answer and them the question. COACHING DRAWS THE ANSWER OUT SO THEY OWN IT, UNDERSTAND IT, AND CAN DO IT NEXT TIME WITHOUT YOU. And the truth that makes it possible, the hardest truth in the unit: THE COACH IS NOT THE EXPERT ON THE PERSON&#039;S OWN SITUATION. THE PERSON WITH THE PROBLEM IS. Your job is not to hand them your answer; it is to ask the question that lets them find theirs. Structure the conversation in four moves. GOAL: where do you actually want to get to - what would a good outcome look like? REALITY: where are you now, honestly - what is really happening, and when does it break? (This is where most of the work is done, because a person who describes their reality plainly usually sees the answer inside it.) OPTIONS: what could you do - all of them, before you judge any? WILL: what WILL you do, by when, and what is the first step? At Corathyl a planner comes to Onalenna stuck: the weekly schedule keeps breaking by Wednesday. THE TELL takes ninety seconds - &#039;protect twenty per cent for emergent work&#039; - correct, and useless, because next week&#039;s different problem sends him back to her door. THE COACHING takes six minutes: she asks what a good week looks like, then what actually happens, and he DISCOVERS OUT LOUD that it always breaks when a breakdown hits and he has kept no slack; asked what he could try, he arrives at the reserve himself plus two ideas she would never have given him; asked what he will do Monday, he commits. He leaves with the answer AND the method for the next problem. AND THE DISCIPLINE THAT MAKES IT REAL: ASK REAL QUESTIONS, NOT LEADING ONES. FAKE COACHING IS MANIPULATION. IT IS TELLING IN DISGUISE. WHEN YOU ASK LEADING QUESTIONS TO STEER A PERSON TO AN ANSWER YOU HAVE ALREADY DECIDED ON, YOU ARE NOT COACHING; YOU ARE HIDING YOUR INSTRUCTION. THIS IS AN ACT OF DISRESPECT DRESSED AS A QUESTION. IT BREAKS TRUST AND IT IS FORBIDDEN. ASK REAL QUESTIONS, OR DO NOT ASK.</p></div><div class="canvas-box"><div class="cb-label">3. The hard part of coaching - listen, and hold the silence</div><p class="cb-demo">ASKING A GOOD QUESTION IS THE EASY HALF. THE HARD HALF - THE ONE THAT SEPARATES REAL COACHING FROM A QUIZ - IS WHAT YOU DO IN THE SILENCE AFTER IT. When you ask someone a real question about their own problem, they need to THINK, and thinking is not instant - there will be a pause, sometimes a long, uncomfortable one, while they turn the problem over. THAT SILENCE IS NOT A PROBLEM TO BE SOLVED. IT IS THE SOUND OF SOMEONE LEARNING. And it is precisely here that most coaching dies, because the coach cannot bear the pause and rushes in to fill it - with a hint, a smaller question, or, fatally, the answer - and in that instant takes the problem back and teaches the person that if they wait long enough, you will do the work. So the discipline of box 3 is two things. FIRST, ACTUALLY LISTEN - not to line up your next point, not to confirm the answer you were already holding, but to hear what THEY are saying, including the half-formed thing they are not quite sure of, which is usually where the real answer is hiding. Reflect it back (&#039;so what you are saying is...&#039;) to check you heard it and to let them hear it. SECOND, HOLD THE SILENCE. Count to ten in your head if you have to. Let the pause do its work. The single most useful sentence in a coaching conversation is often nothing at all - just waiting, with attention, while the other person finds the thing they already half-knew. RESIST THE RESCUE. The moment you feel the urge to save them from the discomfort of not-yet-knowing is the exact moment to sit still, because on the other side of that discomfort is the answer they will actually remember - the one that arrived in their own words, in their own head, because you had the discipline to say nothing.</p></div><div class="canvas-box"><div class="cb-label">4. If mentoring, share the map honestly - and leave the choice theirs</div><p class="cb-demo">WHEN THE JUDGEMENT IN BOX 1 SAYS MENTOR - THE PERSON FACES SOMETHING THEY CANNOT SEE FROM WHERE THEY STAND - THEN YOU DO THE OPPOSITE OF COACHING, ON PURPOSE: YOU TELL. You share the map you have and they do not, because it would be cruel and pointless to ask questions about terrain they have never walked. But mentoring done well has its own discipline, and it is easy to get wrong. FIRST, SHARE THE REAL EXPERIENCE, INCLUDING THE MISTAKES, IN SERVICE OF THEIR DECISION. The useful mentoring is not the polished success story; it is &#039;here is what I chose, here is what it cost me, here is what I wish I had known, and here is the thing I got wrong that you can avoid.&#039; Share the lesson, not just the memory. A map with only the good roads on it is a map that gets people lost. SECOND, AND THIS IS THE LINE THAT PROTECTS THE OTHER PERSON&#039;S DIGNITY: SHARE THE MAP, NOT THE DESTINATION. Your experience is data for their decision, not a template for their life. The failure mode of mentoring is &#039;do what I did&#039; - re-running your own choices through someone else, living vicariously through them, mistaking your path for the only path. THE MENTEE&#039;S CHOICE REMAINS THEIRS. At Corathyl, a month after the coaching conversation, the same planner is deciding whether to specialise in shutdown planning or stay generalist - a fork he has no experience of and cannot reason through from inside. Onalenna does not ask him questions he has no way to answer; she tells him honestly what each path gave her and took from her, and what she wishes she had known - and then she stops, and lets the choice be his. She has given him a map. Where he walks is his to decide, and a good mentor is as pleased when the mentee chooses a road they themselves did not take as when they follow.</p></div><div class="canvas-box"><div class="cb-label">5. Know the boundaries - and when this is not a development question at all</div><p class="cb-demo">THE LAST DISCIPLINE IS KNOWING THE EDGES OF THIS PRACTICE, BECAUSE BOTH COACHING AND MENTORING CAN DO HARM WHEN PUSHED PAST THEIR LIMITS. THREE BOUNDARIES. FIRST, THE FAKE-COACHING BOUNDARY, already named and worth repeating because it is so tempting: if you have already decided the answer, do not dress it as a question - either coach for real and be willing to be surprised, or mentor honestly and own that you are telling. Asking questions you are not genuinely curious about is manipulation, and people feel it. SECOND, THE SHOWING-OFF BOUNDARY IN MENTORING: the conversation is for the mentee&#039;s growth, not the mentor&#039;s audience; if you find yourself enjoying the sound of your own war stories, you have stopped mentoring and started performing. THIRD, AND MOST IMPORTANT: COACHING AND MENTORING ARE FOR CAPABILITY DEVELOPMENT, NOT FOR THERAPY. THE LINE IS CROSSED WHEN THE PROBLEM IS NO LONGER A SKILL OR PERSPECTIVE GAP BUT A PERSISTENT EMOTIONAL OR PSYCHOLOGICAL PATTERN THAT IS HINDERING THEM. WHEN THE PROBLEM IS ABOUT THEIR WELL-BEING, NOT THEIR WORK, YOUR ROLE IS TO GUIDE THEM TO PROFESSIONAL HELP, NOT TO TRY AND SOLVE IT YOURSELF. KNOW THE BOUNDARY. RESPECT THE BOUNDARY. YOUR DUTY OF CARE IS TO RECOGNISE WHEN A DIFFERENT KIND OF CARE IS NEEDED. A person who is stuck on a schedule has a capability gap; a person who is stuck on every schedule because of crippling anxiety has a pattern that needs a different kind of care, and the kindest, most competent thing you can do is to say so gently and help them find the right support. THE THREAD THROUGH ALL FIVE BOXES: YOU ARE THERE TO GROW THE PERSON, NOT TO LIVE THEIR LIFE. YOU SHARE THE MAP; YOU DO NOT CHOOSE THE DESTINATION. AND YOUR EXPERTISE IS NOT THE ANSWER YOU CARRY - IT IS THE ABILITY TO HELP SOMEONE FIND THEIRS.</p></div></div>
+
+<p>Box 2 is the discipline of asking instead of telling. Box 3 is where most coaching quietly dies. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>Your expertise is not the answer you carry. It is the ability to help someone find theirs.</strong> Five questions:</p>
+<ul>
+<li><strong>Coach or mentor?</strong> <strong>Can they find this themselves with help (coach), or do they need a map from experience they don't have (mentor)?</strong> Getting this wrong is the whole failure.</li>
+<li><strong>If coaching, how?</strong> <strong>Ask, don't tell - run goal, reality, options, will.</strong> The coach is not the expert; the person with the problem is.</li>
+<li><strong>What's the hard part?</strong> <strong>Listen, and hold the silence.</strong> The pause after a real question is the sound of someone learning. Resist the rescue.</li>
+<li><strong>If mentoring, how?</strong> <strong>Share the map honestly, mistakes and all - but share the map, not the destination.</strong> The choice stays theirs.</li>
+<li><strong>Where are the edges?</strong> <strong>Fake coaching is manipulation; mentoring is not showing off; and coaching is not therapy.</strong></li>
+</ul>
+<p><strong>The tell and the coach, side by side.</strong> The planner is stuck: the schedule breaks by Wednesday. <em>The tell</em> takes ninety seconds - "protect twenty per cent for emergent work" - and it is correct and useless, because next week's different problem sends him straight back to your door. <em>The coach</em> takes six minutes: you ask what a good week would look like (<strong>goal</strong>), then what actually happens and when it breaks (<strong>reality</strong> - and he discovers, out loud, that it always breaks when a breakdown hits and he has kept no slack), then what he could try (<strong>options</strong> - he arrives at the reserve himself, plus two ideas you would never have given him), then what he'll do Monday (<strong>will</strong>). He leaves with the answer <em>and</em> the method for the next problem. <strong>Telling solves today's problem and teaches nothing. Asking builds the capability that solves tomorrow's.</strong></p>
+<p><strong>The two hardest disciplines, and the honest one.</strong> First, <em>the coach is not the expert on the person's own situation - the person with the problem is</em>, which means the hardest act in coaching is to sit on the answer you already have and let someone else reach it slower, in their own words. Second, after you ask a real question, <em>hold the silence</em> - the pause is not a problem to solve, it is someone thinking, and the coach who rushes in to fill it takes the problem back and teaches the person to wait for rescue. And the honest one: <em>fake coaching is manipulation - telling in disguise.</em> Asking leading questions to steer someone to an answer you already chose is hiding your instruction inside a question, and people feel it. <strong>Ask real questions, or do not ask.</strong></p>
+<p><strong>And the other half - mentoring.</strong> When the person faces something they cannot see from where they stand, you do the opposite on purpose: you tell. But <em>share the real experience, including the mistakes</em> - a map with only the good roads gets people lost - and <em>share the map, not the destination</em>. The failure of mentoring is "do what I did", living your own choices through someone else. A month on, the planner is choosing whether to specialise in shutdowns or stay generalist - a fork he has no experience of. Onalenna does not ask him questions he cannot answer; she tells him honestly what each path gave her and took from her, and then stops and lets the choice be his. <em>A good mentor is as pleased when the mentee takes a road they themselves did not.</em></p>
+<p><strong>The dignity beneath all of it.</strong> <em>Coaching is an act of respect for a person's capability - it says "you can find the answer". Mentoring is an act of respect for a person's genuine need - it says "you do not have to walk this path alone". Both begin from acceptance; both honour the person's agency.</em></p>
+<p>One honest boundary. You grow the person; you do not live their life. And coaching and mentoring are for capability, not therapy - <em>when a person's problem is about their well-being, not their work, your job is to guide them to real help, not to solve it yourself.</em> Your duty of care is to recognise when a different kind of care is needed.</p>
+<p>Does it scale? Anyone who has taught a child to tie a shoelace knows the moment: it is faster to do it for them, and doing it for them is why they still cannot. The bridge is the question that lets a person walk from "I am stuck" to "I see the way" - and every time you build that bridge instead of carrying them across, they can cross the next one alone.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Someone on your team asks to speak to you. Read the situation and decide what it needs.</p>
+<p>A capable maintenance technician, two years in and doing well, sits down and says: <em>"I've been offered the team-leader role. I don't know whether to take it. I keep going round in circles - part of me wants it, part of me is scared I'll be no good at it, and honestly I don't even know what the job is really like day to day. What do you think I should do?"</em></p>
+<p>You have done that job. You know exactly what it is like. And they have asked you directly what you think they should do.</p>
+<ol>
+<li><strong>Decide.</strong> Is this a coaching moment or a mentoring moment - or both, in sequence? Commit.</li>
+<li><strong>Justify.</strong> In one sentence, say why - referencing what the person can and cannot find from where they stand.</li>
+<li><strong>Execute.</strong> Write the opening two or three lines of how you would actually respond.</li>
+<li><strong>The trap.</strong> They asked "what should I do?" What is the one thing you must not do, however directly they ask for it?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, this is <strong>both - and the order matters</strong>. There is a <em>coaching</em> question buried in it (the fear, the going in circles - "part of me wants it, part is scared" is something only they can untangle, and coaching will surface what is really driving the hesitation) and a genuine <em>mentoring</em> need alongside it ("I don't know what the job is really like" is terrain they have never walked and you have - honest mentoring is the right response to that part). A learner who picks only one has missed half the person.</p>
+<p>Second, the justification is the whole judgement: <em>the doubt and the fear are theirs to work through and only they can, so I coach that; but the day-to-day reality of the role is a map I have and they don't, so I mentor that - and I keep the two separate so I don't answer their fear with my experience or their information-gap with a question they can't answer.</em></p>
+<p>Third, the opening should start by <em>not</em> answering the direct question, and should separate the two threads: something like - <em>"I'll happily tell you honestly what the job is really like, because that part you can't know yet and I do. But before I do, tell me this: when you imagine yourself a year into the role and it's going well, what does that look like? And what's underneath the 'scared I'll be no good' - is it a specific part of the job, or something else?"</em> That coaches the fear and promises the map, in the right order.</p>
+<p>Fourth, the trap: <strong>you choose not to answer their direct question, "what should I do?".</strong> Answering it feels like help, but it is the moment mentoring fails and robs the person of their own agency. Your role is to give them the best possible map (mentoring) and help them understand their own heart and mind (coaching), so that <em>they</em> can make a better decision. The choice is the one thing that is truly theirs to own, and a good mentor protects that ownership even when asked to take it away.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-decide_which_the_moment_needs">1. Decide which the moment needs - coach or mentor</label><textarea id="cb-decide_which_the_moment_needs" data-key="t-0204:decide_which_the_moment_needs" placeholder="Before you open your mouth, judge: can this person find the answer themselves with help (coach), or do they genuinely need a map from experience they do not have (mentor)? Getting this wrong is the whole failure."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-ask_dont_tell_run_grow">2. If coaching, ask - don&#039;t tell - and run the four steps</label><textarea id="cb-ask_dont_tell_run_grow" data-key="t-0204:ask_dont_tell_run_grow" placeholder="The whole discipline of coaching is drawing the answer out instead of handing it over. Structure it: where do they want to get to, where are they now, what could they do, what will they do."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-hold_the_silence">3. The hard part of coaching - listen, and hold the silence</label><textarea id="cb-hold_the_silence" data-key="t-0204:hold_the_silence" placeholder="After you ask a real question, the person needs time to think. The urge to fill the pause with your own answer is the urge that ruins coaching. Listen to what they actually say, and wait."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-share_the_map_leave_the_choice">4. If mentoring, share the map honestly - and leave the choice theirs</label><textarea id="cb-share_the_map_leave_the_choice" data-key="t-0204:share_the_map_leave_the_choice" placeholder="When the person genuinely needs your experience, give it - the real version, including the mistakes. But share the map, not the destination: the decision is theirs, not a re-run of yours."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-know_the_boundaries">5. Know the boundaries - and when this is not a development question at all</label><textarea id="cb-know_the_boundaries" data-key="t-0204:know_the_boundaries" placeholder="Coaching is not therapy. There is a line where a person&#039;s problem is about their well-being, not their work - and there your job is to guide them to real help, not to solve it yourself."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now grow a person instead of solving their problem for them.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The most helpful-feeling thing you can do - just give them the answer - is often the least helpful thing you can do.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Telling because it is faster.</strong> It is faster today and slower every day after, because the person never learns to find it themselves.</p>
+<p>&bull; <strong>Believing the coach is the expert.</strong> In a coaching conversation, the person with the problem is the expert on it. Your expertise is the question, not the answer.</p>
+<p>&bull; <strong>Leading questions dressed as coaching.</strong> If you have already decided the answer and you are steering them to it, that is telling in disguise - and it breaks trust. Ask real questions, or mentor honestly.</p>
+<p>&bull; <strong>Rescuing at the first silence.</strong> The pause after a real question is the sound of thinking. Fill it and you take the problem back.</p>
+<p>&bull; <strong>Coaching someone who is genuinely lost.</strong> Asking questions about terrain a person has never walked is not respect - it is withholding a map they need. Mentor that.</p>
+<p>&bull; <strong>Mentoring someone who could find their own answer.</strong> Handing your solution to someone who could reach theirs builds dependence and quietly says "I don't think you can".</p>
+<p>&bull; <strong>"Do what I did."</strong> Share the map, not the destination. Your path is data for their decision, not a template for their life.</p>
+<p>&bull; <strong>Taking the mentee's decision.</strong> However directly they ask, the choice stays theirs. Make it for them and you take the one thing that was truly theirs.</p>
+<p>&bull; <strong>Treating a well-being problem as a development one.</strong> Coaching is not therapy. When the problem is about their life, not their work, guide them to real help.</p>
+</div>
+</details>
+<p>Onalenna was the smartest person on the team and the reason no one else was growing. Before you respond to anyone who brings you a problem, decide what the moment needs - can they find this with help, in which case coach, or do they need a map they cannot draw alone, in which case mentor; if you coach, ask instead of tell and run the four steps - goal, reality, options, will - remembering that the person with the problem is the expert on it and that the hardest and most useful thing you will do is hold the silence and let them think; if you mentor, share your real experience including the mistakes but share the map and never the destination, because the choice is always theirs; and know the edges - a leading question is manipulation, a war story is not mentoring, and a life problem is not a work problem in disguise. <strong>Your expertise is not the answer you carry. It is the ability to help someone find theirs - and the answer they find themselves is the only one they keep.</strong> Take the next person who comes to you with a problem, and before you say anything, ask yourself the one question this whole unit turns on: can they find this themselves if I help them look, or do they truly need my map? Then do that, and only that.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can coach and mentor now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

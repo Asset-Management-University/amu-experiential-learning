@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A delta, not a rebuild</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A delta, not a rebuild</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and the works has spent years building a genuine ISO 55001 asset management system - policy, plans, the SAMP, audits, the lot. It works. Then the alert arrives: the standard has been revised, ISO 55001 is now the 2024 edition, and the works' certification against the old version expires in mid-2027. You are told to "make us compliant with the new version."</p>
+<p>And you are caught between two traps. The first is panic: assume the whole asset management system, years of work, must be torn down and rebuilt to a new standard - which is enormous, slow, and almost entirely unnecessary. The second is paralysis: because you do not actually know what <em>changed</em>, you do nothing, and the deadline creeps closer while the works drifts toward losing its certificate.</p>
+<p>You have a working system and no map of the change. You do not know which parts of your system the revision even touches, or how to update it without either over-reacting or missing the cut-off.</p>
+<blockquote><h2>The standard has been revised and I have to transition before the deadline - but I do not know what actually changed, so I am stuck between rebuilding everything and doing nothing. How do I update my working system, proportionately and in time?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The standard you are certified against has been revised, and there is a transition deadline. You have the new document. You also have an asset management system built over years that genuinely works — dozens of clauses' worth of procedures, records and practice. What you do not have is any idea <strong>which parts of it the revision even touches</strong>. So you are stuck between rebuilding everything, which is months of work possibly on things that never changed, and doing nothing, which drifts toward losing the certificate. Write down how you would go about this — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the reframe that bounds the job</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Read the new standard end to end and rewrite our system against it.&rdquo;</strong> Months spent re-deriving arrangements that were already compliant, and the real risk is subtler — reading the whole thing fresh makes everything look equally novel, so you cannot tell a genuine change from a clause you had simply forgotten.</p>
+<p>&bull; <strong>&ldquo;Wait for the auditor to tell us what to fix.&rdquo;</strong> Outsources the scope to somebody whose job is to find shortfalls, on their timetable, at the worst possible moment. It also means discovering the work with no time left to do it.</p>
+<p>&bull; <strong>&ldquo;Do nothing — our system is good and it will probably still pass.&rdquo;</strong> Possibly true for most of it and certainly false for the parts that changed, and you cannot tell which is which, which is the whole problem.</p>
+<p>&bull; <strong>&ldquo;Hire a consultant to transition us.&rdquo;</strong> Buys the map rather than making it, which is legitimate — and note that the first thing they will do is what you could do yourself, and that the resulting plan will be owned by somebody who leaves.</p>
+<p>&bull; <strong>&ldquo;Rebuild the parts we were least confident about anyway.&rdquo;</strong> Scopes the work by your own unease rather than by what changed, so you will improve things nobody asked about and still miss the new requirements.</p>
+<p>&bull; The reframe that dissolves this: <strong>a revision is a delta, not a new standard.</strong> The great majority of what you built is untouched and stays exactly as it is; only a small set of requirements is new or altered, and <strong>that short list, not the whole document, is your scope.</strong> Getting that frame right is most of the job, because it turns an unbounded task into a bounded one that can be planned, owned and dated. Three disciplines follow. <strong>Establish what actually changed</strong>, as a specific list rather than an impression. <strong>Judge your existing arrangements against each change individually</strong> — and expect the honest answer to be three-valued rather than two, because much of what you have will be <em>partially</em> adequate, needing amendment rather than creation, and it is exactly there that both over-reaction and under-reaction come from. Then convert the findings into <strong>owned, dated items</strong>, since a transition with a deadline fails on scheduling rather than on understanding. One thing worth holding: revisions usually encode something the field has learned, so do the work <strong>for the improvement rather than for the certificate</strong> — transition to keep a badge and you will do the minimum and gain nothing.</p>
+</div>
+</details>
+<p>There is a way to do this that treats a revision as what it is - a delta - and fits on one page. Here it is, for the works.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the ISO 55001:2024 transition plan - the change scoped, the gaps found, the work owned and dated.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Is this a rebuild or a delta? (reframe the task)</div><p class="cb-demo">ISO 55001:2024 is a REVISION of the 2014 edition, not a new standard - about seven new requirements and about five revised ones, against a system with dozens of clauses. That means the vast majority of the works&#039; existing asset management system is unchanged and stays exactly as it is. The task is not to rebuild years of work; it is to find the specific things that changed, see where your system falls short of them, and close those gaps - before the transition deadline in mid-2027. Delta, not rebuild. Getting that frame right is half the job.</p></div><div class="canvas-box"><div class="cb-label">2. What actually changed in the revision? (the deltas)</div><p class="cb-demo">The changes an engineer must manage, plainly, are the deltas. Key changes include: a new clause on ASSET MANAGEMENT DECISION-MAKING (4.5); consolidation of the SAMP into one clause (6.2.1); a new &#039;PREDICTIVE ACTION&#039; requirement; separation of RISK and OPPORTUNITY; a new clause on DATA AND INFORMATION (7.6) requiring DATA AND INFORMATION SPECIFICATIONS; explicit integration of CLIMATE CHANGE in lifecycle decisions; and adoption of the common HARMONIZED STRUCTURE. That short list, not the whole standard, is your scope.</p></div><div class="canvas-box"><div class="cb-label">3. Where does my existing system fall short of each change? (gap-analyse)</div><p class="cb-demo">Rate the works&#039; existing system against each change - compliant, partial, or gap. The SAMP: it EXISTS but is scattered across documents, not consolidated - PARTIAL (a light-touch fix). Decision-making (4.5): decisions are made but not to a documented framework - PARTIAL. Data and information specifications: they do not exist at all - GAP. Climate in lifecycle decisions: the cost models never mention it - GAP. Risk and opportunity: risk is managed, opportunity is not treated as its own requirement - PARTIAL. Now the abstract &#039;revision&#039; is a concrete list of a few partials and a couple of real gaps - manageable, and nothing like a rebuild.</p></div><div class="canvas-box"><div class="cb-label">4. What is my targeted plan, with owners and dates? (the transition plan)</div><p class="cb-demo">A punch-list, one action per gap, each with an OWNER and a DATE, sequenced to finish before mid-2027. SAMP: consolidate the scattered SAMP content into the single clause 6.2.1 document - owner, the asset manager - Q1. Decision-making: document the decision framework already used in practice - owner, engineering lead - Q1. Data specifications: define data and information specifications for the critical asset data - owner, the information manager - Q2. Climate: add climate considerations to the lifecycle cost and renewal models - owner, planning - Q2-Q3. Targeted, owned, dated - so it actually happens, and happens in time.</p></div><div class="canvas-box"><div class="cb-label">5. Am I updating for the value, or just the certificate? (outcomes over box-ticking)</div><p class="cb-demo">The 2024 revision is deliberately more OUTCOME-focused than the 2014 edition, so the test of a good transition is not &#039;would it pass the audit&#039; but &#039;did anything actually get better&#039;. Documenting the decision-making framework should make real decisions more consistent and defensible, not just produce a document. Adding climate to the lifecycle models should change which renewals get prioritised, not just add a paragraph. Defining data specifications should make the asset data usable, not just listed. A transition that updates the paperwork and changes none of the decisions is compliance theatre - it passes the certificate and wastes the opportunity the revision was created to give you.</p></div></div>
+
+<p>Notice box 1 does the most important work: it reframes an intimidating "the standard changed" into "about a dozen requirements changed, most of the system stands." From there it is a punch-list, not a rebuild. And box 5 guards against the opposite failure - a transition that updates the paperwork and improves nothing. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A standard revision is a delta, not a rebuild. Five questions make the transition proportionate:</p>
+<ul>
+<li><strong>Is this a rebuild or a delta?</strong> <strong>ISO 55001:2024</strong> is a revision of the 2014 edition - about seven new requirements and five revised ones, against a system of dozens of clauses. Most of your existing system is unchanged and stays as it is. The task is to find and close the changes, not start over. Getting that frame right is half the job.</li>
+<li><strong>What actually changed?</strong> Know the <strong>deltas</strong>. The key changes include a new decision-making clause (4.5); a consolidated <strong>SAMP</strong> clause (6.2.1); a new <strong>predictive-action</strong> requirement; separation of <strong>risk and opportunity</strong>; a new <strong>data-and-information</strong> clause (7.6) introducing <em>data and information specifications</em>; explicit integration of <strong>climate change</strong>; and adoption of the <strong>Harmonized Structure</strong>. That short list is your whole scope.</li>
+<li><strong>Where does my system fall short of each change?</strong> <strong>Gap-analyse</strong>: against each delta, rate the current system - <em>compliant</em>, <em>partial</em>, or <em>gap</em>. The SAMP exists but scattered (partial); data specifications do not exist (gap); climate is nowhere in the lifecycle models (gap). Now the abstract revision is a concrete list of a few partials and a couple of real gaps.</li>
+<li><strong>What is my targeted plan, with owners and dates?</strong> The <strong>transition plan</strong>: one action per gap, each with an owner and a date, sequenced to finish before <em>mid-2027</em>. A punch-list, not a rebuild - and one that actually happens, because every item has a name and a deadline against it.</li>
+<li><strong>Am I updating for the value, or just the certificate?</strong> The revision is deliberately <strong>outcome-focused</strong>, so the test is not "would it pass the audit" but "did anything get better". Documenting the decision framework should make decisions more consistent; adding climate to the models should change which renewals get prioritised; data specifications should make the data usable. Update for what each change is <em>for</em>.</li>
+</ul>
+<p>One honest boundary. You perform the <em>delta gap-analysis</em> and a proportionate <em>transition plan</em>. You are not rebuilding the asset management system, and you are not re-teaching the whole standard - most of it is unchanged and you already have it. And you are not chasing compliance for its own sake: you update the gaps to capture the outcomes the revision is aiming at. Proportionate, in time, and for the value.</p>
+<p>Does it scale? It is a feature update to your phone's operating system, not wiping the phone and reinstalling everything - you take what changed, keep everything that works, and you take the update for the features it adds, not merely because a newer number exists.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>The works' asset management system has detailed lifecycle cost models that never mention climate change, and documented information procedures but no formal "data and information specifications".</p>
+<ol>
+<li><strong>Rate each</strong> against the relevant 2024 change - compliant, partial, or gap - for this system.</li>
+<li><strong>Write one transition action</strong> for one of them, with a named owner and a rough timeframe before the deadline.</li>
+<li><strong>State the value.</strong> For that action, say what should actually get <em>better</em> - the outcome it delivers beyond passing the audit.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 3, if the only benefit you can name is "it satisfies the new clause", push harder - a transition worth doing changes a decision, a priority, or a piece of usable data, not just a document. If the update improves nothing real, you have written compliance theatre.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-delta_not_rebuild">1. Is this a rebuild or a delta? (reframe the task)</label><textarea id="cb-delta_not_rebuild" data-key="t-0154:delta_not_rebuild" placeholder="Recognise that a standard revision changes only a handful of requirements. Most of your working system stands. The task is to find and close the changes, not start over."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-what_changed">2. What actually changed in the revision? (the deltas)</label><textarea id="cb-what_changed" data-key="t-0154:what_changed" placeholder="List the specific new and revised requirements - the deltas you must manage - plainly."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-gap_analyse">3. Where does my existing system fall short of each change? (gap-analyse)</label><textarea id="cb-gap_analyse" data-key="t-0154:gap_analyse" placeholder="Against each delta, rate the current AMS: compliant, partial, or gap. This turns the change list into a work list."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-transition_plan">4. What is my targeted plan, with owners and dates? (the transition plan)</label><textarea id="cb-transition_plan" data-key="t-0154:transition_plan" placeholder="Write a targeted action for each gap, with an owner and a date, sequenced to be complete before the transition deadline. A punch-list, not a rebuild."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-capture_value">5. Am I updating for the value, or just the certificate? (outcomes over box-ticking)</label><textarea id="cb-capture_value" data-key="t-0154:capture_value" placeholder="The revision is outcome-focused. Update to get what each change is FOR - real decisions, real climate resilience, usable data - not a paper exercise that satisfies an auditor and changes nothing."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now take a revised standard and turn it into a proportionate, owned, on-time transition instead of a panic or a paralysis.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Standard transitions fail at the two extremes - doing too much, and doing nothing real.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Rebuilding the whole system.</strong> Assuming a revision means starting over wastes years of good work and is far too slow to make the deadline. Only a handful of requirements changed - scope to those.</p>
+<p>&bull; <strong>Doing nothing.</strong> When the change feels large and unclear, paralysis lets the deadline pass and the certificate lapse. A delta analysis turns the fog into a short, doable list.</p>
+<p>&bull; <strong>Compliance theatre.</strong> A transition that updates the documents but changes none of the actual decisions passes the audit and wastes the opportunity. Update for the outcome, not the certificate.</p>
+<p>&bull; <strong>Missing that the SAMP was consolidated, not invented.</strong> You almost certainly have a SAMP already, scattered - so the gap is usually partial, a tidy-up, not a from-scratch build. Read the change accurately before you scope the work.</p>
+<p>&bull; <strong>Sidelining the climate integration.</strong> Treating climate as someone else's concern misses that it is now a lifecycle-decision requirement - it belongs in the cost and renewal models, not in a separate report.</p>
+<p>&bull; <strong>A plan with no owners or deadline.</strong> Actions with no name and no date against them do not happen before a cut-off. Every transition item needs both.</p>
+<p>&bull; <strong>Updating documents, not behaviour.</strong> The revision is outcome-focused; if the organisation does exactly what it did before and only the paperwork changed, the transition has failed on its own terms.</p>
+</div>
+</details>
+<p>Onalenna faced a revised standard and a ticking deadline, trapped between rebuilding everything and doing nothing. Now she can do neither: treat the revision as a delta, list what actually changed, gap-analyse her working system against each change, write a targeted plan with owners and dates before the cut-off, and update for the value each change is meant to deliver. A revision is a patch, not a reinstall - and a transition done well leaves the organisation genuinely better, not just re-certified. If you are working with an AMU Facilitator, take one real management-system change and scope it as a delta, then ask of each action what would actually improve.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can transition a standard without a rebuild now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

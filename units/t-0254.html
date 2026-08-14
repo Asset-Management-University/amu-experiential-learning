@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Busy is not the same as underway</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Busy is not the same as underway</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Adaeze, and you are three months into a part-time M.Eng.</p>
+<p>You have a folder with <strong>two hundred and eleven PDFs</strong> in it. You have read perhaps forty of them properly. You have a document called <em>notes.docx</em> that is nineteen pages long and has no shape.</p>
+<p>You have been busy every single week. You have not missed a session. And on Sunday your sister asked, kindly and with real interest, what your research is about - and you talked for a minute and a half and watched her stop following, because you were not saying anything.</p>
+<p>You could not say it in a sentence. Not because you are hiding it. Because there is no sentence yet.</p>
+<p>The proposal is due in seven weeks.</p>
+<blockquote><h2>I have been working hard for three months and I cannot say in one sentence what I am trying to find out. How do I get from a feeling that something is wrong to a question I can actually answer in the time I have?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Three months. Forty-odd papers read, every supervision attended, nothing missed. On Sunday your sister asked what your research is about, and you talked for <strong>a minute and a half</strong> and watched her stop following — because you were not saying anything. You could not say it in a sentence. Not from modesty: <strong>there is no sentence yet.</strong> The proposal is due in <strong>seven weeks.</strong> Meanwhile, at work, the incline conveyors chew through idler rollers far faster between June and October than the rest of the year; everybody in the workshop knows it, nobody has written it down, and you have never thought of it as anything to do with your research. Write down how you would get from a feeling to a question you can answer — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and where a question actually comes from</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Read more — the question will emerge.&rdquo;</strong> Three months of evidence says otherwise. Reading widely feels like progress and can continue indefinitely without narrowing anything, which is exactly how seven weeks becomes three.</p>
+<p>&bull; <strong>&ldquo;Ask my supervisor to give me a question.&rdquo;</strong> They may, and you would spend a year on somebody else's curiosity — and lose the one advantage you actually hold, which is standing in a workshop nobody else in the department has been inside.</p>
+<p>&bull; <strong>&ldquo;Pick a method I want to learn and find an application.&rdquo;</strong> A method looking for a home. It produces a study that is technically competent and answers nothing anybody was wondering about.</p>
+<p>&bull; <strong>&ldquo;Narrow the topic — go from conveyors to idler rollers.&rdquo;</strong> Closer, and a smaller territory is still a territory. &ldquo;Idler rollers&rdquo; is not something that can be true or false.</p>
+<p>&bull; <strong>&ldquo;Write the proposal and work the question out as I go.&rdquo;</strong> The proposal is where the question is examined. Writing round the absence produces a document that reads well and cannot be assessed.</p>
+<p>&bull; The distinction you are feeling has a name: <strong>busy is not the same as underway.</strong> The effort has been real and none of it has been narrowing. So start where the feeling started, and start with <strong>something you saw yourself</strong>: one thing, in one place, that you have personally observed and cannot explain — the rollers, June to October, known to everybody and written down by nobody. That is not a field, and it is not a method looking for a home. Write it <strong>in the language you would use to a colleague</strong>, because the translation into formal language is easy and comes later, while <strong>the observation is the hard part and it is the part only you have.</strong> Then write why it matters to somebody who is not you. Now narrow it until it is <strong>answerable</strong>, and test it rather than admire it: is it specific enough to be settled; is the evidence genuinely obtainable; can it be done in the time and access you actually have; and would anybody but you care about the answer? <strong>A question that fails those tests is not a small problem to fix later — it is the thing that eats a year.</strong> And say what would show you were wrong, because a question nothing could refute is a topic wearing a question mark.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the framing - the dissatisfaction, the question and its four tests, what would refute it, the hours arithmetic, and the proposal written for the person who decides.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Write down the dissatisfaction in operational terms - what you have actually seen, not what you have read</div><p class="cb-demo">&lt;strong&gt;Start where the feeling started, and start with something you saw yourself.&lt;/strong&gt; Not a topic. Not a field. A dissatisfaction, written operationally. Here is mine: &#039;At Dunmara Ridge, the incline conveyors chew through idler rollers. We replace far more of them between June and October than we do the rest of the year. Everybody in the workshop knows this. Nobody has ever written it down, and the maintenance budget is built on an annual average that is wrong in both directions.&#039; &lt;strong&gt;Notice what that is and what it is not.&lt;/strong&gt; It is not &#039;conveyor reliability&#039;, which is a field. It is not &#039;predictive maintenance&#039;, which is a method looking for a home. &lt;strong&gt;It is one thing, in one place, that I have personally observed and cannot explain.&lt;/strong&gt; Write it in the language you would use to a colleague, not the language you would use to a journal - the translation comes later and it is easy; the observation is the hard part and it is the part only you have. &lt;strong&gt;And write down why it matters to somebody who is not you:&lt;/strong&gt; if the seasonal pattern is real and unquantified, then every terminal on this coast is budgeting and stocking rollers against an average that describes no actual month of the year.</p></div><div class="canvas-box"><div class="cb-label">2. Turn it into a question that could actually be answered - then test the question, not the answer</div><p class="cb-demo">&lt;strong&gt;A dissatisfaction is not a question.&lt;/strong&gt; Here is the first attempt, and it is the one nearly everybody writes: &#039;Why do belt conveyors fail prematurely at bulk terminals?&#039; Now test it, and test &lt;strong&gt;the question&lt;/strong&gt; rather than any answer to it. &lt;strong&gt;Is it answerable?&lt;/strong&gt; No - &#039;why do they fail&#039; has dozens of true answers and no way to close the list. &lt;strong&gt;Is it specific?&lt;/strong&gt; No - which conveyors, which failure, which terminals, over what period. &lt;strong&gt;Would the answer be believed?&lt;/strong&gt; Only if it came from many sites, which is a scope you will not survive. &lt;strong&gt;Would anybody act on it?&lt;/strong&gt; Nobody can act on &#039;conveyors fail for many reasons&#039;. &lt;strong&gt;Four tests, four failures&lt;/strong&gt; - and notice that all four are failures &lt;strong&gt;of the question&lt;/strong&gt;, which is good news, because a question can be rewritten in an afternoon and a year of data cannot. Here is the rewrite: &#039;At Dunmara Ridge bulk terminal, does the idler-roller failure rate on the incline sections differ between the wet and dry seasons, and is any difference associated with carry-back accumulation?&#039; Run the four tests again. Answerable - yes, from three years of work orders plus inspection. Specific - one site, one component, one section, two seasons, one candidate mechanism. Believable - the records exist and can be shown. Actionable - if it holds, the stocking policy and the cleaning regime both change. &lt;strong&gt;The second question is smaller than the first in every dimension, and it is the one that will produce knowledge.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. State what you expect, and state what would show you were wrong</div><p class="cb-demo">&lt;strong&gt;Write the hypothesis so that it could lose.&lt;/strong&gt; &#039;Idler-roller failure rate per thousand operating hours on the incline sections is higher in the wet season than the dry season, and the difference is associated with carry-back accumulation measured as belt-cleaner residue depth.&#039; &lt;strong&gt;Now the half that almost nobody writes down, and the half that protects your year: what result would make you abandon this?&lt;/strong&gt; Write it out. &#039;If wet-season and dry-season failure rates per thousand hours are within the range I would expect from ordinary month-to-month variation, the seasonal claim fails. If the rates do differ but residue depth shows no relationship with the failures, then the seasonal effect is real and my proposed mechanism is wrong - which is a different finding and I must report it as one.&#039; &lt;strong&gt;That second sentence is the one that matters.&lt;/strong&gt; It separates two outcomes that a careless study would blur into a single vague conclusion, &lt;strong&gt;and it means you cannot quietly redescribe a failed prediction as a success afterwards&lt;/strong&gt;, because you have already written down what failure looks like, in advance, where your supervisor can see it. &lt;strong&gt;A hypothesis that cannot fail is not a hypothesis.&lt;/strong&gt; It is a description with a decimal point.</p></div><div class="canvas-box"><div class="cb-label">4. Cost the study in &lt;strong&gt;your&lt;/strong&gt; hours, against &lt;strong&gt;your&lt;/strong&gt; access - and cut until it fits</div><p class="cb-demo">&lt;strong&gt;Now the arithmetic that decides whether any of this happens, and almost nobody does it until it is too late.&lt;/strong&gt; I have 14 months to submission and a full-time job. Realistically that is 12 hours a week across about 60 weeks - 720 hours. All of it. Every phase. Split honestly: literature 120, method design 80, data collection 200, analysis 160, writing 160. That is 720 and there is nothing spare. &lt;strong&gt;Now price the first question against it.&lt;/strong&gt; Six terminals to be credible; per terminal about 25 hours of access, ethics and liaison, 40 hours on site, and 15 hours of travel - 80 hours each, 480 hours for six. Against a data-collection budget of 200. &lt;strong&gt;The broad question needs 2.4 times the entire collection budget&lt;/strong&gt;, and that is before a single hour of analysis. &lt;strong&gt;It is not ambitious. It is arithmetically impossible, and it was impossible on day one.&lt;/strong&gt; &lt;strong&gt;Now price the narrowed question.&lt;/strong&gt; One site I already work at: access and ethics 25, extracting and cleaning three years of work orders 90, twelve site inspections at 6 hours each 72. Total 187 hours, against 200. &lt;strong&gt;It fits, with 13 hours of slack&lt;/strong&gt; - which is not much, and it is thirteen more than the alternative. &lt;strong&gt;Do this arithmetic before you fall in love with a question&lt;/strong&gt;, not after.</p></div><div class="canvas-box"><div class="cb-label">5. Write it for the person who must approve it - and say plainly what you are &lt;strong&gt;not&lt;/strong&gt; claiming</div><p class="cb-demo">&lt;strong&gt;A proposal is not a description of your plan. It is an argument aimed at a specific person who can say no. Name them first.&lt;/strong&gt; Mine goes to a departmental research committee: three academics, one industry member, forty minutes, six proposals on the agenda. &lt;strong&gt;What must they believe to say yes?&lt;/strong&gt; Four things, and I should write to each of them in turn. &lt;strong&gt;That the question is worth answering&lt;/strong&gt; - the stocking and cleaning decisions of every terminal on this coast currently rest on an annual average. &lt;strong&gt;That it has not already been answered&lt;/strong&gt; - which is what the literature work is for, and I must be honest that it is not yet complete. &lt;strong&gt;That I can actually do it&lt;/strong&gt; - which is the 187-against-200 arithmetic, and it is the most persuasive paragraph in the whole document precisely because nobody else&#039;s proposal will contain one. &lt;strong&gt;And that it will be done properly&lt;/strong&gt; - access agreed, ethics addressed, method stated. &lt;strong&gt;Now bound the claim, in the proposal, where it can be read.&lt;/strong&gt; &#039;This study examines &lt;strong&gt;one&lt;/strong&gt; terminal. It will not establish that the pattern generalises to other sites, and it does not claim to. It examines an &lt;strong&gt;association&lt;/strong&gt; between residue depth and failure rate; it is not designed to demonstrate &lt;strong&gt;cause&lt;/strong&gt;. And it addresses idler rollers on incline sections only - not belts, not drives, not the horizontal runs.&#039; &lt;strong&gt;Writing the limits down yourself is not weakness and it is not modesty.&lt;/strong&gt; It is the single fastest way to be taken seriously by people whose job is to find exactly those limits, and who will find them in the meeting if you have not found them at your desk.</p></div></div>
+
+<p>Box 2 is where three months of reading becomes a sentence, and box 4 is the one almost nobody does until it is too late to matter. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Framing research is <strong>not the act of choosing a topic. It is the act of narrowing a dissatisfaction until it becomes a question you can answer with the hours you actually have.</strong> Five moves:</p>
+<ul>
+<li><strong>Start from what you saw, not what you read.</strong> <strong>The operational dissatisfaction.</strong> One thing, in one place, that you personally encountered and cannot explain. Written in the language you would use to a colleague.</li>
+<li><strong>Test the question, not the answer.</strong> <strong>The four tests</strong> - answerable, specific, believable, actionable. "Why do conveyors fail prematurely?" fails all four. The rewrite passes all four and is smaller in every dimension.</li>
+<li><strong>Write what would prove you wrong.</strong> <strong>Refutability, stated in advance.</strong> Two distinct failure outcomes named separately, so that a wrong mechanism cannot later be blurred into a vague success.</li>
+<li><strong>Cost it in your own hours.</strong> <strong>The scoping arithmetic.</strong> 720 hours total. The broad question needs 480 hours of collection against a 200-hour budget - 2.4 times over, and impossible from day one. The narrow question needs 187.</li>
+<li><strong>Write it for whoever must say yes.</strong> <strong>The named audience, and the declared boundary.</strong> Four things they must believe, and three things you are explicitly not claiming.</li>
+</ul>
+<p><strong>The arithmetic that decides everything.</strong> Fourteen months, twelve hours a week, sixty weeks: <strong>720 hours</strong>, split 120 / 80 / 200 / 160 / 160 across literature, method, collection, analysis and writing. Six terminals at 80 hours each is <strong>480 hours of collection against a budget of 200</strong> - a factor of <strong>2.4</strong>, before any analysis at all. One terminal, using records that already exist, is <strong>25 + 90 + 72 = 187</strong>, which fits with thirteen hours to spare. Those thirteen hours are not comfortable. They are, however, thirteen more than the alternative has.</p>
+<p><strong>Why the second question is better even though it is smaller.</strong> This is the part that feels wrong and is not. The broad question sounds like it matters more. It does not produce knowledge, because it cannot be closed - and an answer nobody can check is not a contribution, however large the subject. The narrow question produces a result that a person at another terminal can read, test against their own records, and act on next season. <em>Scope is not the same as significance.</em> A finding that holds at one site and is honestly bounded is worth more than a claim about an industry that rests on nothing.</p>
+<p><strong>Where this sits in the real sequence.</strong> You are framing now, and you will frame again. What you write today is a <em>draft</em> question - good enough to aim the reading, not final. When you have worked through the literature properly you will come back to this canvas and rewrite boxes 2 and 3, because you will know things you do not know yet. That is not a sign the first attempt was wasted. Without a draft question you cannot read the literature at all; you can only accumulate it, which is what the two hundred and eleven PDFs are.</p>
+<p><strong>An honest boundary on this unit.</strong> This gives you a question and a costed proposal. It does not replace your supervisor - it gets you to a conversation with them that starts at a different place. It does not make your question novel; establishing that is the next unit's work. And it does not guarantee approval. It gives you the strongest honest version of your own case.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Tunde is nine weeks from his proposal deadline. His problem is not the one you have just solved - in one respect he is <strong>ahead</strong> of where Adaeze started.</p>
+<table>
+<tr><th>Item</th><th>Detail</th></tr>
+<tr><td>His question</td><td>"Does replacing mechanical seals with the manufacturer's upgraded design reduce seal failures on the transfer pumps at my plant?" - already narrow, specific and answerable</td></tr>
+<tr><td>Why he chose it</td><td>The upgrade programme is running anyway. The data will exist whether or not he studies it</td></tr>
+<tr><td>What he has found in the literature</td><td>The manufacturer's own trials, plus four independent studies at other plants, all reporting the same direction of result. Nobody disagrees</td></tr>
+<tr><td>Time available</td><td>10 months, 15 hours a week, roughly 650 hours</td></tr>
+<tr><td>Data access</td><td>His employer has agreed to the pump records. They have <strong>refused</strong> access to the failure-cost data, which is treated as commercially sensitive</td></tr>
+<tr><td>What his supervisor said</td><td>"This is well scoped." Nothing else</td></tr>
+</table>
+<ol>
+<li><strong>Run the four tests</strong> on Tunde's question. Which does it pass, and which does it fail? Be precise - it does not fail the same ones Adaeze's did.</li>
+<li><strong>Name the real problem.</strong> It is not scope and it is not time. Say what it is in one sentence.</li>
+<li><strong>Refutability.</strong> Write what result would show Tunde wrong - and then say why that exercise is uncomfortable in his particular case.</li>
+<li><strong>The access constraint.</strong> His hours are fine. Something else is binding. Identify it, and say which part of a defensible study it removes.</li>
+<li><strong>Rewrite his question</strong> so that it is worth answering, still fits 650 hours, and does not require the data he cannot have.</li>
+<li><strong>The boundary.</strong> Write the two sentences of explicit non-claim that belong in his proposal.</li>
+</ol>
+<p>Work it before you turn over. The point of this one is that a question can be perfectly formed and still not be research.</p>
+<details><summary>Compare your thinking - one way through</summary>
+<div class="reveal-content">
+<p><strong>1. The four tests.</strong> Answerable - <em>passes</em>, comfortably. Specific - <em>passes</em>. Believable - <em>passes</em>; the records exist. Actionable - <em>fails</em>, and this is the one that matters. The upgrade is happening regardless. Nobody is waiting on his answer to decide anything.</p>
+<p><strong>2. The real problem.</strong> <em>The question is already settled by five independent studies, so answering it again produces confirmation rather than knowledge.</em> Tunde has done nothing wrong; he has chosen a question that is easy to answer for exactly the reason it is not worth answering.</p>
+<p><strong>3. Refutability, and why it is uncomfortable here.</strong> He would be shown wrong if failure rates after the upgrade were the same or higher. But notice the position that puts him in: his employer is spending money on this upgrade, and the only result that would be <em>interesting</em> is the one that says the money was wasted. A study whose only publishable outcome embarrasses the organisation that granted him access is a study with a problem, and it is far better to see that in week nine than in month eight.</p>
+<p><strong>4. The binding constraint.</strong> Not hours - <strong>access</strong>. Without failure-cost data he cannot say whether the upgrade is <em>worth</em> anything, only whether it changes a count. That removes the entire economic half of a defensible engineering finding, and it is the half a plant would actually act on.</p>
+<p><strong>5. A rewrite.</strong> "On the transfer pumps at this plant, <strong>which operating and installation conditions are associated with early seal failure in the upgraded design</strong>, and does the upgrade's benefit vary between duties?" Look at what that does. The literature says the upgrade works <em>on average</em> - none of the five studies asks where it works <em>less well</em>, which is a genuine gap. It needs the pump records he has, not the cost data he does not. It is honestly answerable in 650 hours. And it produces something a maintenance planner can use: not "should we upgrade" - that is decided - but "where should we watch".</p>
+<p><strong>6. The boundary.</strong> "This study identifies conditions associated with early failure at a single site; it does not establish that those conditions cause failure, and it does not evaluate the economic case for the upgrade programme, for which cost data was not available."</p>
+<p>That last clause matters. Naming the data you could not get is not an apology - it tells the reader exactly what your finding can and cannot bear, which is the most useful thing a limitations section ever does.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Watch for the traps &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The method is sound. A few traps catch almost everyone applying it for the first time. Glance through these before you trust your own draft.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Mistaking &quot;I find this interesting&quot; for &quot;answerable&quot;.</strong> The four tests are a check you run explicitly on the question, not a feeling about the topic. Run all four, in words, before you trust any of them.</p>
+<p>&bull; <strong>Skipping the arithmetic.</strong> Committing to a scope before pricing it in hours costs months, not minutes. Price the question against your real available time before you fall in love with it.</p>
+<p>&bull; <strong>Reading &quot;nobody disagrees&quot; as a pass.</strong> A question the literature has already settled fails actionable, not answerable - it produces confirmation, not knowledge, however cleanly it can be answered.</p>
+<p>&bull; <strong>Writing the proposal to defend the plan rather than to the person who can say no.</strong> Name the reader first and write to what they must believe, in the order they need to believe it.</p>
+</div>
+</details>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Take a dissatisfaction you have actually felt at work and turn it into a question that survives four tests. Write what would prove you wrong, in advance. Cost the study in your own hours before you commit a year to it. And write the proposal to a named person, with your limits declared by you rather than found by them.</p>
+<p>Adaeze's two hundred and eleven PDFs were not wasted. They were unaimed, which is a different problem, and it is the one this fixes. She can now say it in a sentence, to a research committee or to her sister.</p>
+<p><strong>Being busy and being underway feel identical from the inside.</strong> The only reliable way to tell them apart is whether you can say, in one sentence, what you are trying to find out.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

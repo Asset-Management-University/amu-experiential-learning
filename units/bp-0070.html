@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four suppliers each passed their own tests, four green stickers, and the moment the plant manager pressed START the whole system tripped and slammed a valve - every box is correct, so whose failure is this and where do I even look?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Four suppliers each passed their own tests, four green stickers, and the moment the plant manager pressed START the whole system tripped and slammed a valve - every box is correct, so whose failure is this and where do I even look?</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Felt Problem</h2>
+<p>You are Yonela, the owner's engineer. It is 06:40 on a cold Tuesday and you are standing on the wet concrete apron beside the pump bay at a water reclamation plant just outside an inland town. The new treated-water transfer system was meant to go live yesterday. It did not. The plant manager, Babalwa, is standing next to you with her arms folded and her hard hat pushed back. She has not said good morning.</p>
+<p>In your hand is a thick lever-arch file. On the spine someone has written "HANDOVER PACK". Inside are four neat sections, one per supplier, each with a green "PASSED" sticker:</p>
+<ul>
+<li>The <strong>pump supplier</strong> delivered three transfer pumps, each factory witness-tested to its duty point: 320 litres per second at 45 metres of head. Signed off.</li>
+<li>The <strong>piping contractor</strong> built the discharge manifold and the 600 mm steel line to the reservoir, pressure-tested to 1.5 times working pressure, held for two hours. Signed off.</li>
+<li>The <strong>electrical contractor</strong> supplied and wired the motor control centre and the soft-starters - every motor spun the right way, every breaker tripped on test. Signed off.</li>
+<li>The <strong>controls integrator</strong> installed the PLC and SCADA, every input and output point-tested against the list. Signed off.</li>
+</ul>
+<p>Four green stickers, four invoices, the smallest of which is R2.1 million. And a transfer system that, when Babalwa pressed START yesterday, ramped the lead pump up, threw a high-pressure trip within nine seconds, and slammed a non-return valve hard enough to hear across the yard. You ring each supplier in turn, and each truthfully says it is not them: "Pump's fine, 320 at 45, here's the curve." "The ramp time is whatever the drawing told us - ten seconds, that's the spec." "Ten-second ramp is what the controls schedule asked for." "Our line holds pressure; surge is a system thing." Every one did exactly, precisely what their own contract and document said. And you slowly realise that nowhere in this entire fat file is a single page describing what happens <em>between</em> them - how fast the pump may build pressure against how fast the valve can close, what ramp the line and valve can survive. The failure is not inside any box; it is in the gaps between the boxes, and the gaps belong to no one. Babalwa's plant must push 950 l/s by Friday or the town trucks water in at R38,000 a load - onto her budget. Your firm signed the certificate that said this design was ready.</p>
+<blockquote><h2>Four suppliers each passed their own tests, and the moment START was pressed the whole system tripped and slammed a valve - every box is correct, so whose failure is this, and where do I even look?</h2></blockquote>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>The pull is to find who to blame. <strong>"One of them must have broken their spec - find the culprit."</strong> But you check, and every certificate is real: the pump curve, the pressure test, the ramp on the drawing, the valve's closing speed - each supplier did exactly what their document said, so blaming any one of them changes nothing and stops no failure. <strong>"Re-run START and watch more closely."</strong> But that risks slamming that valve a fourth time - an unsafe, expensive test that tells you what you already heard. <strong>"Demand a tougher penalty clause and move on."</strong> But a penalty punishes after the disaster; it does not find the missing thing, and the missing thing will sink the next project too. Look again at the four sections spread on the bonnet: each is complete, each is correct - and nothing, anywhere, describes what happens in the moment the pump's water meets the controls' timing meets the valve's mechanics.</p>
+<p>So before you read on: do not reach for who to blame; reach for <em>what is missing</em>. Name the kind of document that is absent from this whole file, and the moving moment no static test ever exercised.</p>
+<div class="yardstick-prompt"><label for="yardstick-m2">A quick prediction first: hunting a culprit, re-running START, and penalty clauses all miss it. Name what crosses BETWEEN the boxes that no document owns, and the question that replaces 'whose fault is it?'</label><textarea id="yardstick-m2" placeholder="e.g., what crosses between pump and valve is...; and the better question is 'which boundary failed and who...'"></textarea></div>
+<div class="scratchpad"><label for="scratchpad-m2">My working</label><textarea id="scratchpad-m2" placeholder="Who owns the joint? Name every interface? Model the moving case not the static? Let the model veto the hunch? Build the register in?"></textarea></div>
+<div class="hintbox" data-n="3" data-label-0="I&#039;m stuck - help me think" data-label-1="Another nudge" data-label-2="The clearest way to see it"><button type="button" class="hintbtn" onclick="amuHint(this)">I&#039;m stuck - help me think</button><div class="hintlayers" aria-live="polite"><div class="hint" hidden>It is 06:40 on a cold Tuesday and I am on the wet apron beside a pump bay at a water reclamation plant. The new treated-water transfer system was meant to go live yesterday and did not. I am the owner's engineer; the plant manager, Babalwa, stands beside me, arms folded. In my hand is a thick handover pack with four neat sections, each with a green 'PASSED' sticker: the pump supplier's three transfer pumps, each factory witness-tested to 320 litres a second at 45 metres of head; the piping contractor's 600 mm steel line, pressure-tested to 1.5 times working pressure for two hours; the electrical contractor's motor control centre, every motor spinning right; the controls integrator's PLC and SCADA, every input and output point-tested. Four green stickers, four invoices, the smallest R2.1 million. Yet when Babalwa pressed START, the lead pump ramped up, threw a high-pressure trip in nine seconds, and slammed a non-return valve hard enough to hear across the yard. I phone all four; each truthfully says 'not us - my package passed, I set what the drawing said'. And nowhere in the whole file is a single page describing what happens BETWEEN the packages: how fast the pump may build pressure against how fast that valve can close, what ramp the line and valve can survive. The failure is not inside any box - it is in the gaps between the boxes, and the gaps belong to no one. The plant must push 950 l/s by Friday or the town trucks water in at R38,000 a load. Where do I start?</div><div class="hint" hidden>'Whose fault is it?' is the wrong question, because the honest answer is no one's and everyone's - and that fixes nothing by Friday. Change the question to: WHERE does one supplier's work touch another's, and WHO agreed what happens at that touch? Draw the four blocks - pumps, pipe, electrical, controls - and instead of looking INSIDE them, draw the lines BETWEEN them and ask, at each line, what crosses here and who agreed the rules of the crossing? Those crossing-points are INTERFACES: the boundaries where two scopes meet and something (a flow, a signal, a force, a timing, a piece of data, a physical connection) passes from one to the other. The discipline of finding every boundary, defining what must be true at each, writing it down and giving each a single named owner is INTERFACE MANAGEMENT. The defect here was never a bad pump or bad pipe or bad code; it was the ABSENCE of an interface register - the one document that sits BETWEEN suppliers, so no supplier could write it, and that was your job. And watch for the most dangerous error of all: the '10-second ramp' was a placeholder someone typed early in design, copied into every document, and never checked against the surge case - CONSISTENT across every certificate and WRONG against reality. The real question is not who broke their spec, but which boundary was never owned.</div><div class="hint" hidden>Five moves find the cough no certificate could see. (1) FROM 'WHOSE FAULT?' TO 'WHO OWNS THE JOINT?' - stop chasing blame (no one broke their own spec) and ask where scopes touch and who agreed the rules of the crossing. (2) NAME EVERY INTERFACE - list the boundaries: pump-to-pipe-and-valve (the surge interface, the one that broke), controls-to-electrical (the ramp interface), pumps-to-controls (the multi-pump duty interface), pipe-to-civil (the thrust-block support interface); the missing document is an INTERFACE REGISTER that names each boundary, its agreed requirement and its single owner. (3) MODEL THE MOTION, NOT THE STATIC - the two-hour pressure test held pressure STILL; nobody modelled the MOVING case, where a 10-second ramp against a 1.6 km line and a valve that closes in 0.4 seconds throws ~71 metres of surge on top of the 45-metre duty. (4) LET THE MODEL VETO THE HUNCH - set a success line in advance, then run the cheapest honest test (a desk surge analysis, not another dangerous START); here it surprises you - slowing the ramp ALONE is not enough, because the dominant surge is the VALVE SLAM on a trip (the 0.4-second valve snapping shut on a moving column), the cause you could not hear, not the ramp you could. (5) BUILD THE REGISTER INTO THE PROCESS - the real fix: swap the valve for a slow-closing 4-second type, stretch the ramp to 45 seconds, start the pumps in sequence with a 20-second gap (all at the interfaces, ~R310,000, met on the desk before a part is ordered), and from now every multi-package design opens an interface register on day one with an owner per boundary. A system is only as good as its weakest joint, and a joint with no owner has no strength at all - subsystems meeting their specs is necessary, never sufficient.</div></div></div>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">I've worked it out - show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>You stop chasing fault. "Whose fault is it?" is the wrong question, because the honest answer is no one's and everyone's - and that fixes nothing by Friday. You change the question to: where does one supplier's work touch another's, and who agreed what would happen at that touch? You draw the four blocks and, instead of looking inside them, draw the lines between them - and those crossing-points have a name. They are interfaces, and owning them is a discipline. Five moves:</p>
+<ul><li><strong>From &#039;whose fault?&#039; to &#039;who owns the joint?&#039;:</strong> you stop chasing fault, because 'whose fault is it?' has the honest answer no one's and everyone's - and that answer fixes nothing by Friday. Every supplier is telling the truth: the pump curve is real, the pressure test is real, the ramp time is on the drawing, the valve meets its closing-speed spec; each did exactly, precisely what their own contract and document said. So you change the question to the only one that can move you forward: WHERE does one supplier's work touch another's, and WHO agreed what would happen at that touch? You take a clean sheet, draw the four blocks - pumps, pipe, electrical, controls - and instead of looking inside the blocks, you draw the lines BETWEEN them. That single shift, from auditing the boxes to interrogating the lines between them, is what turns a useless blame-hunt into a solvable problem - because the failure was never inside a box, it was in the white space the blocks share and no contract claimed.</li><li><strong>Name every interface - the boundaries where scope meets:</strong> the crossing-points where two scopes meet have a name: they are INTERFACES, the boundaries where something - a flow, a signal, a force, a timing, a piece of data, a physical connection - passes from one party to another. Finding every one, defining what must be true at each, writing it down and giving each a single named owner is the discipline of INTERFACE MANAGEMENT. You list them, and there are more than you expected: the PUMP-to-PIPE-and-VALVE surge interface (how fast may the pump build pressure before the valve, pipe and reservoir column can no longer absorb the change?); the CONTROLS-to-ELECTRICAL ramp interface (the '10-second ramp' nobody checked against the surge); the PUMPS-to-CONTROLS duty interface (three pumps at 320 l/s is 960 l/s together, but the SCADA was point-tested ONE pump at a time, so nobody tested pumps 2 and 3 cutting in against an already-pressurised line); and the PIPE-to-CIVIL support interface (the surge thrust needs a civil anchor block, but the piping scope ended at the flange and the anchor was a different package - the bolts across that flange belong to a boundary neither party priced). The real defect is now visible: not a bad component, but the ABSENCE of an interface register - the one living document, owned by no supplier because it sits between them, that names every boundary and its owner. Its absence is the hole your name fell through.</li><li><strong>Model the motion, not the static:</strong> here is the trap that hid the failure in plain sight: every test in that file was a STATIC test - the pressure test held the line still for two hours, the SCADA was point-tested one signal at a time, each pump was witnessed at a steady duty point. A static test holds the world still; it never MOVES it. But the failure lived entirely in the moving case - the transient, the few seconds when the pump builds pressure, the controls time the ramp, and the valve reacts, all at once. Run the numbers on the moving case and the danger leaps out: a 10-second ramp against a 1.6 km pipeline and a non-return valve that closes in 0.4 seconds produces a pressure surge of roughly 71 metres of head on top of the 45-metre duty - a transient the two-hour static pressure test never once saw, because it never moved the pressure. And the 10-second ramp itself was a placeholder typed early in design and copied across every document: consistent across all the certificates and wrong against reality - the most dangerous kind of error, because every certificate agrees with every other. The lesson: a green sticker on a static test says nothing about the moving case, and the moving case is where multi-party systems break.</li><li><strong>Let the model veto the hunch:</strong> naming the missing register does not yet prove WHICH joint coughed - and a suspicion is not a finding, especially after you have watched four people point sideways with total confidence. So before you spend a cent, you set a SUCCESS LINE in advance, out loud, so reality not your hunch will answer: 'if it is the surge joint, a transient model will show the trip threshold crossed within the ramp and the trip going away when I slow the ramp; if the trip survives even a long, gentle ramp, I am wrong and the fault is inside a box.' Then you find out the cheapest honest way - not by re-running START and risking the valve a fourth time, but with a surge analysis: a desk model of the moving case against the real pipe length, real valve speed and real pump curve. And it surprises you. Your hunch was 'just slow the ramp', but the model shows stretching the ramp ALONE is not enough: the dominant surge is the VALVE SLAM on a trip - the 0.4-second valve snapping shut on a moving column of water and throwing 71 metres of head back up the line - so you could ramp over a full minute and the valve would still cough the system on any trip. The ramp was the symptom you could hear; the fast valve the cause you could not. You change course on the evidence, not your preference - which is exactly what a model is for.</li><li><strong>Build the interface register into the process:</strong> the fix follows the evidence, and all of it lives at the interfaces, none inside any supplier's failed scope: swap the non-return valve for a slow-closing type (4 seconds, not 0.4) - the real fix the hunch missed; stretch the pump ramp to 45 seconds; and start the pumps in sequence with a 20-second gap, never together cold. Re-run the model with all three and the trip threshold stays uncrossed across start-up, steady running and a worst-case trip - the success line met on the desk before a single part is ordered. The valve swap and re-tune cost about R310,000 and four days, a fraction of even one week of trucked water, and the plant pushes its 950 l/s on Friday, the valve closing now with a soft sigh, not a cough. But the deeper fix is procedural: you write interface management into the design process so this can never recur. Every multi-package design now opens an INTERFACE REGISTER on day one and names an interface OWNER for each boundary, recording what crosses, the agreed requirement and its calculation, the owner, and the date BOTH sides signed the interface - not just their own package. It is honest overhead (a person to maintain, awkward early conversations, and on a small single-vendor job more ceremony than it earns) - but the moment a system is split across two or more contracts, the white space between them is the highest-risk place on the whole project, because each party defends its own green sticker and disowns the gap. The register's cost is small and certain; an unowned interface's cost is large and arrives at the worst possible moment - at start-up, in front of the client, with everyone pointing sideways.</li></ul>
+<p>See it land. Three changes, all at the interfaces, none inside any supplier's failed scope - a slow-closing valve, a 45-second ramp, a sequenced start - and the model's trip threshold stays uncrossed before a single part is ordered. The valve swap and re-tune cost about R310,000 and four days; on Friday afternoon the plant pushes its 950 l/s and the non-return valve closes with a soft sigh, not a cough - exactly as the model predicted. And every future multi-package design now opens an interface register on day one, with a named owner for each boundary. <strong>A system is only as good as its weakest joint, and a joint with no owner has no strength at all. Subsystems meeting their own specs is necessary - it is never sufficient. When every box is correct and the whole still fails, the defect is not in the components but in the unowned, unspecified interfaces between them: so stop chasing fault, find every boundary where scope meets scope, write down what must be true there, give each a single named owner, and test the moving case the static certificates never saw.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You already know the clean version - pumps, valves, a metal cough. Now the same defect in office clothes.</p>
+<details><summary>See the order that shipped perfectly to the wrong place</summary>
+<div class="reveal-content">
+<p>You manage a small online shop. A corporate order comes in: 40 units, billed to head office in one city, delivered to their branch in another province. Two desks handle it. Sales captures the order on a form with one box labelled "Address". Fulfilment reads the form and ships - beautifully packed, on time - to head office, which has no warehouse, so the parcels sit in a reception cupboard for nine days while the branch phones daily asking where their stock is. You pull the file: Sales captured the address the customer gave on the phone (the billing address - that is what "Address" meant to them); Fulfilment shipped to the address on the form (exactly). Both desks did their job correctly.</p>
+<p>This is the surge trip in office clothes. Four suppliers each met their spec and the system failed; here, two desks each did their job and the order failed - and "whose fault is it?" pulls just as hard and is just as useless. What crosses between the two desks is one field, "Address", and its <em>meaning</em>: it means billing address to Sales and delivery address to Fulfilment - consistent across the whole process and quietly wrong, in exactly the way "ten-second ramp" was consistent and wrong. The joint between the desks - what does "Address" mean, and is one address ever enough? - was never defined, and belonged to no one. It is an unowned interface. The fix is not "tell Sales to be more careful" (that is blaming a desk, the same dead end as blaming a supplier); it is one row of the interface register: the form must carry two separate mandatory fields, "Bill to" and "Deliver to", with "Address" alone banned and shipping reading "Deliver to" only - owned by the operations lead, signed by both desks. The split form is your slow-closing valve: a change at the interface, not inside either desk. Strip away the pumps and the parcels and the machine is the same every time - several parties each do their part correctly, and the whole still fails at a boundary no one was told to own. The disguise changes; the shape does not.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>The plant was just the costume. The real shape is this: several parties each do their own part correctly, and the whole still fails - at the boundaries between them, which no one was told to own. That shape lives almost everywhere work is divided up. Find it where you are:</p>
+<ol>
+<li><strong>Name your packages.</strong> In a project or process you know, list the separate parties who each deliver "their part" - teams, vendors, departments, contractors, even software systems passing data - and draw them as blocks.</li>
+<li><strong>Draw the lines between the blocks, not inside them.</strong> At each place where one party's work hands off to another - a file, a signal, a payment, a patient, a part, a permission, a deadline - ask what crosses here. Those crossings are your interfaces.</li>
+<li><strong>Hunt the white space, and the placeholder that became permanent.</strong> For each crossing, is there a written, agreed statement of what must be true there, with one named owner - or does each side point at its own "passed"? And where is the number, setting or assumption one party typed early that everyone copied and no one ever checked against reality?</li>
+<li><strong>Ask the better question, and weigh the overhead.</strong> When something breaks across boundaries, replace "whose fault is it?" with "which boundary failed, and who owned it?" - and decide honestly which boundaries are worth a register and an owner, and which would be more ceremony than the risk justifies.</li>
+</ol>
+<div class="goal-setter"><label for="learner-goal-text">A project or process you know where the work is split across separate parties (teams, vendors, departments, even software systems passing data) - and the boundaries between them where one party's output becomes another's input:</label><input type="text" id="learner-goal-text" class="goal-text" placeholder=""><label for="learner-goal-amount">The plant was just the costume. The real shape is this: several parties each do their own part correctly, and the whole still fails - at the boundaries between them, which no one was told to own. That shape lives almost everywhere work is divided up. Find it where you are. NAME YOUR PACKAGES: list the separate parties who each deliver 'their part' - teams, vendors, departments, contractors, even software systems passing data - and draw them as blocks. DRAW THE LINES BETWEEN THE BLOCKS, NOT INSIDE THEM: at each place where one party's work hands off to another (a file, a signal, a payment, a patient, a part, a permission, a deadline), ask what crosses here - those crossings are your interfaces. HUNT THE WHITE SPACE: for each crossing, is there a written, agreed statement of what must be true at that boundary, with one named owner - or does each side just point at their own 'passed' and assume the other matches? The unowned crossings are your risk. FIND THE PLACEHOLDER THAT BECAME PERMANENT: somewhere a number, setting, assumption or date that one party typed early, everyone copied, and no one ever checked against reality - consistent across all the documents and quietly wrong, like the '10-second ramp'. ASK THE BETTER QUESTION: when something breaks across boundaries, replace 'whose fault is it?' with 'which boundary failed, and who owned it?' - and watch how differently the room responds. AND DECIDE WHERE THE DISCIPLINE EARNS ITS KEEP: for which boundaries is it worth opening a register and naming an owner, and where would that be more ceremony than the risk justifies? A system is only as good as its weakest joint, and a joint with no owner has no strength at all - subsystems meeting their specs is necessary, but it is never sufficient. When every subsystem meets its spec but the system fails, the defect is not in the components but in the unowned, unspecified interfaces between them.</label><div class="input-group"><span class="currency-symbol">R</span><input type="number" id="learner-goal-amount" placeholder="1" onchange="updateLearnerGoal()"></div></div>
+<p>Name your packages, the boundaries between them, the one crossing that worries you most, and who would own it. Then run the smallest test this week: open a single row of the interface register on that boundary - what crosses, the agreed requirement (and the number behind it), one owner's name - and take it to both sides; you will know it worked when <em>both</em> sign the interface, not just their own package. (Working with an AMU facilitator? Build the interface register for your real project together.)</p>
+<p>The water, pumps and valves change; the white space between contracts, and the discipline of owning it, do not. A surge that breaks a valve and a word that means two things are the same defect - an unowned interface - so spot the joint, name the owner, write down what must be true there, and the cough never comes.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

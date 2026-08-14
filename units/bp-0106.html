@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machines wear out far faster than they should and we don&#039;t know why</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Machines wear out far faster than they should and we don&#039;t know why</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Simulation</h2>
+<p>It is 06:40 and the night shift is not finished. You are the maintenance planner at Kareebos Aggregates, a stone-crushing plant outside Kathu in the Northern Cape. The plant feeds gravel and crushed rock to road builders, and when it stops, the trucks queue at the gate and the money stops with it.</p>
+<p>You walk into the workshop. The air is dry and full of fine grey dust - you can taste it at the back of your throat, that chalky grit that never quite leaves. On the steel bench in front of you sits a bearing. It came out of the number-two conveyor head pulley last night. A young fitter, Tebogo, slides it across to you without a word and folds his arms.</p>
+<p>You pick it up. It should be smooth and silver inside. Instead the inner race is scored with fine grey lines, like someone dragged a wire brush around it. One roller has a small flake missing, a shallow pit the size of a match head. You turn it in your hands and it does not spin freely - it drags and clicks.</p>
+<p>You already know what the spreadsheet says, because you keep it. This is the <strong>fourth</strong> head-pulley bearing on number-two conveyor in <strong>eleven months</strong>. The bearing is rated by the maker for around <strong>40,000 hours</strong> of running. You have been getting roughly <strong>2,000</strong>. Each change-out costs you about <strong>R18,000</strong> in the part, <strong>R22,000</strong> in labour and crane time, and - the part that hurts - about <strong>six hours</strong> of stopped plant. At your throughput that lost time is worth close to <strong>R90,000</strong> a stop. Four stops. You can do the sum.</p>
+<p>Tebogo finally speaks. "I greased it myself, every week, like the card says. Two pumps. I don't understand it." He is not lying. You have watched him do it. He is careful.</p>
+<p>Your supervisor, Mr Ferreira, put his head round the door twenty minutes ago. He did not shout. He just said, very quietly, "Order another one and get it running. We'll talk about it at month-end." That quiet is worse than shouting. Month-end is where they decide whose budget is bleeding and why. Your name is on this line.</p>
+<p>And here is the thing that gnaws at you. The easy move - the move your hand is already reaching for - is to phone the supplier, order bearing number five, blame a "bad batch", and get the plant turning before the trucks back up. It would work. It would get you through today. You have done it three times already.</p>
+<p>But four bearings in eleven months is not a bad batch. Something is <em>eating</em> these bearings, the same way, over and over, and every replacement is you paying again for a question you have never actually answered. The new bearing will go in clean and silver this morning. In about three months it will come back to this bench scored and pitted, and Tebogo will fold his arms again.</p>
+<p>You hold the dead bearing up to the light from the window. The scoring, the little pit, the dust on the bench, the grease card on the wall, the way it drags. The bearing is trying to tell you something about how it died. You have never once stopped to read it.</p>
+<p>You set it down. Outside, the first truck is pulling up to the gate.</p>
+<p>Where do you start? What does this bearing need to tell you before you order the next one?</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>Before you read how the Kareebos team worked this out, stop and make your own best attempt. Write your answer down - even a rough one. You will learn far more from comparing your thinking to theirs than from reading theirs cold.</p>
+<p>These questions are built so you can <em>check your own answers against the dead part itself</em>, before any solution is shown. The bearing, the grease and the housing are right there - do not just name a cause, go and see whether the evidence agrees with you.</p>
+<p>Think it through with these questions:</p>
+<ol><li>The marks on the dead bearing - the fine grey scoring, the small pit, the drag - are not random. Different ways of dying leave different marks. <strong>Don't just name a failure mode - set up a comparison you can check.</strong> For each mark, write down the cause you suspect AND the one physical thing that cause would <em>also</em> leave somewhere else. (For example: "fine grey scoring = hard particles dragged across the surface → then I should <em>also</em> find grey grit IN the old grease and grey dust packed in the housing.") <strong>Built-in self-check:</strong> now go and look for that second sign on the actual dead part and grease. If the scoring really is from grit, the grit is findable. If you cannot find any grit anywhere, your reading of that mark is wrong - and the physical corroboration, not our worked solution, is what tells you so.</li><li>Tebogo greases it carefully every week, exactly as the card says, and yet the bearings still die early. So the failure is not "he forgot". <strong>Make his greasing a controlled variable: confirm it from the card.</strong> Done weekly? Tick. Correct grease? Tick. Correct amount? Tick. Now reason it through: if the <em>method</em> is verified correct but the <em>result</em> is still early death, the cause must be entering from <em>outside</em> the method. <strong>Built-in self-check:</strong> list everything your three ticks did NOT cover - what gets into the grease <em>after</em> it is packed, the air around the bearing, the load it carries. Your answer is sound if, with greasing ruled out as the suspect, you are still left with a concrete next thing to inspect (where harm gets in) that you can actually go and check - for instance, cut open the old seal and look for grey dust trapped behind it.</li><li>You taste grey dust in the air all day. A bearing turns thousands of times a minute on a thin film. If that dust is somehow ending up <em>inside</em> the bearing, what kind of damage would you expect to see - and does that match the marks you found in question 1? (You already have the test: if your prediction is right, the marks from question 1 and the grit from its self-check line up into one story. If they don't line up, one of your readings is wrong.)</li><li>If you wanted to <em>prove</em> the cause instead of guessing, what could you look at, measure or collect - from the dead part, from the grease, and from around the machine - before you fit a new one? Write the smallest, cheapest check for each, and what result would confirm your suspicion versus what result would kill it.</li></ol>
+<p><strong>Now set your own yardstick - before you read on.</strong> About <em>your</em> repeating failure in your own world (the one you will work on in Movement 4), write these two short lines and keep them where you can see them:</p>
+<ul><li><em>My idea about the cause is fitting if I see ___ .</em></li><li><em>I would change my mind if ___ .</em></li></ul>
+<p>Write them down now. Then read on - and notice that the Kareebos team set exactly this kind of line for themselves <em>before</em> they found out what was true.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>The Kareebos team did not order bearing number five that morning. The planner kept the dead bearing, took photographs of it in good light, and asked a simple question that changed everything: <em>not "which bearing do we buy?" but "how exactly did this one die?"</em></p>
+<p>But they did more than ask. Before they looked, the planner wrote a success line on the whiteboard - a prediction they could be proved <em>wrong</em> about. It read: <strong>"If our problem is simply worn-out grease, then fresh grease in a clean bearing will buy us back the rated life. If it is something getting <em>in</em>, we will find grit where grit should never be - and fresh grease alone will not save it."</strong> That line mattered, because it told them in advance what evidence would settle the argument, instead of letting them see what they wanted to see.</p>
+<p>Here is how they reasoned it out.</p>
+<p><strong>They read the damage like evidence.</strong> They laid the four failed bearings together on the bench - they had kept the last two, fortunately. Every one showed the same two things: fine grey lines scored <em>around</em> the race in the direction of rotation, and shallow flaking pits. They learnt that surfaces wear out in a small number of recognisable ways, and each leaves its own signature. Scoring that runs in the direction of motion, with grey embedded streaks, is the fingerprint of hard particles being dragged between the surfaces - <strong>abrasive wear</strong>. The shallow flaking pits, where small flakes break out of the surface, are the fingerprint of repeated rolling stress with the surface fatiguing under it - made far worse when the rolling surfaces are not properly separated. Reading these signatures has a name: it is <strong>failure mode analysis of the wear surface</strong>, and the broader study of how surfaces in contact rub, wear and are lubricated is called <strong>tribology</strong>.</p>
+<p><strong>They built the cheapest instrument that could prove or disprove the line.</strong> They did not buy anything to start. They cut open one failed seal with a hacksaw, scraped out a sample of the used grease into a clean jar, and smeared a little on a white tile against a smear of fresh grease for comparison - a R0 test on the bench. Then, to be sure, they sent one used-grease sample to a lab for particle analysis: about <strong>R650</strong>, far less than one more bearing. That was the whole instrument - a jar, a tile, and one lab slip.</p>
+<p><strong>They found the grit - and it forced a real change of plan.</strong> Here is where reality refused to match their first, comfortable theory. The planner had quietly expected the grease to come back "a bit dirty, nothing dramatic" - the kind of finding that lets you carry on greasing harder and feel busy. Instead the sample came back <strong>loaded with fine silica</strong> - crushed-rock dust, the very product the plant makes - and the cut-open seal had grey dust packed <em>behind</em> its single lip. That hit the second half of their success line squarely: grit was where grit should never be, so fresh grease alone would <em>never</em> have saved them. The whole "just grease it more / order a better bearing" plan was dead on the bench. The seal, it turned out, was a basic single-lip type never meant for a dusty environment. Every week, Tebogo's two careful pumps of grease pushed <em>new</em> grease in - and dragged the <em>old, grit-loaded</em> grease right past the worn seal and back across the bearing. He was, without knowing it, lapping the bearing with grinding paste. The dust getting in is <strong>contamination ingress</strong>, and it was driving the abrasive wear they had read on the surface. The surprise was not a small oversight; it inverted the fix - from "buy a better bearing and grease harder" to "stop the dust getting in at all".</p>
+<p><strong>They asked whether the surfaces were ever truly separated.</strong> A healthy bearing does not run metal-on-metal. A thin film of lubricant lifts the surfaces apart so they glide on oil, not steel. Whether that film actually forms depends on three things working together: the speed of the surfaces, the load pushing them together, and the thickness (viscosity) of the lubricant. The team realised they had never checked whether their grease was right for a <em>slow, heavily loaded</em> conveyor head pulley. Their grease was a thin, general-purpose one chosen years ago for "everything on site". A slow, heavy bearing needs a thicker film to stay separated; theirs was too thin to lift the surfaces apart at that low speed. So for part of every revolution the rollers were running with the film collapsed - surfaces touching. The condition of the lubricant film between two surfaces has a name: the <strong>lubrication regime</strong>. Kareebos had been running in the wrong one - a starved, boundary regime - for years, without knowing such a thing existed.</p>
+<p>So the three things tied together into one story: dust got in past a weak seal (<strong>contamination</strong>), the wrong, too-thin grease meant the surfaces were never fully separated (<strong>wrong lubrication regime</strong>), and the trapped grit then ground the touching surfaces away (<strong>abrasive wear</strong>), while the collapsed film let the surfaces fatigue and flake (the pitting). Four bearings, one mechanism, repeating. Not a bad batch. A <strong>tribological root cause</strong> they had been paying to ignore.</p>
+<p><strong>They decided: change the plan, not the bearing.</strong> Their success line had told them in advance that if grit turned up, fresh grease alone was not the answer - so they did not hold their course, they changed it. They committed to attacking the <em>ingress</em> first.</p>
+<p><strong>What they changed - and the honest trade-offs.</strong></p>
+<ul><li>They fitted a <strong>taut, double-lip labyrinth seal</strong> with a grease-purge gap, so old grit-loaded grease escapes <em>outward</em> instead of crossing the bearing. Cost: about <strong>R2,400</strong> more per seal, and the housing had to be machined to fit it - a once-off <strong>R6,000</strong> job per pulley.</li><li>They switched the head pulleys to a <strong>thicker, high-viscosity grease with a solid-film additive</strong> suited to slow, heavy, dusty duty. Trade-off: it is about three times the price of the general grease and must be <strong>stored and tracked separately</strong>, so it cannot be confused with the everyday grease - a real discipline cost on a busy site.</li><li>They cut the greasing from "two pumps weekly" to a <strong>measured amount on a calculated interval</strong>, because over-greasing was also churning heat and dust through the bearing. Tebogo was relieved; he had been doing more, not less, than the bearing wanted.</li><li>They started <strong>keeping every failed part and sampling the grease quarterly</strong>, so the next failure can be read, not guessed.</li></ul>
+<p><strong>The result.</strong> Eleven months later the number-two head pulley was still on its first bearing under the new setup - past <strong>7,000 hours</strong> and running clean, against the old <strong>2,000</strong>. Against roughly <strong>R130,000 a stop</strong> in part, labour and lost plant, avoiding even two failures a year more than paid for the once-off seal machining and the dearer grease many times over. The honest caveat: they have not yet reached the rated 40,000 hours, so they cannot claim the problem is <em>solved</em> - only that they finally understand the mechanism, their success line was met where it could be met, and they are no longer paying, blind, for the same death four times a year.</p>
+<p>The concept, named at last: they stopped treating the <strong>symptom</strong> (replace the bearing) and started analysing the <strong>tribological root cause</strong> - the specific <em>wear mechanism</em> (abrasive wear, surface fatigue), the <em>lubrication regime</em> (whether a film actually separates the surfaces), and the <em>contamination</em> driving the damage. The dead bearing had been trying to tell them all of this from the first failure. They finally read it.</p>
+<blockquote><p><strong>Do this yourself</strong></p>
+<p>The Kareebos team did not need a lab to start. They needed to stop binning the evidence and ask three questions in order. Here is the bare recipe, then a blank grid you can lift straight into your own situation.</p>
+<p><strong>The recipe (three moves, in order):</strong></p>
+<ol><li><strong>Read the death.</strong> Keep the failed thing. Photograph it in good light. Lay several failures side by side and find the mark that <em>repeats</em> - scored, pitted, worn smooth, cracked, melted, clogged, corroded. The repeating mark is the <em>how</em>.</li><li><strong>Check the separator / protector.</strong> Find the thing meant to keep the surfaces apart or keep harm out (lubricant, seal, coating, filter, coolant, barrier). Ask: right type? right amount? and is it itself carrying the harm in?</li><li><strong>Trace the ingress.</strong> Name what is getting <em>into</em> the contact that should not be there, and where it enters. Then ask how you could <em>measure</em> it rather than guess.</li></ol>
+<p><strong>Your blank failure-investigation grid</strong> - copy this and fill it in for your own repeating failure. The headers are the questions; your job is the answers.</p>
+<table><thead><tr><th>Diagnostic move</th><th>What I will look at</th><th>What the evidence might mean (the <em>how</em>)</th><th>How I could prove it (not guess)</th></tr></thead><tbody><tr><td>1. Read the death (the repeating mark)</td><td></td><td></td><td></td></tr><tr><td>2. Check the separator / protector (right type? right amount? clean?)</td><td></td><td></td><td></td></tr><tr><td>3. Trace the ingress (what gets in, from where)</td><td></td><td></td><td></td></tr><tr><td><strong>One mechanism that ties them together</strong></td><td></td><td></td><td></td></tr></tbody></table>
+<p>If you can fill the bottom row with a single sentence - "dust got in past a weak seal, the wrong grease let the surfaces touch, the grit then ground them away" was theirs - you have stopped treating the symptom and started naming the cause.</p>
+<p><strong>Method & Finding</strong></p>
+<ul><li><strong>The Method</strong> (the lesson - reusable): Before you replace a part that keeps dying, write down <em>in advance</em> what evidence would prove your suspected cause versus disprove it, then build the cheapest instrument that can show it - keep the dead part, sample what is meant to protect it, and look for the harm where it should never be.</li><li><strong>The Finding</strong> (in this story only): At Kareebos, a R650 grease sample and a cut-open seal found silica where grit should never be - disproving "just grease it more / buy a better bearing" and re-pointing the whole fix at keeping dust <em>out</em>.</li><li><strong>Your Check</strong> (how you will know in your world): A real number or sight from <em>your</em> failed part - the particle-count on a grease/oil sample, grit or water found behind a cut-open seal, or a repeating wear pattern (e.g. one-edge scrubbing) you can photograph across three failures laid side by side.</li></ul></blockquote>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You have seen the clean version, where all three clues lined up. Real failures are rarely that tidy. Let's take one guided step together on a harder one - the same deep problem, wearing a disguise - before you walk into your own world alone.</p>
+<p><strong>A new bench, a different scale.</strong> You now run a small delivery fleet: six bakkies carrying parts around town. One bakkie, the white bakkie, eats front tyres. A set should last about <strong>60,000 km</strong>. This one is bald at <strong>18,000 km</strong>, the third set this year. Your driver shrugs: "Town driving, boss. It just wears them out." Here is the catch that makes this harder than the bearing - the obvious cause has <em>already been ruled out</em>. The wheel alignment (the "tracking") was checked and signed off by the tyre fitter only last month. So the easy answer is gone, and you are tempted to just buy set number four.</p>
+<p>Notice we are nowhere near a crusher plant. No grease, no seal, no silica. Different world, different scale. But pause before you decide it's a different <em>problem</em>.</p>
+<p><strong>Hint 1 - What do you notice about the move you're about to make?</strong> You are reaching for a new set of tyres without looking at the old ones. Where have you seen that exact move before?</p>
+<p><em>(Pause. Picture the worn tyre in your hands, the way you pictured the bearing.)</em></p>
+<details><summary>Show me &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal 1.</strong> It is the same first move Kareebos kept making: replace the part, never read it. The recipe says move 1 is <em>read the death</em>. So before you buy, you lay the three bald sets side by side and look at <em>how</em> they wore. And they tell you something: they are not worn evenly across the tread - they are scrubbed down hard on the <em>inner edge</em>, the outer edge barely touched. That is a signature. Even wear means "fair use". A repeating, lopsided wear pattern means something is <em>loading one edge</em>.</p>
+</div>
+</details>
+<p><strong>Hint 2 - Where do both of these come from?</strong> You have two facts now that seem to fight each other: the alignment was checked and passed, <em>and</em> the tyres are scrubbing one edge as if the alignment were badly out. Both of these are about the same thing - the angle the wheel sits at under load. How can the angle be "fine" on the ramp and "wrong" on the road?</p>
+<p><em>(Pause. Think about </em>when<em> the fitter checked it - empty, on a flat ramp - versus how this bakkie actually works.)</em></p>
+<details><summary>Show me &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal 2.</strong> This is move 2 - <em>check the separator / protector</em> - in disguise. For a tyre, the thing meant to keep it wearing evenly is the <em>suspension geometry holding the wheel at the right angle</em>. The fitter checked it <strong>empty, on a level ramp</strong>. But this bakkie carries heavy parts every day, often loaded to one side. Under that load a <strong>tired, sagging rear spring</strong> drops the body, tips the front wheels, and throws the angle out - but <em>only when loaded</em>, which is exactly when the fitter never sees it. The "protector" was the wrong thing to trust: a check done in the wrong condition is no check at all. (Remember Tebogo's grease - done faithfully, but the wrong grease for the duty.)</p>
+</div>
+</details>
+<p><strong>Hint 3 - and the third move?</strong> We've read the death (one-edge scrubbing) and found the protector failing under load (sagging suspension throwing the angle). What might be <em>getting in or getting worse</em> that you could actually measure, rather than guess?</p>
+<details><summary>Reveal &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal 3.</strong> Move 3 - <em>trace the ingress</em> - is the one that is <strong>faint here</strong>, and that is the honest part of this case: not every failure has a dramatic "dust" entering. The nearest thing is the <em>load itself</em> and the worn spring - both measurable. You can weigh the bakkie loaded, measure the ride height against spec, and re-check the alignment <em>with the working load on board</em>. That turns "town driving, it just wears them out" into numbers you can prove.</p>
+</div>
+</details>
+<p><strong>The deep-structure lesson.</strong> Tyres are not bearings. But the problem is the same one in a new coat: <strong>a part dies the same way over and over, and you keep replacing it without reading how it died, without checking whether the thing meant to protect it was right <em>for the real conditions</em>, and without tracing what made it worse.</strong> The disguise here was a misleading surface feature - "the alignment was already checked" - that tempts you to stop looking. The deep structure does not care what the part is. Read the death, check the protector <em>in the real conditions</em>, trace what's getting in. That is the move that transfers.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>The Kareebos story is about bearings in crusher dust. But the problem-TYPE is much wider: <strong>a component dies the same way, repeatedly, and you keep replacing it without analysing how the contact surface actually failed, what was meant to separate or protect it, and what was getting in.</strong> That is the pattern. Find it where you are.</p>
+<p>Work through these prompts for your own context. Then take them into the AI-facilitated session, which will build this same problem inside <em>your</em> world so you can practise the analysis on something you recognise.</p>
+<ol><li><strong>Find your repeating death.</strong> Name one part, surface or component in your world that you replace, repair or "reset" far more often than it should last - and that comes back the same way each time. (A pump seal? A cutting tool? A tyre? A door hinge? A pump impeller? Even a non-physical thing - a process step that keeps failing the same way.) Write down how often it fails and what each failure costs you in money and stopped work.</li><li><strong>Read the evidence, don't bin it.</strong> Next time it fails, <em>keep the failed thing</em> and look closely. What are the marks of how it died - worn smooth, scored, pitted, cracked, melted, clogged, corroded? Could you photograph it in good light and lay several failures side by side? What signature repeats?</li><li><strong>Ask what was meant to protect or separate it.</strong> Most wearing surfaces depend on something keeping them apart or keeping harm out - a lubricant, a seal, a coating, a filter, a barrier, a coolant. Is that protective thing actually doing its job, the right type, the right amount, and not itself carrying the harm in? (Remember Tebogo's grease.)</li><li><strong>Hunt the ingress.</strong> What is getting <em>into</em> the contact that should not be there - dust, water, grit, heat, the wrong chemical? Where is it coming in, and could you sample or measure it rather than guess?</li><li><strong>Honest transfer.</strong> This is the same problem-type - analysing the root mechanism of a repeating failure rather than re-treating the symptom - but your specifics will differ. Your "grease" might be a software config; your "dust" might be bad input data; your "seal" might be a checklist. Name the part of the Kareebos method that transfers cleanly to your world, and the part that does not.</li></ol>
+<p>When you are ready, bring your repeating failure to the AI facilitator. It will set you inside a scenario built from <em>your</em> answers, and walk you through reading the failure the way Kareebos finally read theirs.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You&#039;ve worked through the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

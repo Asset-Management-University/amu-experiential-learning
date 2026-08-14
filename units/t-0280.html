@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The design report says both units failing together happens once in two thousand years, and it has happened three times in seven - so how much of my redundancy is actually real, as a number I can get from my own log?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The design report says both units failing together happens once in two thousand years, and it has happened three times in seven - so how much of my redundancy is actually real, as a number I can get from my own log?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The <strong>Nkanyezi telephone exchange</strong> is a windowless brick building behind a fence, and it carries mobile and fixed service for about forty thousand people across six villages and a district hospital. When it drops, nobody in that area can call an ambulance.</p>
+<p>It has dropped three times in seven years. Each time, both rectifier modules - the units that turn incoming mains into the DC the exchange runs on - failed together, the battery string carried the load for its designed forty minutes, and then everything went dark.</p>
+<p>On the desk is the original design report. You are the reliability engineer, and you have read this paragraph four times: <em>"Simultaneous loss of both rectifier modules: once in 2,000 years."</em></p>
+<p>The arithmetic in it is correct. Each module fails about one and a half times a year, each repair takes a few hours, and if you multiply the chance of one being down by the chance of the other being independently down at the same instant, you get a number so small it rounds to never. The designer did not make a mistake in the multiplication.</p>
+<p>They made an assumption in it. And the log on your screen says the assumption is wrong roughly three thousand times over, and it says so in a form nobody can argue with: three outages, forty thousand people, twice during hospital hours.</p>
+<p>Now the proposal in front of you is a <strong>third rectifier module, R140,000</strong>, and you have no way to tell whether it would help. It is the obvious answer. It is what the design logic implies. And that same design logic has already been wrong by a factor of three thousand about this exact system.</p>
+<blockquote><h2>Two of everything did not save us, and I cannot tell how much of the redundancy I already have is actually real. How do I measure that - as a number, from my own log?</h2></blockquote>
+<p><strong>Before you read on, make the call on the third module.</strong> Three outages in seven years, a design report that says this should be impossible, forty thousand people, and R140,000 on the table. Write down what you would recommend and what you would rest it on. Your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the four recommendations, and what each one rests on</summary>
+<div class="reveal-content">
+<p>&bull; <strong>"Buy the third module."</strong> The answer the design logic gives, and the one the proposal was written from. Notice what it assumes: that adding another one multiplies the protection. That is precisely the assumption the last seven years disproved, and buying hardware on it is spending R140,000 on the strength of a number already known to be wrong.</p>
+<p>&bull; <strong>"Investigate the three failures properly."</strong> Right, and necessary, and it gives you three stories rather than a rate. Three well-understood incidents still leave you unable to say what the next seven years hold, or what the third module would change.</p>
+<p>&bull; <strong>"Rewrite the design report's model with better numbers."</strong> Reaches for the model, and the failure was not in its numbers. Better inputs into the same multiplication give a slightly different very small number and the same wrong shape.</p>
+<p>&bull; <strong>"Extend the battery so it carries longer."</strong> Genuinely useful and worth doing, and it buys minutes rather than addressing why both rectifiers keep going at once. It makes the outage shorter, not rarer.</p>
+<p>&bull; What none of them does is ask the one question the log can actually answer. <strong>Of all the rectifier failures this site has had, what fraction took out both at once?</strong> That is a count, not a model. And whatever fraction it turns out to be is the share of failures your duplicate does nothing about - which is exactly what you need before deciding whether a third one is worth anything.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Count every failure of the duplicated component over a window long enough to hold several of the rare events. Count how many of those took the twin with them, from a single cause. Divide. Then check the corrected figure against what actually happened - and spend on separating the shared causes rather than on buying another one. Watch it run at Nkanyezi.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Count every failure of these components over a long enough window</div><p class="cb-demo">Vusimuzi Loots pulls seven years of the exchange&#039;s fault log and counts rectifier failures, one line per rectifier per event: 21 in total across the pair. He resists the temptation to count outages instead - there were far fewer of those - because an outage is what the system did, and he needs what the components did. Seven years is chosen deliberately: three years would have contained one dual event, and one is not a measurement.</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Count how many of those failures took the others with them</div><p class="cb-demo">Three occasions in the seven years took both rectifiers at once - that is six of the twenty-one component failures. Vusimuzi checks each before counting it. In May, the cabinet air conditioning failed and both rectifiers derated and tripped within four minutes: one cause, both units. In November, a surge on the incoming AC feed took both drives: one cause. And in the third, a technician applied the same firmware update to both modules on the same maintenance visit and both locked up two days later. He nearly recorded that third one as two separate faults, because they were two days apart and it did not look like a shared cause at all.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Divide, and read what fraction of your redundancy is fictional</div><p class="cb-demo">Six of twenty-one is 0.29. Vusimuzi says it out loud in the meeting so nobody can soften it: almost three in every ten rectifier failures at this site take out both rectifiers, so for those, having two is exactly as good as having one. That sentence is not an opinion and it is not a warning. It is a count, from their own log, and it is the first honest number anybody has put against a system the design report called effectively immortal.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Check the corrected figure against what has actually happened</div><p class="cb-demo">Each rectifier fails about one and a half times a year. Multiply by 0.29 and you should expect both to go together about every two and a bit years - which is three times in seven. That is exactly the site&#039;s history. The design report&#039;s figure of once in two thousand years came from multiplying the two rectifiers&#039; probabilities together as though nothing could ever take both, and it was wrong by roughly three orders of magnitude. Vusimuzi does not need to argue about the model any more. He has one number that fits the record and one that does not.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Spend on breaking the shared causes, not on buying another one</div><p class="cb-demo">The proposal on the table is a third rectifier at R140,000. Vusimuzi shows what it buys: the shared cabinet air, the shared surge path and the shared maintenance visit would all take a third unit too, so almost three in ten failures would still bring everything down. Instead: separate surge protection per module, a temperature alarm that warns before both derate, and a written rule that firmware goes to one module and waits a fortnight before the other. About R46,000 in total. The third item costs nothing at all - it is a line in a procedure - and it is the one that would have prevented the failure nobody recognised as a shared cause.</p></div></div>
+
+<p>See what one division did. <strong>Six of twenty-one - so almost three in every ten rectifier failures at this site take out both rectifiers, and for those, having two is exactly as good as having one.</strong> Multiply that fraction by how often a single module fails and you get a both-at-once failure about every two years, which is three in seven: the site's actual history, from its own log, where the design report's two thousand years was out by three orders of magnitude. And look at the third shared cause, because it is the one that matters most and the one nobody would draw on a diagram - <em>the same firmware, applied to both modules on the same maintenance visit</em>. Two failures, two days apart, that looked like bad luck and were one cause. A third module would have received that update too.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Five moves, and the second is where the judgement lives.</p>
+<ul>
+<li><strong>1. Count every failure</strong> of the duplicated component - components, not outages - over a window long enough to hold several rare events.</li>
+<li><strong>2. Count how many took the twin with them</strong> from one cause, checking each before you count it.</li>
+<li><strong>3. Divide.</strong> That fraction is the share of your redundancy that is fictional.</li>
+<li><strong>4. Multiply it by the single-component failure rate</strong> and check the answer against what has actually happened.</li>
+<li><strong>5. Separate the shared causes one at a time</strong> - supplies, enclosures, protection, people, days - and re-count after a year.</li>
+</ul>
+<p>The fraction you calculated has a name: it is the <strong>beta factor</strong> for <em>common-cause failure</em> - a failure that takes out more than one supposedly independent item through a single mechanism. Its opposite, the assumption the design report made, is <em>independence</em>: that one item failing tells you nothing about the other, which is what allows probabilities to be multiplied and is almost never quite true in a real installation. The number you produced is the <em>beta-factor model</em> in its simplest honest form - the share of a component's failures that arrive as common-cause - and multiplying it by the single-item failure rate is how it converts into a rate you can compare with your own history. Where a shared mechanism is a physical thing you can point at, it is a <em>shared dependency</em>; but the ones that catch good engineers are the procedural ones - the same person, the same visit, the same update, the same supplier batch - which no diagram of the plant will ever show.</p>
+<p>It fits anywhere you have paid for duplication and want to know what it bought: redundant equipment, standby supplies, second suppliers, cross-trained staff, backup sites. Two limits travel with it. It is a measurement of the past at this installation, so it describes what has happened here, not what is possible here - a shared cause that has not yet fired is not in the number. And it says nothing about consequence: it tells you how much of your redundancy is fictional, never whether that matters enough to spend on.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Find something <em>you</em> have two of - machines, supplies, suppliers, servers, trained people - and go to the record rather than the design. Count every failure of that component over as long a window as you have. Then count how many took the other one with them, and be strict about each. Divide, and say the fraction out loud.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-count_all_failures">Step 1 - Count every failure of these components over a long enough window</label><textarea id="cb-count_all_failures" data-key="t-0280:count_all_failures" placeholder="Go to your own record and count every failure of the duplicated component - not incidents, not outages, but individual component failures, across a window long enough to contain several of the rare events you care about. This is the denominator, and getting it from the log rather than from the design report is the whole point."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-count_shared">Step 2 - Count how many of those failures took the others with them</label><textarea id="cb-count_shared" data-key="t-0280:count_shared" placeholder="Go through the same list and mark every failure that happened together with its twin from a single cause. Count the component failures involved, not the number of events. Be strict about what counts: two failures on the same day from unrelated causes are not a shared cause, and two failures weeks apart from the same slow cause are."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-divide">Step 3 - Divide, and read what fraction of your redundancy is fictional</label><textarea id="cb-divide" data-key="t-0280:divide" placeholder="Divide the shared-cause failures by the total. That fraction is what it says it is: the share of this component&#039;s failures that your duplicate does nothing about. It is not an estimate of how bad your luck is - it is a measurement of how much of the protection you paid for is actually there."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-check_against_reality">Step 4 - Check the corrected figure against what has actually happened</label><textarea id="cb-check_against_reality" data-key="t-0280:check_against_reality" placeholder="Multiply that fraction by the single-component failure rate to get how often you should expect a both-at-once failure. Then compare it with how often it has actually happened. If the corrected figure matches reality and the original did not, you have found where the design report went wrong - and you can now show it rather than assert it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-break_not_buy">Step 5 - Spend on breaking the shared causes, not on buying another one</label><textarea id="cb-break_not_buy" data-key="t-0280:break_not_buy" placeholder="Take the shared causes you actually found and separate them one at a time - different supplies, different enclosures, different protection, different people, different days. A third unit inherits every shared cause you have not broken, so it moves the fraction hardly at all. Then re-count after a year and check the fraction has fallen; that re-count is your only proof."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines decide whether the fraction is honest. First, <strong>hunt the procedural shared causes as hard as the physical ones</strong> - the same technician, the same maintenance visit, the same software version, the same delivery, the same instruction. These are the ones that hide, because they leave failures separated in time and looking unrelated, and because no drawing of the plant contains them. The firmware pair at Nkanyezi were two days apart and were nearly logged as two ordinary faults. Second, <strong>be strict in both directions when you decide what counts</strong>. Marking unrelated same-day failures as a shared cause inflates the fraction and will get your finding dismissed the first time somebody checks it; refusing to mark a slow shared cause because the failures are weeks apart deflates it and hides the very thing you were looking for. Write down the cause you assigned to each one, so that anybody can disagree with a specific judgement rather than with the number.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep the number honest.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Multiplying probabilities assumes independence, and installations are not independent.</strong> The multiplication is not the error; the assumption inside it is. A model that predicts your system is effectively immortal is telling you about its own assumptions, not about your plant.</p>
+<p>&bull; <strong>Count components, not outages.</strong> Outages are what the system did. You need what the parts did, and there are always more of those - it is the denominator, and getting it wrong moves the answer more than anything else.</p>
+<p>&bull; <strong>Hunt the shared causes that are not physical.</strong> The same person, the same visit, the same update, the same batch. They separate the failures in time so they do not look shared, and they are invisible on every drawing.</p>
+<p>&bull; <strong>A third one inherits every shared cause you have not broken.</strong> That is the whole finding, and it is usually the difference between a large capital request and a cheap procedural change.</p>
+<p>&bull; <strong>The window must be long enough to hold several rare events.</strong> One dual failure in the record is an anecdote with a decimal point on it. If you only have one, say so and give the fraction as the rough thing it is.</p>
+<p>&bull; <strong>It measures what has happened, not what could.</strong> A shared cause that has never yet fired contributes nothing to the number and can still take everything down next winter. The fraction is a floor on your exposure, never a ceiling.</p>
+<p>&bull; <strong>Do not let the number land on whoever was holding the spanner.</strong> The technician who applied that firmware to both modules followed the procedure as written - the procedure was the shared cause. A count used to find who to blame will quietly stop producing honest cause assignments, and then it measures nothing.</p>
+</div>
+</details>
+<p>You sat with a design report promising once in two thousand years, a log showing three times in seven, and R140,000 about to be spent on the same assumption that had already failed. What you can put in front of the meeting instead is one fraction from your own record - nearly three in ten rectifier failures take both - the reason the original figure was out by three orders of magnitude, and R46,000 of separation that includes a change to a maintenance procedure costing nothing at all. <strong>This is how you find out what the redundancy you already paid for is actually worth, before you pay for more of it.</strong> For six villages and a district hospital, the number that matters is not the rand. It is whether the next call gets through. (Working with an AMU facilitator? Bring the failure log for something you have two of and count it together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can measure what fraction of your redundancy is fictional, from your own log.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

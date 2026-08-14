@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My loading history is a jagged line with thousands of different swings and the fatigue curves want one number - how do I turn this mess into a defensible damage figure?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>My loading history is a jagged line with thousands of different swings and the fatigue curves want one number - how do I turn this mess into a defensible damage figure?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are on the gas-compression skid at <strong>Thabazimbi Compression Station</strong>, a clipboard in one hand, your other palm flat on the cold steel shell of a <strong>welded separator vessel</strong>. The vessel is fine today. It passed its last inspection. But it does not sit still - every time the upstream compressor loads and unloads, the internal pressure swings, and the steel breathes with it. A faint, low hum comes through your palm as the machine cycles.</p>
+<p>Your clipboard holds a <strong>pressure log from the last 30 days</strong>: a jagged line that climbs to <strong>95 bar</strong>, drops to <strong>40 bar</strong>, jumps to <strong>70 bar</strong>, settles, climbs again. Thousands of swings, all different sizes, never tidy. The plant manager, <strong>Pieter</strong>, stops next to you, calm but direct: "This skid runs another eight years before the renewal budget. I need to know it lasts - not a feeling, a number."</p>
+<p>And you are stuck at the very first step, which is not the one you expected to be stuck at.</p>
+<p>You know how fatigue works. Every stress swing uses up a little of the steel's life, big swings use up much more than small ones, and there are published curves that say how many swings of a given size a detail can take. The curves want <strong>one number</strong>: a stress range, and how many times it happens.</p>
+<p>Your log is not one number. It is a jagged line with thousands of turning points, no two the same. Somewhere in it are a few big swings that matter enormously and a great many small ones that may matter hardly at all, and there is no obvious place to put a ruler.</p>
+<p>The easy wrong move is sitting right there and it is genuinely tempting: <strong>take the biggest swing, 95 down to 40, assume every cycle is that big, and size the life from that.</strong> It is conservative. It is defensible in a meeting. It is also going to tell you this vessel is finished years before it is, and Pieter will replace good steel because you could not read a jagged line.</p>
+<blockquote><h2>My loading history is a jagged line with thousands of different swings, and the fatigue curves want one number. How do I turn this mess into a defensible damage figure?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Thirty days of jagged pressure log, an eight-year question, and a plant manager who will not accept a feeling. Write down how you would get from that log to a number - your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the five answers, and what each one does with the small swings</summary>
+<div class="reveal-content">
+<p>&bull; <strong>"Use the biggest swing for every cycle."</strong> The one your instinct offers, and it is not merely conservative - it is wrong by a lot. Most of those swings are small and do almost no damage, and treating them as the worst case can under-predict life several times over, which spends real money replacing sound steel.</p>
+<p>&bull; <strong>"Use the average swing."</strong> The mirror error, and far more dangerous. Damage rises steeply with the size of the swing - roughly with its cube - so a few large swings can do more damage than thousands of small ones, and an average buries exactly the swings that matter.</p>
+<p>&bull; <strong>"Count every peak and every valley as a cycle."</strong> Closer, and it double-counts: a small wiggle riding on the way up to a big peak is part of that big swing, not a separate one. Counted naively you will invent damage that is not happening.</p>
+<p>&bull; <strong>"Log for longer - thirty days is not enough."</strong> Sometimes true and it does not answer the question: sixty days of jagged line is the same problem twice as long. The difficulty is not the amount of data, it is that you have no method for turning any amount of it into cycles.</p>
+<p>&bull; <strong>"Put a strain gauge on it and monitor for cracks."</strong> Worth doing and it is a different answer - monitoring tells you when something has already started. Pieter asked whether it lasts eight years, which is a question about the future.</p>
+<p>&bull; What the first five miss is that this is a <strong>solved problem with an agreed answer</strong>. There is a standard way to pair every peak with the valley it belongs to, so that each swing gets counted exactly once at its true size - turning a jagged line into a short table of "so many swings of this size, so many of that". And there is an agreed way to add up what a table like that costs you, given that different-sized swings use up different fractions of the life. Together they turn thirty days of mess into a damage figure per year, which is a number Pieter can hold.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>The site engineer, <strong>Lindiwe</strong>, works the log for that vessel: wall thickness <strong>t = 20 mm</strong>, inside radius <strong>r = 500 mm</strong>. Every number here is worked in front of you.</p>
+<p><strong>Step 1 - Convert the thing you logged into the thing that does the damage.</strong> The log is in bar of pressure; fatigue responds to stress. For a cylindrical shell the hoop stress is pressure x r / t. With r/t = 500/20 = 25, and 1 bar being 0.1 MPa, each bar of pressure gives 0.1 x 25 = <strong>2.5 MPa of hoop stress</strong>. So 95 bar is <strong>237.5 MPa</strong>, 70 bar is <strong>175 MPa</strong>, 40 bar is <strong>100 MPa</strong>. Convert to stress first. If you count cycles in the units you measured and convert afterwards, the answer is only right while the relationship is a straight line - and it very often is not.</p>
+<p><strong>Step 2 - Strip the line down to its turning points.</strong> Everything between a peak and the next valley is just the journey; only the turns matter. A representative stretch of the log reduces to, in MPa: <strong>100, 237.5, 100, 175, 130, 200, 100</strong>. Seven turning points, from what was a dense wiggly trace.</p>
+<p><strong>Step 3 - Pair each peak with the valley it belongs to.</strong> This is the step that has an agreed method, and the reason it needs one is the small swing sitting inside a big one. Look at the run 175, 130, 200: the dip to 130 is a small wiggle on the way up to 200. Counted naively you would record a swing from 175 down to 130 <em>and</em> a swing from 130 up to 200, and you would have invented damage. Counted properly, the pairing gives:</p>
+<ul>
+<li>one <strong>large</strong> cycle, 237.5 down to 100 - a range of <strong>137.5 MPa</strong></li>
+<li>one <strong>medium</strong> cycle, 200 down to 100 - a range of <strong>100 MPa</strong></li>
+<li>one <strong>small</strong> cycle, 175 down to 130 - a range of <strong>45 MPa</strong>, counted once, inside the medium one</li>
+</ul>
+<p>Scaled across the full 30-day log and out to a year, the table reads: <strong>137.5 MPa at 4,000 cycles a year; 100 MPa at 12,000; 45 MPa at 60,000.</strong> That table - sizes and counts, each swing counted once at its true size - is the whole output of the counting step, and it is what every fatigue curve in the world is waiting for.</p>
+<p><strong>Step 4 - Look up what each size costs, and turn it into a fraction.</strong> Now Lindiwe goes to the fatigue curve for this vessel's weld detail and reads off, at each of her three stress ranges, the number of cycles the detail could survive if <em>every</em> cycle were that size. <em>The three figures used below are the ones this worked example runs on - when you do this for your own detail you must read your own curve, and the numbers will be different.</em> Suppose they come back as <strong>940,000</strong> at the largest size, <strong>2,440,000</strong> at the medium, and <strong>120,000,000</strong> at the smallest, which sits low enough on the curve to do very little. Each row's damage is then the cycles you apply divided by the cycles it could survive - the fraction of the life that row uses up:</p>
+<table>
+<tr><th>Stress range</th><th>Cycles a year</th><th>Cycles it could survive</th><th>Fraction of life used per year</th></tr>
+<tr><td>137.5 MPa</td><td>4,000</td><td>940,000</td><td>4,000 / 940,000 = <strong>0.00426</strong></td></tr>
+<tr><td>100 MPa</td><td>12,000</td><td>2,440,000</td><td>12,000 / 2,440,000 = <strong>0.00492</strong></td></tr>
+<tr><td>45 MPa</td><td>60,000</td><td>120,000,000</td><td>60,000 / 120,000,000 = <strong>0.0005</strong></td></tr>
+</table>
+<p><strong>Step 5 - Add the fractions, and read the answer.</strong> This is the part that does not depend on whose curve you read: whatever three figures came back, the arithmetic from here is the same. 0.00426 + 0.00492 + 0.0005 = <strong>0.00968 of the life used every year</strong>. Failure is predicted when the running total reaches 1.0, so the predicted life is 1.0 / 0.00968, about <strong>103 years</strong> - and after the code's factor on life, commonly a divide by 2 or 3 for a weld of this importance, call it <strong>34 to 52 years</strong>. Pieter's eight years is comfortably clear.</p>
+<p>Now look at what the table tells you that a single number never could. <strong>The 60,000 small swings a year - by far the most numerous - contribute 5 per cent of the damage.</strong> The 4,000 largest contribute 44 per cent. Had Lindiwe taken the biggest swing and applied it to all 76,000 cycles a year, the answer would have come out at 12.4 years before the code's factor - and 4 to 6 years after it, below Pieter's eight. The vessel would have been condemned. The counting was not a technicality. It was the difference between a replacement and a renewal budget left alone.</p>
+<p>And the honest caveat that comes with the answer: <strong>this is the life of a sound weld with no known flaw.</strong> It says nothing about a vessel that already has a crack in it, and Lindiwe says so in the same sentence she gives Pieter the number.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Five moves, and the middle one is the one with an agreed method behind it.</p>
+<ul>
+<li><strong>1. Convert what you logged into what does the damage</strong> - pressure, load or displacement into stress - before counting anything.</li>
+<li><strong>2. Reduce the trace to its turning points.</strong></li>
+<li><strong>3. Pair each peak with the valley it belongs to</strong>, so every swing is counted once at its true size.</li>
+<li><strong>4. For each size, divide the cycles applied by the cycles that size could survive</strong> - the fraction of life it uses.</li>
+<li><strong>5. Add the fractions.</strong> One whole life is 1.0; the annual total inverted is the predicted life.</li>
+</ul>
+<p>The counting method in move 3 is <strong>rainflow counting</strong> (set out in ASTM E1049 and BS ISO 12110), and it exists to solve exactly one problem: a small swing riding inside a large one must be counted as a small cycle <em>and</em> must not break the large cycle in half. Its name comes from imagining rain running down the turned-on-its-side trace, and its output is always the same shape - a list of ranges with a count against each. The adding-up in moves 4 and 5 is <strong>Miner's rule</strong> (properly the Palmgren-Miner rule), and it is simple: damage is the sum of the fractions, and one whole life is 1.0.</p>
+<p>They are two halves of one job and neither is any use alone. <strong>Rainflow produces a cycle table that only means something if you are going to sum damage over it; Miner's rule needs a cycle table and cannot make one.</strong> Together they answer a single question - how much life does this messy loading use up in a year - and the answer is a number you can put in front of somebody.</p>
+<p>Two things about that number are worth saying out loud, because they are where it gets misused. <strong>Damage is dominated by the biggest swings, not the most numerous ones</strong>: because the curves fall steeply, a range twice as large does roughly eight times the damage per cycle, which is why 60,000 small cycles contributed 5 per cent above and 4,000 large ones contributed 44. And <strong>Miner's rule is an estimate, not a law of nature</strong> - it takes no account of the order the cycles arrive in, real components sometimes fail at totals well below 1.0 and sometimes survive past it, and that is precisely why codes apply a factor to the resulting life. Treat the output as a defensible engineering prediction, never a guarantee.</p>
+<p>Where it fits: anything under repeated variable loading where you can measure or estimate a history - pressure equipment, structures, vehicles, machine components, cranes, roads. Where it does not: a part loaded once or rarely, where static strength is the right check; a history you do not actually have, where the honest move is to go and measure one rather than assume a shape; and high temperature or a corrosive environment, where the mechanisms change and these curves no longer apply unaltered.</p>
+<p>Three neighbouring questions have their own units, and the first of them supplies a number this method needs. <strong>Where the cycles-to-failure figures in move 4 come from</strong> - why a weld does not follow the curve for plain steel, and why two welds at the same stress can have lives a factor of five apart - is <strong>t-0295</strong>. What to do when an inspection has actually <em>found</em> a crack, at which point this whole calculation stops applying to that component, is <strong>t-0296</strong>. And whether the order the cycles arrive in changes the answer - which is the assumption Miner's rule quietly makes - is <strong>t-0183</strong>.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Work each one before you open its answer. Do the arithmetic on paper - that is the whole point.</p>
+<p><strong>Task 1 - Why not just use the biggest swing?</strong> A colleague proposes: "Take the largest pressure swing, 95 to 40 bar, assume every cycle is that big, and size the life from that." Say why that is wrong, in which direction, and what it would have cost here.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>It applies the worst case to all 76,000 cycles a year when most of them are far smaller and do almost no damage. The error is <strong>pessimistic</strong> - it drastically under-predicts life - and here it produces 12.4 years before the code's factor and 4 to 6 after it, against a real 34 to 52 - so it fails the eight-year question that the vessel comfortably passes, condemning sound steel and spending a renewal budget years early. The correct move is to count the cycles properly and sum the real damage. Keep the worst case as a sanity bound only: if even the worst-case answer clears your horizon, you can stop early and skip the whole exercise.</p>
+</div>
+</details>
+<p><strong>Task 2 - Count the cycles.</strong> A trace reduces to these turning points, in MPa: 50, 200, 120, 160, 80, 220, 50. Which cycles does a proper pairing give, and what is the trap in this particular trace?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>The pairing gives a <strong>large cycle of range 170</strong> (220 down to 50), a <strong>medium cycle of range 150</strong> (200 down to 50)... and here is the trap: the small excursion 120 up to 160 is a wiggle sitting inside the larger movement, so it is counted <strong>once, as a range of 40</strong>, and it does <em>not</em> break the larger swings into pieces. A naive peak-to-valley count would report five or six separate cycles and invent damage that is not happening. Good answers say explicitly that the small cycle is counted <em>and</em> the big one is left whole - that is the entire reason the method exists.</p>
+</div>
+</details>
+<p><strong>Task 3 - Sum the damage.</strong> Counting at a weld gives 150 MPa at 5,000 cycles a year and 80 MPa at 40,000 cycles a year. The curve gives 1,000,000 cycles to failure at 150 MPa and 6,500,000 at 80 MPa. Compute the annual damage and the predicted life, and say which row dominates.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Damage = 5,000/1,000,000 + 40,000/6,500,000 = 0.005 + 0.00615 = <strong>0.01115 a year</strong>. Life = 1.0 / 0.01115 = <strong>about 90 years</strong>, before the code's factor. Neither row dominates here - they are close, 45 per cent and 55 per cent - which is worth noticing: eight times as many cycles at roughly half the stress happen to land in the same place. Good answers also add the caveat: this is a sound weld with no known flaw, and the curve value must be the right one for that detail.</p>
+</div>
+</details>
+<p><strong>Task 4 - Which end of the table would you measure better?</strong> Your logger is imprecise. You can improve the accuracy of either the few large swings or the many small ones, not both. Which, and why?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p><strong>The large ones</strong>, and it is not close. Damage rises with roughly the cube of the range, so a 10 per cent error on the largest swings moves the answer by about a third, while a 10 per cent error on swings contributing 5 per cent of the damage moves it by well under 1 per cent. Good answers name the general rule: measure best where the damage is, and the damage is almost always concentrated in a small number of large cycles - which is also why a logger that clips or misses peaks is far more dangerous than one that is noisy in the middle.</p>
+</div>
+</details>
+<p><strong>Now take a real loading history of your own</strong> - pressure, load, torque, strain, even weighbridge tickets - and work the five moves.</p>
+<p><strong>1.</strong> What did you measure, and what is the conversion to the stress that actually does the damage? Write the conversion out, with its units.</p>
+<p><strong>2.</strong> Reduce your trace to turning points.</p>
+<p><strong>3.</strong> Pair them into cycles - by hand for a short trace, or with a rainflow routine for a long one - and write the table: stress range against cycles per year, one row per size.</p>
+<p><strong>4.</strong> For each row, get the cycles-to-failure for that size from the right curve for your detail, and divide.</p>
+<p><strong>5.</strong> Add the fractions. Invert for the predicted life, apply your code's factor, and compare with the horizon you were asked about. Then look at which rows carried the damage - and say plainly that this is the life of a component with no known flaw.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep the damage figure true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>The worst swing applied to every cycle.</strong> Pessimistic, sometimes by several times, and it condemns sound assets. Use it as a sanity bound - if even that clears your horizon, stop - never as the answer.</p>
+<p>&bull; <strong>An average swing used instead of a table.</strong> The dangerous mirror of the first trap: damage is dominated by the large swings, and averaging buries them. If somebody hands you a single "typical" stress range for a variable duty, ask for the table.</p>
+<p>&bull; <strong>Every peak and valley counted as a cycle.</strong> This invents damage. A small wiggle inside a large movement is one small cycle, and the large movement stays whole - which is exactly what the counting method is for.</p>
+<p>&bull; <strong>Cycles counted in the units you logged.</strong> Convert to stress first. Counting in pressure or load and converting after is safe only while the relationship is linear, and nobody checks.</p>
+<p>&bull; <strong>The wrong curve for the detail.</strong> The whole calculation hangs off the cycles-to-failure figures, and for a welded joint those depend on the detail as much as the stress. Getting the curve wrong moves the answer by a factor, not a percentage.</p>
+<p>&bull; <strong>Small cycles doing implausible damage.</strong> If ranges well down the curve dominate your total, check whether they have been placed above the fatigue limit or the shallower slope below it has been mishandled. Tiny ranges should add tiny damage.</p>
+<p>&bull; <strong>The total treated as a guarantee.</strong> Miner's rule ignores the order the cycles arrive in and real components scatter either side of 1.0. That is what the code's factor is for - apply it, and say you have.</p>
+<p>&bull; <strong>A sound-weld life quoted for a cracked component.</strong> The moment an inspection finds a crack, this number stops describing that component. Say so in the same sentence as the number, every time.</p>
+</div>
+</details>
+<p>You came onto that skid with a jagged pressure log and a plant manager who would not accept a feeling. You can leave with a table and a number: three swing sizes, 4,000 and 12,000 and 60,000 times a year, using up 0.00968 of the vessel's life annually - about 34 to 52 years after the code's factor, against Pieter's eight. <strong>And the useful part is what the table shows that a single number hides: the 60,000 small swings do 5 per cent of the damage and the 4,000 big ones do 44, so the worst-case shortcut lands at 4 to 6 years once the code's factor is applied, and would have condemned this vessel.</strong> Count the cycles properly, sum the fractions, apply the factor, and say plainly that it assumes no crack. (Working with an AMU facilitator? Bring a real loading trace and count its cycles together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can turn a messy loading history into a defensible damage figure.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

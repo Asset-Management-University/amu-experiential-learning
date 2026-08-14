@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The flat line that fell off a cliff</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The flat line that fell off a cliff</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, running the monthly review on the treatment-plant upgrade. The wet commissioning date holds at <strong>week 48</strong>. It held at week 48 last month, and the month before. The room relaxes; commissioning is under control.</p>
+<p>At the next review it moves to week 50. A fortnight, nothing to panic about. At the one after, it jumps to <strong>week 58</strong>. At the next, <strong>week 70</strong>.</p>
+<p>In two reviews the commissioning date has slipped by five months, and when the sponsor asks when it started going wrong, you cannot answer - because on paper it never went wrong until it did. The Gantt chart told you the milestone was on track, right up to the moment it told you it was five months late.</p>
+<blockquote><h2>My schedule reported "on track" for months and then fell off a cliff. What could have told me I was losing control while the date still looked fine?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Here are the commissioning dates as reported at each review: <strong>week 48. Week 48. Week 50.</strong> Then <strong>week 58.</strong> Then <strong>week 70.</strong> In two reviews it has slipped by <strong>five months</strong>, and the sponsor has just asked when it started going wrong. You cannot answer — because on paper it never went wrong until it did. Nobody concealed anything; every one of those reports was honest on the day it was made. Write down what could have told you that you were losing control while the date still looked fine — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what a single date cannot carry</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Review more often.&rdquo;</strong> More frequent readings of the same measure. Weekly reports would have shown you week 48, week 48, week 48, week 48 — the flat stretch in higher resolution, and no earlier warning at all.</p>
+<p>&bull; <strong>&ldquo;Add more detail — track every task, not just milestones.&rdquo;</strong> A hundred task dates carry the same defect a hundred times, and the one signal that matters is now buried where nobody will find it.</p>
+<p>&bull; <strong>&ldquo;Somebody was reporting optimistically.&rdquo;</strong> Possibly, and notice that week 50 was already the truth changing — a fortnight's movement that everybody sensibly waved through as noise. The reporting was not obviously dishonest; it was uninformative.</p>
+<p>&bull; <strong>&ldquo;Build in more float.&rdquo;</strong> Absorbs the first slip and hides it, which is worse — the date stays reassuring for longer, and the cliff arrives later and steeper.</p>
+<p>&bull; <strong>&ldquo;Ask people how confident they are.&rdquo;</strong> Genuinely useful and unrecorded, so it decays into an impression. Confidence asked and not written down cannot be compared with last month's.</p>
+<p>&bull; The instrument reports <strong>a date</strong>, and a date is a single value that is either met or not — it carries <strong>no information about how confident that value is becoming</strong>, so a forecast held up by increasingly optimistic assumptions looks identical to one that is genuinely secure. So record the forecast at every review and <strong>watch how it moves</strong>: the movement is the signal, and the value is not. Look again at your own numbers. 48, 48, 50 — and that third reading is the moment the line began to bend, months before the date became alarming. The question changes from <em>is the date still achievable</em>, which stays comfortably yes until it is catastrophically no, to <strong>at what rate is this date changing</strong>, which has an answer while there is still time to act. Two things keep the chart usable. <strong>Only a handful of milestones belong on it</strong> — the ones a sponsor asks about and downstream work depends on — because a chart carrying everything hides the one line that matters; and if you cannot name those few, that is itself a finding about how well the project is understood. And the recorded forecast has to be <strong>honest at each review</strong>, since the whole instrument depends on somebody writing down a worsening number early.</p>
+</div>
+</details>
+<p>Here is the chart that would have.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the milestone trend chart - choosing the few, recording an honest forecast, reading the slope, applying the rules, and using it to act.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Choose the few milestones the project is actually judged on</div><p class="cb-demo">A MILESTONE TREND CHART IS ONLY AS USEFUL AS IT IS READABLE, AND THE FASTEST WAY TO RUIN ONE IS TO PUT EVERYTHING ON IT. So start by choosing the FEW milestones the project is genuinely judged on - the dates a sponsor would ask about, the ones downstream work depends on, the ones that if they slip, the project has slipped. For a treatment-plant upgrade that is a handful: design complete, long-lead equipment delivered, mechanical completion, WET COMMISSIONING, handover to operations. NOT every task, NOT every internal deadline, NOT the hundred things a schedule contains. FIVE TO EIGHT MILESTONES IS A CHART YOU CAN READ AT A GLANCE; TWENTY IS A PLATE OF SPAGHETTI THAT HIDES THE ONE LINE THAT MATTERS INSIDE NINETEEN THAT DO NOT. A milestone worth tracking has three properties: it is a genuine EVENT with a clear done/not-done test, not a fuzzy stretch of work; it MATTERS, in that its slipping changes something a decision-maker cares about; and it is FAR ENOUGH APART from its neighbours that the lines do not tangle. The discipline of choosing is itself part of the value: if you cannot name the eight milestones the project lives or dies by, you do not yet understand the project well enough to control it, and the chart has done you a service before you have plotted a single point. Remember what this chart is FOR - it is a reporting and forecasting instrument that reads the output of your schedule; it does not build the schedule or sequence the work, which is a different discipline entirely. It watches the dates your schedule produces and tells you which way they are moving.</p></div><div class="canvas-box"><div class="cb-label">2. At every review, record a fresh honest forecast - not last time&#039;s number defended</div><p class="cb-demo">AT EVERY REVIEW - and pick a fixed cadence, every four weeks at Corathyl - YOU RECORD, FOR EACH TRACKED MILESTONE, YOUR HONEST CURRENT FORECAST OF WHEN IT WILL ACTUALLY FINISH. This is the whole discipline of the technique and it is harder than it sounds, because the pull at every review is to CARRY LAST PERIOD&#039;S NUMBER FORWARD. The milestone was week 48 last month, nothing dramatic has obviously happened, so it is still week 48 - and that reflex, repeated, is exactly how a chart lies while every individual entry feels reasonable. THE FORECAST IS NOT &#039;THE DATE WE COMMITTED TO&#039;. IT IS &#039;THE DATE I NOW BELIEVE, GIVEN EVERYTHING I KNOW TODAY&#039;. Those two numbers drift apart the moment the work starts, and the gap between them is the single most valuable thing the chart will ever show you. So force the question every period, for every milestone: KNOWING WHAT I KNOW NOW - the work done, the work remaining, the problems found, the resources I actually have - IS THIS DATE STILL REAL? If two of the five design packages are late and commissioning depends on all five, the commissioning forecast has moved, whether or not anyone has said so out loud. Write the number you believe, not the number you promised, because THE CHART IS ONLY AS HONEST AS THIS STEP, and a chart built from defended commitments is a chart of your hopes, plotted precisely, and worth nothing. It is a note-to-self across time, and its only reader who matters is the version of you at the next review who needs to know whether last month&#039;s confidence was warranted.</p></div><div class="canvas-box"><div class="cb-label">3. Plot it, and read the SLOPE - not the point</div><p class="cb-demo">NOW PLOT IT, AND LEARN TO READ THE ONE THING IT IS FOR. THE HORIZONTAL AXIS IS THE REVIEW DATE - when you looked. THE VERTICAL AXIS IS THE FORECAST FINISH DATE - what you saw. Each milestone becomes a line traced left to right across the reviews, and THE SLOPE OF THAT LINE IS THE ENTIRE MESSAGE. A FLAT, HORIZONTAL LINE means the forecast is holding review after review - ON TRACK. A LINE RISING toward later dates means the forecast keeps moving out - SLIPPING. A LINE FALLING toward earlier dates means it is coming back - RECOVERING, genuinely ahead. There is a diagonal running across the chart where the forecast date equals the review date - that diagonal is NOW, and a milestone is DONE at the moment its line touches it. YOU ARE NOT READING A DATE OFF THIS CHART. YOU ARE READING A RATE - how fast the finish is moving relative to you - and that is why it sees things a Gantt chart cannot. AND HERE IS THE NUMBER THAT MATTERS MOST: THE SLOPE OF ONE. A line rising at forty-five degrees means that for every week that passes, the forecast finish moves out by exactly one week. THAT IS NOT SLOW PROGRESS TOWARD THE FINISH. IT IS ZERO PROGRESS TOWARD THE FINISH. The milestone is running away from you at precisely the speed of time, and you are no nearer to it than you were a month ago - you are on a treadmill, and the date at the end is not getting closer, it is walking backward as fast as you walk forward. A slope steeper than one is worse still: the finish is receding FASTER than time passes, which happens when the work keeps growing as you dig into it, and until that slope drops below one the finish date is getting further away, not nearer, no matter how hard anyone is working.</p></div><div class="canvas-box"><div class="cb-label">4. Apply the decision rules - and treat a flat line during hard work as a question</div><p class="cb-demo">THE CHART EARNS ITS KEEP THROUGH A FEW HARD DECISION RULES THAT TURN A PICTURE INTO AN ACTION. FIRST, THE THREE-PERIOD RULE: THREE CONSECUTIVE REVIEWS OF UPWARD MOVEMENT ON ANY MILESTONE TRIGGER AN IMMEDIATE RESPONSE - investigate the root cause, assess the impact on everything downstream, and bring OPTIONS to the sponsor. Not a fourth review to be sure; three, because WAITING FOR THE FOURTH PERIOD IS HOW A TWO-WEEK SLIP BECOMES A SIX-WEEK ONE. SECOND, THE SLOPE RULE: any leg steeper than one means the milestone is receding faster than you are chasing it, and the honest report is not &#039;we are a bit behind&#039; but &#039;we are losing ground and will keep losing it until something changes&#039;. THIRD, AND THIS IS THE ONE THE TECHNIQUE EXISTS FOR: A SUSPICIOUSLY PERFECT FLAT LINE DURING HARD, UNCERTAIN WORK IS A QUESTION, NOT A COMFORT. At Corathyl the wet commissioning forecast sat exactly on week 48 for three reviews running while the design packages behind it were quietly running late, and everyone read the flat line as health. Then it moved to week 50, then week 58, then week 70 - and the last leg was a slope of THREE, three weeks of delay added for every week that passed. Across the whole period it slipped 22 weeks in 20 weeks elapsed, an average slope above one. THE FLAT PART WAS NOT PROGRESS. IT WAS A FORECAST NOBODY UPDATED. THE CHART EXPOSES PATTERNS, NOT MOTIVES: A FLAT LINE THAT PROVES FALSE IS A SIGN OF UNEXAMINED OPTIMISM OR A FORECAST NOT UPDATED. IT IS A PROMPT TO ASK, &#039;IS THIS FORECAST STILL REAL?&#039;, NOT TO ACCUSE. THE GOAL IS SHARED UNDERSTANDING, EARLY. Sometimes a genuinely flat line is then hit by a real, unforeseeable problem - that is bad luck, not bad faith, and the chart cannot tell you which. What it can do is make you ASK, every period, before the cliff, whether the flatness is earned.</p></div><div class="canvas-box"><div class="cb-label">5. Use it to drive early action and honest forecasting - not just to report</div><p class="cb-demo">THE CHART IS NOT THE DELIVERABLE. THE EARLY CONVERSATION IS. A milestone trend chart that is drawn, filed and reported without changing a single decision has cost you effort and bought you nothing - its entire value is that it forces the hard conversation FOUR MONTHS EARLIER than a Gantt chart would, while there is still room to act. Compare the two Corathyl milestones. The flat-then-cliff one ambushed everyone at review 4 with almost no warning and little time to respond. But a second milestone that started slipping at a steady slope from review 0 - rising honestly the whole way - ended up just as late, AND YET IT WAS MANAGEABLE, because everyone saw it coming from the first month, the options were on the table early, and nobody was ambushed. THE HONEST RISING LINE, THOUGH IT LOOKS WORSE, IS BETTER NEWS IN ONE CRUCIAL SENSE THAN THE FLAT LINE THAT ISN&#039;T TRUE: it buys the one thing a project in trouble cannot make more of: time to act. So use the chart to trigger action, not to decorate a status report. AND USE IT ON YOURSELF FIRST. Before it is a report to your sponsor, it is a MIRROR FOR YOUR OWN FORECASTING - a record of how often your confident flat lines turned out to be real and how often they fell off a cliff, which is the only honest way to learn whether your own optimism can be trusted. A project manager who reviews their own past charts and sees a pattern of flat-then-cliff has learned something no training course could teach them: that their instinct to hold a date steady is exactly the instinct to distrust. The chart is a tool for surfacing the truth early, together - not a stick for finding someone to blame once the date is already lost.</p></div></div>
+
+<p>Box 3 is where you learn to read a rate instead of a date. Box 4 is the pattern the whole technique exists to catch. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A milestone trend chart shows you the rate at which the future is moving away from you - whether you are gaining control or just running in place.</strong> Five questions:</p>
+<ul>
+<li><strong>Which milestones?</strong> <strong>The few the project is judged on</strong> - genuine events, that matter, far enough apart not to tangle. Five to eight, not twenty.</li>
+<li><strong>What do I record each period?</strong> <strong>A fresh, honest forecast</strong> - the date you now believe, not the date you promised. The chart is only as honest as this step.</li>
+<li><strong>What do I read?</strong> <strong>The slope, not the point.</strong> Flat is on track, rising is slipping, falling is recovering. The diagonal is now.</li>
+<li><strong>When do I act?</strong> <strong>Three rising periods trigger a response; slope above one means it is receding faster than you chase it; a perfect flat line during hard work is a question.</strong></li>
+<li><strong>What is it for?</strong> <strong>To force the early conversation and to mirror your own optimism</strong> - not to decorate a status report.</li>
+</ul>
+<p><strong>The arithmetic of a line that looked perfect until it wasn't.</strong> Reviewing every four weeks, the wet commissioning forecast reads: week 48, 48, 48, 50, 58, 70. The slopes between reviews are <strong>0, 0, 0.5, 2.0, and 3.0</strong>. Flat for three reviews - the picture of health - then rising, with the last leg at <strong>slope 3: three weeks of delay added for every week that passes</strong>. Over the whole period the forecast moved from week 48 to week 70 - <strong>22 weeks of slip across 20 weeks elapsed, an average slope of 1.1</strong>. And 1.1 is the quiet alarm: a slope above one means the finish is receding <em>faster</em> than you are chasing it, and until the slope drops below one the date is getting further away, not closer, no matter how hard anyone works.</p>
+<p><strong>Why slope one is the number to feel in your stomach.</strong> A line rising at forty-five degrees means that for every week that passes, the forecast finish moves out by exactly one week. <em>That is not slow progress toward the finish. It is zero progress toward the finish.</em> The milestone is running away from you at precisely the speed of time - you are on a treadmill, and the date at the end is walking backward as fast as you walk forward. People read a steadily-rising line as "we are getting there slowly". They are not getting there at all. And the opposite pattern is the more dangerous one: the <strong>flat-then-cliff</strong>. A line held perfectly flat for months, then plunging in one step. That flatness was not progress - it was, at Corathyl, a forecast nobody updated while the design packages behind it quietly ran late. <em>The chart exposes patterns, not motives. A flat line that proves false is a sign of unexamined optimism or a forecast not updated. It is a prompt to ask "is this forecast still real?", not to accuse.</em> Sometimes a genuinely flat line is then hit by a real, unforeseeable problem - that is bad luck, not bad faith, and the chart cannot tell you which. What it can do is make you ask the question every period, before the cliff.</p>
+<p><strong>Why the honest bad news beats the flat line that isn't true.</strong> Picture two milestones ending equally late. One rose at a steady slope from the very first review - visibly, honestly, month after month. The other sat flat and then fell off a cliff at review four. The rising one was <em>manageable</em>, because everyone saw it coming from week four and the options were on the table early. The flat one ambushed everyone with four fewer months to act. So the honest rising line, though it looks worse, is better news in one crucial sense - it buys the one thing a project in trouble cannot manufacture: time.</p>
+<p>One honest boundary. You report and forecast honestly; you do not deliver the project, and the chart does not recover the schedule. <em>It only tells you the truth early enough to do something about it.</em> And it reads the dates your schedule produces - it does not build the schedule or sequence the work, which is a different discipline.</p>
+<p>Does it scale? Anyone watching a fuel gauge knows the difference between how much is in the tank and how fast it is falling. The level tells you where you are; the rate tells you whether you will make it. A milestone trend chart is the rate gauge for a deadline, and most projects fly with only the level.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is a milestone trend chart at review 5, with two milestones on it. You have to advise the sponsor which one to worry about.</p>
+<table>
+<tr><th>Review (every 4 weeks)</th><th>Milestone A forecast (week)</th><th>Milestone B forecast (week)</th></tr>
+<tr><td>Review 0</td><td>60</td><td>44</td></tr>
+<tr><td>Review 1</td><td>64</td><td>44</td></tr>
+<tr><td>Review 2</td><td>68</td><td>44</td></tr>
+<tr><td>Review 3</td><td>72</td><td>44</td></tr>
+<tr><td>Review 4</td><td>76</td><td>44</td></tr>
+<tr><td>Review 5</td><td>80</td><td>47</td></tr>
+<tr><th>On the chart</th><td>A steady rising line, every review</td><td>Flat for five reviews, then a small first rise</td></tr>
+</table>
+<p>Milestone A has slipped 20 weeks and looks alarming. Milestone B has slipped 3 weeks and looks nearly fine. The project manager wants to pour everyone onto A.</p>
+<ol>
+<li><strong>Read the slopes.</strong> What is A's slope, and what is B's, before and at review 5?</li>
+<li><strong>Which should worry you more, and why?</strong> Commit to one.</li>
+<li><strong>The trap.</strong> What is the story A is telling, and why is it, in an important sense, the safer of the two?</li>
+<li><strong>The question for B.</strong> You have five flat reviews and one small rise. What single question do you ask, and of whom?</li>
+<li><strong>The recommendation.</strong> What do you actually tell the sponsor to do about each?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the slopes. A rises at a steady <strong>slope of 1</strong> - four weeks of slip per four weeks elapsed, which is zero real progress but <em>completely visible</em>. B ran at slope 0 for five reviews and has just posted its <strong>first rise</strong>, a slope of about 0.75 in the last leg.</p>
+<p>Second and third, the answer that matters: <strong>B should worry you more</strong>, and a learner who piles everyone onto A has been fooled by the level. A is bad news you already understand - it has been telling the truth loudly since review 0, everyone has had five months to plan around it, and its trajectory is known. B has just done the one thing the flat-then-cliff milestone does: <em>it broke a long, suspicious flatness</em>. Its five flat reviews were either genuine stability or a forecast nobody updated, and <strong>you cannot yet tell which</strong> - which means its true trajectory is unknown and potentially far worse than the small rise suggests. The known 20-week slip on A is less dangerous than the unknown behind B's first crack.</p>
+<p>Fourth, the actions differ in kind. For A you do not investigate <em>whether</em> there is a problem - you know there is - you bring recovery options or a re-baselining to the sponsor. For B you ask one question, of the person who owns that milestone: <em>"was that flat line real, and is the week-47 number your honest forecast today, or last period's number with three weeks added on?"</em> If the answer is confident and evidenced, B may be fine. If it is a shrug, B is your real problem, and you have caught it one review into its slide instead of four.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-choose_the_few_milestones">1. Choose the few milestones the project is actually judged on</label><textarea id="cb-choose_the_few_milestones" data-key="t-0200:choose_the_few_milestones" placeholder="Not every task. The handful of dates whose slipping would matter to the sponsor. Too many lines and the chart becomes an unreadable thicket."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-record_the_honest_current_forecast">2. At every review, record a fresh honest forecast - not last time&#039;s number defended</label><textarea id="cb-record_the_honest_current_forecast" data-key="t-0200:record_the_honest_current_forecast" placeholder="Each period, for each milestone, write down your genuine best current estimate of its completion date. The chart is only as honest as this one step."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-plot_and_read_the_slope">3. Plot it, and read the SLOPE - not the point</label><textarea id="cb-plot_and_read_the_slope" data-key="t-0200:plot_and_read_the_slope" placeholder="Review date across the bottom, forecast date up the side. Trace each milestone. The slope of its line is the message: flat is on track, rising is slipping, falling is recovering."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-apply_the_decision_rules">4. Apply the decision rules - and treat a flat line during hard work as a question</label><textarea id="cb-apply_the_decision_rules" data-key="t-0200:apply_the_decision_rules" placeholder="Three consecutive rising periods trigger action. A slope above one means it is receding faster than you chase it. And a suspiciously perfect flat line is a question, not a comfort."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-use_it_to_act_and_to_stay_honest">5. Use it to drive early action and honest forecasting - not just to report</label><textarea id="cb-use_it_to_act_and_to_stay_honest" data-key="t-0200:use_it_to_act_and_to_stay_honest" placeholder="The chart&#039;s value is that it forces an early conversation and makes optimism visible. It is a mirror for your own forecasting first, and a report to others second."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now read a project's health as a rate, not a date.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The milestone that hurts you most is rarely the one that looks worst.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Tracking too many milestones.</strong> Twenty lines is a plate of spaghetti that hides the one that matters. Five to eight the project is genuinely judged on.</p>
+<p>&bull; <strong>Carrying last period's forecast forward.</strong> The reflex to leave a number unchanged because nothing obvious happened is exactly how a chart lies while every entry feels reasonable.</p>
+<p>&bull; <strong>Reading the level instead of the slope.</strong> The chart's whole power is the rate. A high number that is now flat is recovering; a low number that just started rising may be about to run.</p>
+<p>&bull; <strong>Treating a flat line as health during hard work.</strong> Perfect flatness in the middle of an uncertain build is a question - "is this forecast still real?" - not a comfort.</p>
+<p>&bull; <strong>Waiting past three rising periods.</strong> Three consecutive rises is the trigger. The fourth review is how a two-week slip becomes a six-week one.</p>
+<p>&bull; <strong>Reading a forty-five-degree line as slow progress.</strong> Slope one is zero progress toward the finish. The date is receding as fast as you approach it.</p>
+<p>&bull; <strong>Using the chart only to report upward.</strong> A chart that is drawn and filed without changing a decision cost effort and bought nothing. Its value is the early conversation.</p>
+<p>&bull; <strong>Reading the pattern as blame.</strong> The chart exposes patterns, not motives. A false flat line is a prompt to ask, not to accuse - and sometimes it is genuine bad luck, which the chart cannot distinguish from anything else.</p>
+</div>
+</details>
+<p>Onalenna watched a date hold at week 48 for three reviews and then fall five months in two. Choose the few milestones the project is truly judged on; record a fresh, honest forecast for each at every review, the date you believe rather than the date you promised, because the chart is only as honest as that one step; plot them and read the slope rather than the point, remembering that a forty-five-degree rise is not slow progress but zero progress; apply the rules - three rising periods triggers action, a slope above one means you are losing ground, and a suspiciously perfect flat line during hard work is a question and not a comfort; and use the chart to force the early conversation and to hold a mirror to your own optimism, never to decorate a report or to assign blame. <strong>A Gantt chart tells you a milestone is late. A milestone trend chart tells you whether you are gaining or losing control - and it tells you months earlier, while you can still do something about it.</strong> Take one milestone on a project you know and write down what its forecast date has been at each of the last few reviews. If the number never moved, ask whether the work really stood still - or whether nobody updated the number.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can run a milestone trend analysis now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

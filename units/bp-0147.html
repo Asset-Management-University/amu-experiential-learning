@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>We did thousands of inspections and followed the plan, yet the failure came from a spot nobody ever looked at - how do I stop inspecting the easy places and start finding the real degradation?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>We did thousands of inspections and followed the plan, yet the failure came from a spot nobody ever looked at - how do I stop inspecting the easy places and start finding the real degradation?</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Felt Problem</h2>
+<p>You are Zanenkosi, an integrity engineer at a large fuel storage terminal - miles of pipelines and dozens of big tanks. The phone rings, and your gut goes cold before you answer. It is the shift supervisor from the North Zone: "we've got a weep on the old transfer line, PL-1138. Not a gusher, but steady."</p>
+<p>You pull up the asset register. PL-1138 - a section of it is a "dead-leg", a capped-off spur from an old project, tucked behind a tangle of active pipes, still wrapped in its original, now-weathered insulation. No fuel has flowed through it in a decade.</p>
+<p>On your other screen is the inspection dashboard: green ticks, hundreds of them. For two years your team has been diligent - walked the main pipe racks, visually checked the clean, accessible lines, taken thickness readings at the designated easy-to-reach points. Your compliance score is 98 percent; your desk holds a thick folder of completed checklists. Then the supervisor's voice cuts in: "the thing is, it's leaking from the bottom, right underneath. No one's looked under there in years. It was never on the list." A leak like that threatens your colleagues, the neighbours and the ground, and could cost millions in lost product, clean-up and fines.</p>
+<blockquote><h2>We did thousands of inspections and followed the plan, yet the failure came from a spot nobody ever looked at - how do I stop inspecting the easy places and start finding the real degradation?</h2></blockquote>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>Your first instinct is to react with more of the same. <strong>"Inspect more often"</strong> - you propose halving every interval, looking every three months instead of six. But that just doubles the cost of looking in the same easy, low-risk places: you are polishing the shiny parts of the car twice as often while the chassis rusts through underneath, unseen - more work, not more insight. <strong>"The old plan was wrong, I'll make a new one"</strong> - so you build a fresh master schedule, but on the same logic: access platforms, clear walkways, designated points. You are re-arranging the search under the same streetlight, trusting an inherited map that was itself built for convenience, not for finding corrosion. <strong>"Inspect everything, everywhere"</strong> - in frustration you suggest stripping all insulation and sensoring every inch; the manager gently shows you the estimate: twenty years and bankruptcy, and you would drown the one critical spot of wall-loss in a sea of data.</p>
+<p>Doing more of the wrong thing is pointless, trusting the old way is what caused this, and doing everything is impossible. So before you read on: the real question is not how MUCH you inspect - it is how you decide WHERE to look at all. How?</p>
+<div class="yardstick-prompt"><label for="yardstick-m2">A quick prediction first: more-often, a new same-logic plan and inspect-everything all failed. Name what should decide WHERE you look, and one hard-to-reach place you would inspect that the easy calendar skips.</label><textarea id="yardstick-m2" placeholder="e.g., the looking should be driven by..., not the calendar; so I would inspect..."></textarea></div>
+<div class="scratchpad"><label for="scratchpad-m2">My working</label><textarea id="scratchpad-m2" placeholder="Map how it really fails? Look where it fails even if hard? Interval by risk? Right method for the mechanism? Close the loop?"></textarea></div>
+<div class="hintbox" data-n="3" data-label-0="I&#039;m stuck - help me think" data-label-1="Another nudge" data-label-2="The clearest way to see it"><button type="button" class="hintbtn" onclick="amuHint(this)">I&#039;m stuck - help me think</button><div class="hintlayers" aria-live="polite"><div class="hint" hidden>I am an integrity engineer at a large fuel storage terminal - miles of pipelines, dozens of big tanks. The shift supervisor calls: a steady weep on an old transfer line, PL-1138, from a capped-off 'dead-leg' tucked behind active pipes, still in its weathered original insulation, no flow in a decade. On my dashboard: hundreds of green ticks. For two years my team has been diligent - walked the main pipe racks, visually checked the clean accessible lines, taken thickness readings at the designated easy-to-reach points; our compliance score is 98 percent and my desk has a thick folder of completed checklists. And the supervisor says: 'it is leaking from the bottom, right underneath - no one has looked under there in years, it was never on the list.' A leak like that risks my colleagues, the neighbours and the ground, and could cost millions in lost product, clean-up and fines. I did thousands of checks, I followed the plan, I inspected everything on the calendar - so why does it feel like I saw nothing at all?</div><div class="hint" hidden>INSPECTING MORE OFTEN (halve every interval) just doubles the cost of looking in the same easy, low-risk places - polishing the shiny parts of the car twice as often while the chassis rusts through underneath; more work, not more insight. MAKING A NEW SCHEDULE on the same logic (access platforms, clear walkways, designated points) is re-arranging the search under the same streetlight - the inherited plan was built for convenience, not for finding corrosion. INSPECT EVERYTHING EVERYWHERE (strip all insulation, sensor every inch) would take twenty years and bankrupt us, and drown the one critical spot of wall-loss in a sea of data. So the question is not how MUCH I inspect - it is how I decide WHERE to look at all.</div><div class="hint" hidden>Stop thinking about your inspection schedule and start thinking about rust, fatigue and erosion - let the DEGRADATION drive the inspection, not the calendar or the walkway. It is the streetlight effect: you searched under the lamp because the light was better, but the keys were dropped in the dark. Five moves: (1) UNDERSTAND HOW IT FAILS - map the real degradation mechanisms and where they act (corrosion under insulation on warm wet pipes, pitting in stagnant dead-legs, corrosion on tank floors over damp foundations). (2) INSPECT WHERE IT FAILS, even if hard to reach - cut windows in insulation, crawl the tank floor - not just the easy racks. (3) SET INTERVALS BY RISK - rate of degradation x consequence: a low-pressure contained line maybe every ten years, a high-pressure line near the boundary every twenty-four months - not one calendar for all. (4) USE THE RIGHT METHOD for the mechanism - ultrasonic for hidden wall-loss, radiography for weld cracks; a visual walk-round cannot find internal loss. (5) CLOSE THE LOOP - feed what you find (and don't) back to refine where/when/how you look, and into root cause (bp-0134). Coverage of the convenient is not coverage of the critical: point the torch where the darkness is.</div></div></div>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">I've worked it out - show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>The breakthrough comes when you stop thinking about your inspection schedule and start thinking about rust, fatigue and erosion. You must let the DEGRADATION drive the inspection, not the calendar or the walkway. You were searching under the streetlight because the light was better - but the keys were dropped in the dark, fifty metres away. Five moves:</p>
+<ul><li><strong>Understand how it actually fails:</strong> the breakthrough is to stop thinking about your inspection schedule and start thinking about rust, fatigue and erosion - the actual ways this asset dies. Before you decide where to look, map the real degradation mechanisms at work and WHERE each one acts: corrosion under insulation on warm, wet pipes; pitting where water sits stagnant in a dead-leg; accelerated corrosion on a tank floor resting on a damp foundation. An inspection plan that does not start from how the asset fails is just a tour of the accessible - it can be 98 percent complete and still blind to the one spot that matters. Let the failure mechanism, not the walkway, tell you where the risk lives.</li><li><strong>Inspect where it fails, not where it is easy:</strong> this is the move that breaks the streetlight habit: go to where the degradation IS, even when it is awkward, dirty and hard to reach, and stop spending your effort where the looking is merely convenient. That means roping up to cut inspection windows in the insulation on high lines, sending a crawler across the annular plate of a tank floor, getting into the dead-leg behind the pipe rack - the dark corners where water pools and corrosion thrives. The easy, clean, accessible points were chosen because they are easy, not because they are where the asset is dying. Coverage of the convenient is not coverage of the critical - point the torch where the darkness is.</li><li><strong>Set the interval by risk, not one calendar:</strong> a single calendar interval for everything guarantees you look too often at the harmless and too rarely at the dangerous. Set each interval by the RATE of degradation times the CONSEQUENCE of failure: a low-pressure diesel line in a bunded, contained area might safely wait ten years; a high-pressure petrol line near the site boundary, where a failure threatens people and the neighbourhood, gets looked at every twenty-four months. This is risk-based inspection, and it is the same focus-on-the-vital-few discipline as bp-0158 - concentrate your scarce inspection effort where a failure would do the most harm and where degradation moves fastest, and stop spending it evenly on things that do not need it.</li><li><strong>Use the right method for the mechanism:</strong> the tool must match the failure, or you will look straight at the problem and not see it. A visual walk-round cannot find wall-loss happening on the inside of a pipe; corrosion under insulation is invisible until the insulation comes off or the right technique sees through it; a crack inside a weld needs radiography or advanced ultrasonics, not an eyeball. So choose the method for the mechanism you mapped: ultrasonic thickness for internal wall-loss, radiography for weld cracks, the crawler for the tank floor. This is the partner of bp-0100 (trust the reading) and bp-0096 (get a signal at all) - here the discipline is making sure the signal you take is actually capable of revealing the degradation you are hunting.</li><li><strong>Close the loop - make the plan learn:</strong> the plan must become a living, intelligent system, not a fixed list. Feed what every inspection finds - and what it does NOT find - straight back into where, when and how you look next: discover corrosion under insulation on one pipe elbow and you immediately schedule checks on all similar elbows across the terminal; find a tank floor cleaner than expected and you can safely extend its next interval and spend that effort elsewhere; and feed every finding into root-cause work (bp-0134) so you attack the mechanism, not just the spot. Confidence then rests not on a thick folder of completed checklists but on actually knowing the condition of your assets - especially in the places you never used to look.</li></ul>
+<p>See it transform Zanenkosi's programme. He maps the real mechanisms - corrosion under insulation on warm wet pipes, pitting in stagnant dead-legs, corrosion on tank floors over damp foundations - and sends the team where those live: roped up cutting windows in insulation, a crawler across the tank floor, into the dead-leg behind the rack. Intervals are reset by risk - a contained low-pressure diesel line every ten years, a high-pressure petrol line near the boundary every twenty-four months - and the method is matched to the mechanism: ultrasonic for hidden wall-loss, radiography for weld cracks. Every finding feeds the plan: corrosion on one elbow triggers checks on all similar elbows; a cleaner-than-expected tank floor earns a longer interval. The team does FEWER inspections now, but each is targeted and meaningful, and confidence rests on knowing the true condition of the assets - especially where they never used to look. <strong>An inspection only earns its keep where the asset is actually degrading. Stop counting the easy inspections and start targeting the critical ones: understand how the asset really fails, look where it fails even when that is hard, set each interval by the rate of degradation and the consequence rather than one calendar, match the method to the mechanism, and feed every finding back so the plan learns. Coverage of the convenient is not coverage of the critical - point the torch where the darkness is, not just where the light is good.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You already know how to do this - think about looking after your own house.</p>
+<details><summary>See degradation-led checking at home</summary>
+<div class="reveal-content">
+<p>A calendar-based approach walks through the living room on the first of every month and declares the house "inspected" - it is easy, and the room always looks fine. A degradation-led approach is completely different: you do not check the living-room wall, you check where trouble actually starts.</p>
+<p>&bull; the sealant around the shower, where water gets in and causes damp;<br>
+&bull; the wooden fence posts right at ground level, where they rot;<br>
+&bull; the attic after a heavy storm, to catch a new leak;<br>
+&bull; the back of the kitchen cupboard where the plumbing runs, for a slow drip.</p>
+<p>You look in the dark, awkward, hard-to-reach places, because that is where a house actually "fails". You are not inspecting for comfort - you are hunting for problems before they grow.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>Look at your own inspection, audit or quality-check programmes. Where are you looking under the streetlight - diligently checking what is easy while the real degradation happens in the dark? Stop celebrating the thick folder of completed, low-value checks and start building real confidence.</p>
+<ol>
+<li><strong>Map the failure.</strong> Ask your team: "if this asset fails, what are the three most likely ways, and where?" Forget the current plan - find where the rust, wear or fatigue actually occurs.</li>
+<li><strong>Find the dark spot.</strong> Name one inspection you do purely because it is easy and on a schedule, and one high-risk area you do NOT inspect because it is difficult or hard to access - and swap the former for the latter.</li>
+<li><strong>Challenge the calendar.</strong> Take one one-size-fits-all interval and ask: "does everything here really degrade at the same speed and carry the same risk?"</li>
+<li><strong>Match the method.</strong> Ask: "are we using the right tool - or trying to find internal corrosion with a visual check, or check critical data by glancing at a summary?"</li>
+</ol>
+<div class="goal-setter"><label for="learner-goal-text">An inspection, audit or quality-check programme where you may be looking under the streetlight - diligently checking the easy while the real degradation happens in the dark (equipment, a process, data quality, even your own health):</label><input type="text" id="learner-goal-text" class="goal-text" placeholder=""><label for="learner-goal-amount">Stop celebrating the thick folder of completed, low-value checks and start building real confidence. Map the failure: ask your team 'if this asset fails, what are the three most likely ways it will happen, and where?' - forget the current plan and find where the rust, wear or fatigue actually occurs. Find the dark spot: name one inspection you do purely because it is easy and on a schedule, and one high-risk area you do NOT inspect because it is difficult or hard to access - and swap the former for the latter. Challenge the calendar: take one one-size-fits-all interval and ask 'does everything here really degrade at the same speed and carry the same risk?' Match the method: ask 'are we using the right tool, or trying to find internal corrosion with a visual check?' Then close the loop so every finding refines the next look. An inspection only earns its keep where the asset is actually degrading - coverage of the convenient is not coverage of the critical, so point the torch where the darkness is, not just where the light is good.</label><div class="input-group"><span class="currency-symbol">R</span><input type="number" id="learner-goal-amount" placeholder="1" onchange="updateLearnerGoal()"></div></div>
+<p>Name your streetlight inspection, the dark spot you would swap it for, and how you would match the method to that failure. (Working with an AMU facilitator? Map the degradation mechanisms of one asset and redesign its inspection around them together.)</p>
+<p>This was never about a lazy or careless team - yours did thousands of honest checks and followed the plan they were given; the plan itself pointed them at the light, not the danger. Moving from calendar-based to degradation-led inspection is a move from the false comfort of being busy to the real confidence of being effective - and from protecting a compliance score to protecting the people, the neighbours and the ground that a hidden failure would harm. It is how you finally start looking for your keys where you actually dropped them.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

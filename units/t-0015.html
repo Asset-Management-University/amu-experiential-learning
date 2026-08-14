@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My single-physics model said the bearing was fine at 71 degrees; it hit 94 and we tripped the pump at peak, leaving two towns short of water. How do I build a model I can bet a town&#039;s water on - one that tells me what it knows and what it does not?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>My single-physics model said the bearing was fine at 71 degrees; it hit 94 and we tripped the pump at peak, leaving two towns short of water. How do I build a model I can bet a town&#039;s water on - one that tells me what it knows and what it does not?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is 06:40 on the pump-house floor at <strong>Kgwadi Water Utility</strong>, a small Highveld town, and the morning lift has started. In front of you is <strong>High-Lift Pump 3</strong> - a 2.4 MW vertical pump pushing 1,100 litres a second up 180 metres to the reservoir that feeds three towns. On a steel bench is a laptop running a single-physics model a contractor built two years ago: it predicts bearing temperature from flow and speed alone.</p>
+<p>The plant manager, <strong>Realeboga</strong>, stands next to you, arms folded. "Last Tuesday," she says, "your model told me the bearing was fine at 71 degrees. The real bearing hit 94. We tripped the pump at peak demand. Two towns went short on water for five hours." You can smell the warm oil off the gland housing, and under your hand the casing hums at a pitch you have learned to distrust.</p>
+<p>You check the numbers. The old model used <em>one</em> physics: heat from friction. But the real bearing temperature depends on flow, on the cooling-water loop, on the vibration that climbs as the impeller wears, and on the metal expanding as it heats - things that push and pull on each other, which a single-physics model can never see. And worse: even when it is close, it gives a single number, 71, with no honest band around it. So you cannot tell Realeboga whether the truth is "71, give or take 2" or "71, give or take 25".</p>
+<p>She has a <strong>R3.1 million</strong> budget line for an asset-decision system, and she will sign it to you or to an outside vendor. "I need a model I can bet a town's water on. One that tells me what it knows, and what it does not know. Can you build me that, or not?"</p>
+<blockquote><h2>I need to build a twin that joins several physics together, corrects itself against the real pump's data, and reports its own uncertainty - so that when it gives a number, I know exactly how much to trust it.</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The existing model says Pump 3&rsquo;s bearing will reach <strong>71&nbsp;&deg;C</strong>. Nobody can tell Realeboga whether that means 71 give or take 2, or 71 give or take 25 — and the decision resting on it is whether to shed load half an hour early or trip at peak. The pump has worn: vibration is <strong>4.1&nbsp;mm/s</strong> against 2.6 when new. Every 10&nbsp;&deg;C of rise closes the shaft clearance by about <strong>12&nbsp;&micro;m</strong>, which raises friction, which raises heat. There is <strong>R3.1&nbsp;million</strong> on the table. Write down what you would build, and what would make its number worth betting a town&rsquo;s water on — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and which part of &ldquo;71&rdquo; she is actually buying</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Build a more detailed physics model.&rdquo;</strong> Detail and trust are different things. A very precise model that never meets the real pump can be confidently wrong, and however fine it gets it still will not tell anybody how much to rely on it.</p>
+<p>&bull; <strong>&ldquo;Train a model on the pump&rsquo;s own data and let it learn.&rdquo;</strong> It will learn what this pump has already done, and it will be just as confident about conditions it has never seen — which is precisely where the load-shedding decision lives.</p>
+<p>&bull; <strong>&ldquo;Ask for a wider margin on the temperature limit and stop worrying.&rdquo;</strong> This buries the question. The margin is paid for in production every single day, to cover an uncertainty nobody has measured — you are buying insurance against a risk of unknown size.</p>
+<p>&bull; <strong>&ldquo;Model the whole pump properly — a complete digital copy of it.&rdquo;</strong> The answer that sounds most like a twin. It produces something too slow to answer inside the thirty minutes the decision needs, and scoped to no decision in particular, which means it is never quite right for any of them.</p>
+<p>&bull; <strong>&ldquo;Validate it once against the commissioning data and trust it.&rdquo;</strong> Necessary — and one match is a statement about the past. The impeller has worn since; the pump the model was checked against no longer exists.</p>
+<p>&bull; What makes a number bettable is not detail. It is three things done together. <strong>Scope it to one decision</strong>, with the accuracy and the lead time written down (thirty minutes ahead, within &plusmn;3&nbsp;&deg;C) — a model that answers everything answers nothing well enough to sign. <strong>Join the physics that actually couple</strong>, including the loop the old single-physics model could never see: heat closes the clearance, the tighter clearance raises friction, the friction makes more heat. And <strong>keep correcting it against the real pump</strong>, so it tracks the machine as it wears rather than the machine as it was commissioned. Do that and the model stops saying 71 and starts saying <strong>71, give or take 2</strong>. <strong>The &plusmn;2 is the thing Realeboga is buying. The 71 was never the hard part.</strong></p>
+</div>
+</details>
+<p>That is a high-fidelity hybrid digital twin. Here is how you build it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>A <strong>digital twin</strong> is a living computer model of one specific real asset - not any pump, <em>this</em> pump - kept in step with the real thing by a constant data stream. <strong>High-fidelity</strong> means accurate enough to bet a decision on; <strong>hybrid</strong> means it fuses two powers: the laws of physics, and learning from real data. The point of the whole thing is a number you can trust, with an honest statement of how much. Watch it built for Pump 3.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Scope to the decision, list the coupled physics</div><p class="cb-demo">The decision: &#039;predict bearing temperature 30 minutes ahead, with an honest uncertainty band, so we can shed load early instead of tripping at peak&#039; - required accuracy +/- 3 C, lead time 30 minutes (the ISO 23247 idea of a twin scoped to a use case, not a general copy of the pump). The coupled physics: fluid (flow 1,100 L/s at 1,490 rpm, head 180 m); thermal (bearing friction makes heat, the cooling loop removes it); vibration (impeller wear, now 4.1 mm/s up from 2.6 when new); thermal expansion (every 10 C rise closes the shaft clearance by about 12 micrometres, raising friction, raising heat - a feedback loop the old single-physics model never saw).</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Build the physics model, then make it fast (ROM)</div><p class="cb-demo">The full multi-physics model (in Modelica) joins fluid, thermal and structural sub-models by the coupling equations. Validate it: a new bearing at 1,100 L/s predicts 68 C, and the commissioning logs show 67 C - within 1 C, so the coupled physics is sound. But the full model takes 8 seconds to simulate one minute of pump behaviour, far too slow for a sensor stream arriving every 2 seconds. So you build a ROM - run the full model across the operating envelope, fit a fast surrogate - and it runs the same minute in 40 milliseconds (200 times faster), matching the full model within 0.4 C.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Wire the live two-way link (ISO 23247)</div><p class="cb-demo">Physical to digital: stream six live tags - flow, speed, bearing temperature, cooling inlet temperature, vibration, motor current - into the twin every 2 seconds. Digital to physical: the twin&#039;s 30-minute-ahead prediction and its uncertainty band flow to the control-room dashboard, and later to an automatic early-load-shed signal. The asset, the data and the twin are registered under the ISO 23247 entities, so every link is explicit and auditable.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Correct the drift with data (the PINN)</div><p class="cb-demo">Compared to the real bearing over 90 days, the ROM reads low by a growing amount - 1 C in month one, 4 C by month three - because the worn impeller and a fouled cooling loop are not in the physics. Train a PINN on the residual (real minus ROM), constrained to obey the heat-balance equation. After training, the hybrid (ROM + PINN) tracks the real bearing within 1.2 C across the 90 days - down from a 4 C physics-only error.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Quantify the trust, then hand the decision to the human</div><p class="cb-demo">Combine three errors in quadrature: sensor noise (+/- 0.5 C), ROM simplification (+/- 0.4 C), PINN scatter (+/- 1.0 C): sqrt(0.5^2 + 0.4^2 + 1.0^2) = sqrt(1.41) = about 1.2 C (1-sigma), so a 90% band is about +/- 2.0 C. Now the twin reports not &#039;94&#039; but &#039;94 C, 90% likely between 92 and 96&#039;. Tuesday&#039;s repeat: at 06:10 the twin predicts 93 C in 30 minutes, 90% band 91-95; the trip limit is 90 C, and the LOWER edge of the band (91) is already above it - so the dashboard flags &#039;shed 8% of load now&#039;. You shed early at 06:12; the bearing peaks at 88 C; the pump runs through peak demand; no town goes short. You show Realeboga the band, not just the number - and she signs the budget.</p></div></div>
+
+<p>See what the twin did. The old model gave a bare "71" and cost two towns five hours of water; the new one gives "93, ninety per cent sure it is between 91 and 95" - and that band is what let a person act in time. <strong>And see the mission in it, because the heart of this technique is a model honest about its own ignorance. The single-physics model was not just wrong, it was wrong with confidence - it handed over one clean number and hid how little it knew, and a manager bet a town's water on that false certainty and lost. The hybrid twin refuses to do that. It does the harder, humbler thing: it joins the tangled physics it can model, it corrects itself against the real pump for the drift it cannot, and then - crucially - it says out loud what it still does not know, as a band around every answer. That honesty is not a weakness in the tool; it is the whole point of it, the same integrity as an engineer who quotes an optimistic ceiling rather than a comforting promise. And notice who decides: the twin does not trip the pump. It shows Realeboga the number and the band, and she sheds the load - the machine carries the relentless computation it can do without rest, and the human keeps the judgement, now with honest information instead of false comfort.</strong> The R3.1 million is the measure; the aim is three towns' water kept flowing, a number worth trusting, and a person empowered to act before the bearing ever reaches the limit.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You build the twin in five steps.</p>
+<ul>
+<li><strong>1. Scope to the decision, list the coupled physics.</strong> The decision sizes everything; the physics map the problem.</li>
+<li><strong>2. Build the physics model, then make it fast.</strong> The multi-physics model, validated; then a real-time ROM.</li>
+<li><strong>3. Wire the live two-way link.</strong> Bidirectional data flow - sensors in, prediction and band out.</li>
+<li><strong>4. Correct the drift with data.</strong> A physics-constrained neural network on the residual.</li>
+<li><strong>5. Quantify the trust, hand the decision to the human.</strong> The honest band, and a person to act on it.</li>
+</ul>
+<p>The ideas underneath. A <em>multi-physics model</em> writes down the laws for several physical effects - fluid, heat, vibration - and how they couple, so the solver can capture the feedback a single-physics model misses. Because the full model is too slow to run live, you build a <em>reduced-order model (ROM)</em>: a fast, accurate <em>surrogate</em> fitted to it, so the twin keeps up with the sensor stream in real time. The <em>bidirectional data flow</em> is what makes it a twin and not just a model: live data in, prediction and uncertainty out. No physics is perfect, so the real asset slowly <em>drifts</em> from the model as it wears and fouls; a <em>Physics-Informed Neural Network (PINN)</em> - an AI constrained to obey the physical laws, so it cannot learn nonsense - is trained on the <em>residual</em> (real minus model) to close that gap. And <em>uncertainty quantification (UQ)</em> combines every error source into one honest band, turning a bare number into "94 C, ninety per cent likely between 92 and 96". It fits a high-value, critical asset with tangled physics, real sensor data, and a real decision riding on it; it is over-engineering for a cheap simple part, and impossible without sensors - match the complexity of the tool to the value of the problem.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Take a critical asset of <em>your</em> own and work the five steps. Write the one decision the twin must serve; list the physics that couple; build and validate the model, then reduce it to run live; wire the two-way data link; train a physics-constrained correction on the drift; and combine the errors into an honest band you would put in front of a manager.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-scope_physics">Step 1 - Scope to the decision, list the coupled physics</label><textarea id="cb-scope_physics" data-key="t-0015:scope_physics" placeholder="Write down the single decision the twin must serve first, because it sizes everything else (the accuracy, the lead time, what is in and out of scope). Then list the COUPLED PHYSICS - the different physical effects that push and pull on each other, which a single-physics model can never see."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-build_and_fast">Step 2 - Build the physics model, then make it fast (ROM)</label><textarea id="cb-build_and_fast" data-key="t-0015:build_and_fast" placeholder="Declare each physical domain as connected components joined by the coupling equations - state the rules, let the solver do the work - and validate it against a known baseline. Then reduce it to a Reduced-Order Model (ROM): an accurate but much faster summary, so the twin can run in real time against the live sensor stream."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-wire_link">Step 3 - Wire the live two-way link (ISO 23247)</label><textarea id="cb-wire_link" data-key="t-0015:wire_link" placeholder="Wire the bidirectional data flow (per ISO 23247) that makes it a twin, not just a model. Physical to digital: stream the live sensor tags into the twin. Digital to physical: send the twin&#039;s prediction and its uncertainty band out to the people and systems that act. Register the asset, the data and the twin so the links are explicit and auditable."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-correct_drift">Step 4 - Correct the drift with data (the PINN)</label><textarea id="cb-correct_drift" data-key="t-0015:correct_drift" placeholder="No physics model stays perfect - the real asset wears and fouls in ways the equations do not predict, and the model slowly reads wrong (drift). Train a Physics-Informed Neural Network (PINN) on the residual (real minus model), constrained to obey the physical laws so it cannot learn anything impossible. It closes the gap the physics misses, without inventing nonsense."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-quantify_and_hand">Step 5 - Quantify the trust, then hand the decision to the human</label><textarea id="cb-quantify_and_hand" data-key="t-0015:quantify_and_hand" placeholder="Combine every source of error into one honest band, so the twin reports not a bare number but a number AND how sure it is. Then show the human the whole band, and let them act on it - the machine advises with its uncertainty visible, the person decides."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines keep the twin trustworthy. First, <strong>report the band, never the bare number</strong> - a single figure hides how much it should be trusted, and a confident wrong number is more dangerous than an honest uncertain one; the whole value of the twin is that it states what it does not know, so a person can weigh it. (When the <em>whole</em> band crosses the limit, as 91-95 does against a 90 trip, the decision is robust; when only part of it does, that doubt is itself the information.) Second, <strong>keep the human in the loop and match the tool to the value</strong> - the twin advises, it does not rule, because judgement under real stakes belongs to a person; and a nine-week hybrid twin earns its cost only on a critical asset, never on a part a simple model would serve.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your twin true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Report the band, not the bare number.</strong> A confident single figure that hides its own error is what cost two towns their water. The honest band is the whole point.</p>
+<p>&bull; <strong>Scope the twin to a decision.</strong> Not a general copy of the asset - a model built to answer one question well. The decision sizes the accuracy, the lead time, the physics you bother to include.</p>
+<p>&bull; <strong>Constrain the learning to physics.</strong> A neural network on the residual must obey the physical laws, so it corrects real drift without inventing impossible behaviour. Free-running AI on a safety asset is a trap.</p>
+<p>&bull; <strong>Keep the human in the loop.</strong> The twin advises with its uncertainty shown; the person decides. Judgement under real stakes belongs to a human, now better informed.</p>
+<p>&bull; <strong>Match the tool to the value.</strong> A nine-week hybrid twin is for a critical asset where a real decision rides on it. On a cheap part, a basic model is the honest choice.</p>
+</div>
+</details>
+<p>You came to the pump floor with a model that gave a clean number and hid its own ignorance, and a manager who had been burned by it. You can leave with a twin that joins the physics, corrects itself against the real pump, and says exactly how sure it is - so that when it predicts 93 with the whole band above the limit, a person sheds load at 06:12 and three towns keep their water. <strong>A model that reports not just a number, but an honest measure of its own certainty - so a human can act in time, on what the model knows, and what it knows it does not.</strong> That is what earns the right to be bet on: not a confident guess, but a true number wearing its uncertainty in the open, handed to a person free to act. (Working with an AMU facilitator? Bring one critical asset and scope its twin to a single decision together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can scope and build a high-fidelity hybrid digital twin that reports its own uncertainty now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

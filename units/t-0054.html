@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screen for large-area degradation using advanced NDT (LRUT, MFL, PEC)</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Screen for large-area degradation using advanced NDT (LRUT, MFL, PEC)</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You work at the <strong>Mosselbaai Fuel Terminal</strong>, a coastal storage and distribution site on the southern Cape coast. It holds diesel and petrol in large steel tanks and moves product through kilometres of steel pipe. The sea air is salty. Salt and damp eat steel from the outside. Product and water inside the lines eat steel from the inside. Some pipes are wrapped in insulation. Some tanks sit on a sand pad you cannot see under.</p>
+<p>You will meet three people here: <strong>Nomsa</strong>, the terminal's integrity engineer - calm, careful, runs the inspection budget; <strong>Pieter</strong>, a senior rope-access and NDT technician with twenty years on the tools; and <strong>Thandeka</strong>, the operations manager, who decides when a tank or line can be taken out of service. Every number in this unit stays consistent with this site.</p>
+<p>You are standing on the tank farm at Mosselbaai at seven in the morning. The wind off the sea is cold and carries salt. In your hand is a clipboard with a single line of work: <strong>Line 14</strong>, a 12-inch diesel transfer pipe, <strong>840 metres long</strong>, running from the jetty manifold to Tank 6. It is wrapped in 50 mm of mineral-wool insulation with an aluminium weather jacket. It has been in service <strong>22 years</strong>.</p>
+<p>Nomsa walks up holding a printout. "We had a small drip near support 7 last month," she says. "Pieter cut a window in the insulation, found a thin patch underneath, and we clamped it. But here is what keeps me awake." She taps the printout. "That was one spot. This line has <strong>hundreds of metres</strong> I have never seen. The corrosion is <em>under the insulation</em> - I cannot eyeball it. To inspect it the old way we cut windows, take a thickness reading with a handheld probe, patch the insulation, move on. Each window costs us about <strong>R900</strong> in labour and re-jacketing. To cover this line at one window every two metres would be <strong>420 windows</strong> and roughly <strong>R378 000</strong> - and even then we only see the spots we happened to cut."</p>
+<p>She looks at you. "Thandeka can give me a <strong>three-day shutdown</strong> on Line 14 and a budget of <strong>R120 000</strong>. I cannot cut 420 windows in that time or for that money. And spot-checking 30 windows would be cheap, but if the worst corrosion is between my windows, I miss it and we have a fuel spill on the beach."</p>
+<p>You feel it. A handheld thickness gauge tells you the wall is fine <strong>exactly where you put the probe</strong> - a coin-sized circle. The line is 840 metres long. Between every two points you measure, there is steel you are guessing about. You can smell the diesel and the wet insulation. You think: <em>maybe just cut a few more windows where the line looks rusty from outside</em> - but the jacket looks fine everywhere; the rust is hidden, and your eye cannot pick the right spots.</p>
+<blockquote><h2>Spot readings cannot tell you whether the whole length is healthy. How do you screen a huge area of steel quickly - and get pointed to the few places that actually need a close, accurate look?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Eight hundred and forty metres of insulated line, twenty-two years old, hidden rust and a jacket that looks fine everywhere. Cutting a window every two metres is 420 windows and about R378,000. You have three days and R120,000. <strong>Write down how you would inspect it.</strong> Your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five plans, and what each one leaves unlooked-at</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Cut thirty windows, spread out, and take readings.&rdquo;</strong> Affordable, quick, and it answers a question nobody asked. <strong>A thickness reading tells you the wall is fine exactly where the probe sat</strong> &mdash; a coin-sized circle. Thirty coins on 840 metres, and the worst corrosion is under the jacket in between.</p>
+<p>&bull; <strong>&ldquo;Cut where the line looks worst from outside.&rdquo;</strong> Sensible everywhere else and useless here: <strong>the jacket looks fine everywhere.</strong> The rust is hidden, which means your eye is choosing window positions at random while feeling like it is choosing them well &mdash; the most dangerous kind of sampling there is.</p>
+<p>&bull; <strong>&ldquo;Ask for a longer shutdown and more money.&rdquo;</strong> Worth asking once, and Thandeka&rsquo;s three days are not an opening bid &mdash; they are what the plant can give. A plan that requires a budget you do not have is not a plan, and meanwhile the line stays in service unexamined.</p>
+<p>&bull; <strong>&ldquo;Strip all the insulation and look at the whole thing.&rdquo;</strong> Complete, honest, and it is the R378,000 answer with extra steps &mdash; and re-jacketing 840 metres will not fit in three days either.</p>
+<p>&bull; <strong>&ldquo;Do the thirty windows now and the rest next shutdown.&rdquo;</strong> The compromise everybody reaches, and it accepts a specific risk without naming it: <strong>if the worst spot is in the unexamined nine-tenths, it stays there for another year</strong>, and a diesel line on a beach is what that risk is measured in.</p>
+<p>Notice the shape of what you actually need, because it is not more accuracy. <strong>You need something that says the whole length is healthy or points at the few places that are not</strong> &mdash; and then the accurate coin-sized readings go where that pointed.</p>
+</div>
+</details>
+<p>You need a reliable way to screen a large area quickly. Here it is at work.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Watch Nomsa and Pieter screen <strong>Line 14</strong> in their three-day window. Line 14: 12-inch diesel pipe, 840 m, 50 mm insulation, aluminium jacket, 22 years old, original wall <strong>9.5 mm</strong>, retirement wall (the minimum safe thickness Nomsa calculated for the pressure) <strong>5.0 mm</strong>.</p>
+<p><strong>Step 1 - Pick the screening tool that fits the shape.</strong><br>The shape is a long, mostly straight, insulated pipe run. Long pipe -&gt; <strong>LRUT</strong> is the primary screen. The line is insulated, so Nomsa adds <strong>PEC</strong> as a back-up screen at the supports and any LRUT-flagged zones, because PEC reads through the jacket. She does not need MFL - there is no tank floor here.</p>
+<p><strong>Step 2 - Plan the LRUT ring positions.</strong><br>LRUT reaches about 30 m each way on a clean line, but Line 14 has welded supports every 6 m that scatter some sound, so Pieter plans for a reliable <strong>20 m each way (40 m per ring)</strong>. For 840 m: 840 &divide; 40 = <strong>21 rings</strong>. Each ring needs one small insulation window (about 600 mm) to fit the transducer collar. That is <strong>21 windows</strong>, not 420. Cost so far: 21 windows x R900 = <strong>R18 900</strong>. Compare that to R378 000 for the old full-window approach. Nomsa exhales.</p>
+<p><strong>Step 3 - Run the LRUT sweep.</strong><br>Pieter clamps the collar at ring 1, calibrates on a known-good section, and records echoes in both directions. He repeats at all 21 rings over day 1 and the morning of day 2. The kit plots echo strength against distance. Known features - welds, supports - appear at expected distances, so the calibration is honest. Then two unexpected echoes stand out above the others:</p>
+<table>
+<tr><th>Zone</th><th>Where</th><th>What it means</th></tr>
+<tr><td>Zone A</td><td>A strong echo 17 m past ring 9, near support 7</td><td>Where last month's drip was. No surprise.</td></tr>
+<tr><td>Zone B</td><td>A moderate echo 23 m past ring 14, at a low point in the line where water can pool</td><td>Nobody knew about this one. This is the value of screening: it found the hidden zone the eye never would.</td></tr>
+</table>
+<p><strong>Step 4 - Narrow down with PEC on the flagged zones.</strong><br>Pieter walks to Zone A and Zone B and runs a PEC grid along each - a reading every 250 mm over a 3 m length, straight through the jacket, no stripping. PEC reports average wall: Zone A drops to about <strong>4.6 mm average</strong> over a 700 mm stretch, below the 5.0 mm retirement wall. Zone B drops to about <strong>5.3 mm average</strong> over a 500 mm stretch, close to the limit and getting thin.</p>
+<p><strong>Step 5 - Confirm with accurate handheld UT before any decision.</strong><br>PEC averages, so Nomsa will not condemn pipe on a PEC number alone. Pieter cuts a small window at the worst point of each zone and takes accurate UT thickness readings: Zone A worst point is <strong>4.3 mm</strong> - confirmed below retirement, act. Zone B worst point is <strong>5.1 mm</strong> - just above the 5.0 mm limit, but thinning at a low point, watch closely.</p>
+<p><strong>Step 6 - Decide and record.</strong><br>Nomsa's calls, with reasons: Zone A (4.3 mm, below limit) - replace the affected 1 m spool during this shutdown, since Thandeka has the line open already and the steel is below safe wall. Zone B (5.1 mm, thinning) - fit a clamp now and re-screen in 12 months with PEC (no shutdown needed, it reads through the jacket), and add a drain point so water stops pooling. The other 838 m: LRUT showed clean echoes, logged as screened and clear this cycle.</p>
+<p><strong>Step 7 - Tally the result.</strong></p>
+<table>
+<tr><th>Measure</th><th>Result</th></tr>
+<tr><td>Windows cut</td><td>21 (LRUT) + 2 (UT confirm) = 23</td></tr>
+<tr><td>Cost</td><td>23 x R900 = R20 700 in windows, plus crew and kit. Total came in at about R96 000 - inside the R120 000 budget.</td></tr>
+<tr><td>Time</td><td>2.5 days - inside the three-day shutdown</td></tr>
+<tr><td>Outcome</td><td>One real defect repaired, one watch-item managed, and the whole 840 m line has a documented health picture - instead of 30 lucky guesses.</td></tr>
+</table>
+<p>That is the technique. Screen wide with the tool that fits the shape, confirm narrow with accurate UT, decide on the confirmed number.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>Plain question: how do you check a huge area of steel without measuring every single point?</strong> You stop trying to measure everything. Instead you <strong>screen</strong> first, then <strong>inspect</strong> second. Screening is a fast, wide method that sweeps a large area and flags <em>where</em> something might be wrong - it is not perfectly accurate, it tells you "look here", not "the wall is exactly 6.2 mm". Then you bring an accurate method to only those flagged spots. This two-step habit - <strong>screen wide, then confirm narrow</strong> - is the heart of large-area screening NDT. That is exactly what Nomsa and Pieter did on Line 14.</p>
+<p><strong>Plain term: NDT</strong> means <strong>Non-Destructive Testing</strong> - ways of checking the inside health of steel without cutting it open or damaging it.</p>
+<p>Three screening tools answer three different "how do I see what I cannot see?" questions.</p>
+<p><strong>Tool 1 - LRUT: for a long run of pipe.</strong> Plain question: how do I check hundreds of metres of pipe from one spot? <strong>LRUT</strong> stands for <strong>Long-Range Ultrasonic Testing</strong>. "Ultrasonic" means it uses very high-pitched sound waves, far above what your ear can hear. Normal ultrasonic testing puts a probe on one spot and measures the wall right there. LRUT is different: you clamp a <strong>ring of transducers</strong> (small devices that send and receive sound) around the pipe once. It sends a low-frequency sound wave travelling <strong>along</strong> the pipe wall - like ringing a long bell - often tens of metres in each direction from that one ring. That is why Pieter only needed a ring every 40 m, not a window every 2 m. Where the wall is healthy, the sound passes smoothly; where there is corrosion, a weld, or a support, some sound bounces back, and the kit shows these echoes on a screen against distance - a surprise echo at, say, 31 metres means "something is changing the wall 31 metres away, go look". It was exactly such an echo, 23 m past ring 14, that found Zone B.</p>
+<p>LRUT fits long, straight, accessible pipe runs - exactly Nomsa's Line 14 - and it is great for corrosion under insulation because you only remove insulation at the one ring position, not the whole length. It does not fit very short pipes, pipes packed with bends and branches close together (echoes get confusing), or when you need the exact wall thickness (LRUT flags a zone, it does not measure millimetres). Many sites follow guidance such as ISO 18211, a written rulebook for long-range testing of pipes - what matters is not the number but that an agreed, written method exists to return to.</p>
+<p><strong>Tool 2 - MFL: for a tank floor.</strong> Plain question: how do I check the floor of a tank I am standing inside? <strong>MFL</strong> stands for <strong>Magnetic Flux Leakage</strong>. Think of the steel floor as a road for magnetism. A scanning trolley lays a strong magnetic field into the floor plate as it rolls along. Where the steel is full thickness, the magnetism stays neatly inside the plate. Where corrosion has eaten a pit - top or bottom - the magnetism has less steel to flow through, so some of it leaks out of the surface, and a sensor on the trolley feels that leak and marks the spot. This is perfect for a tank floor, where most of the loss is on the underside (the side touching the damp sand pad) and you can never see it.</p>
+<p>MFL fits flat or gently curved steel plate, like storage-tank floors, and is fast - a technician can sweep a large floor in a shift. It does not fit where you need exact depth: it tells you "there is metal loss here" but is rough on the number, so you confirm flagged spots with an accurate thickness method. It also struggles on very thick plate or through heavy coatings. Line 14 has no tank floor, which is why Nomsa did not reach for MFL.</p>
+<p><strong>Tool 3 - PEC: for corrosion under insulation, without removing it.</strong> Plain question: how do I check insulated steel without stripping the insulation? <strong>PEC</strong> stands for <strong>Pulsed Eddy Current</strong>. An "eddy current" is a small swirl of electricity that a changing magnetic field stirs up inside metal. The PEC probe sends a pulse, then listens to how the swirl fades. Thicker steel makes the swirl fade more slowly; thinner steel makes it fade faster. From the fade, the tool estimates an average wall thickness under the probe - the 4.6 mm and 5.3 mm averages Pieter read at Zone A and Zone B.</p>
+<p>The magic: PEC works <em>through</em> insulation, weather jacket, even light coatings, without removing them. You place the probe on the outside of the jacket and it reads the steel underneath. It does not give you a single sharp point reading; it gives an average over a footprint - a circle the size of the steel's distance away, so a bigger gap means a bigger footprint. PEC fits corrosion under insulation (CUI) screening on pipes and vessels you cannot easily strip, with quick grid scans to find the worst zones. It does not fit finding small, sharp pits (the footprint averages them away), or where you need exact millimetre thickness - it is a screening tool, not a final measurement.</p>
+<p><strong>The accurate confirm tool - handheld UT.</strong> After any screen, you confirm the flagged spots with UT thickness gauging - a handheld Ultrasonic Thickness probe that gives an accurate wall reading at one point, such as the 4.3 mm and 5.1 mm Pieter read at Zone A and Zone B. This is the narrow, accurate step. Screening points you to the spot; UT tells you the exact number you act on.</p>
+<p>The whole technique in one line: choose the screening tool that fits the shape you are inspecting - long pipe -&gt; LRUT; tank floor -&gt; MFL; insulated steel -&gt; PEC - sweep wide to find the suspect zones, then confirm only those zones with accurate handheld UT.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Use this blank planner to run a screen-then-confirm campaign on <strong>your own</strong> asset. Do not copy Nomsa's numbers - fill in yours. The headers are the steps of the technique, in order.</p>
+<p><strong>A. Set the asset up.</strong></p>
+<table>
+<tr><th>What I need to know</th><th>My answer</th></tr>
+<tr><td>Asset and shape (long pipe / tank floor / insulated steel / other)</td><td></td></tr>
+<tr><td>Insulated or bare? Can I strip it?</td><td></td></tr>
+<tr><td>Original wall thickness</td><td></td></tr>
+<tr><td>Retirement wall (minimum safe thickness)</td><td></td></tr>
+<tr><td>Age / service history / known weak spots</td><td></td></tr>
+<tr><td>My shutdown window (time)</td><td></td></tr>
+<tr><td>My budget</td><td></td></tr>
+</table>
+<p><strong>B. Pick the screening tool that fits the SHAPE.</strong> Long pipe -&gt; LRUT. Flat plate / tank floor -&gt; MFL. Insulated steel I cannot strip -&gt; PEC. Mark the primary; add a back-up screen if it helps.</p>
+<table>
+<tr><th>Tool</th><th>Fits my shape? (Y/N + one-line why)</th><th>Primary or back-up?</th></tr>
+<tr><td>LRUT (long-range ultrasonic)</td><td></td><td></td></tr>
+<tr><td>MFL (magnetic flux leakage)</td><td></td><td></td></tr>
+<tr><td>PEC (pulsed eddy current)</td><td></td><td></td></tr>
+</table>
+<p><strong>C. Plan the coverage and the cost.</strong> For LRUT: de-rate the reach for real conditions first, then size the rings.</p>
+<table>
+<tr><th>Coverage question</th><th>My working</th></tr>
+<tr><td>Realistic reach / footprint per set-up (de-rated for supports, welds, coating)</td><td></td></tr>
+<tr><td>Number of set-ups (rings / scan lines / grid) to cover the whole asset</td><td></td></tr>
+<tr><td>Access openings needed (e.g. insulation windows)</td><td></td></tr>
+<tr><td>Estimated screen cost (set-ups x cost each)</td><td></td></tr>
+<tr><td>Compare to the old measure-everything cost - state the saving</td><td></td></tr>
+</table>
+<p><strong>D. Sweep wide, then log what the screen flagged.</strong> Map the known features first - welds, supports, laps, branches - so you can tell a real defect from geometry. A flagged zone is a signal NOT explained by geometry.</p>
+<table>
+<tr><th>Flagged zone</th><th>Where (distance / location)</th><th>Why suspect - and is it high-risk geometry? (low point, support, soil-to-air interface)</th></tr>
+<tr><td>Zone 1</td><td></td><td></td></tr>
+<tr><td>Zone 2</td><td></td><td></td></tr>
+<tr><td>...</td><td></td><td></td></tr>
+</table>
+<p><strong>E. Confirm narrow with accurate handheld UT - then decide on the CONFIRMED number.</strong> Never condemn or clear steel on a screening average alone.</p>
+<table>
+<tr><th>Zone</th><th>Screen reading (avg)</th><th>Confirmed UT reading (worst point)</th><th>vs retirement wall</th><th>Decision + reason (replace now / clamp + re-screen date / log as screened-clear)</th></tr>
+<tr><td>Zone 1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Zone 2</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>The rest of the asset</td><td>screened - clean?</td><td>n/a</td><td>n/a</td><td>log as screened and clear, with the date</td></tr>
+</table>
+<p><strong>F. Tally.</strong> Openings cut: ___ &middot; Cost: ___ (inside budget? Y/N) &middot; Time: ___ (inside window? Y/N) &middot; Outcome in one line: ___</p>
+<p>If you can fill A to F for your own asset, you can run the whole technique - screen wide, confirm narrow, decide on the confirmed number.</p>
+<p>Now try these four tasks. Write your answer down first, before you open the reveal.</p>
+<p><strong>Task 1 (warm-up) - Match the tool to the shape.</strong> For each asset, name the screening tool that fits best and say why in one line: 1) the underside of a 30 m diameter diesel storage tank floor; 2) a 400 m insulated steam pipe you may not strip; 3) a short, heavily insulated vessel nozzle packed with bends.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>1. <strong>MFL</strong> - flat steel plate, most loss is on the hidden underside; MFL sweeps the floor fast and flags pits.</p>
+<p>2. <strong>LRUT</strong> as the long-pipe screen, with <strong>PEC</strong> to confirm zones through the insulation without stripping. Both are reasonable: LRUT covers the length, PEC reads through the jacket.</p>
+<p>3. <strong>PEC</strong> - short and bendy defeats LRUT (too many echoes), but PEC reads through insulation spot by spot. MFL is wrong here - it is not a flat plate.</p>
+</div>
+</details>
+<p><strong>Task 2 - Plan the rings.</strong> A 600 m straight insulated pipe, supports every 6 m. You expect a reliable LRUT reach of 25 m each way. How many rings, and how many insulation windows for the screen?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Reach per ring = 25 + 25 = <strong>50 m</strong>. Rings = 600 &divide; 50 = <strong>12 rings</strong>. One window per ring = <strong>12 windows</strong>. Compare: a window every 2 m would be 300 windows - state the saving, that is the point of screening.</p>
+</div>
+</details>
+<p><strong>Task 3 - Read the screen and choose the next step.</strong> Your PEC grid on a flagged zone reports an average of 5.4 mm. The retirement wall is 5.0 mm. A colleague says "5.4 is above 5.0, so we are fine - close it out." What do you do, and why?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Do not close out on the PEC average. PEC averages over a footprint, so a small deep pit can hide inside a 5.4 mm average. Confirm the worst point with accurate handheld UT. If UT confirms it is comfortably above 5.0 mm with margin, then close out or set a re-screen date; if UT finds a pit near or below 5.0 mm, act. The principle: decide on the confirmed accurate number, never on the screening average.</p>
+</div>
+</details>
+<p><strong>Task 4 (stretch) - Build the screen-then-confirm plan.</strong> You have a three-day shutdown and R110 000 for an 840 m insulated line, 22 years old, original wall 9.5 mm, retirement wall 5.0 mm. Outline your plan in five or six steps with rough numbers.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>A plan that: a) picks <strong>LRUT</strong> as the wide screen because it is a long pipe; b) sizes the rings from a realistic reach (de-rated for supports), giving roughly <strong>20 windows</strong>, not hundreds; c) adds <strong>PEC</strong> at flagged zones because the line is insulated; d) confirms every flagged zone with handheld UT before any decision; e) decides on the confirmed number - replace below limit, clamp-and-re-screen near limit, log the rest as screened-clear; f) checks the tally lands inside three days and R110 000. Good answers separate screen from confirm and never condemn steel on a screening reading.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Common errors, the symptom you will notice, and the fix.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p><strong>1. Treating a screening number as a final measurement.</strong> Symptom: you condemn or pass a pipe straight off a PEC average or an LRUT echo, with no handheld UT. Fix: always confirm the flagged spot with accurate UT before deciding. Screening says "look here"; UT says "it is 4.3 mm". Decide on the 4.3.</p>
+<p><strong>2. Using the wrong tool for the shape.</strong> Symptom: LRUT on a short, bend-packed nozzle gives a mess of overlapping echoes you cannot read; or MFL attempted on a curved pipe instead of a flat floor. Fix: match the tool to the shape - long pipe -&gt; LRUT, flat plate/tank floor -&gt; MFL, insulated steel you cannot strip -&gt; PEC.</p>
+<p><strong>3. Over-claiming LRUT reach.</strong> Symptom: you plan 30 m each way, but welds, supports and product coating eat the signal; the far ends of each span never get real coverage and you miss a thin zone between rings. Fix: de-rate the reach for real conditions - Pieter used 20 m, not 30 m - and overlap your rings slightly. Calibrate on a known-good section first to see your honest reach.</p>
+<p><strong>4. Calibrating PEC on the wrong reference.</strong> Symptom: PEC readings are all oddly thick or thin because the lift-off (the gap from probe to steel, set by insulation thickness) was wrong in the setup. Fix: set PEC for the actual insulation thickness and check it against a known wall (a clean window). Remember PEC gives an average over a footprint - bigger gap, bigger footprint, blurrier result.</p>
+<p><strong>5. Ignoring the geometry that fools the screen.</strong> Symptom: an MFL trolley flags "defects" in a neat line that turn out to be a lap weld or a repair patch, not corrosion; or an LRUT echo is just a known support. Fix: map the known features first - welds, supports, branches - and expect their echoes. A real defect is the echo that is not explained by geometry. Confirm anything genuinely unexpected.</p>
+<p><strong>6. Screening only the easy-to-reach spots.</strong> Symptom: you skip the low points, the supports and the soil-to-air interface - exactly where water pools and corrosion hides - because they are awkward. Fix: deliberately target the high-risk geometry: low points, supports, and where insulation meets a fitting. Nomsa's hidden Zone B was a low point. The screen only pays off if you point it where corrosion actually lives.</p>
+</div>
+</details>
+<p>You came onto the tank farm with a coin-sized thickness reading and 840 metres of pipe you could not see into. You can leave with the habit that solved it: screen wide with the tool that fits the shape - LRUT for the long run, MFL for the tank floor, PEC for insulated steel you cannot strip - then confirm narrow with accurate handheld UT, and decide only on the confirmed number. On Line 14 that habit found one real defect at 4.3 mm, managed one thinning zone at 5.1 mm, and gave Nomsa a documented health picture of the whole 840 m line - inside her three-day window and under her R120 000 budget, instead of 30 lucky guesses or R378 000 she never had.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can screen a large area for hidden degradation and confirm it properly now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

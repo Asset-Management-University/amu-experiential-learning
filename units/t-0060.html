@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three screens, three suppliers, and one blackout that became three problems - the grid trip darkened the junctions and stopped the water pumps, but nobody told the other teams. How do I architect grid, water and transport as one system, not nine pretending to talk?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Three screens, three suppliers, and one blackout that became three problems - the grid trip darkened the junctions and stopped the water pumps, but nobody told the other teams. How do I architect grid, water and transport as one system, not nine pretending to talk?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is 07:40 on a Tuesday in the operations room of the <strong>Mahabane Metro</strong>, a mid-sized municipality of <strong>480,000 people</strong>. On the wall are three big screens, each running a different system: the <strong>electricity grid</strong> dashboard, the <strong>water network</strong> dashboard, and the <strong>traffic and transport</strong> dashboard. They were each bought from a different supplier, in a different year, by a different department.</p>
+<p>You are the new metro systems architect. In your hand is a complaint log from yesterday. At 16:10 a substation tripped in one ward. The traffic lights at four big junctions went dark. Within twenty minutes, two of the metro's water pumps - the ones that need grid power - also stopped, and a reservoir began to drain. Nobody on the grid team told the water team. Nobody told transport. Each team only saw their own screen.</p>
+<p>The metro manager, <strong>Mrs Sesedi</strong>, leans over your shoulder. She is calm, but her jaw is tight. "Three screens. Three suppliers. One blackout that became three problems," she says. "Council has approved <strong>R320 million</strong> to make this 'smart'. The vendors are arriving on Thursday, and every one of them will hand us another screen. I need you to tell me how all of this fits together as <strong>one system</strong>, not nine systems pretending to talk."</p>
+<p>You feel the pull to just pick the best-looking dashboard and standardise on it. It would be quick; it would make Thursday easier. But you already know the trap: one trip in the grid cascaded into water and transport, and no single vendor's box was ever going to see that coming.</p>
+<blockquote><h2>I need to design several independent infrastructure systems as one system-of-systems - a structure showing how they connect, share data and depend on one another - so the next substation trip does not become a silent reservoir drain.</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> One substation trip became a silent reservoir drain and a transport failure, and three teams watched three screens, each blind to the other two. Council has approved R320 million. The vendors arrive on Thursday and every one of them will hand you another screen. <strong>Write down what you would tell Mrs Sesedi.</strong> Your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five answers, and what each one would have done last week</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Pick the best dashboard and standardise everyone onto it.&rdquo;</strong> Quick, and it makes Thursday easy. Ask the only question that matters about it: <strong>would that box have seen the grid trip reach the reservoir?</strong> It would not &mdash; it would have shown all three teams the same three screens in one prettier frame.</p>
+<p>&bull; <strong>&ldquo;Build one big integrated system that runs everything.&rdquo;</strong> It sounds like the real answer and it is the most expensive way to fail. <strong>These systems have their own jobs, their own operators and their own regulators</strong>, and a single machine that owns all three is a single thing that can take all three down.</p>
+<p>&bull; <strong>&ldquo;Get the three teams talking &mdash; a weekly coordination meeting.&rdquo;</strong> Worth doing and it is not an answer to this failure. <strong>The trip cascaded in minutes.</strong> A meeting on Tuesday cannot make a fault visible on Thursday night, and it leaves the seeing of it dependent on somebody remembering to phone.</p>
+<p>&bull; <strong>&ldquo;Give every team access to every system&rsquo;s data.&rdquo;</strong> Closer, and it hands each team three times as much to watch while nobody has been told <strong>which of it matters to them.</strong> The water team did not need the grid&rsquo;s whole feed; they needed to know that their pumps had lost supply.</p>
+<p>&bull; <strong>&ldquo;Design our own architecture from first principles &mdash; our city is unique.&rdquo;</strong> Flattering and slow, and it means inventing something other people have already built and tested. <strong>Thursday is the constraint</strong>, and starting from a blank page is how a metro spends R320 million on nine systems pretending to talk.</p>
+<p>Hold on to the shape of what happened: <strong>the failure was not inside any one system.</strong> It was in the seam between them, which is precisely the place no vendor sells a box for.</p>
+</div>
+</details>
+<p>You do not design them as one giant machine. You fit them onto a proven map. Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>When several large systems must work together but were built separately, you design a <strong>system-of-systems</strong>: independent systems that keep their own jobs, arranged so they can share information and support each other. You do it with <strong>reference-architecture-led design</strong> - fitting your city onto a ready-made, proven map (the ITU-T smart-city layers, the NIST grid's domains-and-interfaces) rather than inventing one. Watch it architected for the Mahabane Metro, before Thursday.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Lay a common layered stack</div><p class="cb-demo">At the Mahabane Metro you draw the four ITU-T floors once and place all three networks on them: the grid (64,000 meters at sensing, its own dashboard at application), the water network (51 pressure sensors, its own SCADA), and transport (140 sensors, its own dashboard). Drawn together, the silos are plain - three separate application layers, three separate data stores, never touching. The blackout cascaded because the grid&#039;s data-and-support layer never spoke to the water network&#039;s.</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Name the dependencies between systems</div><p class="cb-demo">Inside the grid you mark the operations domain (the control room) and the distribution domain (substations and feeders). Then the key move - the interfaces where one network depends on another. Three caused yesterday&#039;s failure: I-1, grid distribution -&gt; water pump stations (4 of the 9 pumps lose power if their feeder trips); I-2, grid distribution -&gt; transport junctions (junctions on the same feeder go dark); I-3, water-reservoir level -&gt; transport (a draining reservoir floods low roads). I-1 and I-2 both fired from one feeder trip, and neither was an agreed, monitored interface - they were accidental.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Build one shared seam</div><p class="cb-demo">You design one shared data-and-support layer all three networks publish into and read from. When a feeder trips, the grid publishes one event - &#039;feeder F-12 down, 16:10&#039; - to the shared layer, and the water and transport applications subscribe to the grid events on feeders they depend on. Cost: about R48 million of the R320 million - the highest-value spend, because it is the seam that was missing.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Twin the cascade</div><p class="cb-demo">One twin holds all three networks and the interfaces I-1/I-2/I-3. Replay yesterday - feed in &#039;feeder F-12 down&#039; and the twin shows the 4 pumps it powers, the reservoir those pumps fill, and the 4 dark junctions, in one picture, in advance. Run a &#039;what if&#039;: a 30-minute trip drops the upper-ward reservoir from 84% to 61% (still safe), but the twin&#039;s simulation shows a 90-minute trip reaching 28% (the drain decelerates as the level falls), where pressure fails in the upper ward. That 28% is the number that justifies an R12 million backup generator on those 4 pumps - a figure the three separate screens could never have surfaced.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Let the architecture govern, keep the judgement yours</div><p class="cb-demo">Your deliverable for the vendors arriving on Thursday is one diagram and one table: the four ITU-T layers with all three networks placed; the domains inside each; the three cross-network interfaces with what crosses, in which direction, how fast; and the shared seam every vendor must publish to. Now you ask each vendor not &#039;is your dashboard nice?&#039; but &#039;which layer, which interface?&#039;. And you design the seam to degrade safely - if it goes down, each network runs on its own exactly as today, losing only the cross-network coordination, never its own control - because staying blind costs more than one well-protected seam.</p></div></div>
+
+<p>See what the architecture did. It took three siloed screens that let a blackout cascade unseen, and turned them into one structure where a fault in the grid is visible to the water and transport teams that depend on it - before the reservoir drains. <strong>And see the mission in it, because this is sober, honest engineering in the direct service of people, not a chase after the shiniest dashboard. The service is to the citizen: a cross-boundary fault made SEEN, not silent, so a single substation trip can no longer drain a reservoir while three teams stare at three screens, each blind to the others. The frugality is in where the money goes: the easy path is to standardise on one vendor's box, which would not have seen the cascade either; the architecture instead directs the R320 million with precision to the two things that matter - the R48 million shared seam that connects the silos, and the twin that justifies an R12 million generator by computing a non-linear reservoir drain a human's straight-line guess would get wrong. The architecture, not the loudest vendor, governs the spend. And the integrity is in two honesties held to the end: the seam is a single point of failure, so it is designed to degrade safely, every network falling back to its own controls if it dies; and a reference architecture is a map, not the territory - it gives the shape, but which failures matter most stays a human judgement, never handed to the framework.</strong> The aim is the 480,000 people whose water, power and movement hold together because someone designed the seams between the systems, not just the systems.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You architect the system-of-systems in five steps.</p>
+<ul>
+<li><strong>1. Lay a common layered stack.</strong> The ITU-T four floors on every network, so the silos become visible.</li>
+<li><strong>2. Name the dependencies between systems.</strong> Every interface where one network depends on another.</li>
+<li><strong>3. Build one shared seam.</strong> A common data layer all networks publish to and subscribe from.</li>
+<li><strong>4. Twin the cascade.</strong> A city-scale digital twin to replay failures and run 'what if'.</li>
+<li><strong>5. Let the architecture govern, keep the judgement yours.</strong> Vendors fit the shape; you weigh what matters.</li>
+</ul>
+<p>The ideas underneath. A <em>system-of-systems</em> is many independent systems arranged to share and support, designed not from scratch but onto a <em>reference architecture</em> - a proven map of the standard layers, parts and connections. The <em>ITU-T smart-city model</em> gives four horizontal layers (floors) every network shares: <em>sensing</em> (meters, sensors), <em>network</em> (the comms), <em>data-and-support</em> (where readings are stored and combined), and <em>application</em> (the dashboards people use). The <em>NIST Smart Grid</em> idea gives you <em>domains</em> (big functional zones) that connect only through defined <em>interfaces</em> - which you borrow to name where water and transport depend on the grid. The shared <em>data-and-support layer</em> is the <em>seam</em>: networks <em>publish</em> events to it and <em>subscribe</em> to the ones they need. A <em>city-scale digital twin</em> is one live model holding all the networks, to test 'what if' before it happens for real. It fits two or more large, independent infrastructure systems, from different suppliers, that must coordinate over many years; it is the wrong, heavy tool for a single self-contained system with one owner.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Take a set of independent systems of <em>your</em> own that must coordinate - they need not be a city; three production lines, three depots, three software services will do. Lay the common four-layer stack across them; name every interface where one depends on another; design the one shared seam they publish to; twin the cascade to find the number a single screen would miss; and write the architecture so the vendors fit your shape - while you keep the judgement of what matters.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-lay_stack">Step 1 - Lay a common layered stack</label><textarea id="cb-lay_stack" data-key="t-0060:lay_stack" placeholder="Take a proven reference architecture - the ITU-T four floors: sensing, network, data-and-support, application - and place every existing asset of every network onto the same floors. The moment you do, the problem becomes visible: each network has its OWN application layer and its OWN data store, and they never meet - which is why a fault in one cascades silently into the others."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-name_dependencies">Step 2 - Name the dependencies between systems</label><textarea id="cb-name_dependencies" data-key="t-0060:name_dependencies" placeholder="Split each network into its domains, then do the KEY MOVE: list every interface where ONE network DEPENDS on another. The cascade you are preventing rode these dependencies - and the dangerous ones are usually accidental and unmonitored. Naming each turns a hidden trap into a design object you can watch, with agreed data, a direction, and a speed."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-shared_seam">Step 3 - Build one shared seam</label><textarea id="cb-shared_seam" data-key="t-0060:shared_seam" placeholder="Instead of nine siloed systems, design ONE common data-and-support layer that every network publishes events into and subscribes to. Each keeps its own sensing, network and application floors - the vendors still bring their boxes - but a fault event now reaches the teams that depend on it. This seam, the thing that was missing, is usually the single highest-value spend."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-twin_cascade">Step 4 - Twin the cascade</label><textarea id="cb-twin_cascade" data-key="t-0060:twin_cascade" placeholder="Stand up a city-scale digital twin that reads the shared layer and holds all the networks and their interfaces together. Now you can replay a failure in one picture, and run &#039;what if&#039; to find the number the separate screens could never surface - including the non-linear, cross-domain effects a human&#039;s straight-line intuition would get wrong."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-architecture_governs">Step 5 - Let the architecture govern, keep the judgement yours</label><textarea id="cb-architecture_governs" data-key="t-0060:architecture_governs" placeholder="Write the architecture - the layers, the domains, the named interfaces, the shared seam - as the deliverable, and let IT set the shape, not the loudest vendor: ask each one &#039;which layer does your box sit on, and which interface does it publish to?&#039;. Be honest about the trade-off - the shared seam is a single point that, if it fails, blinds the city&#039;s coordination, so design it to DEGRADE SAFELY (each network falls back to its own control, losing only the cross-network view). And remember the map is not the territory: the reference architecture gives the shape, but which failures matter most stays YOUR judgement."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines separate one resilient system from nine brittle ones. First, <strong>name the dependencies, then build the seam they share</strong> - a cascade rides the accidental, unmonitored links between systems, so the architect's first job is to drag those hidden dependencies into the light as named, watched interfaces, and then give them one common seam to speak through, rather than letting each vendor's box stay an island. Second, <strong>let the architecture govern the spend, but keep the judgement human</strong> - the architecture, not the loudest salesperson, should decide which layer a box sits on and where the money goes, and the seam that carries the whole city's coordination must be designed to degrade safely so it is never a single silent point of failure; yet the map only gives the shape - which failures matter most, and what to protect first, is a human call you must never hand to the framework.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your architecture true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>One stack, drawn once.</strong> Place every network on the same four floors. The instant you do, the silos - each with its own data store that never meets the others - become impossible to miss.</p>
+<p>&bull; <strong>Name the accidental dependencies.</strong> The links that cascade are the ones nobody agreed to. List every place one network depends on another, and turn each hidden trap into a watched interface.</p>
+<p>&bull; <strong>One seam, not nine islands.</strong> Build a single shared data layer every network publishes to. It is usually the highest-value spend, because it is the connection that was missing.</p>
+<p>&bull; <strong>Design the seam to degrade safely.</strong> A shared layer is a single point that can blind the whole city. If it fails, every network must fall back to its own control - losing only the cross-network view, never its own.</p>
+<p>&bull; <strong>The map is not the territory.</strong> A reference architecture gives the standard shape. It does not decide your budget or which failures matter most. That judgement stays yours.</p>
+</div>
+</details>
+<p>You came into the operations room with three screens, three suppliers, and a blackout that crossed all three because no one had designed the seams between them. You can leave with one architecture: a common stack that exposes the silos, three named dependencies that were once accidental traps, one shared seam worth R48 million that lets a feeder trip reach the teams it threatens, and a twin that turned a draining reservoir into an R12 million decision a manager can defend. <strong>Design independent systems as one system-of-systems: lay a common stack, name the dependencies between them, and build the one seam they share, so a fault in one is seen by all before it cascades. And keep the judgement of what matters most yours, not the framework's.</strong> That is what stops the next substation trip from becoming a silent reservoir drain: not a nicer dashboard, but a structure where the city's services can finally see one another. (Working with an AMU facilitator? Bring three systems that must coordinate and map their stack, dependencies and shared seam together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can architect several independent infrastructure systems as one resilient system-of-systems now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

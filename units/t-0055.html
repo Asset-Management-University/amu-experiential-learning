@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>&quot;Replace the maintenance system&quot; is one sentence - how do I find out what I am actually changing, before I change it?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>&quot;Replace the maintenance system&quot; is one sentence - how do I find out what I am actually changing, before I change it?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is a wet Tuesday morning and you are standing in the control room at <strong>Thornveld Water</strong>, the regional utility that treats and pumps drinking water to about <strong>180,000 people</strong> across four towns. The room smells faintly of warm electronics and old coffee. On the wall, a screen shows the four pump stations as little green dots. One of them - <strong>Riverside</strong> - has just turned amber.</p>
+<p>In your hand is a printed brief from the board. The heading reads: <em>"Replace the maintenance system by 31 March."</em> Below it, the operations director, <strong>Naledi</strong>, has written in blue pen: <em>"This must not interrupt water supply. Make it safe."</em> She is standing beside you now, arms folded, waiting for you to say it is under control.</p>
+<p>Here is the trouble. The maintenance system you are about to replace is not one thing. The pump operators log faults in it. The store room checks spare parts against it. The finance team pulls cost reports out of it every month. The safety officer uses it to prove the pressure vessels were inspected on time. You <strong>think</strong> you know all the places it touches - but you are not sure. Last year a "small" software change broke the spares ordering for nine days, and a critical seal sat un-ordered while a pump ran on borrowed time.</p>
+<p>You can feel the pull to just start. Open the new system's setup screen, begin entering pumps, and sort out the connections later. It would feel like progress. But the nine-day memory sits in your stomach like a stone. If you miss even one hidden link - one report, one safety record, one hand-off between teams - water supply or a safety proof could fail, and your name is on the brief.</p>
+<blockquote><h2>"Replace the maintenance system" is one sentence, and I do not know how many teams, how much information or how many hidden links are inside it. How do I find out what I am actually changing, before I change it?</h2></blockquote>
+<p><strong>Before you read on, say what you would do first.</strong> One sentence from the board, four pump stations, 180,000 people, and a nine-day failure last year that nobody predicted. Write down your actual first move this week - your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the four first moves, and what each one would have caught last year</summary>
+<div class="reveal-content">
+<p>&bull; <strong>"Open the new system and start entering the pump stations."</strong> Visible progress by Friday, and it is the move the brief invites. It also commits the shape of the answer before anybody knows what the old system is quietly holding together - which is exactly how last year's failure was built.</p>
+<p>&bull; <strong>"Ask the vendor what the migration needs."</strong> Sensible, and they can only answer about their own product. What breaks in a replacement is rarely inside the new system; it is the link nobody mentioned because nobody thought of it as part of the system.</p>
+<p>&bull; <strong>"Ask the operators what they need."</strong> Necessary, and it will produce a good list from the people who touch it most - and it will not produce the store room's spreadsheet, or the finance report, or the safety officer's inspection records, because none of those people are operators.</p>
+<p>&bull; <strong>"Write a requirements list."</strong> Right, later. A list of what the new thing must do assumes you already know everything the old thing does, and that assumption is the whole problem.</p>
+<p>&bull; What all four share: each looks at <strong>one part</strong> of the change - the software, the vendor, one group of users, the wish list. Last year's nine days came from a link between two parts that nobody was looking at, because nobody was looking at the whole. What is needed first is not a decision or a requirement. It is a picture of what exists, drawn deliberately enough that a forgotten link has nowhere to hide.</p>
+</div>
+</details>
+<p>You do not need to guess your way through this. Here is the method.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Watch the whole procedure run on the Thornveld case, start to finish. You play the architect; Naledi is the operations director; <strong>Kgotso</strong> runs the store room; <strong>Thandeka</strong> is the safety officer; <strong>Grace</strong> is in finance.</p>
+<p><strong>Step 1 - Name the stakeholders (TOGAF, business layer).</strong> Before drawing anything, you walk the building and ask. You find five stakeholder groups.</p>
+<table>
+<thead><tr><th>Stakeholder</th><th>What they use the system for</th></tr></thead>
+<tbody>
+<tr><td>Pump operators (6 staff)</td><td>Log faults; close completed jobs</td></tr>
+<tr><td>Store room (Kgotso)</td><td>Check and order spare parts</td></tr>
+<tr><td>Safety (Thandeka)</td><td>Record pressure-vessel inspections</td></tr>
+<tr><td>Finance (Grace)</td><td>Pull the monthly maintenance cost report</td></tr>
+<tr><td>Operations (Naledi)</td><td>See open jobs across all 4 pump stations</td></tr>
+</tbody>
+</table>
+<p>Already the picture is sharper than the brief. "Replace the maintenance system" is really <strong>five jobs across five teams</strong>.</p>
+<p><strong>Step 2 - Draw the baseline architecture (TOGAF, four layers, today).</strong></p>
+<ul>
+<li><strong>Business (who does what):</strong> the five jobs above.</li>
+<li><strong>Data (what information flows):</strong> fault record, spare-part number and stock count, inspection date and result, monthly cost figure.</li>
+<li><strong>Application (which software):</strong> the old maintenance system; a separate finance system; a separate stores spreadsheet that Kgotso keeps.</li>
+<li><strong>Technology (what runs it):</strong> one ageing server in the control room.</li>
+</ul>
+<p>The data layer is where the stone in your stomach proves real. You discover <strong>two hidden links</strong> the brief never mentioned: the stores spreadsheet <strong>reads part numbers</strong> out of the maintenance system every night by an automatic export (this is what broke for nine days last year), and the finance cost report <strong>pulls job costs</strong> straight from the maintenance system's database. Neither is obvious from the outside. The four-layer map made them visible.</p>
+<p><strong>Step 3 - Draw the target architecture.</strong> The board wants one modern system. In the target, the new maintenance system <strong>holds the spares data itself</strong>, so the fragile nightly export to Kgotso's spreadsheet is <strong>removed</strong> (one less hidden link); finance gets a <strong>proper report feed</strong> from the new system instead of pulling from its raw database; and the spares check that used to reach outside the system now happens inside it.</p>
+<p><strong>Step 4 - Write the gap list.</strong> Comparing baseline to target gives four concrete items:</p>
+<ol>
+<li>Migrate <strong>312</strong> historical fault records into the new system.</li>
+<li>Rebuild the spares data <strong>inside</strong> the new system and <strong>retire</strong> the nightly spreadsheet export.</li>
+<li>Build a finance report feed; confirm the <strong>first month's figure matches</strong> the old report to the cent before switching.</li>
+<li>Re-link Thandeka's inspection records so <strong>no safety proof is lost</strong> (she has <strong>47</strong> vessels on a legal inspection cycle).</li>
+</ol>
+<p><strong>Step 5 - Sequence the cutover against the risk.</strong> Because item 2 caused last year's nine-day failure, it is scheduled <strong>first</strong> and tested with a <strong>dummy "out of stock" fault</strong> before go-live, to prove the order path still fires. Naledi gets a one-page plan: the four-layer map of today, the target beside it, and the four-item gap list with dates and an owner each.</p>
+<p>Naledi unfolds her arms. The change is no longer a leap in the dark - it is four named, dated, testable steps. <strong>The method turned "replace the system" into a picture nothing could hide in.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>"How do I draw the whole organisation - not just the software - so nothing hides?"</strong> The answer is a method called <strong>TOGAF</strong> - The Open Group Architecture Framework. "Architecture" here does not mean buildings - it means a clear, agreed picture of how an organisation is put together. TOGAF is simply a <strong>shared way to draw that picture</strong> so that different people read it the same way.</p>
+<p>TOGAF splits the picture into four layers, so you never mix up "what the business does" with "which software runs it" - people call these <strong>"the four domains."</strong> That is all a domain is - one of these four layers.</p>
+<ul>
+<li><strong>Business architecture</strong> - the people, the teams, and the things they do. (Who logs a fault? Who orders the part?)</li>
+<li><strong>Data architecture</strong> - the information that flows. (The fault record, the part number, the inspection date.)</li>
+<li><strong>Application architecture</strong> - the software systems. (The maintenance system, the finance system.)</li>
+<li><strong>Technology architecture</strong> - the machines underneath. (Servers, the network, the control system.)</li>
+</ul>
+<p>The big win is simple: when you can see all four layers, the hidden links stop being hidden. The finance report you almost forgot shows up in the data layer, as you saw at Thornveld. The safety proof shows up in the business layer.</p>
+<p><strong>"In what order do I do the work, so I do not skip a step?"</strong> TOGAF also gives you an ordered set of steps called the <strong>ADM</strong> - the Architecture Development Method. Think of it as a recipe with named stages. You do not need all of them for one system swap, but three carry the load:</p>
+<ul>
+<li><strong>Baseline</strong> - draw how things work today, honestly. (Thornveld's four-layer map above.)</li>
+<li><strong>Target</strong> - draw how things should work after the change. (One system holding its own spares data.)</li>
+<li><strong>Gap</strong> - list exactly what must change to get from today to the target. The gap list is your real to-do list. (Thornveld's four numbered items.)</li>
+</ul>
+<p>A short word you will meet is <strong>stakeholder</strong> - anyone who cares about or is affected by the change. The store room, finance, the safety officer: all stakeholders. TOGAF makes you name them on purpose so none get forgotten - as at Step 1, where the five-group list already made the brief look smaller than the real job.</p>
+<p>One thing this map deliberately does <em>not</em> do. It shows you <em>which</em> processes touch the change; it does not draw any one of them step by step, and it will not show you where a process loses its time between the people who run it. That is a different drawing with its own method, and t-0282 is where it lives. Naming which processes are in scope and then modelling one of them in detail are two jobs, and running them together is how a wide map turns into weeks of drawing.</p>
+<p>So what the map gives you is <strong>scope you can see</strong>: every stakeholder named, every layer drawn, and - in the fourth column of the baseline - the links between layers that exist and are written down nowhere. That column is where last year's nine days came from, and filling it is the hardest and most valuable part of the whole exercise.</p>
+<p><strong>When this fits - and when it does not.</strong> Use this map when a change is <strong>wide</strong> (it touches several teams or systems) or <strong>risky</strong> (a mistake interrupts service or a safety proof). A system replacement at a utility is exactly that. Do <strong>not</strong> reach for the full method for a tiny, contained change - fixing a typo in a report, or replacing one operator's mouse. Drawing a four-layer architecture for that would be slow for no gain. Match the size of the method to the size of the risk.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Make your <strong>best attempt before opening "what good looks like"</strong> under each task. The skill grows in the attempt, not in the reading.</p>
+<p><strong>Task 1 (warm-up) - Name the stakeholders.</strong> Thornveld is also replacing its <strong>vehicle log system</strong> (the bakkies and tankers that move staff and emergency parts between the four pump stations). Before drawing anything, list at least <strong>four stakeholder groups</strong> and, in a few words each, what they use it for. <em>Prompts: Who drives? Who pays for fuel? Who must prove a vehicle was serviced? Who plans the routes?</em></p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Four or more named groups, each with a clear use - e.g. drivers (log trips), workshop (record services), finance (fuel and cost reports), operations (plan and dispatch). A good answer names a group an outsider would forget, such as the <strong>safety officer</strong> who needs roadworthy proof.</p>
+</div>
+</details>
+<p><strong>Task 2 - Find the hidden links.</strong> For the vehicle log, write the four layers as they are today and then fill the column everybody leaves for last: which piece of information leaves one layer and arrives in another by a route nobody maintains - an export, a re-typing, a spreadsheet, an email, a person who remembers? <em>Prompts: How does the workshop know a service is due? How does finance get fuel cost per vehicle? What happens to each of those if the paper book disappears?</em></p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Four layers for the vehicle log as it stands today: <strong>business</strong> - drivers record trips, the workshop records services, finance reports cost per vehicle, the depot plans routes. <strong>Data</strong> - trip and odometer readings, service dates and parts, fuel spend, vehicle availability. <strong>Application</strong> - a paper book in each bakkie and a workshop spreadsheet. <strong>Technology</strong> - one shared drive, and the bakkies themselves. And then the column that matters: the odometer reading exists only in the paper book, so the workshop cannot tell a service is due without asking a driver, and finance divides total fuel by the number of vehicles because per-vehicle spend does not exist anywhere. Neither of those links is on any diagram, and both fail silently the day the paper book goes.</p>
+</div>
+</details>
+<p><strong>Task 3 (harder) - Baseline, target and gap.</strong> You learn the vehicle log lives in <strong>two places</strong> today: drivers fill a <strong>paper book</strong> in each bakkie, and the workshop types services into a <strong>separate spreadsheet</strong> - and nobody links the two, so finance guesses fuel cost per vehicle. The target is <strong>one digital log</strong> all teams share. Write a short baseline (today), a target (after), and a gap list of the concrete changes needed. <em>Prompts: What information is duplicated or missing today? What single source replaces it? What must be migrated, rebuilt, or retired - and what must you test before go-live?</em></p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>A baseline that names the <strong>two unlinked sources</strong> and the missing fuel-per-vehicle link; a target of <strong>one shared digital log</strong>; and a gap list of <strong>three or more concrete items</strong> - e.g. migrate existing service history, retire the paper book, build the fuel-cost link - each with a <strong>test before switching</strong> (for instance, check one vehicle's new fuel figure against the old fuel slips). A strong answer schedules the <strong>riskiest item first</strong>, exactly as the Thornveld cutover did.</p>
+</div>
+</details>
+<p><strong>Now run it on your own system.</strong> Below is the whole procedure as a set of blank forms. Copy them, write in your own change, and you have mapped your own change. Fill them in order, top to bottom - each one feeds the next. Where you can put a number, put one.</p>
+<p><strong>Form 1 - Name the stakeholders (TOGAF, business layer).</strong> Walk the building and ask. Aim for every group that <em>touches</em> the system, including the one an outsider would forget.</p>
+<table>
+<tr><th>Stakeholder (team / role)</th><th>What they use the system for</th><th>Easy to forget? (y/n)</th></tr>
+<tr><td></td><td></td><td></td></tr>
+<tr><td></td><td></td><td></td></tr>
+<tr><td></td><td></td><td></td></tr>
+<tr><td></td><td></td><td></td></tr>
+<tr><td></td><td></td><td></td></tr>
+</table>
+<p><strong>Form 2 - Draw the baseline across the four layers (today, honestly).</strong> One row per layer. The last column is where the hidden links live - fill it last and hardest.</p>
+<table>
+<tr><th>Layer</th><th>What is here today</th><th>For each item: what reads from it? what does it read from?</th></tr>
+<tr><td>Business - who does what</td><td></td><td></td></tr>
+<tr><td>Data - what information flows</td><td></td><td></td></tr>
+<tr><td>Application - which software</td><td></td><td></td></tr>
+<tr><td>Technology - what runs it</td><td></td><td></td></tr>
+<tr><td><strong>Hidden links found</strong> (exports, report feeds, nightly jobs)</td><td></td><td></td></tr>
+</table>
+<p><strong>Form 3 - Target, then gap (the real to-do list).</strong> Write the target beside today, then list only the concrete, testable changes between them - riskiest first.</p>
+<table>
+<tr><th>#</th><th>Gap item (concrete + numbered)</th><th>Migrate / Rebuild / Retire?</th><th>Test before go-live</th><th>Order (risk-first)</th></tr>
+<tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>3</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>4</td><td></td><td></td><td></td><td></td></tr>
+</table>
+<p>When all three forms are full, you hold the same one-page plan you handed Naledi: the four-layer map of today, the target beside it, and a numbered, dated, testable gap list with an owner on every line. That is the change, with nowhere for trouble to hide.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your architecture work true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>You jump straight into drawing software boxes.</strong> <em>Symptom:</em> your map is all systems and servers; a team or a report later turns out to be missing, and it bites you at go-live. <em>Fix:</em> always start at the <strong>business layer</strong> - people and what they do - then data, then applications, then technology. Walk the building and ask each team. The layer order exists to stop exactly this.</p>
+<p>&bull; <strong>The hidden-links column is left empty or filled with the obvious ones.</strong> <em>Symptom:</em> the baseline looks tidy and lists only the connections that appear on a diagram somewhere. <em>Fix:</em> ask of every piece of information, "how does it get from where it is created to everyone who needs it?" - and write down the exports, the re-typing, the spreadsheets and the people who remember. Those are the links that fail, precisely because nobody owns them.</p>
+<p>&bull; <strong>You map only the teams who are obviously involved.</strong> <em>Symptom:</em> the stakeholder list contains the people who use the system daily and none of the people who take something out of it monthly or yearly - finance, safety, audit, the regulator. <em>Fix:</em> ask who receives anything that starts here, however rarely. The forgotten stakeholder is almost never a daily user; that is exactly why they are forgotten.</p>
+<p>&bull; <strong>The gap list is vague.</strong> <em>Symptom:</em> items like "sort out finance" or "fix data" - nobody can do them or test them. <em>Fix:</em> write each gap item so it is <strong>concrete and testable</strong>, with a number where you can - "migrate <strong>312</strong> fault records", "match the first month's cost report to the cent". If you cannot test it, it is not finished enough to write down.</p>
+<p>&bull; <strong>You use the full method for a tiny change.</strong> <em>Symptom:</em> days spent drawing four-layer architectures to replace one keyboard or fix a label. <em>Fix:</em> match the method to the risk. Wide or risky &rarr; map it properly. Small and contained &rarr; just do it. Over-modelling is as much a mistake as under-modelling.</p>
+<p>&bull; <strong>You skip the hidden data links.</strong> <em>Symptom:</em> the obvious users are fine after go-live, but a nightly export or a report feed quietly dies - the nine-day failure all over again. <em>Fix:</em> spend real time in the <strong>data layer</strong>. For every system, ask "what reads from this, and what does this read from?" Automatic exports and report feeds are the links that hide best.</p>
+</div>
+</details>
+<p>You came into the control room with a board brief that said "replace the system" and a stone in your stomach from a nine-day failure you never want to repeat. You can leave with five stakeholder groups named where the brief implied one job, a four-layer map of today whose last column lists every link that exists and is written down nowhere, the target beside it, and a four-item gap list with dates, owners and the riskiest item scheduled first and tested with a dummy fault before go-live. <strong>Turn "replace the system" into a picture nothing important can hide in.</strong> That is how a wide, risky change at a real utility gets made safely - not by opening the setup screen and hoping, but by finding out what you are actually changing before you change it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can map what a wide change actually touches, before you change it.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

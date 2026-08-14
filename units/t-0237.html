@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ordered, received, billed</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Ordered, received, billed</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You have sent the report. A week later, the question comes back: "Are you sure about this R45,000 work-order cost?" And you are not sure. You know the number came straight out of the system, that it was booked to the work order and flowed into your maintenance-cost report - but you never actually checked it against the invoice, the delivery note, or the purchase order. You trusted the system, and the system trusted whoever typed the number in.</p>
+<p>That is the quiet dread of reporting costs you have not verified: if even one of them is wrong, it does not stay wrong in one place. It flows into the budget, the cost-per-asset, the reliability-per-rand, the next business case - every decision that trusts your report inherits your unchecked number. An unverified number is not a fact; it is a risk you have just passed on to everyone downstream.</p>
+<blockquote><h2>The costs in my report come straight from the work orders, but I never checked them against what was actually ordered and received - and if one is wrong, it corrupts everything built on it. How do I verify cost data before I report it?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The report is ready and the costs came straight out of the work orders. Then the finance clerk asks, in passing, whether anybody checked that <strong>R84,000</strong> bearing order against what actually arrived — and you realise nobody ever has. Not this one, not any of them. You also remember the storeman mentioning that a delivery came short and the rest followed a fortnight later, and you have no idea whether that was this order. Meanwhile these figures are already in the maintenance budget, in the cost-per-asset table, and in the business case you submitted last month. Write down how you would verify cost data before reporting it — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why an error does not stay in one place</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;The system is reliable — the figures are what they are.&rdquo;</strong> The system faithfully records what it was told. It has no way of knowing whether the goods arrived, or arrived in full, and it will report a wrong figure with exactly the confidence of a right one.</p>
+<p>&bull; <strong>&ldquo;Check the big ones and let the small ones go.&rdquo;</strong> A reasonable-sounding sampling rule, and it is a decision about materiality made without evidence. It also misses the pattern kind of error, where many small ones share a cause.</p>
+<p>&bull; <strong>&ldquo;Fix it at year-end when finance reconciles.&rdquo;</strong> By then the number has already shaped a budget and a business case, and <strong>you cannot unwind a decision that has been taken on it.</strong></p>
+<p>&bull; <strong>&ldquo;Ask the supplier to confirm their invoices are correct.&rdquo;</strong> Asks one of the three parties to audit itself, and the likeliest error here is not a supplier's dishonesty but a delivery nobody counted.</p>
+<p>&bull; <strong>&ldquo;Add a note that the figures are unaudited.&rdquo;</strong> A caveat beside a precise number, which will be read and ignored — the figure travels and the note does not.</p>
+<p>&bull; The principle underneath: <strong>a number you have not checked against the reality it claims to describe is not a fact, it is an assumption</strong> — and once it is in the records it never becomes more true. <strong>It just travels.</strong> Your wrong figure does not stay wrong in one place: it flows into the budget, the cost per asset, the next business case, so <strong>every decision that trusts your report inherits your unchecked number.</strong> So verify at the <strong>source, once, before it is paid and before it is reported</strong> — the only point at which correcting it is cheap. The check itself is simple: <strong>three documents must tell the same story.</strong> What you agreed to buy — item, quantity, price. What was actually delivered and received. What the supplier is billing. Where all three agree the cost is evidenced; where they disagree, <strong>the disagreement is the finding</strong>, and it gets resolved before the number goes anywhere. Two honesties keep it real. The receipt must record <strong>what genuinely arrived</strong>, not what was expected — a receipt signed off the order defeats the entire control, and that short delivery is exactly the case. And a mismatch is <strong>investigated rather than adjusted</strong>, because making the figures agree is how an error becomes a misstatement.</p>
+</div>
+</details>
+<p>You verify at the source, with a simple, powerful control: the three-way match. Let us learn it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you verify financial data before you report it - matching what was ordered, received and billed, reconciling it to the work order, and handling the mismatches honestly.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Why verify before you report</div><p class="cb-demo">Start with the principle the whole technique rests on: A NUMBER YOU HAVE NOT CHECKED AGAINST THE REALITY IT CLAIMS TO DESCRIBE IS NOT A FACT, IT IS AN ASSUMPTION - and once an unverified cost enters your records, it never becomes more true. IT JUST TRAVELS. So you verify it at the SOURCE, once, before it is paid and before it is reported, rather than discovering it was wrong three reports later when it has already shaped a budget and a business case. A wrong work-order cost does not stay wrong in one place: it flows into the maintenance budget, the cost-per-asset, the reliability-per-rand, and the next business case - every decision that trusts your report inherits your unchecked number. AN UNVERIFIED NUMBER IS NOT A FACT; VERIFY AT THE SOURCE, ONCE, SO EVERY DECISION THAT FOLLOWS IS TRUE.</p></div><div class="canvas-box"><div class="cb-label">2. The three-way match: ordered, received, billed must agree</div><p class="cb-demo">The classic control for verifying a cost is the THREE-WAY MATCH, and it is exactly what it sounds like: before a supplier&#039;s invoice is paid, THREE DOCUMENTS MUST TELL THE SAME STORY. The PURCHASE ORDER - what you agreed to buy: the item, the quantity, the price. The GOODS RECEIPT - what was actually delivered and received. And the INVOICE - what the supplier is billing you. You match all three on QUANTITY, PRICE AND TERMS, and you PAY ONLY WHAT ALL THREE AGREE ON. ORDERED, RECEIVED, BILLED: if those three agree, the cost is real; if they disagree, something is wrong and it must be resolved before a single rand moves. This is not bureaucracy for its own sake - IT IS THE DIFFERENCE BETWEEN PAYING FOR WHAT YOU GOT AND PAYING FOR WHAT SOMEONE TYPED.</p></div><div class="canvas-box"><div class="cb-label">3. Reconcile the work-order cost</div><p class="cb-demo">In the asset-management world the match extends to the WORK ORDER. The cost booked to a maintenance work order - its LABOUR, its PARTS, its CONTRACTOR CHARGES - must trace back to and reconcile with those same procurement documents: the parts on the work order to the purchase order, goods receipt and invoice for those parts; the contractor charge to the contractor&#039;s order and invoice. When you do this BEFORE the work-order cost rolls up into your monthly report, the maintenance cost you report is THE COST THAT ACTUALLY HAPPENED, evidenced by documents, rather than a figure the system inherited from an unverified invoice. This is precisely what &#039;verify financial data before it is reported&#039; means in practice: you do not report the work order&#039;s number and hope, you report the number the documents confirm.</p></div><div class="canvas-box"><div class="cb-label">4. A control against error and fraud - needs segregation of duties</div><p class="cb-demo">The three-way match earns its keep TWO WAYS. It catches the HONEST ERRORS that are constant and costly: the duplicate invoice paid twice, the quantity billed that exceeds what was delivered, the price that crept above the agreed order, the invoice for goods that never arrived. And it DETERS AND DETECTS FRAUD: a fabricated cost CANNOT PRODUCE A GENUINE GOODS RECEIPT TO MATCH, so billing for undelivered goods or a phantom supplier is exposed the moment you insist all three documents agree. For this to work, one condition is essential - SEGREGATION OF DUTIES: the person who orders must not be the same person who confirms receipt and approves the invoice, because one person controlling all three steps can make the documents &#039;agree&#039; on a lie. And hold this clearly, because it is the heart of how AMU teaches controls: A CONTROL IS A GUARDRAIL FOR THE SYSTEM, NOT A CAGE FOR THE PERSON. IT PROTECTS THE HONEST FROM ERROR, THE ORGANISATION FROM LOSS, AND THE PROCESS FROM DOUBT. WE BUILD STRONG CONTROLS NOT BECAUSE WE ASSUME PEOPLE ARE DISHONEST, BUT SO THAT EVERYONE CAN OPERATE WITH CONFIDENCE, KNOWING THE SYSTEM ITSELF ENSURES INTEGRITY. A GOOD CONTROL PROTECTS HONEST PEOPLE FROM SUSPICION.</p></div><div class="canvas-box"><div class="cb-label">5. Handle exceptions honestly - a mismatch is a question</div><p class="cb-demo">When the three documents do not agree, you have an EXCEPTION, and how you treat it matters as much as catching it. The invoice is HELD - payment does not go through - until the discrepancy is resolved, with small differences within an agreed TOLERANCE allowed to pass so trivial roundings do not stall everything. But RESOLVING IS NOT ACCUSING: A MISMATCH IS A SIGNAL TO INVESTIGATE, NOT A VERDICT OF FAULT. WE APPROACH IT WITH CURIOSITY TO FIND THE CAUSE, NOT WITH AN ASSUMPTION OF BLAME. MOST DISCREPANCIES ARE HONEST ERRORS - A TYPO, A SHORT DELIVERY, A PRICE UPDATE NOT YET REFLECTED. THE PROCESS IS TO RESOLVE THE DISCREPANCY, NOT TO ACCUSE THE PERSON. You find the cause, correct the record to the verified figure, and pay and report only that - in the spirit of two parties fixing an error together, not one catching the other out. That is what keeps the control an instrument of trust rather than a source of fear.</p></div></div>
+
+<p>Boxes 2 and 3 are the match itself. Boxes 4 and 5 are why it works and how to handle what it catches. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>Ordered, received, billed must agree before you pay and before you report - because an unverified number is not a fact you can report, it is an assumption you are about to spread.</strong> Five questions:</p>
+<ul>
+<li><strong>Why verify before I report?</strong> <strong>An unverified number is an assumption you are about to spread.</strong> A wrong cost corrupts every decision downstream. Verify at the source, once, so every decision built on it is true.</li>
+<li><strong>How do I verify a cost?</strong> <strong>The three-way match.</strong> The purchase order (what was ordered), the goods receipt (what was received), and the invoice (what is billed) must agree. Pay only what all three agree on.</li>
+<li><strong>How does that reach my report?</strong> <strong>Reconcile the work-order cost.</strong> The cost booked to a maintenance work order must trace back to those same documents, so the cost you report is the cost that happened.</li>
+<li><strong>What does the match protect against?</strong> <strong>Error and fraud.</strong> It catches honest mistakes and detects the dishonest ones - and it needs segregation of duties to work.</li>
+<li><strong>What about a mismatch?</strong> <strong>Investigate, do not accuse.</strong> A discrepancy is a flag to resolve within tolerance, not a verdict of fraud - most are honest errors.</li>
+</ul>
+<p><strong>Verify at the source, because a number does not get truer downstream.</strong> Start with the principle the whole technique rests on: a number you have not checked against the reality it claims to describe is not a fact, it is an assumption - and once an unverified cost enters your records, it never becomes more true. It just travels. So you verify it at the <em>source</em>, once, before it is paid and before it is reported, rather than discovering it was wrong three reports later when it has already shaped a budget and a business case. <strong>An unverified number is not a fact; verify at the source, once, so every decision that follows is true.</strong></p>
+<p><strong>The three-way match: ordered, received, billed must agree.</strong> The classic control for verifying a cost is the <em>three-way match</em>, and it is exactly what it sounds like: before a supplier's invoice is paid, three documents must tell the same story. The <strong>purchase order</strong> - what you agreed to buy: the item, the quantity, the price. The <strong>goods receipt</strong> - what was actually delivered and received. And the <strong>invoice</strong> - what the supplier is billing you. You match all three on quantity, price and terms, and you <em>pay only what all three agree on</em>. Ordered, received, billed: if those three agree, the cost is real; if they disagree, something is wrong and it must be resolved before a single rand moves. This is not bureaucracy for its own sake - it is the difference between paying for what you got and paying for what someone typed.</p>
+<p><strong>Reconcile the work-order cost - this is how the match reaches your report.</strong> In the asset-management world the match extends to the <em>work order</em>. The cost booked to a maintenance work order - its labour, its parts, its contractor charges - must trace back to and reconcile with those same procurement documents: the parts on the work order to the purchase order, goods receipt and invoice for those parts; the contractor charge to the contractor's order and invoice. When you do this before the work-order cost rolls up into your monthly report, the maintenance cost you report is the cost that <em>actually happened</em>, evidenced by documents, rather than a figure the system inherited from an unverified invoice. This is precisely what "verify financial data before it is reported" means in practice.</p>
+<p><strong>A control against error and fraud - and why it needs segregation of duties.</strong> The three-way match earns its keep two ways. It catches the <em>honest errors</em> that are constant and costly: the duplicate invoice paid twice, the quantity billed that exceeds what was delivered, the price that crept above the agreed order, the invoice for goods that never arrived. And it <em>deters and detects fraud</em>: a fabricated cost cannot produce a genuine goods receipt to match, so billing for undelivered goods or a phantom supplier is exposed the moment you insist all three documents agree. For this to work, one condition is essential - <strong>segregation of duties</strong>: the person who orders must not be the same person who confirms receipt and approves the invoice, because one person controlling all three steps can make the documents "agree" on a lie. And hold this clearly, because it is the heart of how AMU teaches controls: <strong>a control is a guardrail for the system, not a cage for the person. It protects the honest from error, the organisation from loss, and the process from doubt. We build strong controls not because we assume people are dishonest, but so that everyone can operate with confidence, knowing the system itself ensures integrity. A good control protects honest people from suspicion.</strong></p>
+<p><strong>Handle exceptions honestly - a mismatch is a question, not a verdict.</strong> When the three documents do not agree, you have an <em>exception</em>, and how you treat it matters as much as catching it. The invoice is held - payment does not go through - until the discrepancy is resolved, with small differences within an agreed <em>tolerance</em> allowed to pass so trivial roundings do not stall everything. But resolving is not accusing: <strong>a mismatch is a signal to investigate, not a verdict of fault. We approach it with curiosity to find the cause, not with an assumption of blame. Most discrepancies are honest errors - a typo, a short delivery, a price update not yet reflected. The process is to resolve the discrepancy, not to accuse the person.</strong> You find the cause, correct the record to the verified figure, and pay and report only that - and you do it in the spirit of two parties fixing an error together, not one catching the other out. That is what keeps the control an instrument of trust rather than a source of fear.</p>
+<p>Does it scale? This is how you make any reported figure trustworthy - a project's spend, a grant's expenses, your own household's records: do not trust a number because it is written down or sitting in a system; check it against the independent evidence of what was actually agreed, actually received, and actually billed, and reconcile the three before you rely on it. Verifying at the source, once, and treating a mismatch as a question rather than an accusation, is how you turn a pile of documents into a figure you can defend - and never again have to answer "are you sure?" with a silence.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is your situation. A Corathyl work order for a pump overhaul has three parts line items from one supplier. You hold the purchase order (PO), the goods receipt (GRN), and the invoice. Verify before you pay and report.</p>
+<table>
+<tr><th>Item</th><th>Purchase order</th><th>Goods receipt</th><th>Invoice</th></tr>
+<tr><td>Mechanical seal</td><td>1 at R2,000</td><td>1 received</td><td>1 at R2,000</td></tr>
+<tr><td>Bearings</td><td>2 at R1,500</td><td>2 received</td><td>3 at R1,500</td></tr>
+<tr><td>Coupling</td><td>1 at R4,000</td><td>none received</td><td>1 at R4,000</td></tr>
+</table>
+<ol>
+<li><strong>Find the discrepancies.</strong> Run the three-way match on each item and name what is wrong with items 2 and 3.</li>
+<li><strong>Calculate the verified cost.</strong> What total should be approved for payment and reported?</li>
+<li><strong>Item 2 - the action.</strong> What must happen before this invoice is paid?</li>
+<li><strong>Item 3 - why the goods receipt matters.</strong> Explain why matching only the PO to the invoice would have missed this, and how the goods receipt protects the organisation.</li>
+<li><strong>Segregation of duties.</strong> Explain how having one person order and a different person receive makes this control effective.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> five things.</p>
+<p>First, the discrepancies: <em>Item 1 (seal)</em> is a perfect three-way match - ordered, received and billed all say 1 at R2,000. <em>Item 2 (bearings)</em>: the invoice bills for <strong>3</strong> but only <strong>2</strong> were ordered and <strong>2</strong> received - an over-quantity billing of one bearing. <em>Item 3 (coupling)</em>: it is on the PO and the invoice, but the goods receipt shows <strong>none received</strong> - billed for something not delivered.</p>
+<p>Second, the verified cost: pay and report only what all three agree on - seal R2,000 + bearings (the 2 actually ordered and received) R3,000 + coupling (not received) R0 = <strong>R5,000</strong>. The invoice total was R2,000 + R4,500 + R4,000 = R10,500, so <strong>R5,500 would have been wrongly paid and reported</strong> without the match.</p>
+<p>Third, item 2 action: hold the invoice as an exception, investigate the cause (a keying error, or an over-bill), correct it to 2 bearings = R3,000, and pay and report only the verified figure - approached as resolving a discrepancy, not accusing the supplier.</p>
+<p>Fourth, item 3: matching only the PO to the invoice would have passed the coupling, because the PO and invoice agree - it was ordered and it was billed. Only the <em>goods receipt</em> reveals it was never delivered. The goods receipt is the independent evidence of reality, and skipping it is the exact gap that billing-for-undelivered-goods relies on.</p>
+<p>Fifth, segregation of duties: if the person who ordered were also the one confirming receipt and approving payment, they could sign off a delivery that never came. Splitting order and receipt between two people means the receipt is independent evidence, so no one person can make the documents "agree" on a lie - which protects the honest and blocks the dishonest.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-why_verify_before_report">1. Why verify before you report</label><textarea id="cb-why_verify_before_report" data-key="t-0237:why_verify_before_report" placeholder="A number you have not checked against the reality it claims to describe is not a fact, it is an assumption - and once an unverified cost enters your records it never becomes more true, it just travels. So verify at the source, once, before it is paid and reported, rather than discovering it was wrong three reports later when it has already shaped a budget and a business case. An unverified number is not a fact; verify at the source, once, so every decision that follows is true."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_three_way_match">2. The three-way match: ordered, received, billed must agree</label><textarea id="cb-the_three_way_match" data-key="t-0237:the_three_way_match" placeholder="The classic control for verifying a cost: before a supplier&#039;s invoice is paid, three documents must tell the same story. The PURCHASE ORDER (what you agreed to buy - item, quantity, price), the GOODS RECEIPT (what was actually delivered and received), and the INVOICE (what is billed). Match all three on quantity, price and terms, and pay only what all three agree on. Ordered, received, billed: if they agree the cost is real; if they disagree, resolve it before a single rand moves."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-reconcile_the_work_order">3. Reconcile the work-order cost</label><textarea id="cb-reconcile_the_work_order" data-key="t-0237:reconcile_the_work_order" placeholder="In asset management the match extends to the WORK ORDER: the cost booked to a maintenance work order - labour, parts, contractor charges - must trace back to and reconcile with those same procurement documents (the parts to the PO/receipt/invoice, the contractor charge to the contractor&#039;s order and invoice). Do this before the work-order cost rolls up into the monthly report, and the maintenance cost you report is the cost that actually happened, evidenced by documents, not a figure inherited from an unverified invoice."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-control_against_error_and_fraud">4. A control against error and fraud - needs segregation of duties</label><textarea id="cb-control_against_error_and_fraud" data-key="t-0237:control_against_error_and_fraud" placeholder="The match earns its keep two ways. It catches HONEST ERRORS (the duplicate invoice, the quantity billed above what was delivered, the price crept above the order, the invoice for goods that never arrived); and it DETERS AND DETECTS FRAUD (a fabricated cost cannot produce a genuine goods receipt to match). It needs SEGREGATION OF DUTIES: the person who orders must not be the one who confirms receipt and approves the invoice. A control is a guardrail for the system, not a cage for the person - it protects honest people from suspicion."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-handle_exceptions_honestly">5. Handle exceptions honestly - a mismatch is a question</label><textarea id="cb-handle_exceptions_honestly" data-key="t-0237:handle_exceptions_honestly" placeholder="When the three documents disagree you have an EXCEPTION: the invoice is held (payment does not go through) until it is resolved, with small differences within an agreed TOLERANCE allowed to pass. But resolving is not accusing. A mismatch is a signal to investigate, not a verdict of fault; we approach it with curiosity to find the cause, not an assumption of blame. Most discrepancies are honest errors - a typo, a short delivery, a price update not yet reflected. Resolve the discrepancy, correct to the verified figure, pay and report only that."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When ordered, received and billed all agree - and the work-order cost traces to the documents - <strong>save it</strong>. You can now report a figure you have verified and can defend.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Ordered, received, billed must agree before you pay and before you report - because an unverified number is not a fact you can report, it is an assumption you are about to spread.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Reporting unverified work-order costs.</strong> A number in the system is not a verified fact. Trace it to the order, the receipt and the invoice before it enters your report.</p>
+<p>&bull; <strong>Matching only two documents.</strong> Checking the PO against the invoice while skipping the goods receipt is the exact gap that billing-for-undelivered-goods exploits. Always match all three.</p>
+<p>&bull; <strong>One person controlling all three steps.</strong> If the same person orders, receives and pays, the documents can be made to "agree" on a lie. Separate the duties.</p>
+<p>&bull; <strong>Treating every mismatch as fraud.</strong> Most discrepancies are honest errors. Investigate with curiosity to find the cause, not with an accusation.</p>
+<p>&bull; <strong>Waving a mismatch through to hit a deadline.</strong> A held invoice is the control working. Resolve the exception before you pay; the deadline is not worth a fiction in the report.</p>
+<p>&bull; <strong>No tolerance policy.</strong> With no agreed tolerance, trivial roundings stall everything and people start skipping the check. Set a sensible tolerance so effort goes where it matters.</p>
+<p>&bull; <strong>Verifying in the report instead of at the source.</strong> By the time a wrong cost is in the report it has already spread. Verify once, at the source, where the documents are.</p>
+<p>&bull; <strong>Assuming the number is right because it is in the system.</strong> The system trusts whoever typed it in. The match is what makes the number trustworthy.</p>
+</div>
+</details>
+<p>The dreaded question - "are you sure about this cost?" - only has a good answer if you verified before you reported. So verify at the source: make the purchase order, the goods receipt and the invoice agree on what was ordered, received and billed, pay only what all three confirm, and reconcile the work-order cost to those documents before it ever reaches your report. Keep the duties separated so the evidence stays independent, and treat every mismatch as a question to resolve rather than a person to accuse. <strong>Ordered, received, billed must agree before you pay and before you report - because an unverified number is not a fact, it is an assumption, and the whole job is to make sure that what you report is what truly happened.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can verify cost data before you report it now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

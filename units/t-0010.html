@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A 32-year-old truss fails the safety-factor rule on paper (1.35 against 1.5), but the board will ask &#039;what is the chance it actually fails?&#039; - and I cannot answer that with one number. How do I turn the doubt into a real probability?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A 32-year-old truss fails the safety-factor rule on paper (1.35 against 1.5), but the board will ask &#039;what is the chance it actually fails?&#039; - and I cannot answer that with one number. How do I turn the doubt into a real probability?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are on the walkway above the reservoir at <strong>Ridgepoint Bulk Water</strong>, looking up at roof truss <strong>T-6</strong>. It is <strong>32 years old</strong>. Your colleague <strong>Boipelo</strong>, the structures lead, stands next to you with her arms folded. The board meets on Thursday: it will either approve <strong>R4.2 million</strong> to strengthen T-6 now, or leave it for the next budget cycle in three years.</p>
+<p>You have done the normal sum. You worked out the worst load the truss could ever carry - full roof weight, a soaked concrete deck after heavy rain, plus the heaviest maintenance trolley - and divided the truss's strength by it. You got a <strong>safety factor of 1.35</strong>. The drawing-office rule says 1.5. So on paper, T-6 fails the rule. But you do not believe the worst case happens often: the deck is almost never fully soaked, the trolley is rarely at mid-span.</p>
+<p>Boipelo says it plainly: "A safety factor of 1.35 doesn't tell the board anything. They will ask me: <em>what is the chance it actually fails?</em> And I can't answer that with one number." She is right. The single factor hides everything - how much the load varies, how unsure you are of the steel's true strength after 32 years, how those two kinds of doubt stack up. There is a faint smell of chlorine and wet concrete rising from the reservoir below.</p>
+<p>If you go to the board with "safety factor 1.35, rule says 1.5," they will spend R4.2 million out of fear, or refuse it out of stubbornness - and neither of you will actually know if T-6 is safe.</p>
+<blockquote><h2>A single safety factor hides everything and answers nothing. How do I turn the scatter in the load and the doubt in the steel into a real, defensible probability that T-6 fails - and an honest account of how much I trust that number?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Truss T-6 carries the roof. Three coupon tests put the critical chord&rsquo;s strength at a mean of <strong>820 kN</strong>, scattering by about <strong>12%</strong>. Five years of deck-moisture and trolley logs put the load on it at a mean of <strong>560 kN</strong>, with a spread of about <strong>70 kN</strong>. The old worst-case sum gives a safety factor of <strong>1.35</strong> against a rule that says 1.5. Strengthening costs <strong>R4.2 million</strong>. Write down what you would tell the board, and how you would show it — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what a single safety factor throws away</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;1.35 is below 1.5, so it fails the rule. Strengthen it.&rdquo;</strong> Defensible on paper and it spends R4.2 million without anybody learning whether T-6 was ever likely to fail. If the board asks &ldquo;what was the chance?&rdquo;, there is no answer in the file.</p>
+<p>&bull; <strong>&ldquo;The worst case almost never happens. On mean load it is 820 over 560, about 1.46 — near enough.&rdquo;</strong> A better number, honestly reasoned, and still a single ratio. It says nothing about how <em>often</em> the load might cross the strength, which is the only thing anybody actually wants to know.</p>
+<p>&bull; <strong>&ldquo;Cut more coupons and test them.&rdquo;</strong> This reduces one doubt — how much you know about the steel. It does nothing at all to the other, which is that the load itself genuinely varies. More tests on the wrong doubt buy nothing.</p>
+<p>&bull; <strong>&ldquo;Apply a bigger factor to be safe.&rdquo;</strong> Conservatism piled on conservatism, with no idea which of the two doubts is driving the risk — so you cannot tell whether you have bought safety or only cost.</p>
+<p>&bull; <strong>&ldquo;Instrument it and watch for cracks.&rdquo;</strong> Worth doing alongside, and no answer to the question in front of you, which is whether it is safe <em>now</em>.</p>
+<p>&bull; Notice what every one of them does: collapses two spread-out ranges into one number, and then argues about the number. Keep them as ranges instead and the question becomes answerable. The margin between strength and load has a mean of <strong>820 &minus; 560 = 260 kN</strong>, and the two spreads combine to about <strong>120.8 kN</strong> — so the margin is roughly <strong>2.15</strong> spreads wide, which puts the chance of failure at about <strong>1.6%</strong>, or <strong>1 in 63</strong>, over the period those load records cover. That is a number a board can act on. And the method does something a safety factor never can: it tells you <em>which</em> doubt is driving the risk — so you can see whether better load data would buy more certainty than R4.2 million of steel. The two doubts are not even the same kind of thing: one is real scatter that will always be there, the other is ignorance that measurement would reduce.</p>
+</div>
+</details>
+<p>You need a method that turns doubt into a number. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>The method is <strong>structural reliability analysis</strong>, and it answers one question: <em>what is the real chance this thing will fail?</em> It treats strength and load not as single numbers but as they really are - spread-out ranges of possibility - and asks how often, across all the ways those ranges combine, the load crosses over the strength. That crossover chance is the <strong>probability of failure</strong>. The main tool, the First-Order Reliability Method, also tells you <em>which</em> of your doubts is driving the risk. Watch it run on T-6.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Frame the limit state, describe inputs as distributions</div><p class="cb-demo">For T-6&#039;s critical bottom chord, g = R - S, where R is the chord&#039;s tensile resistance and S the demand from the roof loads. Resistance R (from 3 coupon tests, modelled lognormal): mean 820 kN, CoV 0.12, so sigma_R = 820 x 0.12 = 98.4 kN. Load effect S (from 5 years of deck-moisture and trolley logs, modelled normal): mean 560 kN, std dev 70 kN. (The old worst-case sum gave a safety factor of just 1.35, below the rule of 1.5 - but the worst case almost never happens; on mean load the ratio is 820/560 = 1.46, a number that still tells the board almost nothing.)</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Compute the reliability index (beta) and Pf (FORM)</div><p class="cb-demo">Mean of g = 820 - 560 = 260 kN; std dev of g = sqrt(sigma_R^2 + sigma_S^2) = sqrt(98.4^2 + 70^2) = sqrt(14,584) = 120.8 kN. So beta = 260 / 120.8 = 2.15, and Pf = Phi(-2.15) = 0.0158 - about 1.6%, or roughly 1 in 63, over the period the load data represents. Already this says far more than &#039;safety factor 1.35&#039;: the board now has a number it can weigh.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Find what drives the risk (the gift of FORM)</div><p class="cb-demo">The variance shares: resistance sigma_R^2 / (std dev of g)^2 = 9,684 / 14,584 = 66%; load = 4,900 / 14,584 = 34%. Two-thirds of the risk comes from uncertainty about the truss&#039;s STRENGTH, not the load - the single most useful line in the whole analysis, and you only see it because reliability analysis breaks the problem open.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Check the curvature (SORM) and split the doubt (UQ)</div><p class="cb-demo">SORM nudges Pf from 1.6% to about 1.6% (beta 2.15 to about 2.12) - a change under 10%, which confirms FORM was trustworthy here; report Pf about 1.6%. The split: the load spread is mostly aleatoric (design for it). The strength CoV of 0.12 rests on just 3 coupon tests on a 32-year-old truss - largely epistemic. If the true CoV is 0.08 (steel healthy), beta rises to about 2.7 and Pf drops to about 0.3%; if 0.16 (hidden corrosion), beta falls to about 1.75 and Pf climbs to about 4.0%. So the honest answer is Pf about 1.6%, credibly anywhere from 0.3% to 4.0% - and that whole spread is driven by how little we know about the steel, which we can fix.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Turn the split into the decision, report honestly</div><p class="cb-demo">Two-thirds of the risk and nearly all the reducible doubt live in the steel strength, resting on 3 tests. So before spending R4.2 million, propose a R30,000 inspection and 12 more coupon tests. If the steel comes back healthy (Pf about 0.3%), defer the R4.2m for three years with confidence; if poor (Pf about 4.0%), the board approves the spend without fear. The board paper: Pf about 1.6% (range 0.3% to 4.0%); the dominant driver is epistemic uncertainty in steel strength; the recommended action is the R30,000 inspection first. Boipelo can now answer the board&#039;s real question - what is the chance it fails, and how sure are we? - with a defensible number and a cheaper next step.</p></div></div>
+
+<p>See what the analysis did. It turned "1.35 against a rule of 1.5" - a number that spreads fear without information - into "a 1.6% chance of failure, and here is exactly how sure we are, and here is the cheap test that would tell us more." <strong>And see the mission in it, because this is honesty and stewardship in the same method. The single safety factor is a comfortable lie: it sounds precise and answers nothing, and it pushes a board either to spend four million rand out of fear or to refuse it out of stubbornness, with no one any the wiser about whether people are safe under that roof. Reliability analysis refuses that. It says plainly how likely failure is, and - more honestly still - it splits the doubt into the part that is real randomness you must design around and the part that is simply not having measured enough, which a thirty-thousand-rand inspection can clear. So the four-million-rand decision is no longer made in the dark: you buy down the cheap doubt first, and then you either defer the spend with confidence or justify it with evidence.</strong> The money - R4.2 million against R30,000 - is the measure of what an honest number is worth; the aim is a truss you actually know to be safe, and scarce public funds spent on knowledge instead of fear.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You run the analysis in five moves.</p>
+<ul>
+<li><strong>1. Frame the limit state, describe inputs as distributions.</strong> g = Strength - Load; each input a mean and a spread.</li>
+<li><strong>2. Compute the reliability index and Pf.</strong> FORM: beta = margin over its own scatter; Pf from beta.</li>
+<li><strong>3. Find what drives the risk.</strong> Which doubt - strength or load - owns most of the failure chance.</li>
+<li><strong>4. Check the curvature, split the doubt.</strong> SORM; then aleatoric (irreducible) versus epistemic (reducible).</li>
+<li><strong>5. Turn the split into the decision.</strong> Buy down the reducible doubt cheaply; report honestly.</li>
+</ul>
+<p>The ideas underneath. The <em>limit-state function</em> g = R - S is the safety check: failure is g below zero, and the method computes the chance of that. Each input is a <em>distribution</em> - a mean and a <em>coefficient of variation (CoV)</em>, its spread relative to the mean - because strength is not exactly 820, it is <em>around</em> 820. The <em>First-Order Reliability Method (FORM)</em> finds the <em>reliability index, beta</em> - how many standard deviations the safety margin sits above failure - and the <em>probability of failure, Pf</em>, is the normal-curve probability of landing below minus beta (written Pf = Phi(-beta)). FORM's gift is the <em>sensitivity</em>: each input's share of the variance, so you see which doubt drives the risk. The <em>Second-Order method (SORM)</em> corrects for a curved failure boundary when an input is lognormal. And <em>uncertainty quantification (UQ)</em> splits doubt into <em>aleatoric</em> (genuine randomness - you measure it, design for it, but cannot remove it) and <em>epistemic</em> (not knowing enough - more measurement shrinks it). It fits high-stakes, hard-to-reverse calls where a single safety factor hides too much - critical structures, renewal or life-extension of ageing assets; it is overkill for routine low-consequence parts or early sketch design with no distribution data, where a code safety factor is faster and fine.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Take a high-stakes asset decision of <em>your</em> own - a girder, a foundation, a pressure shell, a pipeline section - and run the five moves. Write g = Strength - Load and describe each as a distribution; compute beta and Pf; find which doubt owns the risk; check the curvature and split the doubt into the part you design for and the part you can measure away; then propose the cheap measurement that buys down the reducible doubt before the big spend.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-frame_inputs">Step 1 - Frame the limit state, describe inputs as distributions</label><textarea id="cb-frame_inputs" data-key="t-0010:frame_inputs" placeholder="Write the limit state - the simple safety check g = Strength - Load (failure is g below zero) - then describe each input not as a single number but as a DISTRIBUTION: a mean and a coefficient of variation (CoV) capturing its spread. A single safety factor hides all of this; the distributions are what let you compute a real chance of failure."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-compute_beta">Step 2 - Compute the reliability index (beta) and Pf (FORM)</label><textarea id="cb-compute_beta" data-key="t-0010:compute_beta" placeholder="Run the First-Order Reliability Method (FORM) to get the reliability index, beta - how many standard deviations the safety margin sits above failure - then convert it to a probability of failure, Pf. With independent normal inputs, the margin g = R - S is itself normal: beta = (mean of g) / (std dev of g), and Pf is the normal-curve probability of landing below -beta."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-drives_risk">Step 3 - Find what drives the risk (the gift of FORM)</label><textarea id="cb-drives_risk" data-key="t-0010:drives_risk" placeholder="Find what DRIVES the risk - FORM&#039;s real gift. Each input&#039;s share of the variance in the margin tells you whether the failure chance is driven by your doubt about the load, or your doubt about the strength. That one line tells you exactly where to spend effort to reduce the risk."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-curvature_split">Step 4 - Check the curvature (SORM) and split the doubt (UQ)</label><textarea id="cb-curvature_split" data-key="t-0010:curvature_split" placeholder="Check the curvature with the Second-Order method (SORM) - because a lognormal input bends the failure boundary slightly - then SPLIT your doubt into two kinds: ALEATORIC (genuine randomness you can measure but never remove, so you must DESIGN for it) and EPISTEMIC (not knowing enough, which more measurement can SHRINK - so you can often buy it down cheaply)."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-decision_report">Step 5 - Turn the split into the decision, report honestly</label><textarea id="cb-decision_report" data-key="t-0010:decision_report" placeholder="Turn the split into the decision, and report honestly. Because nearly all the REDUCIBLE doubt lives in one input, buy it down cheaply BEFORE the big, hard-to-reverse spend - then give the board one page: the probability, its honest range, the dominant driver, and the cheaper next step."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines keep the analysis honest. First, <strong>use the true mean load, never the worst case, and a real spread</strong> - the worst-case-divided-by-strength habit is exactly what produced the useless 1.35; reliability works on how the load and the strength actually vary, so a single conservative number smuggled into a probabilistic method poisons the answer in both directions. Second, <strong>split the doubt before you spend, and chase the reducible part first</strong> - the most expensive mistake in this whole field is to treat all uncertainty as irreducible and design (or spend) around it, when a large slice is simply "we have not measured enough"; find where the reducible doubt lives, buy it down with the cheapest test that will move it, and let the big, hard-to-reverse spend wait for that evidence.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your reliability analysis true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>A safety factor is one number hiding many.</strong> It cannot say how the load varies or how sure you are of the strength. When the decision is big, compute the probability, not the ratio.</p>
+<p>&bull; <strong>Distributions, not worst cases.</strong> Use the true mean and the real spread of each input. A worst-case number forced into a probabilistic method gives a false answer.</p>
+<p>&bull; <strong>Read the sensitivity - it tells you where to look.</strong> The input that owns most of the variance is where the risk lives, and where a measurement will move the answer most.</p>
+<p>&bull; <strong>Split the doubt: design for one kind, measure away the other.</strong> Aleatoric randomness you design around; epistemic doubt you can shrink with cheap tests. Confusing them wastes money.</p>
+<p>&bull; <strong>Buy down the cheap doubt before the dear spend.</strong> A R30,000 test that could defer or justify a R4.2m decision is the most valuable line in the plan.</p>
+</div>
+</details>
+<p>You came onto the walkway with a failed rule of thumb and a board paper you could not defend. You can leave with a real probability and the honest spread behind it: T-6 fails about 1.7 times in a hundred, credibly somewhere between 0.3% and 4.0%, and almost all of that uncertainty is not the steel truly varying but our not having measured it - which a R30,000 inspection can clear before anyone spends R4.2 million. <strong>Turn one hiding safety factor into a probability of failure and the honest spread behind it - the difference between guessing and knowing, and the cheap test that buys down the doubt before the big spend.</strong> That is how a high-stakes call on an ageing asset is made well: not with a comfortable ratio that answers nothing, but with a number you can defend, a spread you can name, and the cheapest possible step toward certainty. (Working with an AMU facilitator? Bring one ageing structure and run its limit state together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can run a FORM/SORM structural reliability analysis and split the uncertainty now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

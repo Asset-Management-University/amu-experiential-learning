@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The calculation was right, and the bearing failed anyway</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The calculation was right, and the bearing failed anyway</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>A partner organisation in the renewable energy sector has asked you to look at a gearbox. You are Onalenna, and you run a water treatment works - but asset management travels, and they want someone who will read the evidence rather than defend a supplier.</p>
+<p>The gearbox failed at a fraction of its design life, and <em>every calculation says it should not have</em>.</p>
+<p>The load duty was within rating. The lubricant was correct and the cleanliness was in specification. The bearing life arithmetic gives decades. You check it twice, because your first instinct - everyone's first instinct - is that something in the data must be wrong.</p>
+<p>Then the stripped bearing arrives.</p>
+<p>The inner raceway of the high-speed shaft carries <strong>cracks running axially</strong> - across the rolling direction. It looks nothing like the shallow, flaking spalls of classical fatigue. It is not what a bearing that has simply run out of life looks like.</p>
+<p>And you understand that the calculation was not wrong. It was <em>answering a different question</em> from the one this bearing was failing.</p>
+<blockquote><h2>Every calculation says this gearbox should still be running, and it is in pieces on a bench. How do I analyse the data and the evidence to say what actually failed, how far it had progressed, and how much of that I actually know?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The life calculation says this bearing has years left. You have checked it twice and it is right. It is in pieces on the bench in front of you, and the damage is <strong>cracks running axially across the inner raceway, against the rolling direction</strong> — nothing like the shallow flaking of a bearing that has simply run out of life. The operating record shows <strong>1,850 hours near rated</strong>, which reads as a comfortably loaded machine, and also <strong>340 braking and grid events a year</strong> at roughly three minutes each, which nobody has ever looked at separately. Write down how you would establish what actually failed — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the order that protects the analysis</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Recheck the calculation — something must be wrong in it.&rdquo;</strong> You have, and it is right. The resolution is not that the calculation is wrong but that it is <strong>answering a different question from the one this bearing was failing</strong>.</p>
+<p>&bull; <strong>&ldquo;It must be a manufacturing defect — raise it with the supplier.&rdquo;</strong> The convenient answer, and it is a hypothesis being adopted before anything has been described. It also ends the investigation, which is why it is attractive.</p>
+<p>&bull; <strong>&ldquo;Apply a bigger safety factor and move on.&rdquo;</strong> Covers an unknown mechanism with a margin whose size nobody can justify, on every future bearing, forever — and it will not help if the mechanism is not load-magnitude driven.</p>
+<p>&bull; <strong>&ldquo;Look at the average load over the dataset.&rdquo;</strong> This is the trap sitting in your own data. <strong>Averaging erases exactly the events that do the damage</strong> — 340 events of three minutes is about 17 hours, under one per cent of loaded time, and it vanishes into a mean that reports a comfortable machine.</p>
+<p>&bull; <strong>&ldquo;It looks like a fatigue crack — start from there.&rdquo;</strong> The most natural move and the one that costs most. <strong>A name carries a mechanism with it</strong>, and naming this early quietly commits the whole analysis to a hypothesis nobody has yet tested.</p>
+<p>&bull; So stop defending the model and <strong>read the machine</strong>, in an order that protects you. First the duty <strong>including the transients</strong>, counted <em>and</em> magnitude-quantified separately — those braking events can carry loads far above rated, and characterising them separately is the difference between analysing this machine and analysing one that does not exist. Then the mode, and here the ordering is the whole safeguard: <strong>describe before you name</strong> — location, orientation, morphology. Axial cracks on the inner raceway of a high-speed stage already exclude a great deal, and the description does that work without committing you. Then <strong>how far it had progressed</strong>, because a failure has a history and the evidence usually shows where it began and how it travelled. And finally the part that makes the analysis usable rather than merely confident: <strong>say plainly what is known, what is inferred and what remains unknown</strong> — because an account that does not distinguish those will be read as more certain than it is, and will drive decisions it cannot support.</p>
+</div>
+</details>
+<p>You stop defending the model and start reading the machine. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the failure analysis - duty, mode, progression, and an honest account of what is known.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Characterise the duty from the data - including the transients</div><p class="cb-demo">Do NOT average the dataset. Separate STEADY OPERATION from the TRANSIENT EVENTS - starts, stops, braking, grid disturbances - and quantify both the count and the MAGNITUDE of each, because a wind turbine drivetrain lives a dynamic life that a mean power figure erases completely. The magnitudes are not marginal: DURING BRAKING EVENTS, GEARBOX TORQUE INCREASES ABRUPTLY TO 70 PER CENT ABOVE RATED, PRODUCING MAXIMUM BEARING STRESSES 45 TO 60 PER CENT ABOVE RATED. This dataset shows 1,850 hours near rated plus 340 transient events a year at roughly three minutes each - 17 hours, or 0.9 PER CENT OF LOADED TIME. Any average over this dataset reports a comfortably-loaded gearbox, and every one of those 340 events disappears into it. Characterise them separately or you will analyse a machine that does not exist.</p></div><div class="canvas-box"><div class="cb-label">2. Identify the failure mode from its APPEARANCE (describe before naming)</div><p class="cb-demo">DESCRIBE WHAT IS THERE BEFORE YOU NAME IT, because a name carries a mechanism with it and naming early quietly commits the whole analysis. Record the LOCATION (which component, which raceway, which stage), the ORIENTATION of the damage, and its MORPHOLOGY. Here: cracks running AXIALLY on the INNER RACEWAY of a HIGH-SPEED PARALLEL-STAGE bearing. That description already excludes a great deal - it is not the flank pitting of a gear tooth, and it is not the shallow spalling of classical rolling contact fatigue. THEN name it: the most common wind turbine gearbox failure is BEARING AXIAL CRACKING, commonly called WHITE ETCHING CRACKS, with WHITE STRUCTURE FLAKING the other principal form, and both are characteristically found in the inner raceways of the high-speed parallel stage. The order matters: description is evidence, the name is a classification, and a report that begins with the name has skipped the only part a reader can check.</p></div><div class="canvas-box"><div class="cb-label">3. Place it on its PROGRESSION - not just what, but how far along</div><p class="cb-demo">A mode without a position on its progression tells the operator nothing useful, because what they need to know is HOW LONG THEY HAVE. Read the surface: SMALL AXIAL CRACKS OF 1 TO 3 MM appear to be an EARLY STAGE of propagation, while LARGE CRACKS EXCEEDING 10 MM are advanced. Read the subsurface, which is where this mode develops before it is visible at all: BUTTERFLY WING FORMATIONS around NON-METALLIC INCLUSIONS at depths of up to about 260 MICROMETRES from the contact surface, and CIRCUMFERENTIAL CRACKS running parallel to the contact surface at depths GREATER THAN 300 MICROMETRES. So a raceway showing many 1-3 mm cracks with subsurface butterflies is early in its development, and one with cracks beyond 10 mm and circumferential subsurface cracking is late. THAT distinction changes the recommendation from monitor-and-plan to remove-from-service, and it is the difference between a report and an observation.</p></div><div class="canvas-box"><div class="cb-label">4. Say what the model does and does NOT explain</div><p class="cb-demo">Run the classical calculation and then be honest about it. Using the ISO 281 roller exponent of 10/3, a load 45 per cent above rated cuts life by a factor of 3.45, and 60 per cent above rated by 4.79 - so the transients are about FOUR TIMES more damaging per unit time. But they occupy 0.9 per cent of loaded time, so on a classical rolling contact fatigue model THEY CARRY ONLY ABOUT 3.4 PER CENT OF ACCUMULATED DAMAGE. The model therefore attributes almost everything to steady operation and predicts a long life. AND THE BEARING FAILED EARLY, WITH AXIAL CRACKS, WHICH IS NOT THE APPEARANCE OF CLASSICAL ROLLING CONTACT FATIGUE. Do not force the evidence into the model. Report the ANOMALY: the calculation was applied correctly and it does not describe this failure. This is not a claim that the standard is useless - it is the recognition that it is INSUFFICIENT for this mode, which is exactly why this phenomenon became a research priority and why it surprised an industry that was calculating correctly throughout.</p></div><div class="canvas-box"><div class="cb-label">5. Separate what the evidence SHOWS from what the mechanism is BELIEVED to be</div><p class="cb-demo">This failure mode has a well-characterised APPEARANCE and a genuinely CONTESTED MECHANISM, and your report must not blur the two. What the EVIDENCE shows: the location, orientation and morphology; the subsurface features; the transient duty. What is BELIEVED: one theory relates this cracking to the routine dynamic conditions and occasional transient events prevalent in wind turbines, producing high bearing stress combined with SLIDING of the rolling elements, with high contact stress and sliding a POSSIBLE root cause. The literature is unsettled - the sources hedge, and the sequence of white-etching and cracking is itself debated. So write the findings as findings, write the mechanism as a hypothesis with its status stated, and MAKE EVERY RECOMMENDATION REST ON THE EVIDENCE - inspect these bearings, characterise these transients, review this operating regime - rather than on the contested cause. A recommendation built on a theory fails when the theory moves; one built on the evidence survives. AN ENGINEER WHO PRESENTS A CONTESTED THEORY AS SETTLED FACT IS A LIABILITY.</p></div></div>
+
+<p>Box 4 is the uncomfortable one, and it is the reason this unit exists. The calculation was performed correctly, by competent people, and it does not describe what happened. Read what box 5 then does with that. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A correct calculation showing a component <em>should not</em> fail is the <strong>start of an investigation, not the end</strong> - and it forces you to trust the physical evidence over the model, and to report what is seen rather than what is believed. Five questions:</p>
+<ul>
+<li><strong>What duty did it actually live?</strong> Separate steady operation from <strong>transients</strong> and quantify both. Braking events drive gearbox torque 70 per cent above rated and bearing stress 45 to 60 per cent above. An average erases every one of them.</li>
+<li><strong>What does the damage look like?</strong> <strong>Describe before naming</strong> - location, orientation, morphology. Axial cracking on the inner raceway of a high-speed stage is a description; <strong>white etching cracks</strong> and <strong>white structure flaking</strong> are classifications, and they carry a mechanism with them.</li>
+<li><strong>How far along is it?</strong> The <strong>progression</strong>: small 1 to 3 mm axial cracks are early; cracks beyond 10 mm are advanced. Subsurface, <strong>butterfly formations</strong> around non-metallic inclusions appear at depths up to about 260 micrometres, and circumferential cracks parallel to the surface beyond 300 micrometres.</li>
+<li><strong>What does the model say, and what does it miss?</strong> Run it, report it honestly, and name the <strong>anomaly</strong> rather than forcing the evidence to fit a familiar calculation.</li>
+<li><strong>What do you actually know?</strong> Separate <strong>evidence</strong> from <strong>mechanism</strong>, and rest the recommendation on the first.</li>
+</ul>
+<p><strong>The arithmetic that makes the point, and its honest bound.</strong> Using the ISO 281 roller exponent of 10/3, a load 45 per cent above rated cuts life by a factor of 3.45 and 60 per cent above by 4.79 - so the transients are around four times more damaging per unit time. But they occupy under one per cent of loaded time, so on a classical fatigue model they account for only about 3.4 per cent of accumulated damage. The model therefore says the bearing is fine. The bearing is not fine. This is <em>not</em> a claim that the standard is useless - it is applied correctly and remains the right tool for classical rolling contact fatigue. It is the recognition that it is <strong>insufficient for this failure mode</strong>, which is exactly why this phenomenon became a research priority while an industry calculated correctly throughout.</p>
+<p><strong>And the discipline that follows from a contested mechanism.</strong> This failure has a well-characterised appearance and a genuinely debated cause. One theory relates the cracking to routine dynamic conditions and occasional transient events producing high contact stress combined with <em>sliding</em> of the rolling elements. The literature hedges, and the sequence of white-etching and cracking is itself argued over. So state findings as findings and the mechanism as a hypothesis with its status attached. <strong>An engineer who presents a contested theory as settled fact is a liability</strong> - and a recommendation resting on a theory fails when the theory moves.</p>
+<p>One honest boundary. You are analysing a dataset and physical evidence to report the failure mode and its progression. You are not selecting the replacement bearing, not calculating design life, and certainly not resolving a mechanism that the research community has not resolved. Your job is to be exact about what is known and exact about what is not.</p>
+<p>Does it scale? A pathologist who finds a healthy heart does not conclude the patient is alive. The finding is real, correctly obtained, and it means the cause of death is somewhere else - so the investigation continues rather than stopping at the reassuring result. Your bearing life calculation is that healthy heart.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A second gearbox from the same fleet is stripped after 41 months. Its condition record:</p>
+<table>
+<tr><th>Evidence</th><th>Observation</th></tr>
+<tr><td>Duty data</td><td>1,600 h/yr near rated; 480 grid-disconnection events per year averaging 2 minutes</td></tr>
+<tr><td>Oil debris monitoring</td><td>Ferrous particle count rising steadily from month 29, doubling by month 36</td></tr>
+<tr><td>Vibration</td><td>No clear bearing defect frequencies until month 38, then rapid growth</td></tr>
+<tr><td>Bearing temperature</td><td>Unremarkable throughout, rising only in the final three weeks</td></tr>
+<tr><td>Raceway on strip-down</td><td>High-speed stage inner raceway: numerous axial cracks, mostly 1 to 3 mm, two exceeding 12 mm</td></tr>
+<tr><td>Metallography</td><td>Butterfly formations around inclusions at 180 to 250 micrometres depth</td></tr>
+</table>
+<ol>
+<li><strong>Duty.</strong> Compute the transient hours per year and their share of loaded time. Say what an average would have told you.</li>
+<li><strong>Describe, then name.</strong> Write the physical description first, then the classification it supports.</li>
+<li><strong>Progression.</strong> Place this bearing on its progression using both the surface and subsurface evidence, and justify the position.</li>
+<li><strong>Sequence.</strong> The three condition indicators moved at different times. What does that ordering tell you, and which indicator would you rely on for earlier warning next time?</li>
+<li><strong>Report.</strong> Write two sentences of findings and one of mechanism, with the status of each made explicit.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, step 3 has a genuine tension in it and you should not resolve it by picking the more dramatic evidence. The surface shows mostly early-stage cracking with two advanced ones; the subsurface butterflies sit at 180 to 250 micrometres, within the depth band associated with this mode but not beyond the 300 micrometre circumferential-cracking depth. An honest answer says <em>mid-progression, with local advancement</em>, and says why - rather than declaring it late because two cracks are large.</p>
+<p>Second, step 4 is the practical prize. Oil debris moved at month 29, vibration at month 38, temperature at the very end. That ordering is the P-F interval made visible, and it tells you which instrument buys the most warning on this failure mode - roughly nine months of it in this case.</p>
+<p>Third, in step 5, notice how hard it is to write one sentence about mechanism without asserting more than you know. If your sentence would survive the literature changing its mind next year, you have written it correctly.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-characterise_duty_transients">1. Characterise the duty from the data - including the transients</label><textarea id="cb-characterise_duty_transients" data-key="t-0179:characterise_duty_transients" placeholder="Separate steady operation from starts, stops, braking and grid events, and quantify the magnitude of each - averaging destroys exactly the evidence you need."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-identify_from_appearance">2. Identify the failure mode from its APPEARANCE (describe before naming)</label><textarea id="cb-identify_from_appearance" data-key="t-0179:identify_from_appearance" placeholder="Record what is physically observed - location, orientation, morphology - before attaching a name, because naming early commits the analysis to a mechanism."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-place_on_progression">3. Place it on its PROGRESSION - not just what, but how far along</label><textarea id="cb-place_on_progression" data-key="t-0179:place_on_progression" placeholder="Use the surface and subsurface evidence to locate the failure on its development sequence, because that is what determines how much time remains."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-model_limits">4. Say what the model does and does NOT explain</label><textarea id="cb-model_limits" data-key="t-0179:model_limits" placeholder="Run the classical life calculation, report honestly what it attributes the damage to, and name the anomaly rather than forcing the evidence to fit."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-evidence_vs_mechanism">5. Separate what the evidence SHOWS from what the mechanism is BELIEVED to be</label><textarea id="cb-evidence_vs_mechanism" data-key="t-0179:evidence_vs_mechanism" placeholder="State the observations as findings, state the mechanism as contested, and make every recommendation rest on the evidence rather than on the theory."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now report what a machine actually did, and how much of it you know.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Failure analysis goes wrong in ways that make the report more confident and less true.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Averaging the duty.</strong> The transients are under one per cent of the time and carry the conditions that characterise this mode. An average analyses a machine that does not exist.</p>
+<p>&bull; <strong>Naming before describing.</strong> A name imports a mechanism. Record location, orientation and morphology first, because that is the part a reader can check.</p>
+<p>&bull; <strong>A mode with no position on its progression.</strong> "Axial cracking" tells an operator nothing about whether to plan an outage or stop the machine tonight.</p>
+<p>&bull; <strong>Reading only the surface.</strong> This mode develops subsurface before it is visible, so metallography is evidence rather than confirmation.</p>
+<p>&bull; <strong>Forcing the evidence into the familiar model.</strong> The calculation is comfortable and it is answering a different question. Report the anomaly.</p>
+<p>&bull; <strong>Concluding the standard is useless.</strong> The opposite error. It is correct for classical rolling contact fatigue and insufficient for this - and knowing which is which is the skill.</p>
+<p>&bull; <strong>Asserting a contested mechanism as fact.</strong> The literature hedges for good reasons. An engineer who does not is a liability.</p>
+<p>&bull; <strong>Recommendations that depend on the contested cause.</strong> They fail when the debate moves. Rest them on the evidence.</p>
+<p>&bull; <strong>Treating a reassuring calculation as evidence of health.</strong> A model that says the component is fine, beside a component that is not, is a finding about the model.</p>
+<p>&bull; <strong>Ignoring the ordering of the indicators.</strong> Which instrument moved first is the most actionable thing in the whole dataset, and it is usually left out of the report.</p>
+</div>
+</details>
+<p>Onalenna's calculation was right and the bearing failed anyway. Characterise the duty including the transients, because braking drives torque well above rated and an average erases every event; describe the damage before naming it, since a name imports a mechanism; place the mode on its progression using surface and subsurface evidence, because how far along it is determines what anyone should do; run the model, report honestly what it explains and name the anomaly where it does not; and separate what the evidence shows from what the mechanism is believed to be, resting every recommendation on the first. A correct calculation showing a component should not have failed is the beginning of an investigation. And on a failure whose cause the research community has not settled, the most professional sentence you can write is the one that says exactly how much you know. If you are working with an AMU Facilitator, take a failure report from your own organisation and mark which sentences are evidence and which are theory.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can report what you know, and what you do not, now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

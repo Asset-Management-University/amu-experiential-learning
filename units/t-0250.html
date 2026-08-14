@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The same total, a different story</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The same total, a different story</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You needed to replace the transfer pump, and you had the numbers to prove it. But the books said otherwise: the pump still had years of life left on paper, plenty of value un-depreciated, so the renewal was deferred and the budget went elsewhere.</p>
+<p>Then the pump failed. Not because the books were wrong to add up - they added up perfectly - but because they told a <em>calendar</em> story about an asset that actually wears out with <em>use</em>, and that pump had been run hard, day and night, for two years. The numbers lied to you about the pump's real condition, and you believed them, because no one ever chose them to tell the truth.</p>
+<blockquote><h2>My books said the asset had years left, and then it wore out anyway - how do I choose a depreciation method that tells the truth about how an asset actually gives up its value?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The pump ran <strong>day and night for two years</strong> — near-continuous duty, roughly three times what its sisters do. On the books it was written down evenly over ten years, like everything else, so it still showed about <strong>R320,000</strong> of remaining value. Nobody put it in the renewal programme, because the record said it had years left. It is now in pieces, worn out, and the replacement is unbudgeted and urgent. The method was not chosen for this pump; it is simply the one always used here. Write down how you would choose a method that tells the truth — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what the choice actually changes</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Shorten the life — write it down over five years instead.&rdquo;</strong> Better for a hard-worked pump and still the wrong shape: an even charge over a shorter period assumes the wear is evenly spread, when this pump's life was consumed by <em>how hard it ran</em>, which varies year to year.</p>
+<p>&bull; <strong>&ldquo;It is finance's decision, not mine.&rdquo;</strong> They chose a schedule; only you know that this pump runs three times as hard as its sisters. <strong>The information that makes the choice honest is yours</strong>, and without it they cannot get it right.</p>
+<p>&bull; <strong>&ldquo;Use whichever method reduces this year's charge.&rdquo;</strong> Treats it as a device for managing profit — and note that it cannot even do that in the long run, since the total is fixed.</p>
+<p>&bull; <strong>&ldquo;Ignore the books and use condition monitoring for renewals.&rdquo;</strong> Right that condition should drive renewal, and it leaves the books telling a false story that will keep contradicting you in every budget conversation.</p>
+<p>&bull; <strong>&ldquo;It is only accounting — it does not change the pump.&rdquo;</strong> It changed when somebody planned to replace it, which is why the replacement is now unbudgeted and urgent.</p>
+<p>&bull; Here is the fact that makes this honest rather than a game: <strong>over the asset's life the total written off is exactly the same, whichever method you use.</strong> The method does not change <em>how much</em> — it changes <strong>when</strong>, how the charge is spread across the years. So there is only <strong>one honest basis for choosing</strong>: which pattern best matches how this asset actually gives up its service. It is not an accountant's trick for managing profit; it is <strong>a story about how a thing wears out, and your job is to tell the true one.</strong> The patterns tell different stories. An even charge suits something that gives roughly equal service and wears mostly with <strong>time</strong> — a building, a structure, a fence. A charge weighted early suits something that loses most of its value when it is new. And a charge that follows <strong>use</strong> suits something whose life is consumed by how hard it is worked rather than by how long it has existed — which is this pump exactly. And the reason it matters beyond the ledger: <strong>the pattern feeds real decisions</strong>, so a comfortable story quietly postpones an uncomfortable renewal.</p>
+</div>
+</details>
+<p>The total depreciation is the same whatever you choose - so the only honest reason to choose a method is that it tells the truth about how the asset actually wears out. Let us learn to choose it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you compare the depreciation methods and choose one - seeing that the total is fixed and only the timing changes, matching the method to how the asset really wears out, and remembering that the pattern you choose feeds real decisions about renewal.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. The same total, a different story</div><p class="cb-demo">Depreciation spreads the cost of an asset across the years it serves, so each year carries its fair share and the books show the asset steadily giving up its value. Here is the fact that makes the choice honest rather than a game: OVER THE ASSET&#039;S LIFE THE TOTAL DEPRECIATED IS EXACTLY THE SAME, WHICHEVER METHOD YOU USE. The method does not change how much - it changes WHEN, how the charge is spread across the years. So there is only ONE honest basis for choosing between them: WHICH PATTERN BEST MATCHES HOW THE ASSET ACTUALLY GIVES UP ITS SERVICE. Depreciation is not an accountant&#039;s trick to manage profit; it is a story about how a thing wears out, and your job is to tell the true one.</p></div><div class="canvas-box"><div class="cb-label">2. Three methods, three stories of wear</div><p class="cb-demo">STRAIGHT-LINE charges the SAME AMOUNT EVERY YEAR. It is the right story for an asset that gives roughly equal service each year and wears mostly with TIME - a building, a fixed concrete structure, a boundary fence. REDUCING-BALANCE charges MORE IN THE EARLY YEARS and less later. It is the right story for an asset that LOSES MOST OF ITS VALUE WHEN IT IS NEW AND FAST - a vehicle is the classic case, worth far less the moment it is driven. UNITS-OF-PRODUCTION ties the charge to ACTUAL USE - per hour run, per unit made, per megalitre pumped - rather than to the calendar. It is the right story for an asset whose wear is driven by HOW HARD IT IS WORKED, not by how old it is: a high-use pump, heavy plant, a production machine.</p></div><div class="canvas-box"><div class="cb-label">3. Match the method to the wear</div><p class="cb-demo">So you choose by asking the honest question: HOW DOES THIS ASSET ACTUALLY GIVE UP ITS VALUE - WITH TIME, WITH AGE-WHEN-NEW, OR WITH USE? Then you tell that story. An asset that wears steadily with the calendar takes STRAIGHT-LINE. An asset that loses most of its value the moment it is new takes REDUCING-BALANCE. An asset that wears with how hard it is worked takes UNITS-OF-PRODUCTION. The right method is the one that MATCHES REALITY - not the simplest to compute, and not the one that happens to flatter this year&#039;s numbers. A use-driven pump put on a calendar method looks healthy on the books long after it is worn out in the field.</p></div><div class="canvas-box"><div class="cb-label">4. The pattern feeds real decisions</div><p class="cb-demo">The choice is NOT cosmetic paperwork, because the depreciation pattern FEEDS REAL DECISIONS: it shapes the asset&#039;s BOOK VALUE, the PROFIT reported each year, and - critically for an asset manager - THE POINT AT WHICH THE ASSET LOOKS WORN OUT ON PAPER AND THE SIGNAL TO PLAN ITS RENEWAL. A method matched to reality gives honest signals for when to renew and replace; a METHOD CHOSEN TO FLATTER A NUMBER LIES TO EXACTLY THOSE DECISIONS. That is why a use-driven pump put on a calendar method looks healthy on the books long after it is worn out in the field - and why the books once told you a hard-run pump had years of life left.</p></div><div class="canvas-box"><div class="cb-label">5. Choose truth, not flattery</div><p class="cb-demo">There is a SMALL DISHONESTY TO REFUSE, and naming it is part of the craft: picking a method - or quietly stretching an asset&#039;s assumed life - NOT because it tells the truth about the asset, but because it SMOOTHS THIS YEAR&#039;S PROFIT OR DEFERS AN INCONVENIENT CHARGE. It is tempting because the total comes out the same in the end, so it feels harmless. IT IS NOT HARMLESS: the whole point of the number is to inform a decision, and a number bent to look good MISINFORMS the renewal plan, the budget, and eventually the people who depend on the asset being renewed before it fails. CHOOSE THE METHOD THAT TELLS THE TRUTH ABOUT HOW THE ASSET ACTUALLY WEARS OUT, and let the books be a map you can trust.</p></div></div>
+
+<p>Box 2 is the three methods. Box 3 is how you match one to the asset. Box 4 is why the choice matters beyond the books. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>The total depreciation is the same whatever you choose; the only honest reason to choose a method is that it tells the truth about how the asset actually wears out.</strong> Choosing a depreciation method is not an accounting choice - it is an honest statement about how an asset gives up its value, and that statement guides real decisions. Five questions:</p>
+<ul>
+<li><strong>What is depreciation?</strong> <strong>The same total, a different story.</strong> It spreads an asset's cost across the years it serves. The total is fixed whatever method you use; only the <em>timing</em> - how the charge is spread across the years - changes.</li>
+<li><strong>What are my choices?</strong> <strong>Three methods, three stories of wear.</strong> The same charge each year; a bigger charge early; or the charge tied to actual use.</li>
+<li><strong>How do I choose?</strong> <strong>Match the method to the wear.</strong> Does the asset wear with time, lose most value when new, or wear with how hard it is used?</li>
+<li><strong>Why does it matter beyond the books?</strong> <strong>The pattern feeds decisions.</strong> It shapes the book value, the yearly profit, and the signal for when to plan renewal.</li>
+<li><strong>What must I refuse?</strong> <strong>Truth, not flattery.</strong> Never bend the method or the life to smooth this year's number - that lies to the very decisions it should inform.</li>
+</ul>
+<p><strong>The same total, a different story.</strong> Depreciation spreads the cost of an asset across the years it serves, so each year carries its fair share and the books show the asset steadily giving up its value. Here is the fact that makes the choice honest rather than a game: <strong>over the asset's life the total depreciated is exactly the same, whichever method you use.</strong> The method does not change how much - it changes <em>when</em>, how the charge is spread across the years. So there is only one honest basis for choosing between them: which pattern best <em>matches</em> how the asset actually gives up its service. Depreciation is not an accountant's trick to manage profit; it is a story about how a thing wears out, and your job is to tell the true one.</p>
+<p><strong>Three methods, three stories of wear.</strong> <em>Straight-line</em> charges the same amount every year. It is the right story for an asset that gives roughly equal service each year and wears mostly with time - a building, a fixed concrete structure, a boundary fence. <em>Reducing-balance</em> charges more in the early years and less later. It is the right story for an asset that loses most of its value when it is new and fast - a vehicle is the classic case, worth far less the moment it is driven and shedding value quickest in its first years. <em>Units-of-production</em> ties the charge to actual use - per hour run, per unit made, per megalitre pumped - rather than to the calendar. It is the right story for an asset whose wear is driven by how hard it is worked, not by how old it is: a high-use pump, heavy plant, a production machine.</p>
+<p><strong>Match the method to the wear - and let the pattern feed the decision.</strong> So you choose by asking the honest question: how does <em>this</em> asset actually give up its value - with time, with age-when-new, or with use? Then you tell that story. And the choice is not cosmetic paperwork, because the depreciation pattern feeds real decisions: it shapes the asset's book value, the profit reported each year, and - critically for an asset manager - the point at which the asset looks worn out on paper and the signal to plan its renewal. A method matched to reality gives honest signals for when to renew and replace; a method chosen to flatter a number lies to exactly those decisions. That is why a use-driven pump put on a calendar method looks healthy on the books long after it is worn out in the field.</p>
+<p><strong>Choose truth, not flattery.</strong> There is a small dishonesty to refuse, and naming it is part of the craft: picking a method - or quietly stretching an asset's assumed life - not because it tells the truth about the asset, but because it smooths this year's profit or defers an inconvenient charge. It is tempting because the total comes out the same in the end, so it feels harmless. It is not harmless: the whole point of the number is to inform a decision, and a number bent to look good misinforms the renewal plan, the budget, and eventually the people who depend on the asset being renewed before it fails. Choose the method that tells the truth about how the asset actually wears out, and let the books be a map you can trust.</p>
+<p>Does it scale? This is how you think honestly about anything that wears out and must be replaced - a work vehicle, a laptop, a home appliance, your own tools. Do not assume it loses value evenly by the calendar; ask how it actually gives up its use - steadily, fast-when-new, or with how hard you run it - and set aside for its renewal on that real pattern. The honest story of how a thing wears out is what tells you, in time, when to replace it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Onalenna must choose a depreciation method for three new assets at Corathyl, and defend a couple of numbers. Your job is to match each to how it wears, and to see what the wrong method would hide.</p>
+<p><strong>The three assets:</strong> a small brick <strong>office building</strong>; a <strong>delivery vehicle</strong> costing R250 000 with a 5-year life and negligible residual; and a <strong>production-line stamping machine</strong> whose wear tracks the number of parts it presses.</p>
+<ol>
+<li><strong>Choose and justify.</strong> Pick a depreciation method for each of the three assets, and justify each choice from how that asset actually wears.</li>
+<li><strong>Do the arithmetic.</strong> For the vehicle, compute the first year's depreciation two ways: straight-line, and reducing-balance at 40 per cent per year.</li>
+<li><strong>See the distortion.</strong> Explain how using straight-line for the vehicle could mislead a decision to sell it after two years.</li>
+<li><strong>Name the refusal.</strong> Name the small dishonesty to refuse when choosing a method.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the choices: the <em>office building</em> wears mostly with time and gives steady service - <strong>straight-line</strong>. The <em>vehicle</em> loses most value when new and fast - <strong>reducing-balance</strong>. The <em>stamping machine</em> wears with how much it presses, not with age - <strong>units-of-production</strong>. Each method is chosen because it tells that asset's true story of wear.</p>
+<p>Second, the vehicle arithmetic: <strong>straight-line</strong> = R250 000 / 5 = <strong>R50 000</strong> in the first year. <strong>Reducing-balance at 40 per cent</strong> = R250 000 x 0.40 = <strong>R100 000</strong> in the first year. Same asset, same total over its life, very different first-year charge.</p>
+<p>Third, the distortion: after two years, straight-line leaves the vehicle on the books at R250 000 - R100 000 = <strong>R150 000</strong>. But a two-year-old vehicle has really lost value fast; reducing-balance would carry it at about R90 000 (R100 000 then R60 000 of charge), far closer to what it would actually fetch. So a manager deciding whether to sell, trusting the straight-line book value of R150 000, would believe the vehicle is worth far more than the market will pay - and could turn down a fair offer, or budget a replacement on a fiction. The calendar method flattered the asset and misled the decision.</p>
+<p>Fourth, the refusal: refuse to choose a method - or stretch an asset's assumed life - to smooth this year's profit or defer a charge rather than to tell the truth about how the asset wears. The total is the same either way; the only thing you gain by bending it is a number that lies to the next decision.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-same_total_different_story">1. The same total, a different story</label><textarea id="cb-same_total_different_story" data-key="t-0250:same_total_different_story" placeholder="Depreciation spreads an asset&#039;s cost across the years it serves, so each year carries its fair share and the books show the asset giving up its value. The fact that makes the choice honest: over the asset&#039;s life the TOTAL depreciated is exactly the same whichever method you use. The method does not change how much - it changes WHEN, how the charge is spread across the years. So the only honest basis for choosing is which pattern best MATCHES how the asset actually gives up its service. Not an accountant&#039;s trick - a story about how a thing wears out."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-three_methods">2. Three methods, three stories of wear</label><textarea id="cb-three_methods" data-key="t-0250:three_methods" placeholder="STRAIGHT-LINE: the same charge every year. The right story for an asset that gives roughly equal service and wears with time - a building, a fixed structure, a fence. REDUCING-BALANCE: more early, less later. The right story for an asset that loses most value when new and fast - a vehicle is the classic case. UNITS-OF-PRODUCTION: the charge tied to actual use (per hour run, per unit made, per megalitre pumped), not the calendar. The right story for an asset whose wear is driven by how hard it is worked - a high-use pump, heavy plant, a production machine."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-match_to_the_wear">3. Match the method to the wear</label><textarea id="cb-match_to_the_wear" data-key="t-0250:match_to_the_wear" placeholder="Choose by asking the honest question: how does THIS asset actually give up its value - with time, with age-when-new, or with use? Then tell that story. Does it wear steadily with the calendar (straight-line)? Lose most value the moment it is new (reducing-balance)? Or wear with how hard it is worked (units-of-production)? The choice is the one that matches reality - not the simplest, and not the one that happens to suit this year&#039;s numbers."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-pattern_feeds_decisions">4. The pattern feeds real decisions</label><textarea id="cb-pattern_feeds_decisions" data-key="t-0250:pattern_feeds_decisions" placeholder="The choice is not cosmetic paperwork. The depreciation pattern shapes the asset&#039;s book value, the profit reported each year, and - critically for an asset manager - the point at which the asset looks worn out on paper and the signal to plan its renewal. A method matched to reality gives honest signals for when to renew and replace; a method chosen to flatter a number lies to exactly those decisions. That is why a use-driven pump on a calendar method looks healthy on the books long after it is worn out in the field."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-truth_not_flattery">5. Choose truth, not flattery</label><textarea id="cb-truth_not_flattery" data-key="t-0250:truth_not_flattery" placeholder="The small dishonesty to refuse: picking a method - or quietly stretching an asset&#039;s assumed life - not because it tells the truth, but because it smooths this year&#039;s profit or defers a charge. It feels harmless because the total comes out the same. It is not harmless: the whole point of the number is to inform a decision, and a number bent to look good misinforms the renewal plan, the budget, and eventually the people who depend on the asset being renewed before it fails. Choose the method that tells the truth about how the asset actually wears out."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you can match a method to how each asset truly wears - and see how the wrong one would mislead a real decision - <strong>save it</strong>. You can now make the books tell the truth about your assets, so your renewal plans rest on reality.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The total depreciation is the same whatever you choose - so choose the method that tells the truth about how the asset actually wears out, because that story feeds every renewal decision that follows.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Straight-line by default for everything.</strong> The same charge every year is only true for an asset that wears evenly with time. A use-driven pump or a fast-depreciating vehicle needs a method that tells its own story.</p>
+<p>&bull; <strong>Choosing a method to smooth or defer profit.</strong> The total is the same whatever you pick, so bending the method buys nothing real - except a number that lies to the next decision. Choose for truth.</p>
+<p>&bull; <strong>Forgetting the total is fixed.</strong> The method changes the timing, not the amount. So the only thing to weigh is which timing pattern matches how the asset actually gives up its value.</p>
+<p>&bull; <strong>Ignoring the renewal signal.</strong> The depreciation pattern is when the asset looks worn out on paper. A method mismatched to real wear will call for renewal too early or, worse, too late - after the asset has failed.</p>
+<p>&bull; <strong>Treating depreciation as mystique.</strong> It is not accountancy magic; it is an honest story about how a thing wears out. Any asset manager can and should choose it deliberately.</p>
+<p>&bull; <strong>Bending the useful life to hit a number.</strong> Stretching an asset's assumed life to lower the yearly charge is the same small dishonesty wearing a different hat. Set the life to reality, not to the target.</p>
+</div>
+</details>
+<p>Your books said the pump had life left, and it failed anyway, because they told a calendar story about an asset that wears with use. Now you can choose the true story. Remember the total is the same whatever you pick, so choose only for truth; match the method to how the asset really gives up its value - with time, with age-when-new, or with use; and hold the pattern honest, because it is what tells you, in time, when to renew. <strong>Choose the method that tells the truth about how the asset actually wears out - because a number bent to look good lies to the very decision it was meant to serve.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can choose a depreciation method now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

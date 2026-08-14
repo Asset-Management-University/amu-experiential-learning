@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The day nobody protected</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The day nobody protected</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are the planner at Corathyl, and you take professional pride in never loading the plant's weekly schedule past 80 per cent. You keep a reserve for emergent work. You defend it against every manager who wants to cram one more job in, because you know a schedule with no slack shatters the moment reality touches it.</p>
+<p>Then you arrive on Monday and run your own day at 100 per cent, with no reserve, taking every interruption as it comes. By half past nine, three people have been to your desk and a "quick question" has eaten an hour.</p>
+<p>At four o'clock, the one task that would have prevented next month's emergencies - rebuilding the shutdown plan - has not been touched. And it will not be touched tomorrow either, because tomorrow will also be full of other people's urgent.</p>
+<blockquote><h2>I bring order to the whole plant's work and my own day is chaos. How do I stop reacting to everyone else's urgency long enough to do the quiet, important work my job actually exists for?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Yesterday you refused to let the works manager squeeze two more jobs into next week's schedule, because the crew is already at capacity and a schedule with no slack shatters. You were right and you held the line. This morning you arrived with a full list and no reserve at all. By <strong>half past nine</strong> three people had been to your desk and a &ldquo;quick question&rdquo; had eaten an hour. It is four o'clock, and rebuilding the shutdown plan — the one task that would prevent next month's emergencies — <strong>has not been touched.</strong> It will not be touched tomorrow either. Write down how you would get that work done — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the irony sitting at the centre</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Come in an hour early.&rdquo;</strong> Buys quiet time by spending your own, and it lasts about three weeks. It also leaves the normal day untouched, so the interruptions simply expand into the hour you have added.</p>
+<p>&bull; <strong>&ldquo;Work harder — be more disciplined.&rdquo;</strong> You are already the hardest-working person in this account. Discipline applied to a day with no structure produces a more efficiently consumed day.</p>
+<p>&bull; <strong>&ldquo;Tell people to stop interrupting me.&rdquo;</strong> Each of those three had a real question and a person attached, and one of them genuinely needed you within the hour. A blanket refusal turns you into an obstacle and the questions do not disappear.</p>
+<p>&bull; <strong>&ldquo;Delegate the shutdown plan.&rdquo;</strong> It is the task the role exists for. Delegating it is not a solution to a time problem; it is giving away the job and keeping the interruptions.</p>
+<p>&bull; <strong>&ldquo;It is the nature of the role — planners get interrupted.&rdquo;</strong> True, and it explains why the day is busy rather than why it is unplanned. The interruptions are foreseeable; you plan for foreseeable demand professionally, every week, for other people.</p>
+<p>&bull; Look at what you did yesterday and what you did this morning. <strong>You would never load the plant's weekly schedule to full capacity.</strong> You insist on a reserve for emergent work, you sequence tasks so they do not collide, and you defend that reserve against everybody who wants one more job in — because you know professionally that a schedule with no slack shatters the first time reality touches it. <strong>And then you ran your own day at exactly that.</strong> This is not a personal failing; it is <strong>professional discipline applied to everything except the one asset nobody counts as an asset</strong> — your own time and attention. So the whole move is one line: <strong>plan your own day the way you plan the plant's week.</strong> Decide what the day is for before it decides for you. <strong>Protect a reserve</strong>, exactly as you protect one in the schedule, because a day planned to the last minute breaks on the first arrival — and the reserve is what turns an interruption from a derailment into something absorbed. And treat interruptions as <strong>the thing to be managed</strong>: triaged, sequenced, sometimes deferred, occasionally genuinely urgent. The hard part is not technique, it is permission — the important work is quiet and nobody is chasing it, while every interruption arrives with a person attached.</p>
+</div>
+</details>
+<p>Here is how you protect the day.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you manage your own day - seeing the paradox, sorting by what matters, protecting the block, triaging the rest, and writing the plan.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. See the paradox - plan your own day the way you plan the plant&#039;s week</div><p class="cb-demo">START WITH THE IRONY AT THE CENTRE OF THIS, BECAUSE NAMING IT IS HALF THE CURE. AS A PLANNER YOU WOULD NEVER LOAD THE PLANT&#039;S WEEKLY SCHEDULE TO 100 PER CENT. You insist on a capacity reserve for emergent work, you sequence tasks so they do not collide, and you defend that reserve against every manager who wants to cram one more job in - because you know, professionally, that a schedule with no slack shatters the first time reality touches it. AND THEN YOU RUN YOUR OWN DAY AT 100 PER CENT, WITH NO RESERVE, TAKING EVERY INTERRUPTION AS IT ARRIVES. The one person whose entire job is to bring order to the plant&#039;s work runs their own day in exactly the chaos they exist to prevent - and so the actual planning, the reason the role exists, never happens. THIS IS NOT A PERSONAL FAILING. IT IS PROFESSIONAL DISCIPLINE APPLIED TO EVERYTHING EXCEPT THE ONE ASSET YOU FORGET IS AN ASSET: YOUR OWN TIME AND ATTENTION. The whole unit is a single move - PLAN YOUR OWN DAY THE WAY YOU PLAN THE PLANT&#039;S WEEK. Decide what the day is FOR before it decides for you. Protect a reserve in it, exactly as you protect a reserve in the schedule. And treat interruptions as the thing to be MANAGED - triaged, sequenced, sometimes deferred - not as the day itself. You already have this skill; you use it every week on the plant. This unit only asks you to turn it on yourself, and to notice that a planner who never gets to plan is not being diligent by taking every call - they are quietly failing the plant, one interruption at a time.</p></div><div class="canvas-box"><div class="cb-label">2. Sort by urgent AND important - they are different axes</div><p class="cb-demo">THE ENGINE OF THE CHAOS IS A CONFUSION BETWEEN TWO WORDS THAT FEEL THE SAME AND ARE NOT: URGENT AND IMPORTANT. THEY ARE DIFFERENT AXES. URGENT means time-sensitive, demanding your attention right now - the ringing phone, the person at your desk, the &#039;I need this in ten minutes&#039; - AND URGENT WORK IS VERY OFTEN SOMEONE ELSE&#039;S PRIORITY ARRIVING AT YOUR DESK. IMPORTANT means it actually moves something that matters to your goals and the plant&#039;s - AND THE IMPORTANT WORK IS VERY OFTEN QUIET, WITH NO DEADLINE TODAY: the shutdown plan for next month, the analysis that would stop a recurring failure, the standard you have been meaning to write. Every task sits in one of four combinations. URGENT AND IMPORTANT - a genuine breakdown - you do now. IMPORTANT BUT NOT URGENT - the planning and prevention work - is the one that gets sacrificed. URGENT BUT NOT IMPORTANT - most interruptions, most &#039;quick questions&#039; - feels like work and mostly is not yours. NEITHER - drop it. AND HERE IS THE TRAP, THE THING THAT MAKES THIS SO HARD THAT WILLPOWER ALONE WILL NOT FIX IT: HUMANS ARE PULLED TOWARD THE URGENT EVEN WHEN IT IS TRIVIAL, AND EVEN WHEN THE LESS-URGENT TASK WOULD PAY OFF FAR MORE. It is not a choice you are consciously making badly; it is a pull you cannot feel yourself giving in to, and it means the loud-but-unimportant will crowd out the quiet-but-important EVERY SINGLE DAY unless you build a structure that protects the important. So the first practical act is to take your real task list and sort it on these two axes honestly - not by how loud each item is, but by how much it actually matters - and watch how much of a normal day turns out to be other people&#039;s urgency consuming your importance. THE IMPORTANT-BUT-NOT-URGENT WORK IS THE ONLY THING THAT EVER REDUCES THE FIREFIGHTING. Firefighting is not bad luck. It is what happens to the important work you never protected.</p></div><div class="canvas-box"><div class="cb-label">3. Protect the important-not-urgent block - it is the only work that shrinks the fires</div><p class="cb-demo">IF YOU DO ONLY ONE THING FROM THIS UNIT, DO THIS: PUT A PROTECTED BLOCK IN YOUR DAY FOR THE IMPORTANT-BUT-NOT-URGENT WORK, AND DEFEND IT LIKE A MEETING WITH THE MOST SENIOR PERSON IN THE ORGANISATION. It does not need to be long - 90 minutes is enough to move a shutdown plan forward, to finish the analysis that kills a recurring fault, to do the thinking the role exists for. What it needs is to be REAL: a fixed time, written down, that you treat as genuinely unavailable, because a block you will surrender to the first &#039;quick question&#039; is not a block, it is a wish. Here is why this single habit is the lever that moves everything else. The important-not-urgent work is, by definition, the work with no deadline shouting at you - which is exactly why it never happens, because there is always something louder. But it is also, almost always, the PREVENTIVE work: the plan that stops the scramble, the fix that stops the repeat call-out, the standard that stops the same question being asked forty times. SO EVERY HOUR YOU PROTECT FOR IT BUYS BACK SEVERAL HOURS OF FUTURE FIREFIGHTING - it is the highest-return time in your week, and it is the first time you sacrifice. Protect it at the time of day your mind is sharpest and interruptions are fewest - for many people that is early - and guard it plainly: &#039;I am on the shutdown plan until half past ten, come to me after that unless something is actually on fire.&#039; That last clause matters, and box 4 is about it, because the whole discipline collapses if you cannot tell a real fire from a loud noise. But start here: the block is the difference between a planner who plans and a planner who only ever reacts, and it is entirely within your gift to create.</p></div><div class="canvas-box"><div class="cb-label">4. Triage the interruptions, keep a reserve - and drop everything for a real emergency</div><p class="cb-demo">A PROTECTED BLOCK IS NOTHING WITHOUT A WAY TO HANDLE THE STORM OF INTERRUPTIONS AROUND IT, AND THE ANSWER IS NOT TO REFUSE THEM ALL - IT IS TO TRIAGE THEM. When something arrives, make a fast decision in one of four ways. HANDLE BRIEFLY: if it genuinely takes two minutes and clears someone&#039;s blockage, do it and return to your block. DELEGATE: if it is someone else&#039;s to own, or a growth chance for a junior, hand it over rather than absorbing it. DEFER: if it is urgent to them but not important to the plant right now, agree a real time to deal with it - &#039;I will come to you at eleven&#039; - which respects them without surrendering your block. DROP: if it is neither urgent nor important, let it go. Most of what feels like an overwhelming day is urgent-but-not-important work that could have been handled briefly, deferred, or delegated, and was instead taken at full attention because it was loud. AND KEEP A RESERVE - LEAVE PART OF THE DAY GENUINELY UNPLANNED, exactly as you leave slack in the plant&#039;s schedule, because emergencies are not a surprise in maintenance, they are a certainty, and a day planned to 100 per cent shatters the moment the first real one lands. NOW THE LINE THAT KEEPS ALL OF THIS SAFE, AND IT IS NON-NEGOTIABLE: THE GOAL IS NOT TO BECOME UNAVAILABLE, IT IS TO BECOME INTENTIONAL. A GENUINE BREAKDOWN OR A SAFETY ISSUE IS BOTH URGENT AND IMPORTANT, AND YOU DROP EVERYTHING TO HANDLE IT - THE BLOCK, THE PLAN, ALL OF IT - AND THAT IS EXACTLY THE RIGHT CALL. The skill is not ignoring interruptions; it is distinguishing the real fire, which you run toward, from the &#039;quick question&#039; that is urgent to someone else but not important to the plant right now, which you triage. A person who defends their block against a genuine emergency has not learned this unit; they have missed its heart. Protect your time fiercely, and drop it instantly for the thing that truly cannot wait.</p></div><div class="canvas-box"><div class="cb-label">5. Write the daily plan - and know when it is a workload problem, not a discipline problem</div><p class="cb-demo">MAKE IT REAL BY WRITING IT DOWN. A PERSONAL DAILY PLAN IS NOT A CORPORATE RITUAL - IT IS A FEW MINUTES, THE NIGHT BEFORE OR FIRST THING, DECIDING WHAT TODAY IS FOR. It has four parts and no more: the PROTECTED BLOCK and what it is for; the RESERVE for emergencies; the two or three things that genuinely must happen today; and, honestly sorted, everything else that will be handled briefly, deferred, delegated or dropped. The act of writing it does something the best intentions cannot: it forces you to DECIDE what matters before the day floods in and decides for you, so that when the noise arrives - and it will - you are choosing against a plan instead of drowning without one. Keep it on one page. Review it against reality at the end of the day, not to punish yourself but to learn where the day actually went, which is almost never where you thought. AND NOW THE MOST IMPORTANT SENTENCES IN THE UNIT, BECAUSE THIS SKILL CAN BE TURNED INTO A STICK TO BEAT AN EXHAUSTED PERSON WITH, AND IT MUST NOT BE. THIS IS ABOUT TAKING AGENCY OVER YOUR DAY - YOU MANAGE YOUR TIME NOT TO DO MORE, BUT TO DO WHAT MATTERS, AND OFTEN THAT MEANS DOING LESS OF THE TRIVIAL-URGENT, ON PURPOSE. A PLANNER WHO NEVER GETS TO PLAN IS ON A PATH TO BURNOUT; PROTECTING YOUR TIME TO THINK IS NOT SELFISH, IT IS THE CORE OF YOUR PROFESSIONAL DUTY TO THE PLANT. AND THE HONEST LINE: A DAILY PLAN BRINGS CLARITY AND FOCUS TO A MANAGEABLE DAY. IT CANNOT FIX AN IMPOSSIBLE ONE. IF, AFTER YOU HAVE PLANNED IT WELL, THE WORKLOAD IS STILL NOT POSSIBLE, THAT IS NOT A PERSONAL FAILING - IT IS A WORKLOAD PROBLEM, AND YOUR PLAN IS THE EVIDENCE YOU NEED TO RAISE IT WITH YOUR MANAGER. Never absorb an impossible day in silence as though better discipline could have saved it; the plan that proves it cannot be done is doing its job. YOU MANAGE YOUR OWN DAY WITH THE SAME DISCIPLINE YOU MANAGE THE PLANT&#039;S WORK, BECAUSE THE QUIET, IMPORTANT WORK YOU PROTECT IS WHAT PREVENTS TOMORROW&#039;S FIRES.</p></div></div>
+
+<p>Box 3 is the one habit that changes everything. Box 5 is the line that keeps this from becoming a stick to beat yourself with. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>You manage your own day with the same discipline you manage the plant's work, because the quiet, important work you protect is what prevents tomorrow's fires.</strong> Five questions:</p>
+<ul>
+<li><strong>Do I plan my day like I plan the plant?</strong> <strong>You protect the plant's reserve; protect your own.</strong> You already have the skill - turn it on yourself.</li>
+<li><strong>Urgent or important?</strong> <strong>Different axes.</strong> Urgent is often someone else's priority; important is often quiet with no deadline today. And we're pulled to the urgent even when it's trivial.</li>
+<li><strong>What must I protect?</strong> <strong>A block for the important-not-urgent work</strong> - the only work that shrinks tomorrow's firefighting. Defend it like a meeting.</li>
+<li><strong>What about the rest?</strong> <strong>Triage - handle briefly, delegate, defer, or drop - and keep a reserve.</strong> Drop everything for a real emergency.</li>
+<li><strong>How do I hold it?</strong> <strong>Write the daily plan</strong> - and know that an impossible day is a workload problem to raise, not a failing to absorb.</li>
+</ul>
+<p><strong>The planner's paradox.</strong> You would never run the plant's schedule at 100 per cent with no slack - you know it would shatter. Yet you run your own day exactly that way, and the role that exists to bring order to the work is itself run in chaos, so the actual planning never happens. <em>This is not a personal failing; it's professional discipline applied to everything except the one asset you forget is an asset - your own time.</em> The whole unit is one move: plan your own day the way you plan the plant's week. Decide what it's <em>for</em> before it decides for you.</p>
+<p><strong>Why urgent beats important, without you choosing it.</strong> Urgent and important feel the same and are different axes. <em>Urgent</em> is time-sensitive and loud, and very often someone else's priority arriving at your desk. <em>Important</em> moves what actually matters, and is very often quiet, with no deadline today - the shutdown plan, the fix that ends a recurring fault. The trap is that <strong>we are pulled toward the urgent even when it is trivial, and even when the less-urgent task would pay off far more</strong> - it's not a choice you're consciously making badly, it's a pull you can't feel yourself giving in to. So the loud-but-unimportant crowds out the quiet-but-important every single day, until <em>the important-not-urgent work - the only thing that ever reduces the firefighting - never happens</em>. Firefighting isn't bad luck. It's what happens to the important work you never protected.</p>
+<p><strong>The one habit that moves everything.</strong> Put a protected block in your day - even 90 minutes - for the important-not-urgent work, and defend it like a meeting with the most senior person you know. Make it <em>real</em>: a fixed time, written down, treated as genuinely unavailable, because a block you'll surrender to the first "quick question" is a wish, not a block. Every hour you protect for the preventive work buys back several hours of future firefighting - <strong>it's the highest-return time in your week, and it's the first thing you sacrifice</strong>. Put it where your mind is sharpest and interruptions fewest, and guard it plainly: "I'm on the shutdown plan until half past ten - come to me after that unless something is actually on fire."</p>
+<p><strong>Triage the rest, and keep a reserve.</strong> The answer to interruptions isn't refusing them all - it's a fast decision: <em>handle briefly</em> (a genuine two-minute unblock), <em>delegate</em> (someone else's to own, or a junior's chance to grow), <em>defer</em> ("I'll come to you at eleven" - respects them without surrendering your block), or <em>drop</em>. And leave part of the day genuinely unplanned, exactly as you leave slack in the plant's schedule, because emergencies aren't a surprise in maintenance - they're a certainty. But hold the line that keeps this safe: <strong>the goal is not to become unavailable, it's to become intentional. A genuine breakdown or safety issue is both urgent and important, and you drop everything to handle it - that's the right call.</strong> The skill is telling the real fire, which you run toward, from the "quick question" that is urgent to someone else but not important to the plant right now.</p>
+<p>One honest boundary. <em>You manage your time not to do more, but to do what matters</em> - and often that means doing <em>less</em> of the trivial-urgent, on purpose. Protecting your time to think is not selfish; a planner who never plans harms the whole plant. And <strong>a daily plan brings clarity to a manageable day - it cannot fix an impossible one. If, after you've planned it well, the workload is still not possible, that is a workload problem to raise, and your plan is the evidence.</strong> Never absorb an impossible day in silence as though better discipline could have saved it.</p>
+<p>Does it scale? A student with an exam next month and a party tonight feels the same pull - the party is urgent, the studying is important, and the pull wins unless the study block is protected in advance. This is the skill of deciding what your time is for before the world decides for you, and it runs a plant and a life the same way.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is a real planner's Monday. You have an eight-hour day with a one-hour lunch - seven working hours. Build the day.</p>
+<table>
+<tr><th>#</th><th>What lands on your desk</th></tr>
+<tr><td>1</td><td>A safety-critical breakdown report on the number-two pump - it is leaking near an electrical panel</td></tr>
+<tr><td>2</td><td>Review and rebuild next month's shutdown plan (three weeks away; if it's wrong, the shutdown overruns)</td></tr>
+<tr><td>3</td><td>A senior manager wants a "quick update" on a non-critical improvement project, by end of day</td></tr>
+<tr><td>4</td><td>A colleague asks for help with their spares list - it's due Thursday</td></tr>
+<tr><td>5</td><td>An all-staff email about a revised car-park policy</td></tr>
+<tr><td>6</td><td>A routine weekly compliance report, due Friday</td></tr>
+<tr><td>7</td><td>Four separate "quick questions" from technicians through the morning</td></tr>
+<tr><td>8</td><td>A vendor calls to sell you software you didn't ask about</td></tr>
+</table>
+<ol>
+<li><strong>Sort all eight</strong> into urgent+important, important+not-urgent, urgent+not-important, and neither.</li>
+<li><strong>Build the day</strong>: name the 90-minute protected block, where you place it, and the 60-minute reserve.</li>
+<li><strong>Justify one placement</strong>: say exactly where the shutdown-plan rebuild goes, and why there.</li>
+<li><strong>The trap</strong>: which item must break your protected block the instant it is real - and which item is the one people most often mistake for that?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the sort. <strong>Urgent+important:</strong> the leaking pump near the panel (1) - safety-critical, now. <strong>Important+not-urgent:</strong> the shutdown-plan rebuild (2) and the Friday compliance report (6) - both matter, neither is due today. <strong>Urgent+not-important:</strong> the manager's "quick update" (3), the colleague's Thursday spares list (4), and the four "quick questions" (7) - loud, mostly someone else's, none critical to the plant today. <strong>Neither:</strong> the car-park email (5) and the vendor call (8) - drop.</p>
+<p>Second, the day: deal with the pump first (it's a real fire), then <strong>protect a 90-minute block for the shutdown plan - placed early, before the day fills</strong>, say 09:30 to 11:00 once the pump is handed to the crew - and hold a 60-minute reserve in the afternoon for the next emergency, because on a maintenance Monday there will be one. The manager's update gets 15 minutes late morning, the colleague's spares list is offered a slot Wednesday (it's due Thursday), the questions are triaged as they come, and the compliance report takes a slice tomorrow.</p>
+<p>Third, the shutdown-plan rebuild goes in the <em>early protected block</em> precisely because it is important-not-urgent - it has no deadline shouting today, so it will never happen unless it is protected <em>first</em>, before the urgent floods in. Put it late and it will be gone; put it first and it is the one thing you are certain to have done when the day inevitably unravels.</p>
+<p>Fourth, the trap: <strong>only the leaking pump (1) breaks the block the instant it's real</strong> - a safety issue is urgent <em>and</em> important, and defending your block against it would be missing the entire point of the unit. The item people <em>mistake</em> for that is the manager's "quick update" (3): it feels like it must be done now because a senior person asked, but it is urgent-to-them and not-important-to-the-plant-today, and it can wait 90 minutes without any harm at all. Telling those two apart is the whole skill.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-see_the_paradox">1. See the paradox - plan your own day the way you plan the plant&#039;s week</label><textarea id="cb-see_the_paradox" data-key="t-0206:see_the_paradox" placeholder="You insist the plant&#039;s schedule keeps a reserve and never runs at 100 per cent - then run your own day at 100 per cent with no reserve, taking every interruption. Protect your own time the way you protect the plant&#039;s."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-sort_urgent_and_important">2. Sort by urgent AND important - they are different axes</label><textarea id="cb-sort_urgent_and_important" data-key="t-0206:sort_urgent_and_important" placeholder="Urgent means time-sensitive and demanding attention now - often someone else&#039;s priority. Important means it moves what matters to your goals - often quiet, with no deadline today. A task can be one, both, or neither."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-protect_the_block">3. Protect the important-not-urgent block - it is the only work that shrinks the fires</label><textarea id="cb-protect_the_block" data-key="t-0206:protect_the_block" placeholder="Put a block in your day - even 90 minutes - for the important, no-deadline-today work, and defend it like a meeting with the most senior person you know. Nothing else reduces tomorrow&#039;s emergencies."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-triage_and_keep_a_reserve">4. Triage the interruptions, keep a reserve - and drop everything for a real emergency</label><textarea id="cb-triage_and_keep_a_reserve" data-key="t-0206:triage_and_keep_a_reserve" placeholder="Not every interruption gets your whole attention. Handle briefly, delegate, defer, or drop. Leave slack for genuine emergencies. And know the difference between a real fire and someone else&#039;s urgency."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-write_the_plan_and_know_the_line">5. Write the daily plan - and know when it is a workload problem, not a discipline problem</label><textarea id="cb-write_the_plan_and_know_the_line" data-key="t-0206:write_the_plan_and_know_the_line" placeholder="Write the day down the night before or first thing: the block, the reserve, the few things that matter. And hold the honest line - if no plan can make the day possible, that is a workload to raise, not a failing to absorb."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now protect the day instead of losing it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The person whose job is to bring order to the work is often the one with the least order in their own day.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Running your own day at 100 per cent.</strong> You'd never do it to the plant's schedule. A day with no reserve shatters on the first real emergency.</p>
+<p>&bull; <strong>Taking every interruption at full attention.</strong> Most are urgent to someone else, not important to the plant. Handle briefly, delegate, defer, or drop.</p>
+<p>&bull; <strong>Letting urgent drive out important.</strong> The pull toward the loud task is a bias you can't feel. Only a protected block beats it.</p>
+<p>&bull; <strong>Never protecting a block, so the planning never happens.</strong> The quiet, preventive work is the only thing that shrinks tomorrow's fires - and it's the first thing sacrificed.</p>
+<p>&bull; <strong>Mistaking busy for productive.</strong> A full day of other people's urgency can move nothing that matters. Sort by importance, not loudness.</p>
+<p>&bull; <strong>Defending your block against a real emergency.</strong> A genuine breakdown or safety issue is urgent AND important - you drop everything, and that's correct. The block is for the noise, not the fire.</p>
+<p>&bull; <strong>Feeling guilty when a real emergency takes your block.</strong> The block is a plan, not a promise. On some days, genuine emergencies will consume it. That is not failure; it is the reality of maintenance. Acknowledge it, and plan the block again for tomorrow.</p>
+<p>&bull; <strong>Hustle instead of judgement.</strong> This is not about squeezing more in. It's about doing the right things and doing less of the trivial-urgent, on purpose.</p>
+<p>&bull; <strong>Absorbing an impossible day in silence.</strong> If no plan can make it fit, that's a workload problem to raise - and your plan is the evidence, not a confession of failure.</p>
+</div>
+</details>
+<p>The planner ran the plant's week with a reserve and their own day at 100 per cent. See the paradox and turn your planning discipline on yourself, protecting your own time the way you protect the plant's schedule; sort your tasks on the two different axes of urgent and important, knowing the pull toward the urgent is a bias you cannot feel and that the important-not-urgent work is the only thing that ever reduces the firefighting; protect a real block for that work and defend it like a meeting with the most senior person you know; triage everything else - handle briefly, delegate, defer, or drop - keep a reserve for the emergencies that are a certainty in maintenance, and drop everything the instant a genuine fire is real; and write the day down so you decide what it is for before it decides for you. <strong>You manage your own time not to do more, but to do what matters - and if, planned well, the day is still impossible, that is a workload to raise, not a failing to carry.</strong> Tonight, before tomorrow starts, write down the one important-not-urgent thing you will protect a block for - and then defend that block as if the plant depended on it, because in the end it does.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can manage your own day now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

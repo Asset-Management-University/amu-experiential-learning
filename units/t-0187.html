@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An appetite without criteria is a sentiment</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>An appetite without criteria is a sentiment</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna. An external audit found that Corathyl has no risk management policy, so the board has drafted one and asked you to comment before they adopt it.</p>
+<p>It is a good document. Five risk categories. A clear commitment. The right signatures waiting at the bottom.</p>
+<p>You read it three times before you work out what is wrong with it, and it is not a drafting problem.</p>
+<p><strong>You cannot use it.</strong> Not one sentence in it would help you decide, on Tuesday, whether the chlorine facility's exposure is acceptable. The policy says the appetite for safety risk is <em>low</em>. Your assessment says the risk is <strong>3.2 x 10<sup>-4</sup> per year</strong>.</p>
+<p>Those two sentences are about the same facility, and nothing connects them. And it is not only this risk: of the <strong>412 entries on the register, the number that can be tested against this policy is zero</strong>.</p>
+<blockquote><h2>The board has written down what it is willing to tolerate, and I still cannot tell whether the risk in front of me is inside it or outside it. What is missing, and how do I build it without deciding on the board's behalf?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The board's adopted statement says the works has no appetite for risks that could harm the public and a low appetite for those affecting service continuity. Entirely sincere. The quantitative assessment on your desk says the risk at the chlorine facility is <strong>3.2 × 10⁻⁴ per year</strong>. Both sentences are about the same facility, and <strong>nothing connects them</strong> — you cannot say whether that figure is inside the board's appetite or outside it. And it is not just this one: of the <strong>412 entries</strong> on the register, the number that can be tested against the policy is <strong>zero</strong>. Write down what is missing and how you would build it — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and whose judgement the thresholds encode</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Ask the board what number they meant.&rdquo;</strong> They did not mean a number; they meant an intention. Asked cold, they will reasonably ask what you recommend — and you will be back here, having spent a board meeting.</p>
+<p>&bull; <strong>&ldquo;Set the thresholds myself — I am the one who understands the numbers.&rdquo;</strong> You do understand them, and the thresholds encode <strong>a judgement about acceptable harm to the public</strong>, which is not an engineering judgement. Set them and you have quietly decided on the board's behalf what level of risk to people is tolerable.</p>
+<p>&bull; <strong>&ldquo;Use the industry standard figures.&rdquo;</strong> Borrows somebody's judgement rather than making one, and imports it without the context that justified it. It also still needs adopting by somebody here, which is the step being skipped.</p>
+<p>&bull; <strong>&ldquo;Rewrite the appetite statement in quantitative terms.&rdquo;</strong> Closer, and done alone it is the same overreach with better drafting — you would be rewriting the board's own adopted words into numbers they never approved.</p>
+<p>&bull; <strong>&ldquo;Report the risk to the board and let them decide case by case.&rdquo;</strong> Workable for one risk and hopeless for 412, and it means the organisation has no consistent standard — which is the condition the policy was written to end.</p>
+<p>&bull; What is missing is <strong>an instrument that translates between the two languages</strong>: criteria converting a statement of what is tolerable into thresholds an assessment can be compared against. Without it, <strong>an appetite is a sentiment</strong> — and the works' real appetite goes on being whatever individual engineers decide case by case. The delicate part is building it without usurping the decision, and the answer is procedural: <strong>draft it, present it, and leave it to be adopted</strong>, with the adoption line written and deliberately blank. That is the general shape of a document that governs rather than advises — it states <strong>why it exists, what and whom it binds, who is accountable and who may grant an exception, and who signs it into force.</strong> That last is the one people get wrong: <strong>a policy an engineer wrote and an engineer approved is a well-researched opinion.</strong> Two smaller traps worth naming — a scope that says everything binds nobody, and an accountability left implicit collapses onto whoever is most conscientious.</p>
+</div>
+</details>
+<p>Here is the risk governance set - the policy, the appetite, and the instrument that connects them.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the set - mandate, appetite, criteria, the test against what you already carry, and the strategy that closes the distance.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Say what the policy is for, what it binds, and who adopts it</div><p class="cb-demo">THIS IS THE MOVE FROM ANALYSIS TO AUTHORITY, AND IT IS WHAT MAKES A DOCUMENT GOVERN RATHER THAN ADVISE. Every governing document - a policy, a strategy, a standard - opens with the same four things, and this unit teaches them here because the later governing documents you write will need them too. THE MANDATE: why this document exists and what it is for. Here, an external audit found that the works has no risk management policy, and the risk framework calls for one. THE SCOPE: what it binds and whom. All asset-related risk at the works, all staff and contractors, all decisions above a stated threshold - and be exact, because a scope that says everything binds nobody. THE ACCOUNTABILITY: who owns the document, who must comply, and who may grant an exception. THE ADOPTING AUTHORITY: WHO SIGNS IT INTO FORCE. And this is the one people get wrong. YOU DO NOT ADOPT IT. The framework is explicit that senior management and the board should be involved in defining risk appetite and THE BOARD ADOPTS THE APPETITE STATEMENT AS PART OF THE RISK MANAGEMENT POLICY. A policy an engineer wrote and an engineer approved is a well-researched opinion. WRITE THE ADOPTION LINE AND THE DATE, and leave them blank until the board fills them.</p></div><div class="canvas-box"><div class="cb-label">2. State the appetite by category, in the board&#039;s voice</div><p class="cb-demo">RISK APPETITE IS THE AMOUNT AND TYPE OF RISK THE ORGANISATION IS WILLING TO PURSUE, RETAIN OR TOLERATE TO ACHIEVE ITS OBJECTIVES. It is a CHOICE, made by the people accountable for the organisation, and your job is to draft it for them rather than to make it. TWO THINGS DECIDE WHETHER THIS BOX IS ANY USE. FIRST, THE CATEGORIES MUST BE THE ONES THIS ORGANISATION ACTUALLY FACES, not the ones on a template. A water utility faces safety, environmental and public-health, service continuity, financial, and legal or regulatory risk - and if you have imported a category the works has no exposure to, you have made the document longer and weaker. SECOND, WRITE IT IN THE BOARD&#039;S VOICE, because they must be able to read it aloud and recognise themselves. &#039;We will not pursue growth that increases risk to the public.&#039; &#039;We accept service interruptions in pursuit of long-term renewal, within limits.&#039; NOW SEE THE PROBLEM, BECAUSE IT IS THE WHOLE UNIT. The board&#039;s draft has FIVE CATEGORIES AND ALL FIVE ARE ADJECTIVES - low, moderate, very low. Every sentence is true and sincerely meant. AND OF THE 412 ENTRIES ON THE RISK REGISTER, THE NUMBER THAT CAN BE TESTED AGAINST THIS STATEMENT IS ZERO. The register and the appetite describe the same organisation and cannot be compared. That is not a drafting flaw to be polished. It is a missing instrument, and box 3 is the instrument.</p></div><div class="canvas-box"><div class="cb-label">3. Derive the criteria that make each category testable</div><p class="cb-demo">ONCE APPETITE IS SET, RISK CRITERIA OPERATIONALISE IT: THEY ARE THE MEASURES USED TO JUDGE EACH RISK&#039;S SIGNIFICANCE. APPETITE IS THE INTENT; CRITERIA ARE THE INSTRUMENT. Take each category and ask what measure would let somebody decide a specific case. FOR THE SAFETY CATEGORY, the widely used convention for individual risk of fatality gives you the calibration: ABOVE 1 IN 1,000 PER YEAR IS BROADLY UNACCEPTABLE; BELOW 1 IN 1,000,000 PER YEAR IS BROADLY ACCEPTABLE; BETWEEN THE TWO A RISK IS TOLERABLE ONLY IF IT IS DEMONSTRATED TO BE AS LOW AS REASONABLY PRACTICABLE, with 1 IN 10,000 PER YEAR commonly used as the boundary for members of the public. So Onalenna proposes a criterion: TOLERABLE INDIVIDUAL RISK OF FATALITY NO GREATER THAN 1 x 10^-4 PER YEAR. Note what she has done - she has proposed a line STRICTER THAN THE POINT AT WHICH RISK BECOMES BROADLY UNACCEPTABLE, which is the board&#039;s prerogative and the entire reason the statement is worth writing. DO THE SAME FOR EVERY CATEGORY: a financial criterion in Rand against something real such as annual revenue or reserves, a service criterion in interruption-hours per connection, an environmental criterion against the discharge consent. AND WRITE THE UNITS AND THE MEASUREMENT METHOD BESIDE EACH ONE, because a criterion nobody can measure the same way twice is an adjective with a number in it.</p></div><div class="canvas-box"><div class="cb-label">4. Test the existing register against the criteria - and expect to fail</div><p class="cb-demo">NOW RUN THE CRITERIA ACROSS THE RISKS YOU ALREADY CARRY, AND DO IT BEFORE THE BOARD ADOPTS ANYTHING. THE MOMENT AN APPETITE BECOMES NUMERIC IT STARTS INDICTING YOUR OWN ASSET BASE, AND THAT IS THE POINT RATHER THAN AN ACCIDENT - the organisation has been carrying risks it would not have accepted had anyone written the number down. AT CORATHYL: the assessed individual risk at the chlorine facility is 3.2 x 10^-4 PER YEAR. Against the proposed criterion of 1 x 10^-4 that is 3.2 TIMES THE BOARD&#039;S OWN STATED APPETITE. Against the broadly-unacceptable threshold of 1 x 10^-3 it is 0.32 TIMES - SO IT SITS INSIDE THE TOLERABLE BAND AND IS LAWFUL. NOW SAY BOTH THINGS CLEARLY, AND DO NOT LET THEM BLUR. AN ORGANISATION&#039;S RISK APPETITE IS A SELF-IMPOSED STANDARD, NOT A LEGAL STATUTE. IT IS THE LINE THE ORGANISATION DRAWS FOR ITSELF. BREACHING THIS INTERNAL STANDARD IS A GOVERNANCE MATTER TO BE MANAGED, NOT A VIOLATION OF THE LAW. CONVERSELY, COMPLIANCE WITH THE LAW IS THE NON-NEGOTIABLE MINIMUM; IT DOES NOT AUTOMATICALLY MEAN A RISK IS ACCEPTABLE UNDER THE ORGANISATION&#039;S CHOSEN APPETITE, WHICH IS OFTEN STRICTER. Report the test as two separate columns - outside appetite, and outside the law - because they call for different responses from different people. AND BRING THE TEST TO THE BOARD WITH THE DRAFT. A board that adopts an appetite without seeing what it fails has adopted a statement whose consequences it has not read, and the engineer who runs the test first is doing it a service rather than an embarrassment.</p></div><div class="canvas-box"><div class="cb-label">5. Write the strategy - how the distance gets closed, and what happens meanwhile</div><p class="cb-demo">THE POLICY IS THE COMMITMENT AND THE APPETITE IS THE LINE. THE STRATEGY IS HOW THE ORGANISATION GETS FROM WHERE IT IS TO WHERE IT SAID IT WOULD BE, and without it the first two are a promise with no plan behind it. WRITE FOUR THINGS. THE APPROACH: for each risk outside appetite, the intended treatment and the period over which it will be brought inside - and be honest that some will take years, because a strategy that closes everything next year will be ignored by March. THE ACCOUNTABILITIES: who owns each treatment, who monitors, who reports to the board and how often. THE REVIEW CYCLE: when the appetite itself is revisited, because an appetite set once and never reviewed becomes a description of a company that no longer exists. AND THE EXCEPTION ROUTE, WHICH IS THE PART MOST OFTEN LEFT OUT AND THE PART THAT DECIDES WHETHER ANY OF THIS SURVIVES CONTACT WITH REALITY. Some risk will sit outside appetite for a period, because the fix is capital work with a lead time. If the policy has no way to say so, the honest response becomes impossible and people simply stop reporting - so the policy quietly stops being true. WRITE THE ROUTE: who may accept a temporary excursion, on what evidence, for how long, with what interim controls, and to whom it is reported. A DOCUMENTED EXCEPTION IS GOVERNANCE. AN UNDOCUMENTED ONE IS THE SAME DECISION, TAKEN BY THE SAME PERSON, WITH NOBODY ABLE TO SEE IT.</p></div></div>
+
+<p>Box 3 is the missing instrument and box 4 is where it starts costing you something. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>An appetite without criteria is a sentiment.</strong> Your job is to build the instrument that turns the board's intent into a decision. Five questions:</p>
+<ul>
+<li><strong>What does this document bind, and who puts it into force?</strong> <strong>Mandate, scope, accountability, adoption.</strong> This is the move from analysis to authority, and you will need it for every governing document you ever write.</li>
+<li><strong>What is the organisation willing to tolerate?</strong> <strong>Appetite by category, in the board's voice</strong> - what it will pursue, retain or tolerate to achieve its objectives.</li>
+<li><strong>How would anyone apply that on a Tuesday?</strong> <strong>Risk criteria</strong> - the measures used to judge each risk's significance. Appetite is the intent; criteria are the instrument.</li>
+<li><strong>What do we already carry that fails it?</strong> <strong>The test, run before adoption</strong>, reported in two columns: outside appetite, and outside the law.</li>
+<li><strong>How does the distance get closed, and what happens meanwhile?</strong> <strong>Strategy, accountabilities, review cycle, and the exception route.</strong></li>
+</ul>
+<p><strong>The arithmetic that makes the point, and the distinction inside it.</strong> The proposed criterion is a tolerable individual risk of fatality no greater than <strong>1 x 10<sup>-4</sup> per year</strong>. The chlorine facility assesses at <strong>3.2 x 10<sup>-4</sup></strong>. That is <strong>3.2 times the board's own stated appetite</strong>. It is also <strong>0.32 times</strong> the threshold above which risk is broadly unacceptable - so it sits inside the tolerable band, and it is lawful.</p>
+<p><strong>Say both things, and never let them blur.</strong> An organisation's risk appetite is <em>a self-imposed standard, not a legal statute</em>. It is the line the organisation draws for itself. <strong>Breaching this internal standard is a governance matter to be managed, not a violation of the law.</strong> Conversely, compliance with the law is the non-negotiable minimum; <strong>it does not automatically mean a risk is acceptable under the organisation's chosen appetite, which is often stricter</strong>. Those two failures go to different people and call for different responses, so report them in different columns.</p>
+<p><strong>And the sequence that makes this honest rather than decorative.</strong> Run the test <em>before</em> the board adopts anything. The moment an appetite becomes numeric it begins indicting the asset base, because the organisation has been carrying risks it would not have accepted had anyone written the number down. That is the point of the exercise, not an accident of it. A board that adopts an appetite without seeing what fails has adopted a statement whose consequences it has not read - and the engineer who runs the test first is doing it a service, not an embarrassment.</p>
+<p>One honest boundary. <strong>You draft and you test. The board adopts.</strong> That is the separation between management and governance, and it matters in both directions: you must not set the line on the board's behalf, and you must not let a line be set without the evidence of what it costs. Leave the adoption line and the date blank until they fill them.</p>
+<p>Does it scale? A speed limit is a number, and the reason it works is not that the number is wise but that it is <em>a number</em>. "Drive appropriately for the conditions" is sincerely meant, universally agreed, and settles no dispute at the roadside. Your appetite statement is the sign; your criteria are the figure painted on it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A regional bulk water supplier hands you its risk appetite statement. Unlike Corathyl's, <strong>this one is already numeric</strong> - and it was adopted eighteen months ago.</p>
+<table>
+<tr><th>Category</th><th>Stated appetite</th><th>Adopted criterion</th></tr>
+<tr><td>Safety</td><td>"Very low"</td><td>Individual risk of fatality up to 1 x 10<sup>-4</sup> per year</td></tr>
+<tr><td>Financial</td><td>"Moderate"</td><td>Single loss event up to R142 million</td></tr>
+<tr><td>Service continuity</td><td>"Low"</td><td>Up to 48 hours of unplanned interruption per connection per year</td></tr>
+<tr><td>Environmental</td><td>"Zero"</td><td>No criterion recorded</td></tr>
+<tr><th>Context</th><th colspan="2">Detail</th></tr>
+<tr><td>Annual revenue</td><td colspan="2">R96.8 million</td></tr>
+<tr><td>Risks recorded outside appetite in 18 months</td><td colspan="2">None</td></tr>
+<tr><td>Environmental incidents in the same period</td><td colspan="2">Three reportable discharge exceedances</td></tr>
+</table>
+<ol>
+<li><strong>Calibration.</strong> Test each numeric criterion against the adjective it is supposed to express. Which ones disagree, and in which direction?</li>
+<li><strong>The financial figure.</strong> Put it against revenue and say what it means operationally.</li>
+<li><strong>The zero.</strong> What is wrong with an appetite of "zero", and why has it produced no recorded breaches despite three exceedances?</li>
+<li><strong>The silence.</strong> Eighteen months, no risk recorded outside appetite. Give two competing explanations and say how you would tell them apart.</li>
+<li><strong>Propose.</strong> Revised criteria for two categories, and what you would put to the board.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, on calibration (questions 1 and 2). A "very low" safety appetite has been operationalised at the boundary commonly used for members of the public - the <em>top</em> of the tolerable band, not a low point within it. And R142 million against <strong>R96.8 million of revenue is 1.47 times annual revenue</strong>: a "moderate" financial appetite that only a company-ending loss could breach. <strong>Both adjectives have been operationalised into their opposites</strong>, and both were signed off, because nobody tested the numbers against the words.</p>
+<p>Second, on the environmental zero (question 3). "Zero" is not an appetite, it is an aspiration - and because no criterion was recorded, nothing could be measured against it, so three reportable exceedances generated no appetite breach. <em>The category with the strongest-sounding commitment produced the weakest control.</em> That inversion is worth sitting with: the stronger the adjective, the less likely anyone felt the need to put a number beside it.</p>
+<p>Third, on the silence (question 4). Eighteen months with nothing outside appetite has two explanations: the organisation is genuinely operating well inside its limits, or <em>the criteria are set where nothing can breach them</em>. The previous points tell you which, but the way to prove it is to test the existing register against the criteria - the box 4 move - and see whether real risks cluster just under the lines. If a policy has never been breached, that is a hypothesis to test, not a result to report.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-mandate_and_scope">1. Say what the policy is for, what it binds, and who adopts it</label><textarea id="cb-mandate_and_scope" data-key="t-0187:mandate_and_scope" placeholder="A governing document starts with its mandate: why it exists, what and whom it applies to, and the authority that adopts it. A policy nobody adopted is a draft."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-state_the_appetite">2. State the appetite by category, in the board&#039;s voice</label><textarea id="cb-state_the_appetite" data-key="t-0187:state_the_appetite" placeholder="Risk appetite is what the organisation is willing to pursue, retain or tolerate to achieve its objectives. Set it by category, and use the categories the organisation actually faces."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-derive_the_criteria">3. Derive the criteria that make each category testable</label><textarea id="cb-derive_the_criteria" data-key="t-0187:derive_the_criteria" placeholder="Risk criteria are the measures used to judge each risk&#039;s significance. They are what turn an appetite into something an engineer can apply on a Tuesday."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-test_the_register">4. Test the existing register against the criteria - and expect to fail</label><textarea id="cb-test_the_register" data-key="t-0187:test_the_register" placeholder="Run the criteria across the risks you already carry, before adoption. The failures are the value of the exercise, and the board must see them before it signs."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-strategy_and_exceptions">5. Write the strategy - how the distance gets closed, and what happens meanwhile</label><textarea id="cb-strategy_and_exceptions" data-key="t-0187:strategy_and_exceptions" placeholder="The strategy is the approach: how risks outside appetite are brought inside it, over what period, who is accountable, and the route for one that cannot be closed quickly."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now turn a board's intent into something an engineer can apply.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Risk policies fail politely. Nobody argues with them; they simply cannot be used.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Adjectives with no criteria.</strong> "Low appetite for safety risk" is true, sincere and settles nothing. Until there is a measure, the appetite cannot be applied or breached.</p>
+<p>&bull; <strong>Criteria the engineer wrote and the engineer approved.</strong> You draft; the board adopts. Leave the adoption line blank until they fill it.</p>
+<p>&bull; <strong>Adopting first and testing afterwards.</strong> The board should see what its own line fails before it signs, not six months later.</p>
+<p>&bull; <strong>Treating lawful as acceptable.</strong> Compliance is the non-negotiable minimum. The appetite is usually stricter, and that is the whole reason for writing it.</p>
+<p>&bull; <strong>Treating an appetite breach as a legal breach.</strong> It is a governance matter to be managed. Conflating the two makes people hide breaches instead of reporting them.</p>
+<p>&bull; <strong>An appetite of "zero".</strong> An aspiration, not a criterion. It cannot be measured, so nothing ever breaches it - and the category with the strongest words ends up with the weakest control.</p>
+<p>&bull; <strong>Criteria calibrated against nothing.</strong> A financial limit above annual revenue is not moderate. Put every number against something real before you propose it.</p>
+<p>&bull; <strong>No exception route.</strong> Some risk will sit outside appetite while capital work is done. Without a documented route, people stop reporting and the policy quietly stops being true.</p>
+<p>&bull; <strong>Categories from a template.</strong> Use the exposures the organisation actually has. An imported category makes the document longer and weaker.</p>
+<p>&bull; <strong>A policy never breached.</strong> Not a triumph. A hypothesis to test.</p>
+<p>&bull; <strong>An appetite set once.</strong> Without a review cycle it becomes a description of an organisation that no longer exists.</p>
+</div>
+</details>
+<p>Onalenna could not use a policy that was sincerely meant and correctly signed. Set out the mandate, the scope, the accountabilities and the adopting authority, and leave the adoption to the board; state the appetite by category in the board's own voice, using the exposures the organisation actually has; derive the criteria that make each category testable, because appetite is the intent and criteria are the instrument; run those criteria across the risks you already carry before anything is adopted, and report what fails in two columns - outside appetite, and outside the law - because they go to different people; then write the strategy that closes the distance, with accountabilities, a review cycle, and a documented route for the excursion that cannot be closed quickly. An appetite without criteria is a sentiment. And the moment you write the number down, it will start telling you things about your own organisation that nobody wanted to know - which is exactly what you wrote it for. If you are working with an AMU Facilitator, take your organisation's risk appetite statement and try to test one real risk against it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can turn an appetite into an instrument now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

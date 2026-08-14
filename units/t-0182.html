@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The tools are blind where the damage is</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The tools are blind where the damage is</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and you have two inspections to specify at Corathyl this outage. The <strong>bulk diesel tank</strong> for standby generation is due its internal inspection - 12.2 metres across, 6 mm floor plate, 24 years in the ground. And the <strong>heated sludge line</strong> at the digesters needs a condition assessment - 240 metres of DN150, insulated, outdoors.</p>
+<p>The technique for each is already named. <strong>Magnetic flux leakage</strong> for the tank floor. <strong>Pulsed eddy current</strong> for the insulated line. It looks like the work has been done for you.</p>
+<p>Then you read the small print on both.</p>
+<p>The floor scanner cannot get closer than a band next to the shell - and the code defines the <em>critical zone</em> as the strip within 76.2 mm of that same shell. The pulsed eddy current footprint on that line works out at <strong>86.7 mm across</strong>, and it reports the average across it - while corrosion under insulation makes pits far smaller than that.</p>
+<p>You have been handed two instruments that are blind precisely where the damage will be.</p>
+<blockquote><h2>The right technique is already chosen for each asset and neither one can see the thing I am looking for. How do I design an inspection that actually finds the damage?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Two assets, two techniques already specified by competent people. The tank floor pits from underneath, worst in the strip where the plate meets the shell and water collects — and the code defines the critical zone as the band within <strong>76.2 mm</strong> of that shell. The instrument's footprint on that line works out at <strong>86.7 mm across</strong>, and it reports the <em>average</em> over it, while the pits are far smaller than that. The insulated line has the same shape of problem. Nobody chose badly; both are the standard techniques. Write down how you would design an inspection that actually finds the damage — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and where the strategy has to start</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Take more readings — increase the coverage.&rdquo;</strong> More averages, each still wider than the strip that matters. Density does not fix resolution: a thousand readings that each blend sound metal with a pit report a thousand comfortable numbers.</p>
+<p>&bull; <strong>&ldquo;Trust the technique — it is the industry-standard method for this asset.&rdquo;</strong> It is, and it is excellent at what it is for, which is covering large areas cheaply. It was simply never selected against <em>this</em> threat, because nobody named the threat first.</p>
+<p>&bull; <strong>&ldquo;Buy a higher-resolution instrument and survey everything with it.&rdquo;</strong> Resolves the feature and cannot cover the area — you would be inspecting a 12-metre floor and 240 metres of line at a rate nobody will fund, and the job would never finish.</p>
+<p>&bull; <strong>&ldquo;Strip the insulation and look.&rdquo;</strong> For the line this genuinely finds it, at a cost that guarantees it is done rarely and partially — and rare partial stripping is how the untouched sections become the ones that fail.</p>
+<p>&bull; <strong>&ldquo;Report it as inspected and move on — we followed the procedure.&rdquo;</strong> Procedurally defensible and the most dangerous answer available, because a clean result from an instrument blind to the threat is worse than no inspection: everybody downstream now believes something.</p>
+<p>&bull; The strategy has to start from <strong>the threat rather than the technique</strong>, because a technique is chosen to find something specific and cannot be chosen well until that something is named — which mechanism, where it concentrates and why, and, the part most often skipped, <strong>what failure would actually cost</strong>, since that is the reason the rest has to be good. Here that means soil-side pitting gathering at the shell junction, and insulation corrosion clustering at supports, penetrations, low points and damaged cladding — <strong>characteristically localised</strong>, wherever water enters and cannot drain. Then <strong>quantify the blind spot rather than acknowledging it</strong>: put the footprint and the critical strip side by side, as you just have, and the mismatch stops being a worry and becomes a specification. From that arithmetic the answer falls out in three parts. Use the wide instrument for what it is genuinely good at — <strong>screening</strong> to say where to look. <strong>Prove up</strong> the suspect areas with something that can resolve the actual feature. And because the screen is blind exactly where the damage is, <strong>cover the critical zone deliberately</strong>, by a method chosen for that zone rather than by whatever the screen happened to flag.</p>
+</div>
+</details>
+<p>Here is the strategy, for both assets, side by side.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the inspection strategy - the threat, the screen, the blind spot in numbers, the prove-up, and the deliberate cover.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. State the threat - the mechanism, where it lives, and what failure costs</div><p class="cb-demo">AN INSPECTION STRATEGY STARTS WITH THE THREAT, NOT THE TECHNIQUE, because the technique is chosen to find something specific and you cannot choose well until the something is named. TANK FLOOR (12.2 m diameter, 6 mm plate, 24 years in service, about 701 cubic metres of standby diesel): the mechanism is SOIL-SIDE PITTING on the underside where the plate meets damp ground, concentrated toward the SHELL-TO-FLOOR JUNCTION where water collects and the plate is most restrained - localised, deep, and invisible from inside the tank. HEATED SLUDGE LINE (240 m of DN150, 7.1 mm wall, 50 mm mineral wool, 0.7 mm aluminium cladding, outdoors): the mechanism is CORROSION UNDER INSULATION, which is characteristically LOCALISED and clusters at PIPE SUPPORTS, PENETRATIONS, LOW POINTS AND DAMAGED CLADDING where water enters and cannot drain. NOW WRITE DOWN WHAT FAILURE COSTS, because it is the reason the rest of the strategy has to be good. THE DESIGN OF AN INSPECTION STRATEGY IS AN ACT OF ENGINEERING RESPONSIBILITY. For the diesel tank, an undetected floor leak means soil and groundwater contamination - a significant environmental hazard and a financial liability. For the heated sludge line, a failure releases hot, biologically active material - a burn risk, a biohazard, and plant downtime. YOUR STRATEGY MUST BE ROBUST ENOUGH TO PREVENT THESE SPECIFIC OUTCOMES.</p></div><div class="canvas-box"><div class="cb-label">2. Choose the screen and state its coverage and its reporting threshold</div><p class="cb-demo">A SCREEN IS A FAST, BROAD FIRST PASS, AND IT IS ONLY USEFUL IF YOU SAY HOW MUCH OF THE ASSET IT TOUCHES AND WHAT MAKES IT SPEAK. TANK FLOOR - MAGNETIC FLUX LEAKAGE: floor scan of the 116.90 square metres of plate, REPORTING THRESHOLD SET AT 20 PER CENT WALL LOSS, with modern scanners able to detect down to about 10 PER CENT. It is fast, it is the industry standard for a tank taken out of service, and it will produce a corrosion map in hours rather than weeks. SLUDGE LINE - PULSED EDDY CURRENT: readings taken THROUGH the insulation and cladding without removing them - which is the entire reason to use it - on a GRID. PEC grids are laid out like ultrasonic thickness grids BUT WITH GREATER SPACING, typically 50 TO 150 MM, precisely because each reading is an area average rather than a point. STATE THE GRID YOU HAVE CHOSEN AND THE COST OF IT: a grid at roughly 100 mm spacing over 240 m of DN150 is 6 points around a 528.7 mm circumference - about 88 mm apart - and 2,400 stations along, which is 14,400 READINGS - about 32 HOURS, FOUR FULL SHIFTS. That number is not a detail. It is what forces the risk-based targeting in box 5, because nobody funds four shifts of screening on every insulated line on the site.</p></div><div class="canvas-box"><div class="cb-label">3. Name what the screen CANNOT see - in numbers</div><p class="cb-demo">EVERY SCREEN HAS A CHARACTERISTIC BLIND SPOT, AND ON BOTH OF THESE ASSETS THE BLIND SPOT SITS EXACTLY WHERE THE THREAT IS. THEY FAIL IN OPPOSITE WAYS, WHICH IS WHY LEARNING BOTH TEACHES THE PRINCIPLE. MFL IS BLIND SPATIALLY. API 653 defines the CRITICAL ZONE as the tank bottom within 76.2 MM (3 INCHES) of the inside edge of the shell. On this floor that annulus is 2.9023 square metres - JUST 2.48 PER CENT OF THE AREA. A conventional scanner that cannot approach closer than 150 mm leaves 5.6784 square metres unscanned, 4.86 PER CENT - AND THAT UNSCANNED BAND COMPLETELY SWALLOWS THE CODE-DEFINED CRITICAL ZONE. A scanner reaching to within 12 mm of the shell leaves only 0.4595 square metres, 0.39 per cent, and covers 64.2 mm of the 76.2 mm critical zone - 84.3 PER CENT OF IT. SO &#039;95 PER CENT COVERAGE&#039; IS A MEANINGLESS NUMBER UNTIL YOU SAY WHICH FIVE PER CENT IS MISSING. MFL is also blind in a second way: IT CANNOT DISTINGUISH WHETHER CORROSION IS ON THE TOP SIDE OR THE UNDERSIDE, so a harmless scrape from a squeegee and a serious soil-side pit produce the same indication. And because it responds to a CHANGE in thickness, a large area of uniform loss is under-called - once the head is inside such an area, the system can only register further loss. PEC IS BLIND DIMENSIONALLY. It reports the AVERAGE thickness over a FOOTPRINT whose DIAMETER IS 1.5 TIMES THE SUM OF THE LIFT-OFF AND THE WALL THICKNESS, minimum 25 mm. Here: 1.5 x (50.7 + 7.1) = 86.7 MM ACROSS, an area of 5,903.8 square millimetres. A 20 MM DIAMETER CUI PIT is 314.2 square millimetres - ONLY 5.3 PER CENT OF THE FOOTPRINT AREA. Because the technique averages, that severe and localised defect registers as a very small change in wall thickness, ON THE ORDER OF ONLY 5 PER CENT LOSS, EVEN IF IT IS THROUGH-WALL. A CRITICAL DEFECT COULD THEREFORE BE MISREAD AS MINOR THINNING OR MISSED ENTIRELY - PEC ALONE CANNOT BE RELIED UPON TO FIND SMALL PITS. The rule of thumb is plain: if the corroded area is comparable to or larger than the footprint the remaining wall will be determined correctly; SMALLER THAN THE FOOTPRINT AND IT WILL PROBABLY BE UNDERSIZED OR UNDETECTED. And CUI is characteristically smaller than the footprint. Note too that PEC readings are usually RELATIVE rather than absolute, because the true reference thickness under the insulation is rarely available.</p></div><div class="canvas-box"><div class="cb-label">4. Design the prove-up - because neither screen sizes anything</div><p class="cb-demo">BOTH OF THESE TECHNIQUES DETECT AND LOCATE. NEITHER ONE SIZES. If your strategy stops at the screen, you have a map of places where something might be wrong and no basis on which to repair, replace or accept anything. TANK FLOOR: every MFL indication above the 20 per cent reporting threshold is PROVED UP BY ENCODED ULTRASONIC THICKNESS MEASUREMENT, which does three things the screen cannot - it gives an actual remaining thickness, it maps the BORDERS of the corroded area, and it resolves the TOP-SIDE OR UNDERSIDE ambiguity. Cost it: 63 indications at 25 minutes each is 26.25 HOURS, more than three shifts, and it must be in the outage plan from the start rather than discovered on the last day. Coupons may be cut where the ultrasonic result is itself ambiguous. SLUDGE LINE: any PEC reading showing loss beyond the agreed action level triggers LOCAL INSULATION REMOVAL, VISUAL EXAMINATION AND CONVENTIONAL ULTRASONIC THICKNESS at that location - which also converts a relative reading into an absolute one. WRITE THE TRIGGER, THE TECHNIQUE, THE RESPONSIBLE PARTY AND THE TIME INTO THE STRATEGY. A prove-up that is not planned and funded does not happen, and an unproved screen is the most expensive way there is to feel informed.</p></div><div class="canvas-box"><div class="cb-label">5. Cover the blind spot deliberately - with a different technique, chosen by risk</div><p class="cb-demo">THIS IS THE BOX THAT TURNS TWO TECHNIQUES INTO A STRATEGY, AND IT IS THE ONE MOST OFTEN LEFT OUT. YOU KNOW WHERE THE SCREEN IS BLIND. COVER IT ON PURPOSE, WITH SOMETHING ELSE. TANK FLOOR: the critical zone and the shell-to-floor weld are inspected by a DIFFERENT METHOD ENTIRELY - VACUUM BOX TESTING of the weld for through-leaks, and MAGNETIC PARTICLE OR DYE PENETRANT EXAMINATION for cracking - plus manual ultrasonic readings on a spacing you specify around the annulus. This is a small area, 2.9 square metres, so covering it thoroughly is cheap; the failure is not one of cost, it is one of ATTENTION, because the scan produced a coloured map and the coloured map felt complete. SLUDGE LINE: you cannot strip 240 m of insulation, so choose WINDOWS BY RISK - at PIPE SUPPORTS, PENETRATIONS AND FITTINGS, and LOW POINTS; where CLADDING IS DAMAGED or sealant has failed; beneath anything that drips; and, critically for a heated line, BY OPERATING TEMPERATURE. Carbon steel is susceptible to corrosion under insulation across roughly MINUS 4 TO 175 DEGREES C, the band in which cyclic wetting and drying is most active, with the most severe attack reported around 77 TO 110 DEGREES C. A mesophilic digester line running at 35 to 40 degrees C is therefore WELL INSIDE THE SUSCEPTIBLE RANGE THOUGH BELOW THE WORST OF IT - which is exactly the case that gets waved away as &#039;not hot enough&#039; and then leaks. And note what actually drives it: not the temperature reading itself but the WETTING AND DRYING CYCLES it produces, so a line that is shut down and restarted, or that at times runs below the ambient dew point, deserves more windows than its steady operating temperature alone would suggest. Open, look, measure with ultrasound, reinstate. STRIPPING INSULATION AT RANDOM IS NOT SAMPLING - IT IS HOPING. Write into the strategy how many windows, chosen on what evidence, and what result would cause you to open more. And say plainly in the report what remains uninspected, because the person reading it will otherwise assume the opposite.</p></div></div>
+
+<p>Box 3 is where the strategy is won or lost, and box 5 is what a strategy is <em>for</em>. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A screening tool finds anomalies. A strategy finds the threat.</strong> Five questions:</p>
+<ul>
+<li><strong>What am I looking for, and what does missing it cost?</strong> <strong>Threat-led targeting.</strong> Soil-side pitting at the shell-to-floor junction; localised corrosion under insulation at supports, penetrations and low points. Then the consequence, written down, because it is why the rest has to be good.</li>
+<li><strong>What is the screen, how much does it touch, and what makes it speak?</strong> <strong>Coverage and threshold.</strong> An MFL floor scan at a 20 per cent reporting threshold. A PEC grid at a stated spacing - and the four shifts that grid actually costs.</li>
+<li><strong>What can it not see?</strong> <strong>The characteristic blind spot, quantified.</strong> The two techniques fail in <em>opposite</em> ways, which is exactly why learning them together teaches the principle rather than two facts.</li>
+<li><strong>What happens to an indication?</strong> <strong>Screen and prove.</strong> Neither technique sizes anything. Ultrasound sizes, maps borders, and resolves whether the loss is on the top or the underside.</li>
+<li><strong>Who covers the blind spot, and how do I choose where?</strong> <strong>Deliberate cover, risk-based.</strong> A different method for the critical zone; targeted windows on the insulated line, because 240 metres cannot be stripped.</li>
+</ul>
+<p><strong>The arithmetic that makes the point - twice, in opposite directions.</strong> <em>Spatially:</em> the API 653 critical zone on this floor is 2.9023 m<sup>2</sup>, just <strong>2.48 per cent</strong> of the 116.90 m<sup>2</sup> of plate. A scanner that stops 150 mm from the shell leaves 5.6784 m<sup>2</sup> unscanned - <strong>4.86 per cent</strong> - and that band <em>completely contains</em> the zone the code singles out. A scanner reaching to within 12 mm leaves 0.39 per cent and covers 84.3 per cent of the critical zone. <em>Dimensionally:</em> the PEC footprint is 1.5 x (50.7 + 7.1) = <strong>86.7 mm</strong> across, an area of 5,903.8 mm<sup>2</sup>. A 20 mm CUI pit is 314.2 mm<sup>2</sup> - <strong>5.3 per cent of that footprint</strong> - so because the technique averages, a severe localised defect registers as a very small change in wall thickness, <strong>on the order of only 5 per cent loss, even if it is through-wall</strong>. A critical defect can be misread as minor thinning or missed entirely. <strong>Pulsed eddy current alone cannot be relied upon to find small pits</strong>, and corrosion under insulation makes small pits.</p>
+<p><strong>And the number you must never report on its own.</strong> "Ninety-five per cent coverage" is not a result. It is a result <em>and</em> a question, and the question is <em>which five per cent</em>. If the missing five per cent is the band the code calls critical and the mechanism concentrates in, then 95 per cent coverage is not a good score - it is a strategy that inspected the easy part. Every coverage figure in an inspection report should be followed immediately by a sentence naming what is not covered and what covers it instead.</p>
+<p>One honest boundary. You are <em>designing the strategy</em> - the threat, the screen, the quantified blind spot, the prove-up and the cover. You are not performing the inspection, not calibrating the equipment, and not making the fitness-for-service decision that follows from the results. Your document is what the inspection contractor works to and what the integrity engineer judges on.</p>
+<p>Does it scale? A search party does not stop because the helicopter has flown the whole valley. The helicopter covers ground fast and cannot see under the tree canopy - so somebody walks the treeline, and everybody knows which part the helicopter did. The screen is the helicopter. Box 5 is the treeline.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A third asset, a third screening technique, and a blind spot that is neither a band nor a footprint.</p>
+<table>
+<tr><th>Item</th><th>Detail</th></tr>
+<tr><td>Asset</td><td>300 m of DN200 carbon steel process water line (219.1 mm outside diameter), elevated on a pipe rack</td></tr>
+<tr><td>Features</td><td>Supports every 6 m, each about 300 mm of contact; two flanged connections; one 90 degree elbow</td></tr>
+<tr><td>Proposed screen</td><td>Guided wave ultrasonic testing - long-range, from sensor rings clamped at intervals</td></tr>
+<tr><td>Known behaviour</td><td>A screening method: precise measurement of minimum wall thickness is not possible</td></tr>
+<tr><td>Blind lengths</td><td>Roughly 0.275 m of dead zone and 0.9 m of near-field per sensor direction from each ring</td></tr>
+<tr><td>Practical range</td><td>Attenuates at every support; on a line like this, plan on about 12 m usable each way from a ring</td></tr>
+<tr><td>Known hot spot</td><td>Corrosion under pipe supports, where water sits in the contact and cannot dry</td></tr>
+</table>
+<ol>
+<li><strong>The threat.</strong> Name the mechanism, where it concentrates on this geometry, and the consequence of missing it.</li>
+<li><strong>The screen.</strong> Work out how many ring positions the line needs and what that implies for time and access on a rack.</li>
+<li><strong>The blind spot - in numbers.</strong> Compute the total blind length and express it as a percentage. Then say what is <em>different</em> about the shape of this blind spot compared with the tank and the pipeline.</li>
+<li><strong>The prove-up.</strong> This screen does not size either. State what does.</li>
+<li><strong>The cover.</strong> Design the deliberate cover for the blind spots, and say how you would prioritise if you could only reach half of them.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, your step 2 and 3 arithmetic should come out at <strong>13 ring positions</strong> for 300 m at 24 m of usable coverage each, and with 0.9 m of near-field either side of each ring that is 1.8 m per ring, <strong>23.4 m or 7.80 per cent of the line</strong> uninterpretable at the rings themselves. Separately, 50 supports at 300 mm of contact is <strong>15 m, 5.00 per cent</strong> of the line, in the single highest-risk location on it.</p>
+<p>Second, step 3 is the whole exercise. The tank's blind spot was a <em>continuous band at one edge</em>. The pipeline's was a <em>resolution limit</em> that applied everywhere equally. This one is <strong>many small blind spots distributed at known features</strong> - and because they sit at welds, flanges and supports, they land on exactly the discontinuities where corrosion concentrates. Three techniques, three shapes of blindness, one principle. If you can state that principle in your own words, the unit has done its job.</p>
+<p>Third, in step 5, notice that the honest prioritisation is not "inspect the supports nearest the office". Rank by where water can enter and cannot leave - low points, supports beneath drip sources, the elbow where flow changes direction - and be able to defend the ranking to somebody who wants to know why you did not inspect the other twenty-five.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-the_threat">1. State the threat - the mechanism, where it lives, and what failure costs</label><textarea id="cb-the_threat" data-key="t-0182:the_threat" placeholder="Name the damage mechanism, its likely shape and location, and the consequence of missing it - for each asset separately."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_screen">2. Choose the screen and state its coverage and its reporting threshold</label><textarea id="cb-the_screen" data-key="t-0182:the_screen" placeholder="Name the screening technique for each asset, the area or grid it will cover, and the threshold at which something gets reported."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_blind_spot">3. Name what the screen CANNOT see - in numbers</label><textarea id="cb-the_blind_spot" data-key="t-0182:the_blind_spot" placeholder="Quantify the blind spot of each technique and check it against where you said the threat lives. This is the box that decides whether the strategy works."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_prove_up">4. Design the prove-up - because neither screen sizes anything</label><textarea id="cb-the_prove_up" data-key="t-0182:the_prove_up" placeholder="State exactly what happens to an indication: which technique sizes it, who does it, and how long it takes. A screen that is never proved up has produced a map, not a decision."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-cover_the_blind_spot">5. Cover the blind spot deliberately - with a different technique, chosen by risk</label><textarea id="cb-cover_the_blind_spot" data-key="t-0182:cover_the_blind_spot" placeholder="Specify what inspects the places the screen cannot, and how you choose those places when covering all of them is unaffordable."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now design an inspection that sees what the instrument cannot.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Inspection strategies fail in ways that produce a thick report and a thin result.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Mistaking the technique for the strategy.</strong> "We will use MFL" is a procurement decision. The strategy is everything that surrounds it.</p>
+<p>&bull; <strong>Reporting coverage without naming what is missing.</strong> Ninety-five per cent is a good number or a terrible one depending entirely on which five per cent it is. Say which.</p>
+<p>&bull; <strong>Assuming the screen sizes.</strong> Both of these detect and locate. A remaining-thickness figure comes from ultrasound, not from a coloured map.</p>
+<p>&bull; <strong>Forgetting that MFL cannot tell top from bottom.</strong> A squeegee scar on the topside and a deep soil-side pit look the same on the scan and mean entirely different things.</p>
+<p>&bull; <strong>Trusting MFL on broad uniform loss.</strong> It responds to a change in thickness; once the head is inside a large thinned area it can only register further loss.</p>
+<p>&bull; <strong>Gridding PEC finer than the footprint and believing the resolution.</strong> Readings 25 mm apart with an 86.7 mm footprint are not four times as detailed. They are four times as many measurements of overlapping ground.</p>
+<p>&bull; <strong>Reading PEC values as absolute wall thickness.</strong> They are usually relative, because the true reference thickness under the insulation is rarely known. Prove one up and you have your reference.</p>
+<p>&bull; <strong>Stripping insulation at random.</strong> That is not sampling, it is hoping. Choose the windows by where water enters and cannot drain.</p>
+<p>&bull; <strong>Waving a warm line away as "not hot enough".</strong> Carbon steel is susceptible to corrosion under insulation from about minus 4 to 175 degrees C, worst around 77 to 110. A digester line at 35 to 40 sits well inside the susceptible band, and what drives the attack is the wetting and drying cycles rather than the temperature reading itself.</p>
+<p>&bull; <strong>Closing out a scan with no prove-up.</strong> An unproved screen is the most expensive way there is to feel informed.</p>
+<p>&bull; <strong>Leaving the prove-up out of the outage plan.</strong> Twenty-six hours of ultrasonic work discovered on the last day of an outage becomes a deferral, and a deferral becomes next year's problem.</p>
+<p>&bull; <strong>Writing a report that does not say what remains uninspected.</strong> The reader will assume it was all covered. That assumption is created by your silence.</p>
+</div>
+</details>
+<p>Onalenna was handed the right technique for each asset and neither one could see the damage. Name the threat, where it concentrates and what missing it costs; choose the screen and state its coverage and its reporting threshold honestly; quantify the blind spot and check it against where you said the threat lives, because on both of these assets they coincided; design the prove-up, since a screen that detects and locates has not sized anything and an unproved indication supports no decision; and then cover the blind spot deliberately, with a different technique, choosing the places by risk when covering all of them is unaffordable. A screening tool finds anomalies. A strategy finds the threat. And the difference between a technician and an engineer is that the engineer's design accounts for what the tool cannot see. If you are working with an AMU Facilitator, take a recent inspection report from your organisation and find the sentence that says what was not inspected. If there is not one, that is the finding.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can design around a blind spot now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find the fatal flaw while it is still cheap</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Find the fatal flaw while it is still cheap</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Adaeze, and you now have a question and a literature review that holds together. The hard part is supposed to be behind you.</p>
+<p>What is in front of you is a year of your life and a form.</p>
+<p>The year is the part that frightens you. You will spend it collecting data, and you will not know whether it was worth collecting until the end, and by then the year will be spent. Somebody in your cohort last year got to month ten and found that his measurements could not answer his question. He did not fail. He just started again, with eight months left, and he looks tired now.</p>
+<p>The form is the part that irritates you. Eleven pages of ethics application, and you are studying <em>rollers</em>. It reads like it was written to catch you out.</p>
+<p>Both of these are the same fear wearing different clothes: <em>that there is something wrong with this and I will not find out until it is too late to fix.</em></p>
+<blockquote><h2>How do I find the flaw that would waste my year - while finding it still only costs a week?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Access is arranged, the records are promised, and you are about to commit <strong>fourteen months.</strong> Somebody in the year above got to <strong>month ten</strong> before finding his measurements could not answer his question; he did not fail, he simply started again with eight months left, and he looks tired now. On your desk is an <strong>eleven-page</strong> ethics application that irritates you, because you are studying <em>rollers</em>. And sitting in your plan, unexamined: your seasonal comparison draws on three years of maintenance records, and the workshop changed its recording system partway through the second year. Write down how you would find the flaw that would waste your year — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the fear underneath both irritations</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Start collecting — I will see problems as they arise.&rdquo;</strong> That is precisely the path the man in the year above took. Problems of this kind become visible when you try to answer the question, which is at the end.</p>
+<p>&bull; <strong>&ldquo;Get the ethics form out of the way and move on.&rdquo;</strong> Treats it as an obstacle. It is asking the same question you are afraid of — what could go wrong here, and for whom — only about people rather than about your design.</p>
+<p>&bull; <strong>&ldquo;Ask my supervisor to check the design.&rdquo;</strong> Worth doing and it is one reading by somebody with less detail than you. They cannot know that the recording system changed; only you can.</p>
+<p>&bull; <strong>&ldquo;Collect more data to be safe.&rdquo;</strong> More of a measurement that may not answer the question. Volume does not rescue a mismatch between method and question, and it costs the months you would need to recover.</p>
+<p>&bull; <strong>&ldquo;Design it perfectly before starting.&rdquo;</strong> Unavailable, and it postpones indefinitely. The aim is not a flawless design but <strong>finding the fatal flaw while it still costs a week.</strong></p>
+<p>&bull; Both your irritations are the same fear in different clothes: <em>that something is wrong with this and I will not find out until it is too late.</em> So go looking, in the four places studies actually die. <strong>The match between method and question</strong> — a method is chosen for a question, not for a discipline, so list what could answer yours, note that the strongest option is usually unavailable for reasons of access or safety, choose what fits, and <strong>write down what you rejected and why</strong>: the sentence most proposals leave out and the one that makes a design defensible. <strong>Everything else that could produce your result</strong> — and here is yours, sitting in plain sight: a recording system that changed partway through your comparison could manufacture a seasonal pattern out of nothing. Name every such candidate <em>before</em> you collect, because afterwards you can only apologise for them. <strong>The denominator</strong>, which is the quiet killer — a count of failures means nothing without the population it came from. And <strong>run it small first, deliberately</strong>, because a pilot exists to find the flaw while it is cheap.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the design - method matched to question, everything else that could produce the result, the denominator, the deliberate pilot, and the ethics application written to what the committee is actually asking.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Match the method to the question - and write down why you rejected the others</div><p class="cb-demo">&lt;strong&gt;A method is chosen for a question, not for a discipline.&lt;/strong&gt; My question asks whether idler-roller failure rate differs by season and whether carry-back is associated with it. &lt;strong&gt;List what could answer it, and what each would cost me.&lt;/strong&gt; A &lt;strong&gt;controlled experiment&lt;/strong&gt; - vary carry-back deliberately and observe failures - would give the strongest causal claim and is unavailable, because deliberately running a conveyor dirtier is a safety and production decision no plant will grant a part-time student. A &lt;strong&gt;prospective study&lt;/strong&gt; - instrument now, measure forward - is clean but needs three years of seasons and I have fourteen months. A &lt;strong&gt;retrospective observational study&lt;/strong&gt; using three years of existing maintenance records, with a forward inspection component for the residue measurement, fits the time and the access and yields association rather than cause. &lt;strong&gt;Choose it, and then write the sentence that most proposals leave out:&lt;/strong&gt; &#039;A controlled trial was rejected because deliberate degradation of belt cleaning cannot be justified on an operating plant. A prospective design was rejected because the required observation period exceeds the study period.&#039; &lt;strong&gt;Naming what you rejected and why is not padding.&lt;/strong&gt; It is the difference between a design and a default, and an examiner can tell which one they are reading within a paragraph.</p></div><div class="canvas-box"><div class="cb-label">2. Write down everything else that could produce your result - then design each one out or measure it</div><p class="cb-demo">&lt;strong&gt;Before you collect anything, write down every other thing that could produce the result you expect.&lt;/strong&gt; This list is the single cheapest hour in the whole study. For me: &lt;strong&gt;the commodity changes.&lt;/strong&gt; The terminal handles a wetter, finer ore through the same months as the rainy season, so commodity and season move together and either could be doing the work. &lt;strong&gt;The maintenance regime changes.&lt;/strong&gt; More inspections happen in the wet season, so more failures may be found rather than occurring. &lt;strong&gt;The throughput changes.&lt;/strong&gt; Higher tonnage in one season means more operating hours, and more hours means more failures for no interesting reason at all. &lt;strong&gt;Now deal with each, honestly.&lt;/strong&gt; Commodity: I can stratify - there are dry-season months when the same commodity runs, so I compare within commodity as well as across seasons. Inspection frequency: I can obtain inspection counts per month and check whether detection opportunity tracks the pattern. Operating hours: &lt;strong&gt;this one is not a stratification problem, it is a denominator problem, and it is dealt with in box 3.&lt;/strong&gt; &lt;strong&gt;And write down the one you cannot fix&lt;/strong&gt; - ambient temperature also varies with season, and I have no way to separate its effect from moisture with the data available. &lt;strong&gt;That sentence belongs in the limitations, written by me, now, rather than found by an examiner later.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. Work out what you are dividing by - and how much data you actually need - before you collect any</div><p class="cb-demo">&lt;strong&gt;The denominator is the study. Almost every wrong conclusion in maintenance data is a count that should have been a rate.&lt;/strong&gt; Three years of records for the incline sections give &lt;strong&gt;412 roller failures&lt;/strong&gt;: &lt;strong&gt;214 in wet-season months and 198 in dry-season months&lt;/strong&gt;. Stop there and the answer is that seasons barely differ - 214 against 198, about eight per cent. &lt;strong&gt;Now put in the denominator.&lt;/strong&gt; The wet season is roughly five months a year, so across three years it is &lt;strong&gt;15 months of exposure against 21&lt;/strong&gt;. The rates are &lt;strong&gt;14.3 failures per month in the wet season against 9.4 in the dry&lt;/strong&gt; - a ratio of &lt;strong&gt;1.51&lt;/strong&gt;. &lt;strong&gt;The same 412 failures say &#039;no real difference&#039; and &#039;half as many again&#039; depending only on what you divided by&lt;/strong&gt;, and nothing about the data changed. &lt;strong&gt;Then ask whether you have enough.&lt;/strong&gt; 412 events across two groups is a workable volume for the comparison I intend; 41 would not have been, and I would rather know that now than in month eleven. &lt;strong&gt;Where operating hours are available, use them rather than months&lt;/strong&gt; - hours are the honest exposure and months are a stand-in for them. &lt;strong&gt;Write down which one you used and why, because the reader cannot tell from the result.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">4. Pilot it small and deliberately - the point is to find the flaw, not to succeed</div><p class="cb-demo">&lt;strong&gt;Run the entire method small, on purpose, before you run it properly - and go looking for the thing that breaks it.&lt;/strong&gt; Mine is &lt;strong&gt;two weeks, about 24 hours&lt;/strong&gt;, which is &lt;strong&gt;12 per cent of my 200-hour collection budget&lt;/strong&gt;. In it I do every step once: extract three months of records rather than thirty-six, take residue measurements at four locations rather than the full set, and carry both all the way through to a rate. &lt;strong&gt;What am I looking for?&lt;/strong&gt; Whether the work orders actually distinguish an idler failure from a scheduled replacement - because if they do not, my entire outcome variable is unusable and no analysis can rescue it. Whether residue depth can be measured repeatably by one person with the access available while the belt is running. Whether the incline sections are identifiable in the asset register at all. &lt;strong&gt;A pilot that goes badly has done its job.&lt;/strong&gt; Twenty-four hours spent discovering that failures and replacements are indistinguishable is twenty-four hours; discovering it in month eleven is the year. &lt;strong&gt;Write down in advance what you will do if it fails&lt;/strong&gt;, because deciding that in the moment, having just lost two weeks, is the worst condition anybody ever makes that decision in.</p></div><div class="canvas-box"><div class="cb-label">5. Write the ethics application to what the committee is actually asking - who could be harmed, and what you have done about it</div><p class="cb-demo">&lt;strong&gt;The form looks like a legal document and it is not one. It is a committee of people asking a single question in many ways: could this study harm somebody, and has the researcher thought about it.&lt;/strong&gt; Answer that question and the form becomes straightforward. &lt;strong&gt;Start by listing everyone the study touches&lt;/strong&gt;, which for a records-based engineering study is more people than it first appears. &lt;strong&gt;The people whose work the records describe.&lt;/strong&gt; Every work order carries a name. My question is about rollers and seasons, not about who did what - so I have no reason to hold names and I remove them at extraction, which I say in the application. &lt;strong&gt;The people I inspect alongside.&lt;/strong&gt; A researcher on a walkway during operations is a person in a live plant, and my presence must not change what anybody does or put them at risk; the site&#039;s permit and induction requirements apply to me exactly as to a contractor. &lt;strong&gt;The organisation granting access.&lt;/strong&gt; They are exposed if the study is read as an audit of their maintenance, so what will and will not be published, and in what form, is agreed in writing before anything is collected. &lt;strong&gt;Now the sentence that most engineering applications omit and every committee is waiting for:&lt;/strong&gt; what happens if I find something unsafe. &lt;strong&gt;Write it down in advance:&lt;/strong&gt; &#039;If inspection reveals a condition presenting immediate risk, it will be reported to the site&#039;s responsible engineer that day, before any consideration of the study.&#039; &lt;strong&gt;That is not a concession to bureaucracy. It is the thing an engineer would do anyway, said out loud, in writing, before it is needed.&lt;/strong&gt;</p></div></div>
+
+<p>Box 3 is where the same 412 failures give two opposite answers, and box 4 is the two weeks that protect the year. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Research design is <strong>the practice of finding the flaw that would ruin the study while finding it is still cheap.</strong> Five moves:</p>
+<ul>
+<li><strong>Match the method to the question, and record the rejections.</strong> <strong>Design, not default.</strong> A controlled trial rejected because deliberate degradation cannot be justified on an operating plant; a prospective design rejected because it needs three years and you have fourteen months.</li>
+<li><strong>List everything else that could produce your result.</strong> <strong>The alternative explanations.</strong> Commodity, inspection frequency, operating hours - each stratified out, measured, or honestly declared as unfixable.</li>
+<li><strong>Find the denominator before you collect.</strong> <strong>Rates, not counts.</strong> 214 against 198 says "no real difference". 14.3 per month against 9.4 says "half as many again". Same 412 failures.</li>
+<li><strong>Pilot the whole method small, hunting for the break.</strong> <strong>The deliberate pilot.</strong> 24 hours, 12 per cent of the collection budget, doing every step once.</li>
+<li><strong>Write the ethics application to the committee's real question.</strong> <strong>Who could be harmed, and what protects them.</strong> Including the sentence engineering applications usually omit.</li>
+</ul>
+<p><strong>The arithmetic that carries the unit.</strong> Three years of incline-section records: <strong>412 roller failures</strong>, <strong>214</strong> in wet-season months and <strong>198</strong> in dry. As raw counts that is a difference of about eight per cent - nothing. But the wet season is roughly five months a year, so over three years the exposure is <strong>15 months against 21</strong>. As rates: <strong>14.3 failures per month against 9.4</strong>, a ratio of <strong>1.51</strong>. <em>The same data, unchanged, says "no effect" or "half as many again" depending entirely on what you divided by.</em> This is not a subtle statistical point. It is the commonest way a maintenance dataset produces a confident wrong answer, and where operating hours are available they are the honest exposure - months are a stand-in.</p>
+<p><strong>Why the confounder list is the cheapest hour in the study.</strong> Writing down every other thing that could produce your expected result takes an afternoon and changes the design. Adaeze's terminal runs a wetter, finer ore through the same months as the rain, so commodity and season move together - and if she had not noticed, she could have run a flawless year-long study and attributed to weather an effect that belonged to material. The fix is not clever; it is comparing within commodity as well as across seasons, and it costs nothing <em>if you think of it first</em>. Afterwards it costs the study.</p>
+<p><strong>On the pilot, and why it is designed to fail.</strong> A pilot is not a rehearsal you hope goes well. It is a search for the thing that breaks the method, and the best possible outcome is finding one. The specific fear worth naming: if the work orders do not distinguish a genuine idler failure from a scheduled replacement, the entire outcome variable is unusable and no amount of analysis will rescue it. Twenty-four hours to discover that is twenty-four hours. Month eleven to discover it is the year - and it is what happened to that researcher in the cohort above, who did nothing wrong except find out late.</p>
+<p><strong>On the ethics form, and what it actually is.</strong> It is not a legal trap and it was not written to catch you. It is a committee of people asking one question in eleven pages of ways: <em>could this harm somebody, and has the researcher thought about it.</em> Once you read it that way you can answer it, because you already know how to think about who a piece of work touches. And engineering applications routinely omit the one thing a committee most wants to see - what you will do if you find something unsafe. Writing that down in advance is not bureaucracy. It is what you would do anyway, said out loud, before you need it.</p>
+<p><strong>An honest boundary.</strong> This gives you a design you can defend and an application that answers the real question. It does not guarantee approval - the committee holds that, and they may know a consideration you do not. It does not guarantee your study works; some flaws are not visible until you are inside. And it does not replace your supervisor, who has watched this go wrong before in ways neither of you can predict from a canvas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Musa's method is sound. His problem is somewhere else entirely.</p>
+<table>
+<tr><th>Item</th><th>Detail</th></tr>
+<tr><td>His question</td><td>"Does the time of shift affect the rate of procedural non-compliance during isolation and lock-out at the plant?"</td></tr>
+<tr><td>Why it matters</td><td>Three near-misses in two years, all on night shift. Nobody has checked whether that is a pattern or three events</td></tr>
+<tr><td>His data</td><td>Permit records with the issuing and receiving names, shift rosters, and CCTV covering the isolation points</td></tr>
+<tr><td>Denominator</td><td>He has permits issued per shift. Good - he is already working in rates</td></tr>
+<tr><td>Confounders considered</td><td>Task complexity, crew experience, workload per shift. All identified, all stratifiable</td></tr>
+<tr><td>Site</td><td>His own employer. His manager is enthusiastic and has offered "whatever you need"</td></tr>
+<tr><td>Plant size</td><td><strong>Fourteen</strong> people work night shift. Four are authorised to issue isolation permits</td></tr>
+</table>
+<ol>
+<li><strong>Is the method sound?</strong> Say what he has got right - be specific, because it matters that his design work is not dismissed.</li>
+<li><strong>Name the fatal flaw.</strong> It is not the method and it is not the denominator.</li>
+<li><strong>The four.</strong> Explain precisely why "the data is anonymised" does not solve his problem.</li>
+<li><strong>The enthusiastic manager.</strong> Why is "whatever you need" a warning rather than a gift?</li>
+<li><strong>Redesign it.</strong> Keep the question if you can. If the question must change, say what it becomes and what is lost.</li>
+<li><strong>The unsafe-finding clause.</strong> Write Musa's version. His is harder than Adaeze's - say why.</li>
+</ol>
+<p>Work it before you turn over. The point of this one is that a study can be methodologically flawless and still be one you must not run as designed.</p>
+<details><summary>Compare your thinking - one way through</summary>
+<div class="reveal-content">
+<p><strong>1. What he has right.</strong> A specific, answerable question aimed at a real safety concern. Rates rather than counts, unprompted. Three plausible confounders identified and all of them stratifiable. This is careful work, and the problem that follows is not a failure of care - it is a category of risk his engineering training never had reason to cover.</p>
+<p><strong>2. The fatal flaw.</strong> <em>His study measures the behaviour of identifiable individuals, in a workplace, with findings that reach their employer.</em> Fourteen people on nights, four permit issuers. Any result about night shift is a result about those four.</p>
+<p><strong>3. Why anonymisation does not save it.</strong> Removing names does not remove identifiability when the population is four. "Non-compliance was higher among night-shift issuers" is, in a plant that size, a sentence with faces attached, and everyone in the building can attach them. The information is in the <em>structure</em> of the finding, not in the name fields - and CCTV compounds it, because footage of a person performing an isolation cannot meaningfully be anonymised at all.</p>
+<p><strong>4. The enthusiastic manager.</strong> Because he can grant access to data about people who have not been asked, and because his enthusiasm creates the exact pressure the participants cannot resist. If your manager wants you in the study, you are not consenting freely - and Musa, who reports to him too, is not neutral either. "Whatever you need" is an offer of something that is not his to give.</p>
+<p><strong>5. A redesign.</strong> Keep the safety question; move it off the individuals. Ask instead: <strong>"Do the conditions under which isolation permits are issued differ by shift - in supervision availability, permit complexity, concurrent work, and time pressure - and do those conditions differ in ways known to increase procedural error?"</strong> That is answerable from rosters, permit records and workload data with no individual behaviour measured, no CCTV, and no consent problem. <em>What is lost:</em> he can no longer say non-compliance is higher at night, which was the original claim. <em>What is gained:</em> he can say night shift is being asked to do the same safety-critical task with less supervision available - which is a finding the organisation can act on, and one that does not require four people to be identified as the problem. It is also, on the evidence, the more likely explanation.</p>
+<p><strong>6. His unsafe-finding clause, and why it is harder.</strong> "If observation identifies a practice presenting immediate risk to a person, it will be reported to the responsible engineer that day." Adaeze's version costs her nothing - a corroded roller has no interests. Musa's may identify a person and reach their employer, and he has to write it down anyway, in advance, knowing that. That is precisely why it must be written before it happens rather than decided in the moment: <em>safety outranks the study, and the time to commit to that is when it is still hypothetical.</em></p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Watch for the traps &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The method is sound. A few traps catch almost everyone applying it for the first time. Glance through these before you trust your own draft.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Treating anonymisation as sufficient when the population is small.</strong> Removing names does not remove identifiability when only a handful of people could be the subject - the information is in the structure of the finding, not the name field.</p>
+<p>&bull; <strong>Skipping the confounder list because the design already feels sound.</strong> An afternoon spent listing what else could produce your result is the cheapest hour in the study. Skipped, it becomes the whole year.</p>
+<p>&bull; <strong>Mistaking enthusiastic access for a green light.</strong> An offer of &quot;whatever you need&quot; from someone with authority over your participants is pressure they cannot resist, not a gift you should accept unexamined.</p>
+<p>&bull; <strong>Running the full method before piloting it small.</strong> A pilot that finds nothing wrong has not proven the method works - it may simply be too short to find the break.</p>
+</div>
+</details>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Choose a method for a question and record what you rejected. List what else could produce your result and design each one out. Find the denominator before you collect a single record. Pilot the whole method deliberately, hunting for what breaks it. And write an ethics application that answers what the committee is really asking.</p>
+<p>That researcher from the cohort above did nothing wrong. He found out late, and late is the entire difference. Everything in this unit is machinery for moving the discovery of a flaw from month eleven to week two.</p>
+<p><strong>You cannot make a study that cannot fail. You can make one that fails early, while failing is still affordable.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

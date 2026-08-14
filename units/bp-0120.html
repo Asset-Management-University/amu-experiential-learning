@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two incident reports two years apart carry the same root cause at the bottom, the overdue list keeps climbing, and the policy on the wall says &#039;continuously improve&#039; - what is actually broken here, and how would I even know?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Two incident reports two years apart carry the same root cause at the bottom, the overdue list keeps climbing, and the policy on the wall says &#039;continuously improve&#039; - what is actually broken here, and how would I even know?</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Felt Problem</h2>
+<p>You are Muhammad. The business you and Ibraaheem built from a car and a few cylinders now runs four depots, a fleet of eleven delivery vehicles, and a filling line that turns out roughly 900 cylinders a day. On the wall behind you is a framed certificate: the asset management policy you wrote three years ago, when you first put real systems in place. It still hangs straight. Nobody has touched it since.</p>
+<p>In your hands is a thin blue folder - Saturday's incident report. A 9 kg cylinder failed its seal at the north depot - a slow leak, caught by the driver before it reached the customer, no one hurt. You read the last line twice: <em>"Root cause: requalification overdue by 14 months. Same finding as incident IR-2024-07."</em> You remember IR-2024-07 - the geyser-bracket failure. Different part, different depot, but the same sentence at the bottom: <em>requalification overdue.</em></p>
+<p>Across the table, your maintenance lead, Asemahle, sits with her arms folded - not defensive, just tired. "Muhammad," she says quietly, "I flagged the requalification backlog in March. I flagged it the March before that. It goes into the report, the report goes into the drawer, and nothing in how we work actually changes." She slides over the overdue list: 47 cylinders past their five-year test date, R600 each to put right - and a quiet voice in your head says that number was 31 a year ago, and 19 the year before.</p>
+<p>Everything <em>works</em> on the surface - orders come in on the phone, drivers are punctual, the card machines swipe. But you are holding two incident reports, two years apart, with the same root cause at the bottom of each. Your objectives say "zero safety incidents" and "100% requalification compliance". Your policy on the wall says the system should "continuously improve". And here is Asemahle telling you the truth you already suspect: the warnings reach the report, but the report never reaches back into how the business decides, schedules and spends. The easy move is already forming - fix the 47, send a stern email, close the folder. But you have closed this exact folder before, and the number keeps climbing.</p>
+<blockquote><h2>Two incident reports two years apart carry the same root cause, the overdue list keeps climbing, and the policy says 'continuously improve' - what is actually broken here, and how would I even know?</h2></blockquote>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>The easy move feels like action. <strong>"Fix the 47 cylinders and tell Asemahle to chase the backlog harder."</strong> But plot the number - 19, then 31, then 47, heading for about 60 - and ask the deciding question: does clearing today's 47 change the SLOPE of that line? It does not; the problem is the inflow rate, not the stock you keep clearing, so a one-off clear just refills. <strong>"The warning system must be failing - make her report it louder."</strong> But trace her real warning step by step (found, written in the report, read, worried about... then filed) and you find it already reached you - it just stopped there, because no one asked whether the scheduling rule, the policy or the budget needed to change. <strong>"Someone is slacking - find who to blame."</strong> But everyone is doing exactly what they were asked: Asemahle flagged it, twice; you read it, twice. The failure is not a lazy person - it is that the system has no way to learn from itself.</p>
+<p>So before you read on: the question is not "how do I clear the backlog?" Name what is actually broken - and what review would have caught it.</p>
+<div class="yardstick-prompt"><label for="yardstick-m2">A quick prediction first: clearing the 47, reporting louder, and finding someone to blame all leave the line climbing. Name the difference between reviewing your ASSETS and reviewing the SYSTEM that manages them, and where the warning's journey actually dies.</label><textarea id="yardstick-m2" placeholder="e.g., I review the cylinders but never review the...; the warning reaches the report and then..."></textarea></div>
+<div class="scratchpad"><label for="scratchpad-m2">My working</label><textarea id="scratchpad-m2" placeholder="Separate symptom from disease? Trace the broken loop? Build a review of the SYSTEM? Test it against reality? Own it + the trade-offs?"></textarea></div>
+<div class="hintbox" data-n="3" data-label-0="I&#039;m stuck - help me think" data-label-1="Another nudge" data-label-2="The clearest way to see it"><button type="button" class="hintbtn" onclick="amuHint(this)">I&#039;m stuck - help me think</button><div class="hintlayers" aria-live="polite"><div class="hint" hidden>I am Muhammad. The business Ibraaheem and I built from a car and a few cylinders now runs four depots, eleven delivery vehicles and a filling line that turns out roughly 900 cylinders a day. On the wall hangs the asset management policy I wrote three years ago, untouched since. In my hands is Saturday's incident report: a 9 kg cylinder failed its seal at the north depot - a slow leak, caught by the driver, no one hurt. The last line: 'Root cause: requalification overdue by 14 months. Same finding as incident IR-2024-07.' I remember IR-2024-07 - a different part, a different depot, the same sentence at the bottom: requalification overdue. My maintenance lead, Asemahle, slides over the overdue list: 47 cylinders past their five-year test date, R600 each to put right - and that number was 31 a year ago and 19 the year before. She is not defensive, she is tired: 'I flagged this in March, and the March before. It goes into the report, the report goes into the drawer, and nothing in how we work actually changes.' Everything works on the surface - orders on the phone, punctual drivers, swiping card machines - yet the same root cause keeps appearing, my objectives say 'zero safety incidents' and '100% requalification compliance', and the policy says 'continuously improve'. What is actually broken here, and how would I even know?</div><div class="hint" hidden>The easy move is already forming: fix the 47 cylinders, send a stern email, tell Asemahle to chase the backlog harder, close the folder - it would feel like action by Friday. But you have closed this exact folder before, and the number keeps climbing (19 -> 31 -> 47, heading for ~60). Plot that line and ask the deciding question: does clearing today's 47 cylinders change the SLOPE? It does not - so the problem is the inflow rate, not the stock you keep clearing. The warning has a path it is supposed to travel - found, written in the report, reviewed, action assigned, action done, checked - and if you follow Asemahle's real warning, it reaches the report, gets read and worried about, and then STOPS: no one asks 'does this mean our scheduling rule is wrong? does the policy need changing? does next year's budget need a requalification line?'. You have a system that GENERATES lessons and a system that FILES them - but not the connection between. The thing that is broken is not the cylinders; it is that the system has no way to LEARN from itself. The real question is not 'how do I clear the backlog?' but 'why does my system keep letting it refill, and what review would catch that?'</div><div class="hint" hidden>The breakthrough is to review the SYSTEM, not just the assets. Most businesses review their assets (is this cylinder safe, is this van serviced?); far fewer ever review the system that MANAGES the assets - is it meeting our objectives, and when it drifts, do we feed the root cause and the lesson back into policy and procedure so the same failure cannot recur? That missing review is the difference between a system that runs and one that learns. Five moves: (1) SEPARATE THE SYMPTOM FROM THE DISEASE - 'the cylinders are overdue' (a maintenance problem, fix this week for 47 x R600 = R28,200) is a different thing from 'we did not learn from the last time', which is the reason the first keeps refilling. (2) TRACE THE BROKEN FEEDBACK LOOP - follow one real warning until it stops moving; the step where it stops, every time, is the breakdown (here: written, read, worried about - then filed, and nothing changes in the rules). (3) BUILD THE MISSING LOOP - a standing quarterly review, fixed shape, owned by you: measure the system against its objectives, trace each deviation's ROOT CAUSE (why did the system let it fail - the scheduling rule trusted drivers to spot overdue cylinders by eye), decide what changes in the SYSTEM not just the asset (the filling line now automatically blocks any cylinder past its date; the procedure rewritten; a standing R30,000 requalification budget line), and write the lesson back into policy + procedure with an owner and a date. (4) TEST THE REVIEW AGAINST REALITY - set a success line in advance ('it works only if the first run catches a deviation we were NOT already chasing and names one rule change with an owner and date; else it is theatre') and run it once cheaply. (5) OWN IT AND WEIGH THE TRADE-OFFS - the recurring failure was not Asemahle's, it was yours: you owned the system and the system had no way to learn. Recurring failures are the symptom of a management system that cannot learn; the remedy is a small, regular, owned review of the system itself against its own objectives - find the rule, schedule or budget behind each drift and change THAT.</div></div></div>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">I've worked it out - show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>That afternoon, you and Ibraaheem sit down with Asemahle and do something you have never actually done before. You do not start with the 47 cylinders. You start with the two reports. The breakthrough is to review the SYSTEM, not just the assets - because most businesses review their assets (is this cylinder safe, is this van serviced?) and far fewer ever review the system that manages them. Five moves:</p>
+<ul><li><strong>Separate the symptom from the systemic disease:</strong> Ibraaheem draws two boxes on the whiteboard. In the first: 'the cylinders are overdue.' In the second: 'we did not learn from the last time the cylinders were overdue.' The first box is a maintenance problem - you can fix it this week with R28,200 (47 cylinders x R600) and some hard chasing. The second box is a different kind of problem entirely: it is the reason the first box keeps refilling itself. This is the turn. The 47 overdue cylinders are not the disease - they are the second visible SYMPTOM of a disease that has no feedback loop. The business is very good at doing the work and very bad at checking whether the system that organises the work is actually meeting its own goals, and feeding what it learns back in. Clearing the 47 (and the geyser-bracket fault before them) treats the symptom while the disease compounds; you have to name the two as different problems before you can fix the one that matters, because every rand and every stern email spent on the first box leaves the second box exactly as broken as it was.</li><li><strong>Trace the broken feedback loop:</strong> follow one real warning, step by step, until it stops moving - the step where it stops, every single time, is the breakdown. Asemahle walks you through the actual path of her March warning: she found the backlog and wrote it in the monthly report (this part worked); the report reached you and you read it and felt worried (this part worked); and then nothing. The report was filed. No one ever asked the questions that would have turned the warning into change: does this mean our scheduling rule is wrong? does the policy need rewriting? does next year's budget need a requalification line? You had a system that GENERATED lessons and a system that FILED them - but not the connection in between, the part where you stop, look at the whole system against what you said you wanted, find why it drifted, and change the rule, the schedule or the budget so the same drift cannot happen again. A warning that reaches a record but never reaches back into the rules is a lesson written and instantly lost - and that lost connection, not any cylinder, is what kept the same sentence appearing at the bottom of the folder.</li><li><strong>Build the missing loop - review the system, not just the assets:</strong> you had reviewed your assets for years - is this cylinder safe, is this van serviced? - but never once reviewed the SYSTEM that manages the assets. So you build the missing loop: a standing quarterly review, a fixed shape, owned by you yourself, not a new certificate on the wall. Its shape is four steps. MEASURE the system against its objectives: put the yearly targets on the table ('zero safety incidents', '100% requalification compliance') with the real numbers beside them (2 incidents, 47 overdue - the gap is plain). LIST every deviation and trace its ROOT CAUSE - not 'the cylinder failed' but 'why did our system let it fail' (here, the scheduling rule trusted drivers to flag overdue cylinders by eye, and nothing stopped a cylinder being filled once it had passed its test date). DECIDE what changes in the SYSTEM, not just the asset - the fix is not 47 cylinders, it is that the filling line now automatically blocks any cylinder past its requalification date, the procedure is rewritten to make that the rule, and next year's budget gains a standing R30,000 requalification line so the work is funded before it becomes a backlog. And WRITE the lesson back into the policy and procedure, recording who owns the change and by when. That is the difference between a system that runs and a system that learns.</li><li><strong>Test the review against reality, not on paper:</strong> a review that looks tidy on a whiteboard is just another certificate on the wall, so before you trust it, set a success line IN ADVANCE and run the cheapest honest trial you can. Muhammad's line: 'this review works only if, the first time we run it, it catches a deviation we were NOT already chasing - and produces one rule change with a named owner and a date; if it only restates the backlog we already knew about, it is theatre, and we change the format.' Then run it once - a single half-day session, on the real numbers, fully reversible, nothing committed. And it surprised them. They walked in certain the headline finding would be the requalification backlog; it was not. Measuring the WHOLE system honestly surfaced a different gap no report had ever flagged: two of the four depots had no one formally responsible for closing out an incident report at all - there the loop never even reached the 'filed' step, and warnings simply evaporated. The backlog was the symptom they could see; the unowned close-out was the deeper hole the review FOUND, precisely because it forced them to measure the system rather than the cylinders. So they added a second change the first plan had missed: every depot now has one named incident-close-out owner, and the quarterly review reads each depot's open reports aloud. A review earns its place by catching what you did not already know.</li><li><strong>Own it, and weigh the honest trade-offs:</strong> this is not free, and pretending otherwise is how good intentions die. The review costs roughly half a day every quarter of your three most senior people - the same people who fight the fires - and the automatic date-block cost about R8,000 to set up and will occasionally stop a cylinder that is fine and slow a round. And there is a harder cost still: Muhammad had to accept that the recurring failure was not Asemahle's. It was his. He owned the system, and the system had no way to learn - owning that, out loud, was the price of fixing it, because a leader who blames the person closest to the symptom can never reach the rule behind it. But the maths settles it. The backlog grew 19 to 31 to 47 over three years, each overdue cylinder a live safety risk, a compliance breach and eventually a R600 scramble; the quarterly review and the R30,000 budget line cost real time and money, but they convert a problem that compounds SILENTLY into one that is seen and funded every quarter. You stop paying for the same lesson twice - and the certificate on the wall that promised 'continuously improve' for three years finally becomes true, because for the first time something in how the business actually works makes it so.</li></ul>
+<p>See what it changes. You run the new quarterly review once, on the real numbers, with the three of you in the room - and it surprises you: the headline gap is not the backlog you expected but two depots where no one owns incident close-out at all, a hole no report had ever flagged. So the filling line now blocks any overdue cylinder automatically, every depot has a named close-out owner, and next year's budget carries a standing R30,000 requalification line. The certificate on the wall had promised "continuously improve" for three years; now, for the first time, something in how the business actually works makes it true. <strong>Recurring failures are the symptom of a management system that cannot learn - warnings reach a report but never reach back into the rules. Most businesses review their assets; far fewer review the system that manages them, and that missing review is the difference between a system that runs and one that learns. The remedy is a small, regular, owned review of the system itself against its own objectives: keep asking 'why did our SYSTEM let this drift?' until you reach a rule, a schedule or a budget - never a person to chase - and change THAT, so you stop paying for the same lesson twice.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You already know this one - forget the cylinders, and picture a careful person's monthly budget.</p>
+<details><summary>See the same trap in a household that keeps missing its savings goal</summary>
+<div class="reveal-content">
+<p>Buhle earns a steady salary and is, by every account, careful with money. But every month for over a year the same thing happens: she overspends in the last week, dips into her savings to cover it, and tells herself she will do better next month. She even has a note on her phone - "watch the month-end spend". She set a goal two years ago: save R2,000 a month. She has hit it maybe three times. The note keeps getting written; the R2,000 keeps not happening.</p>
+<p>On the surface this looks like a willpower problem - but that is the wrong diagnosis, her version of "tell Asemahle to chase the backlog harder": it blames the person and changes nothing in the system. Buhle's month has the same three pieces as Muhammad's: a goal she once set (save R2,000), a warning that keeps getting raised (the note), and a thing that runs every month without changing (how she spends). And just like the report, the note reaches a record and stops there. The real cause is a SCHEDULING RULE: nothing moves the R2,000 out of reach before she can spend it - the savings transfer happens at month-end, IF anything is left, so the goal is funded last instead of first, exactly like filling a cylinder that is already past its test date. The fix is not "try harder"; it is to change the rule - move the R2,000 to savings on payday, automatically, before the spending month begins - plus a five-minute monthly check where the goal meets the real number. A gas business with eleven vans and a person with a household budget look nothing alike, but underneath the failure is identical: a system that runs, a warning that reaches a record but never travels back into the rules, and a goal hanging untouched while reality drifts. When the same failure keeps recurring, the broken thing is almost never the symptom you keep fixing - it is the missing review of the system against its own goals.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>The trap you just felt is not really about cylinders. It is any system that quietly stops learning from itself - where warnings reach a report but never reach back into how you decide, schedule and spend, so the same failure recurs because nothing in the SYSTEM changes; you only ever fix the latest symptom. Find it in your own world:</p>
+<ol>
+<li><strong>Find your recurring sentence.</strong> A problem in your work, team, studies or home that has come back more than once with roughly the same cause - write down the sentence that keeps appearing at the bottom of the folder.</li>
+<li><strong>Separate the symptom from the missing loop.</strong> Like Ibraaheem's two boxes: name the thing that keeps breaking, and the review that never happens that lets it keep breaking. Name both, separately.</li>
+<li><strong>Trace where the lesson dies.</strong> When the problem happens, the information travels somewhere - a complaint, a note, a quiet worry. Trace its path step by step. At exactly which step does it stop turning into a change in how things actually work?</li>
+<li><strong>Build the smallest loop.</strong> Not a grand new policy - a small, repeating review with a fixed shape and a named owner. Who runs it, how often, and what is the one rule, schedule or budget you would change so this quarter's lesson is written back in and cannot be lost? (And be honest: a learning loop costs time and sometimes uncomfortable ownership - is that smaller than paying for the same lesson again next year?)</li>
+</ol>
+<div class="goal-setter"><label for="learner-goal-text">A recurring problem in your own world - one that has come back more than once with roughly the same cause, where you keep fixing the symptom and the same sentence keeps appearing at the bottom of the folder:</label><input type="text" id="learner-goal-text" class="goal-text" placeholder=""><label for="learner-goal-amount">The trap is not really about cylinders: it is any system that quietly stops learning from itself, where warnings reach a report but never reach back into how you decide, schedule and spend, so the same failure keeps recurring because nothing in the SYSTEM changes - you only ever fix the latest symptom. Find it in your own world. FIND YOUR RECURRING SENTENCE: a problem in your work, team, studies or home that has come back more than once with roughly the same cause - write down the sentence that keeps appearing at the bottom of the folder. SEPARATE THE SYMPTOM FROM THE MISSING LOOP: like Ibraaheem's two boxes, name the thing that keeps breaking AND the review that never happens that lets it keep breaking. TRACE WHERE THE LESSON DIES: when the problem happens the information travels somewhere (a complaint, a note, a quiet worry) - follow its path and find the exact step where it stops turning into a change in how things actually work. CHECK YOUR SYSTEM AGAINST ITS OWN STATED GOALS: what did you SAY you wanted (a target, a promise, a standard)? Put the real numbers next to it - is anyone doing this comparison on a regular, owned schedule, or is the goal just hanging straight on the wall, untouched? DECIDE THE SMALLEST LOOP YOU COULD BUILD: not a grand new policy but a small, repeating review with a fixed shape and a named owner - who runs it, how often, and the one rule, schedule or budget you would change so this quarter's lesson is written back in and cannot be lost? And be honest about the cost: a learning loop costs time and sometimes uncomfortable ownership - but is that smaller than the cost of paying for the same lesson again next year? Recurring failures are the symptom of a management system that cannot learn; the remedy is a small, regular, owned review of the system itself against its own objectives - keep asking 'why did our SYSTEM let this drift?' until you reach a rule, a schedule or a budget (never a person to chase), and change THAT. Most businesses review their assets; far fewer ever review the system that manages them - and that missing review is exactly why the same sentence keeps coming back.</label><div class="input-group"><span class="currency-symbol">R</span><input type="number" id="learner-goal-amount" placeholder="1" onchange="updateLearnerGoal()"></div></div>
+<p>Name your recurring sentence, the step where the lesson dies, and the smallest owned review you could start - with the one rule, schedule or budget it would change. (Working with an AMU facilitator? Build your own System Review grid together and run it once on real numbers.)</p>
+<p>Keep one test in front of you: if your fix ever names a <em>person to chase</em> instead of a <em>rule to change</em>, you are still fixing the symptom - go back one step. The assets change; the trap does not. Most businesses review their assets; far fewer ever review the system that manages them - and that missing review is exactly why the same sentence keeps coming back.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

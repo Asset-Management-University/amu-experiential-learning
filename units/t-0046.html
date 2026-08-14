@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The data is all there - millions of rows of sensor and work-order history - yet the pumps keep failing by surprise. How do I turn all that data into an early warning I can actually trust and act on?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The data is all there - millions of rows of sensor and work-order history - yet the pumps keep failing by surprise. How do I turn all that data into an early warning I can actually trust and act on?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is a Tuesday morning at Tarka Ferrochrome, a smelter in an inland mining region. You are the reliability engineer for the cooling-water plant that keeps the furnace alive - six big pumps running day and night. In your hand is a printed log. Last night, at <strong>02:40</strong>, <strong>Pump P-204</strong> seized. The night shift caught it just in time and swung the standby pump in.</p>
+<p><strong>Yusra</strong>, the maintenance superintendent, is standing at your desk with her arms folded. <em>"That is the third unplanned pump failure this quarter,"</em> she says. Her voice is flat, tired. <em>"Each one is a near-miss. One day we will not catch it in time."</em></p>
+<p>You feel the heat from the furnace floor through the office wall. Every pump has a sensor pack - vibration, bearing temperature, motor current, flow - sampled every minute, and a <strong>CMMS</strong> (the maintenance database of every work order) going back four years. So the data is <em>there</em>. Millions of rows. The tempting move is to grab last night's vibration chart, eyeball the spike, and write "bearing wear - replace bearing" on the work order. That is what you have always done. But you have done that three times this quarter, and the pumps keep failing anyway. Eyeballing one chart at a time is not finding the problem early enough - and Yusra trusts you to fix this.</p>
+<blockquote><h2>The data is all there - millions of rows of sensors and work orders - yet the pumps keep failing by surprise, and one day the night shift will not catch it in time. How do I turn all that data into an early warning I can actually trust and act on?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Six cooling-water pumps, a reading a minute, four years of history — about <strong>3.15 million rows</strong> of sensor data, plus the work-order history. Somewhere in there are <strong>41,000</strong> rows reading exactly 0.00&nbsp;mm/s, because a probe was unplugged for 28 days, and three readings of 620&nbsp;&deg;C that never happened. And in four years there have been only <strong>nine</strong> actual bearing failures. The pumps keep failing by surprise. Write down how you would turn this into a warning the night shift can act on — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the two numbers that decide everything</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Plot it all and look for patterns.&rdquo;</strong> This is what is being done now, one chart at a time, and it is why the failures are still surprises. Three million rows do not fit in anybody&rsquo;s eye.</p>
+<p>&bull; <strong>&ldquo;Feed everything into a model and see what it finds.&rdquo;</strong> It will find the unplugged probe, confidently, because 41,000 identical zeros are the strongest pattern in the dataset and they mean nothing at all.</p>
+<p>&bull; <strong>&ldquo;Clean the data first, then decide what to do with it.&rdquo;</strong> Half right, and it invites cleaning without a purpose — and whether those zeros should be dropped, marked missing, or filled depends entirely on the question being asked.</p>
+<p>&bull; <strong>&ldquo;Train on the nine failures.&rdquo;</strong> Nine events across four years is thin, and it is not nothing — but it decides the shape of everything that follows, so it must be faced at the start rather than discovered at the end.</p>
+<p>&bull; <strong>&ldquo;Get a better sensor fitted and start collecting properly.&rdquo;</strong> Sound, and it discards four years you already have to begin waiting again.</p>
+<p>&bull; The two numbers that decide this are not in the sensor data at all: <strong>how much warning the team actually needs</strong>, and <strong>how many real failures you have to learn from</strong>. So the first move is to sharpen the question until it is answerable and testable — not &ldquo;analyse the pumps&rdquo; but warn the team at least a certain number of hours ahead, chosen because that is the difference between swapping a bearing on a normal day shift and doing it at 02:40. Everything downstream follows from that: it tells you what counts as a success, which readings are relevant, and what to build the label from. And <strong>look before you model</strong>, because the 41,000 zeros and the 620&nbsp;&deg;C readings are not data — one is an unplugged probe, the other never happened — and no amount of modelling recovers from feeding them in as though they were real.</p>
+</div>
+</details>
+<p>You do not need a better guess. You need a reliable, repeatable way to turn all that sensor and work-order data into an early warning a human can act on - the same steps every time, so you and others can trust the result. Here is that workflow.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>What you need is a <strong>data-science workflow</strong>: a fixed set of steps that takes raw asset data and turns it into a trustworthy answer to a question. It is repeatable on purpose - follow the same steps every time, so you can trust the result and others can check it. Watch it run on the six cooling-water pumps.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Frame the question (sharp, and early enough to act)</div><p class="cb-demo">Not &#039;analyse the pumps&#039; but: &#039;Using the sensor and CMMS data, can I warn the team at least 48 hours before a cooling-water pump bearing fails?&#039; - early enough to plan a swap on a normal day shift, not at 02:40.</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Explore the data (EDA: look before you model)</div><p class="cb-demo">The raw table is 3.15 million rows (6 pumps x 1 reading a minute x 365 days). You find 41,000 impossible 0.00 mm/s vibration rows - a probe was unplugged for 28 days - so you mark them missing, not zero; and 3 glitch readings of 620 C, which you drop. And only 9 real failure events in 4 years of CMMS history - thin. Hold that thought.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Shape the clues (feature engineering + the label)</div><p class="cb-demo">Per pump per hour: rolling 24-hour average vibration; how fast that average rises over 7 days; bearing-temperature rise rate; current-to-flow ratio (a climbing ratio means the pump works harder for the same water - a classic wear sign); days-since-bearing-change from the CMMS. The label: fails_within_7d = 1 if a bearing failure lands in the next 7 days, else 0.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Find the signal (supervised + unsupervised + time-series)</div><p class="cb-demo">Supervised (split by time, 3 years train / last year test): catches 2 of 2 real failures with a 63-hour median warning, plus 3 false alarms a year. Anomaly detection (no labels - the net for only 9 failures): flags P-204 71 hours before it seized. Time-series: vibration trend climbs 2.1 -&gt; 4.8 mm/s; an FFT peak at 24.5 Hz (1470 rpm / 60 = once-per-revolution) points to imbalance or a worn bearing - telling the millwright what to look for.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Trust it and explain it (no leakage; SHAP)</div><p class="cb-demo">A random split let future hours of the same failure run-up leak into training and falsely claimed 98% accuracy; splitting by time (train on the past, test on the future) gave the true, lower, real picture. Then SHAP shows why the P-204 alarm fired: bearing-temperature slope (largest), vibration slope, then current-to-flow. Now Yusra gets a one-page alert she can act on - &#039;plan a bearing swap on day shift Thursday&#039; - not &#039;the computer said so&#039;.</p></div></div>
+
+<p>See what the five steps did. They turned a flood of three million rows into a single honest alert: <em>P-204, sixty-three hours out, bearing temperature and vibration rising, once-per-rev fault - plan the swap for Thursday day shift.</em> And notice what makes it trustworthy. <strong>The point was never a clever model; it was an honest one that lets a human act in time.</strong> Two things guard that honesty: refusing <em>leakage</em> (the random split that flattered the model to 98% was a lie - the honest time split told the truth), and refusing the black box (SHAP says <em>why</em>, so Yusra acts on a reason, not on "the computer said so"). The data does not fix the pump. It buys a person time and a reason - which is the whole gift.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You build the answer in five moves (the third move, finding the signal, folds in three classic tools).</p>
+<ul>
+<li><strong>1. Frame.</strong> Write the question sharply, and early enough to act on - "warn me 48 hours before a bearing fails", not "analyse the pumps".</li>
+<li><strong>2. Explore (EDA).</strong> Look at the data before modelling: count rows, find gaps and impossible values, draw a quick chart - catch the broken sensor before it fools you.</li>
+<li><strong>3. Shape.</strong> Feature engineering: turn raw readings into shaped clues (rolling averages, slopes, ratios, days-since-X) and build the label you want to predict.</li>
+<li><strong>4. Find the signal.</strong> <em>Supervised</em> learning predicts a labelled outcome; <em>unsupervised</em> anomaly detection flags "weird" with no labels (the net when failures are rare); <em>time-series</em> (decomposition + FFT) shows trend and the repeating frequency that names the fault.</li>
+<li><strong>5. Trust and explain.</strong> Validate without leakage (split by time, not randomly), and explain each alarm (SHAP) so a human can act on the reason.</li>
+</ul>
+<p>The key ideas: a <em>feature</em> is one shaped column the model learns from (a 7-day slope beats a single noisy reading); <em>leakage</em> is future information sneaking into training, the single most common way a model looks brilliant in testing and proves useless in life; <em>anomaly detection</em> learns what normal looks like and flags what strays, so it needs no labels; and <em>interpretability</em> (SHAP) turns a verdict into a reason. This workflow fits when you have enough good history and a real decision to support; it does <em>not</em> fit when you have a handful of rows, when the data is mostly broken, or when a simple rule ("replace the bearing every 12 months") already does the job - data science earns its keep on hard, data-rich problems, not on every problem.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Take ONE asset and ONE worry you actually have - a pump, a compressor, a fleet vehicle, a server, a chiller - and walk the five moves <em>before</em> you write a line of code. Frame the question; explore what data you have; name the clues you would shape; decide which lens fits; and plan how you will keep it honest.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-frame">Step 1 - Frame the question (sharp, and early enough to act)</label><textarea id="cb-frame" data-key="t-0046:frame" placeholder="Before touching the data, write the question plainly. A vague question gives a vague answer; a sharp one tells you exactly what data and what test you need - and it must be answerable early enough to be useful."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-explore">Step 2 - Explore the data (EDA: look before you model)</label><textarea id="cb-explore" data-key="t-0046:explore" placeholder="Exploratory Data Analysis - look at the data properly first (pandas to hold it, a quick seaborn chart to see it). Count rows; find gaps, zeros, negatives and impossible values, and learn what caused them. This is where you catch the broken sensor before it fools you."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-shape">Step 3 - Shape the clues (feature engineering + the label)</label><textarea id="cb-shape" data-key="t-0046:shape" placeholder="Turn noisy raw readings into useful clues called features - one column the model learns from - and build the label (the known outcome you want to predict). Rolling averages, slopes and ratios carry far more signal than a single raw reading."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-find_signal">Step 4 - Find the signal (supervised + unsupervised + time-series)</label><textarea id="cb-find_signal" data-key="t-0046:find_signal" placeholder="Use three complementary lenses. Supervised learning predicts a labelled outcome from the features. Unsupervised anomaly detection flags &#039;weird&#039; with no labels - the safety net when failures are rare. Time-series analysis (decomposition + FFT) reveals trends and hidden frequencies that say WHAT kind of fault, not just when."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-trust_explain">Step 5 - Trust it and explain it (no leakage; SHAP)</label><textarea id="cb-trust_explain" data-key="t-0046:trust_explain" placeholder="Validate honestly - above all avoid LEAKAGE, where future information sneaks into training so the model looks brilliant in testing and useless in life; split by TIME, not randomly. Then explain WHY each alarm fired, so a human can act on a reason, not a verdict."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines keep the answer honest. First, <strong>split by time, never at random</strong> - if hours from the same failure run-up land in both training and testing, the model has secretly seen the answer; it will dazzle you and then fail you, and judging it on plain accuracy when failures are rare hides the lie (judge it on real failures caught early and false alarms raised). Second, <strong>be willing to say "not yet"</strong> - if your data is mostly broken, or you have one or two failures and no clean "normal" to learn from, or a simple rule already works, the honest move is to stop. Saying "not yet" is a correct use of this technique, not a failure of it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your analysis honest.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Leakage is the cardinal sin.</strong> A model that has glimpsed the future scores beautifully and helps no one. Split by time; let every feature use only what you would truly know at the moment of prediction.</p>
+<p>&bull; <strong>Do not trust the headline accuracy.</strong> With 9 failures in millions of rows, a model that always says "fine" is 99.99% accurate and worthless. Judge on real failures caught early and false alarms raised, not on accuracy.</p>
+<p>&bull; <strong>Clean before you model.</strong> A 0.00 from an unplugged probe or a 620 C glitch will quietly poison everything downstream. EDA is not a formality; it is where you catch the lie in the data.</p>
+<p>&bull; <strong>Explain, or it will not be trusted.</strong> "The computer said so" is not actionable and will not survive a hard question. If you cannot say <em>why</em> the alarm fired, you do not yet have a tool a team can use.</p>
+<p>&bull; <strong>Know when not to.</strong> Too few rows, mostly-broken data, or a problem a simple rule already solves - then this is the wrong tool. "Not yet" is a professional answer, not a defeat.</p>
+</div>
+</details>
+<p>You came in with a flood of data and a superintendent who only wanted the failures to stop catching her by surprise. You can give her something far better than another eyeballed chart: a single, honest alert that says <em>what</em> is failing, <em>why</em> it is failing, and <em>when</em> she must act - early enough to fix it on a calm day shift instead of at 02:40. <strong>That is the whole craft here: move from a flood of raw data to one trustworthy warning a person can act on - built honestly, explained plainly, and humble enough to say "not yet" when the data is not ready.</strong> The model never fixes the pump; it buys a human the time and the reason to. (Working with an AMU facilitator? Bring one asset and one worry, and frame the question together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can run the data-science workflow - frame, explore, shape, find the signal, and trust it - now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

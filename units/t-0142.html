@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The plan that was written for no machine</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The plan that was written for no machine</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and you inherited the plant's maintenance schedule from the CMMS defaults the day you arrived. "Lubricate pumps monthly. Clean heat exchangers every six months." It looked reasonable. It is failing you in both directions at once.</p>
+<p>A critical centrifugal pump failed hard last month - and when you pulled the plan apart afterwards, it had no alignment check and no vibration limit in it at all. Not one. Those are the two things the pump's own governing standard is built around, and misalignment is exactly how the pump died. The plan never even looked.</p>
+<p>Meanwhile, every six months a heat exchanger gets shut down and cleaned because the calendar says so. Sometimes you lose a production shutdown to scrub an exchanger that was barely dirty. Other times it runs badly fouled for months between cleans, quietly burning extra energy the whole time. The plan cannot see the difference, because it is not looking at the exchanger - only at the date.</p>
+<blockquote><h2>My maintenance plan was written for no machine in particular - so it misses what this pump actually needs and it is blind to what this exchanger is actually doing. How do I build a plan grounded in this equipment's real failures and real condition?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Every task on the plan was done and signed off. The pump died anyway — of misalignment, which appears nowhere in the plan, not once. And the exchanger is cleaned on a fixed date: sometimes you strip it down to find it barely dirty, and sometimes it runs badly fouled for months, quietly burning extra energy the whole time. The plan is not being ignored. It is being followed perfectly, and it is failing in two opposite directions at once. Write down how you would build a plan that is grounded in this equipment — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the one cause behind both failures</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Do the tasks more often.&rdquo;</strong> Multiplies both failures. More frequent cleaning means more strip-downs of a clean exchanger, and no amount of extra frequency helps with a failure mode the plan does not mention.</p>
+<p>&bull; <strong>&ldquo;Get the manufacturer's recommended schedule.&rdquo;</strong> Useful input and still generic — written for the machine as a type, in conditions that are not yours. It is where your current plan came from.</p>
+<p>&bull; <strong>&ldquo;Add an alignment check because that is what killed it.&rdquo;</strong> The right task, arrived at by autopsy. Add it and you have covered the one mode that has already cost you a pump, and you are still blind to whichever mode is next on the list nobody has written.</p>
+<p>&bull; <strong>&ldquo;Look up the standard for this pump and follow it.&rdquo;</strong> Closer, and it will frustrate you — you will hunt for a maintenance section that does not exist, because a design standard was never written to schedule your work.</p>
+<p>&bull; <strong>&ldquo;Train the fitters better.&rdquo;</strong> They did every task correctly. Skill applied to an incomplete list produces an excellently executed incomplete list.</p>
+<p>&bull; Both failures have one cause: <strong>the plan was written for no machine in particular.</strong> In one direction it omits — and the omission was invisible, because <strong>you cannot write a task against a failure mode nobody named.</strong> In the other it wastes, because it triggers on the calendar and <strong>the calendar knows nothing about the exchanger</strong>. So ground it. First, enumerate <strong>how this specific thing actually fails</strong> — bearings, seal, misalignment, cavitation, lubricant degradation, each a distinct path with its own warning sign — because that list is what the plan answers, and nothing absent from it can be defended against. Second, take your limits from <strong>what the standard genuinely provides</strong>: not a schedule, but the definition of acceptable condition — how good is good enough — which is exactly what a check needs. Third, write each task <strong>against a named failure mode, with an interval and a limit</strong>, since a task with no limit is an observation rather than a check. And wherever the condition can actually be measured, move the trigger <strong>from the date to the measurement</strong>, so the exchanger is cleaned when it is dirty rather than when it is Tuesday.</p>
+</div>
+</details>
+<p>There is a way to build a plan that is grounded rather than generic, and it fits on one page per machine. Here it is, for the pump and the exchanger.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the equipment-specific plan - the pump grounded in its standard, the exchanger cleaned on its condition.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What does THIS equipment actually fail from? (failure modes)</div><p class="cb-demo">The centrifugal pump does not fail &#039;in general&#039; - it fails in specific ways: BEARING degradation, MECHANICAL SEAL failure, MISALIGNMENT of the shaft to its driver, CAVITATION, and LUBRICANT contamination or degradation. Each is a distinct path to failure with its own warning sign. The generic plan that killed the last pump never listed misalignment at all - and misalignment is exactly what killed it. You cannot write a task against a failure mode you never named.</p></div><div class="canvas-box"><div class="cb-label">2. What does the governing standard require - and to what limit? (acceptance criteria)</div><p class="cb-demo">ISO 5199 is a DESIGN and purchase standard for this pump, not a maintenance manual - and the common mistake is to hunt for a maintenance section that does not exist. What it DOES give you is the hard limits that become your acceptance criteria: the VIBRATION acceptance level to monitor against, the requirement for accurate SHAFT ALIGNMENT (a tolerance to align to), and the LUBRICATION system requirements (clean oil, kept free of contamination). The standard tells you WHAT good looks like and HOW GOOD is good enough; you turn that into checks.</p></div><div class="canvas-box"><div class="cb-label">3. The pump plan - each failure mode to a task, interval and limit</div><p class="cb-demo">Now the plan, grounded in boxes 1 and 2. MISALIGNMENT -&gt; check shaft alignment to the ISO 5199 tolerance after any disturbance to the pump or its base (specify it; a specialist does the precision alignment). BEARINGS -&gt; monitor vibration monthly against the ISO 5199 acceptance limit; investigate on exceedance. LUBE -&gt; analyse oil quarterly against contamination and chemistry limits from the standard; change or filter on exceedance, not on a fixed date. SEAL -&gt; inspect on a defined trigger (e.g., defined leakage rate, pressure change). Every line traces to a failure mode and carries a LIMIT - &#039;check alignment&#039; is worthless without the tolerance to check it to.</p></div><div class="canvas-box"><div class="cb-label">4. The heat exchanger - clean on condition, not on the calendar (trend the performance)</div><p class="cb-demo">Fouling is condition-driven, so a calendar is the wrong tool. Trend the OVERALL HEAT-TRANSFER COEFFICIENT (U) - as fouling builds, U falls and the exchanger delivers less duty. Design U is 500 W/m2K; set the clean trigger at 400 (a 20% loss), the point where the energy cost of running fouled exceeds the cost of a clean. Measure U monthly, plot the decline, and PROJECT when it will cross 400 - then schedule the clean for THAT week. No wasted shutdown on a clean exchanger, no months burning energy on a fouled one. The interval comes from the data, not the diary.</p></div><div class="canvas-box"><div class="cb-label">5. The living plan - tune it with real history</div><p class="cb-demo">Even a well-grounded plan is a hypothesis: it predicts how THIS pump and THIS exchanger will fail, based on the class and the standard. Real history is the evidence that tunes it. If the bearings keep failing before the monthly check, shorten the interval. If three years of oil analysis never finds a problem, lengthen it. If the exchanger fouls faster in summer, trend more often then. The standard sets the starting point; your own failure and performance data earn the final numbers. A plan you never revise is a plan slowly drifting out of date.</p></div></div>
+
+<p>Look at what every line in box 3 has that the old plan did not: a failure mode it protects against, and a <em>limit</em> it checks to. And look at box 4 - the exchanger's cleaning date is no longer on the calendar at all; it is wherever the performance line crosses the threshold. The old plan was a fantasy about maintenance. This one is grounded in the two things that actually decide whether equipment survives: what it fails from, and what it is doing right now. Let us name the moves.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A maintenance plan is only as good as its grounding, and a plan grounded in nothing protects nothing. Build it in five moves, each a question:</p>
+<ul>
+<li><strong>What does this equipment actually fail from?</strong> Name the <strong>failure modes</strong> of the class. A centrifugal pump fails from bearing wear, seal failure, misalignment, cavitation, lube degradation - specific paths, each with a warning sign. The plan that killed the last pump never named misalignment, so it never checked it. You cannot write a task against a failure you did not list.</li>
+<li><strong>What does the governing standard require, and to what limit?</strong> Read the equipment's standard for the specifications that become your <strong>acceptance criteria</strong>. Here is the professional subtlety: <strong>ISO 5199</strong> (the centrifugal-pump design standard for this kind of water-duty service) is a <em>design and purchase</em> standard for the pump, not a maintenance manual - do not hunt for a maintenance section that does not exist. What it gives you is the hard limits: the vibration acceptance level, the shaft-alignment requirement, the lubrication regime. The standard tells you what good looks like and how good is good enough; you turn that into checks.</li>
+<li><strong>What is the task, interval and limit for each failure mode?</strong> Now build the <strong>plan</strong>: every failure mode maps to a task, an interval, and an acceptance limit. Misalignment - check alignment to the ISO 5199 tolerance after any disturbance. Bearings - monitor vibration monthly against the ISO 5199 limit. Lube - analyse quarterly, change on condition. And the rule that separates a plan from a wish: a task with no <em>limit</em> is not a task. "Check alignment" is meaningless without the tolerance to check it to.</li>
+<li><strong>Where the failure is condition-driven, what do you trend?</strong> Some failures cannot be managed by a calendar at all. Fouling in a heat exchanger is one: as it builds, the <strong>overall heat-transfer coefficient</strong> falls. So you <em>trend</em> it - measure the performance parameter over time, and schedule the action when it crosses an economic <strong>threshold</strong>, not on a date. That is condition-based maintenance: the interval comes from the data, not the diary.</li>
+<li><strong>How do you tune it with real history?</strong> A plan grounded in standards is still a <strong>hypothesis</strong> about how this equipment will fail. Its intervals and limits are a starting point; this installation's actual failure and performance history earns the final numbers. A plan you never revise drifts quietly out of date.</li>
+</ul>
+<p>One honest boundary. You build the grounded, equipment-specific plan. To do it you <em>apply</em> the RCM decision logic you already have - you do not re-derive it here. You <em>specify</em> specialist tasks like precision alignment - you do not perform them in this unit. And you use the standard to <em>inform</em> the plan with hard limits, not to replace your judgement about this particular machine's duty and history. The standard is where the plan starts; the machine is what it must actually fit.</p>
+<p>Does it scale? A generic plan is a diet copied from a magazine - not written for you, and unlikely to work. An equipment-specific plan is a nutrition plan a doctor builds from your own bloodwork - grounded in your actual condition, and aimed at your actual problems.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different machine: an electric motor driving a large process fan, running more or less continuously.</p>
+<ol>
+<li><strong>Failure modes.</strong> Name two ways this motor-and-fan set actually fails.</li>
+<li><strong>Acceptance criterion.</strong> State one limit you would take from the relevant standard or the OEM manual (for example, an insulation-resistance value, a bearing-temperature limit, or a vibration level) - and say what task checks it.</li>
+<li><strong>Task, interval, limit.</strong> Write one complete plan line: the task, how often, and the acceptance limit it is checked against.</li>
+<li><strong>Condition-driven.</strong> Name one failure mode here that you would manage by <em>trending</em> a measured parameter rather than by a calendar - and say what you would trend.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> every line you wrote must carry an acceptance limit - a number or a defined pass/fail, not just "inspect" or "check". If any task has no limit, it cannot be passed or failed, which means it cannot actually protect the machine. Add the limit.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-failure_modes">1. What does THIS equipment actually fail from? (failure modes)</label><textarea id="cb-failure_modes" data-key="t-0142:failure_modes" placeholder="List the real failure modes of this equipment class. A plan that does not name them cannot protect against them."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-standard">2. What does the governing standard require - and to what limit? (acceptance criteria)</label><textarea id="cb-standard" data-key="t-0142:standard" placeholder="Read the equipment&#039;s governing standard for the specifications that become inspection tasks and acceptance limits. Do not look for a maintenance manual in a design standard - look for the limits."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-pump_plan">3. The pump plan - each failure mode to a task, interval and limit</label><textarea id="cb-pump_plan" data-key="t-0142:pump_plan" placeholder="For each failure mode, write a task, its interval, and its acceptance limit (from the standard or OEM). A task with no limit is not a task."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-hx_trending">4. The heat exchanger - clean on condition, not on the calendar (trend the performance)</label><textarea id="cb-hx_trending" data-key="t-0142:hx_trending" placeholder="For a condition-driven failure like fouling, trend a measured performance parameter and clean when it crosses a threshold - do not fix a calendar date."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-living">5. The living plan - tune it with real history</label><textarea id="cb-living" data-key="t-0142:living" placeholder="A plan grounded in standards is still a hypothesis about failure. Revise its intervals and limits with this installation&#039;s actual failure and performance history."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now build a plan grounded in what a machine really fails from and what it is really doing, instead of one written for no machine at all.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Maintenance plans fail quietly, long before the equipment does, and almost always for the same handful of reasons.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>The generic plan from the CMMS defaults.</strong> A schedule grounded in nothing - not the failure modes, not the standard, not the condition - is the plan that let the pump die. Every task must trace to a real failure mode of this equipment.</p>
+<p>&bull; <strong>A task with no acceptance limit.</strong> "Check alignment", "inspect the bearing", "monitor vibration" - without a tolerance or a limit, these cannot be passed or failed, so they protect nothing. The number is the task.</p>
+<p>&bull; <strong>A calendar for a condition-driven failure.</strong> Cleaning a heat exchanger on a fixed date wastes shutdowns on clean units and runs fouled ones for months. If the failure builds gradually and can be measured, trend it and act on the threshold.</p>
+<p>&bull; <strong>Hunting for a maintenance manual inside a design standard.</strong> ISO 5199 will not tell you how to service the pump; it tells you the limits the pump must be kept within. Read a design standard for its acceptance criteria, not for procedures.</p>
+<p>&bull; <strong>Trending nothing.</strong> If no performance parameter is measured over time, you cannot see fouling, wear or drift coming - you can only react after it has cost you. What you do not trend, you cannot anticipate.</p>
+<p>&bull; <strong>Confusing building the plan with deciding or doing the tasks.</strong> Deciding which tasks a failure mode needs is the RCM method; performing precision alignment is a specialist craft. This job is assembling the grounded plan that ties them together - keep the three distinct.</p>
+<p>&bull; <strong>Writing it once and never tuning it.</strong> The standard sets the starting intervals; your own failure and performance history should move them. A plan never revised against reality slowly becomes fiction.</p>
+</div>
+</details>
+<p>Onalenna's plant was being maintained to a plan written for no machine in particular, and it was failing exactly where it was blind. Now she can ground it: name what each machine really fails from, take the hard limits from its standard, write every task against a failure mode and a number, set the condition-driven intervals from a trended measurement, and tune the whole thing with real history. A generic plan protects nobody; a grounded one is the difference between maintenance that looks busy and maintenance that actually keeps the plant running. If you are working with an AMU Facilitator, take one real machine's maintenance plan and check every line for its acceptance limit - you will usually find where the plan is really only pretending.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can ground a plan in the real machine now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The black box on your books</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The black box on your books</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The new blower is running. It was commissioned in March, it is on the asset register, and the depreciation clock started the day it was accepted.</p>
+<p>In the cabinet there is a folder. It contains generic manuals for the product family - a range of six machines, of which yours is one - a wiring diagram that is not quite the wiring in the panel, and a parts list at assembly level: <em>drive assembly, one</em>.</p>
+<p>The contract said the supplier would provide operating and maintenance documentation. The supplier provided operating and maintenance documentation. Nobody breached anything.</p>
+<p>And you are the custodian of a machine you cannot see inside. It has not failed yet. When it does - and the tightness you feel about it is not irrational - you will be standing in front of it with a folder that describes six machines, none of them exactly this one, ringing a supplier who is under no obligation to answer quickly.</p>
+<blockquote><h2>The asset is on my books, the target is on the wall, and I have no idea how to keep it running. How do I buy the capability to operate a machine rather than just the machine?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The contract required operating and maintenance documentation. The supplier provided operating and maintenance documentation. <strong>Nobody breached anything</strong> &mdash; and what arrived describes six machines, none of them exactly this one, and you are the custodian of an asset you cannot see inside with a target for it already on the wall. It has not failed yet. Write down what you would have written into that purchase so that you were buying <strong>the ability to run this thing</strong> rather than the thing &mdash; your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five answers, and the one word that undoes four of them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Require full documentation in the contract.&rdquo;</strong> It did. That is the whole trap. <strong>&ldquo;Documentation shall be provided&rdquo; is a requirement that cannot be failed</strong>, which means it was never specified &mdash; anything at all discharges it. A requirement you cannot imagine rejecting is not a requirement; it is a hope with a clause number.</p>
+<p>&bull; <strong>&ldquo;Take the supplier&rsquo;s service contract.&rdquo;</strong> Available, and it answers a different question than the one you are being paid to answer. It keeps the machine running; it does not make your people able to run it, and each year you renew it the alternative gets further away. <strong>That is the clause that quietly decides whether you have bought an asset or a subscription</strong>, and it is being decided by default.</p>
+<p>&bull; <strong>&ldquo;Ask them for the detail now &mdash; they will help.&rdquo;</strong> They may well, out of goodwill, slowly. Notice what changed at the moment of final payment: <strong>you had leverage and now you have a relationship.</strong> Everything obtainable cheaply before that date is obtainable expensively, or not at all, after it.</p>
+<p>&bull; <strong>&ldquo;Buy the spares package the supplier offers.&rdquo;</strong> Sensible, and it locks the very thing you were trying to keep open. Assembly-level part numbers mean one source; <strong>component-level detail is what makes a second source possible</strong>, and which of the two you receive was settled by what you asked for, not by what you paid.</p>
+<p>&bull; <strong>&ldquo;Compare the tenders on price and pick the best value.&rdquo;</strong> You did. And only one side of the price was on the table. <strong>What is paid at purchase is visible; what is paid across twenty-five years for information not obtained now is not</strong> &mdash; and it is largest precisely where the purchase price looked most attractive.</p>
+<p>Your unease is not irrational and it is not about today. It is about the morning it fails, with a folder describing six machines and a supplier under no obligation to ring you back.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the acquisition - what you are actually buying, the information specified as a deliverable with tests, both sides of the price, a gate somebody will hold, and taking delivery of the information as deliberately as the machine.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Decide what you are actually buying - the machine, or twenty-five years of being able to run it</div><p class="cb-demo">&lt;strong&gt;Write the objective in terms of what the organisation must be able to DO, and the whole specification falls out of it.&lt;/strong&gt; &lt;strong&gt;Not &#039;procure a 250 kW blower&#039; - that is a purchase.&lt;/strong&gt; &lt;strong&gt;Instead: &#039;acquire the capability to move this volume of air, reliably, for twenty-five years, maintained by our own people, with parts we can source from more than one place.&#039;&lt;/strong&gt; &lt;strong&gt;Now read that sentence back and list what each clause actually requires.&lt;/strong&gt; &lt;strong&gt;Reliably&lt;/strong&gt; requires the failure modes and the manufacturer&#039;s maintenance requirements, not a service contract. &lt;strong&gt;For twenty-five years&lt;/strong&gt; requires knowing what is obsolescence-exposed and when. &lt;strong&gt;Maintained by our own people&lt;/strong&gt; requires the procedures, the tolerances, the special tools and the training - and is the clause that quietly decides whether you are buying an asset or a subscription. &lt;strong&gt;Parts from more than one place&lt;/strong&gt; requires component-level detail rather than assembly part numbers, and it is the clause suppliers resist most, which tells you what it is worth. &lt;strong&gt;This is the whole difference between the two acquisitions.&lt;/strong&gt; &lt;strong&gt;An organisation that buys a machine receives a machine. An organisation that buys the capability to operate a machine receives a machine and everything required to keep it running - and the second is not more expensive so much as more specified.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">2. Specify the information as a deliverable with acceptance criteria - not as a clause saying documentation shall be provided</div><p class="cb-demo">&lt;strong&gt;A clause reading &#039;the supplier shall provide operating and maintenance documentation&#039; is satisfied by a folder of generic manuals for a product family, and the supplier who does that has complied exactly.&lt;/strong&gt; &lt;strong&gt;Specify each deliverable, its format, and the ACCEPTANCE TEST - which is the part that is always missing.&lt;/strong&gt; &lt;strong&gt;Not &#039;as-built drawings&#039; but &#039;as-built drawings reflecting the equipment as installed on this site, in a named editable format, with the acceptance test being that our engineer can identify every field-modified item from them&#039;.&lt;/strong&gt; &lt;strong&gt;Not &#039;spares list&#039; but &#039;recommended spares with component-level part numbers, lead times, and identification of every single-source item&#039;&lt;/strong&gt; - and note that the single-source declaration is the most valuable line in it and the one a supplier will most want to leave out. &lt;strong&gt;Not &#039;training&#039; but &#039;training that leaves three named people able to perform the routine maintenance unsupervised, assessed by demonstration&#039;.&lt;/strong&gt; &lt;strong&gt;Six categories cover most acquisitions:&lt;/strong&gt; as-built configuration, maintenance requirements, spares and obsolescence, operating procedures and limits, test and commissioning records, and competence transfer. &lt;strong&gt;Write the acceptance test for each before the tender goes out, because a test invented at handover is a test you will lose.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. Price the information - and price its absence, using what a failure actually costs</div><p class="cb-demo">&lt;strong&gt;Ask for the information package priced separately, because a supplier who will not price it separately is telling you something.&lt;/strong&gt; &lt;strong&gt;Mine: a R2.4 million asset, and the full information requirement added R96,000 - four per cent.&lt;/strong&gt; &lt;strong&gt;Now price its absence, and price it from a failure that has actually happened rather than one you imagine.&lt;/strong&gt; &lt;strong&gt;The equivalent machine on the other line failed and took eleven days to return to service, at about R38,000 a day of lost production - R418,000.&lt;/strong&gt; &lt;strong&gt;Of those eleven days, nine were spent identifying the failed component, finding somebody who could supply it, and waiting.&lt;/strong&gt; Two were the repair. &lt;strong&gt;The information package would not have removed the failure. It would have removed most of the nine.&lt;/strong&gt; &lt;strong&gt;So: R96,000 against R418,000, on a single event - about four and a third times, and it recurs.&lt;/strong&gt; &lt;strong&gt;Put both numbers in the acquisition case, side by side, and state the assumption openly&lt;/strong&gt; - this is one comparable event, the next failure may be cheaper or worse, and the argument does not depend on precision because the ratio is not close. &lt;strong&gt;An approver who declines a four per cent uplift after seeing that comparison has made a decision rather than an oversight, which is all you can ask.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">4. Make handover conditional on it - at a gate somebody will actually hold</div><p class="cb-demo">&lt;strong&gt;An information requirement with no gate is a request, and it will be met last or not at all - because by handover the plant is needed, the supplier has been paid most of the money, and everybody wants to start up.&lt;/strong&gt; &lt;strong&gt;Attach it to something that hurts: a retention payment, or acceptance itself.&lt;/strong&gt; &lt;strong&gt;And then do the thing that decides whether the gate is real - look at who is holding it.&lt;/strong&gt; &lt;strong&gt;If the gate is held by the project manager, it will not hold.&lt;/strong&gt; Not because they are weak, but because they are measured on schedule and on cost, and they are being asked to delay a start-up over a spares list. &lt;strong&gt;That is an incentive problem, and no amount of insisting fixes it.&lt;/strong&gt; &lt;strong&gt;Give the gate to the person who will own the asset for twenty-five years&lt;/strong&gt; - the maintenance or asset manager - who has the opposite incentive and will still be here when it matters. &lt;strong&gt;Then make the gate specific enough to be defensible under pressure.&lt;/strong&gt; &#039;Documentation not satisfactory&#039; loses that argument on a Friday afternoon. &lt;strong&gt;&#039;Deliverables 3 and 5 of the six specified are outstanding; the acceptance tests are in schedule 4; retention is released when they pass&#039;&lt;/strong&gt; wins it, because it is a fact rather than a judgement, and the supplier agreed to it before the money moved.</p></div><div class="canvas-box"><div class="cb-label">5. Take delivery of the information as deliberately as the machine - and put it where the asset lives</div><p class="cb-demo">&lt;strong&gt;Nobody signs for a machine without looking at it, and almost everybody signs for the documentation without opening it.&lt;/strong&gt; &lt;strong&gt;Verify against the specification, deliverable by deliverable, using the acceptance tests you wrote before the tender.&lt;/strong&gt; &lt;strong&gt;Then do the part that is genuinely most often lost: put it where the asset lives.&lt;/strong&gt; &lt;strong&gt;Information that arrives and is filed as a project record has not been received in any sense that matters.&lt;/strong&gt; The register entry gets the configuration. The maintenance system gets the requirements as actual tasks with intervals. The spares catalogue gets the part numbers, the lead times and the single-source flags. The document system gets the drawings, versioned and reachable from the workshop. &lt;strong&gt;And each of those has a named owner from the day of handover&lt;/strong&gt;, because a project team disperses and an unowned document set is stale within a year. &lt;strong&gt;Then record honestly what did NOT arrive.&lt;/strong&gt; &lt;strong&gt;Some things will be missing, some will be refused, and some will be accepted as commercially reasonable to withhold.&lt;/strong&gt; &lt;strong&gt;Write that list into the asset record&lt;/strong&gt; - &#039;we do not hold component-level detail for the drive assembly; it is single-source; this is a known exposure&#039; - because the person who meets that gap at two in the morning in year seven is entitled to have been told, rather than to discover it while the plant is down.</p></div></div>
+
+<p>Box 2 is where the folder of generic manuals is prevented, and box 4 is where most information requirements are actually lost. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>An acquisition strategy is <strong>not a procurement plan. It is the decision to buy the capability to operate something for its whole life, rather than the thing itself - and almost all of that decision is made before the tender goes out.</strong> Five moves:</p>
+<ul>
+<li><strong>State what you must be able to DO.</strong> <strong>Reliably, for twenty-five years, maintained by our own people, with parts from more than one place</strong> - and every clause generates a requirement.</li>
+<li><strong>Specify information with acceptance tests.</strong> <strong>Not "documentation shall be provided".</strong> Six categories, each with the test that decides whether it is met.</li>
+<li><strong>Price both sides.</strong> <strong>What the information costs, and what one failure costs without it.</strong></li>
+<li><strong>A gate somebody will actually hold.</strong> <strong>Not the project manager</strong> - an incentive problem no amount of insisting fixes.</li>
+<li><strong>Take delivery of the information, and put it where the asset lives.</strong> <strong>And record what did not arrive.</strong></li>
+</ul>
+<p><strong>The arithmetic that carries the case.</strong> A <strong>R2.4 million</strong> asset. The full information requirement, priced separately, added <strong>R96,000 - four per cent</strong>. Against it: the equivalent machine on the other line failed and took <strong>eleven days</strong> to return to service at about <strong>R38,000 a day</strong> - <strong>R418,000</strong>. <em>Nine of those eleven days were spent identifying the failed component, finding a supplier and waiting. Two were the repair.</em> The information package would not have prevented the failure; it would have removed most of the nine. <strong>R96,000 against R418,000 on a single event - about four and a third times - and it recurs.</strong></p>
+<p><strong>The clause that quietly decides everything.</strong> <em>"Maintained by our own people."</em> Drop it and you have bought a subscription with a machine attached - every intervention needs the supplier, at their rate, on their schedule, for twenty-five years. Keep it and you need procedures, tolerances, special tools and assessed training, which is most of the 4 per cent. <em>Suppliers resist the component-level parts detail hardest, which is a reliable signal of what it is worth.</em></p>
+<p><strong>Why the gate fails, and it is not about anybody's character.</strong> By handover the plant is needed, the supplier has been paid most of the money, and everybody wants to start up. A project manager measured on schedule and cost is being asked to delay a start-up over a spares list. <em>That is an incentive problem.</em> Give the gate to the person who will own the asset for twenty-five years and has the opposite incentive - and make it specific enough to survive a Friday afternoon: <strong>"deliverables 3 and 5 are outstanding, the tests are in schedule 4, retention releases when they pass"</strong> is a fact; "documentation not satisfactory" is a judgement, and judgements lose.</p>
+<p><strong>An honest boundary.</strong> This specifies and takes delivery of an acquisition. It does not conduct the procurement, which has its own rules, its own thresholds and often its own department. It cannot recover information for an asset already bought without it - that is a survey, with a cost. And some information genuinely will be refused for legitimate commercial reasons; the discipline is then to record the exposure rather than to pretend it does not exist.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>You are acquiring a packaged water-treatment skid. R6.8 million. The tender closes in three weeks and you have been asked to review the specification.</p>
+<table>
+<tr><th>Item</th><th>Position</th></tr>
+<tr><td>Technical specification</td><td>Excellent. Performance, duty, materials, all thorough</td></tr>
+<tr><td>Documentation clause</td><td>"The Contractor shall supply all necessary operating and maintenance manuals prior to practical completion."</td></tr>
+<tr><td>Training clause</td><td>"Two days of operator training shall be provided."</td></tr>
+<tr><td>Spares clause</td><td>"A recommended spares holding shall be proposed."</td></tr>
+<tr><td>Acceptance</td><td>Held by the projects engineer, who is measured on delivery date and budget</td></tr>
+<tr><td>Retention</td><td>5 per cent, released 90 days after practical completion</td></tr>
+<tr><td>Known history</td><td>The last skid, bought in 2021, is maintained entirely by its supplier at about R340,000 a year. Nobody planned that</td></tr>
+</table>
+<ol>
+<li><strong>The three clauses are all defective in the same way.</strong> Name it in one sentence.</li>
+<li><strong>Rewrite the training clause</strong> so it cannot be satisfied by two days of anything.</li>
+<li><strong>The 2021 skid costs R340,000 a year to maintain and nobody planned it.</strong> Use that number. What does it let you argue, and roughly what uplift does it justify here?</li>
+<li><strong>The acceptance gate.</strong> State the problem and the fix, and be specific about why it is not about the projects engineer's diligence.</li>
+<li><strong>Retention at 5 per cent released 90 days after practical completion.</strong> Say why that is nearly useless as a lever here, and what you would change.</li>
+<li><strong>One thing you will not get.</strong> Name something a supplier of a packaged skid will legitimately refuse, and write the line that goes in the asset record about it.</li>
+</ol>
+<p>Work it before you turn over.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me one way &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: One Way Through</h2>
+<p><strong>1. The common defect.</strong> <em>Every one of the three specifies an activity rather than an outcome, and none contains a test - so each is satisfied by the cheapest thing the supplier can call by that name.</em> "All necessary" is decided by the supplier. "Two days" is a duration, not a capability. "Shall be proposed" is a document, not a holding.</p>
+<p><strong>2. The training clause rewritten.</strong> "The Contractor shall deliver training such that, at acceptance, three named employees of the Purchaser can each independently perform the routine maintenance tasks listed in schedule 6 to the intervals stated, demonstrated by assessed practical completion of each task witnessed by the Purchaser's representative. Training materials shall be supplied in editable form and may be reused by the Purchaser for future staff without further licence."</p>
+<p><em>Three things it now does:</em> it names an outcome, it names the test, and the last sentence quietly buys you the ability to train the next person in year four - which is what turns training into a capability rather than an event.</p>
+<p><strong>3. Using the R340,000.</strong> That is a comparable asset, bought the same way, whose whole-life maintenance was outsourced by default because nobody bought the ability to do it. Over twenty years, undiscounted, that is <strong>R6.8 million</strong> - as much again as the skid you are now buying. <em>What it lets you argue:</em> that an information and competence package is not an overhead on the purchase, it is the alternative to a recurring cost that nobody has ever approved and that appears in the operating budget forever. <strong>At the ratio in this unit, an uplift of even 5 to 8 per cent - R340,000 to R544,000 - is justified against one year of the alternative.</strong> State the assumption plainly: this rests on one comparable asset, and the argument does not need precision because the comparison is not close.</p>
+<p><strong>4. The gate.</strong> The projects engineer is measured on delivery date and budget and is being asked to withhold acceptance over a spares list, three weeks before a plant is needed. <em>That is a structural conflict, not a diligence problem</em> - and it would be true of a conscientious person and of a careless one equally. <em>The fix:</em> the information deliverables are accepted by the asset owner who will hold this skid for twenty years, separately from technical acceptance, with the schedule of deliverables and their tests written into the contract before tender.</p>
+<p><strong>5. The retention.</strong> Two problems. Five per cent of R6.8 million is R340,000, which is real money but is small against the value to the supplier of closing the job and moving on. And <em>released 90 days after practical completion</em> means it releases on time regardless - so it is a clock, not a condition. <em>What to change:</em> make a defined portion of retention conditional on acceptance of the named information deliverables rather than on elapsed time, so it releases when they pass and not before. <strong>A lever tied to a calendar is not a lever.</strong></p>
+<p><strong>6. What you will not get.</strong> The control-system source code and the proprietary logic in the packaged controller. A supplier will refuse that, and refusing it is commercially reasonable rather than obstructive. <em>The line for the asset record:</em> "Control logic for the packaged skid controller is proprietary and not held. Any modification to control behaviour requires the original supplier. This is a known single-source dependency, accepted at acquisition in 2026, and it should be considered when planning any future upgrade or when assessing obsolescence of the controller."</p>
+<p><em>Written down at acquisition, that is a decision.</em> Discovered in year nine by somebody trying to change a setpoint at two in the morning, it is a betrayal.</p>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> State an acquisition as a capability rather than a purchase. Specify information with acceptance tests instead of clauses. Price both the package and its absence from a failure that really happened. Put the gate where the incentive is right. And take delivery of the information into the systems where the asset lives - recording honestly what never arrived.</p>
+<p>The supplier who sent a folder of generic manuals did exactly what was asked. The clause was met.</p>
+<p><strong>You are not buying a machine. You are buying twenty-five years of being able to keep it running - and almost the whole of that is decided before anybody quotes.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

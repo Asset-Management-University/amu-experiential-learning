@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perform precision laser shaft alignment and soft-foot correction to tolerance</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Perform precision laser shaft alignment and soft-foot correction to tolerance</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are on the second floor of the <strong>Thornhill Maize Mill</strong> in Bethal, standing next to the No. 3 hammer-mill drive. It is the third bearing you have changed on this machine in five months.</p>
+<p>In your hand is the maintenance log. The same line keeps coming back: <em>"M3 drive - coupling end bearing - replaced."</em> February. April. Now June. The bearing you just pulled out is in a steel tray at your feet. You turn it over. The rollers are blue-black on one side, bright on the other. Heat marks. This bearing did not wear out. Something cooked it.</p>
+<p>The motor, M3, drives a gearbox, G3, through a rubber coupling. When the mill runs, you can feel a low buzz through the floor plate under your boots that should not be there. <strong>Pieter</strong>, the maintenance planner, walks past with his clipboard and stops. "Same bearing again? That's the third one. Each one is about R4 200 in parts, and the mill sits dead for four hours every time we go in. Management is asking me why No. 3 keeps eating itself."</p>
+<p>You already know the honest answer. The last two times, you and the day-shift fitter set the motor and gearbox in line by eye and by feel - a straight-edge laid across the coupling, a thumb run over the gap, a "that looks square enough." It clearly is not square enough. Something is pulling on that shaft every single revolution, and it is killing the bearing.</p>
+<p>You crouch down and rock the motor's front-left foot with your hand. It lifts off the base, just a hair, then drops back with a tiny <em>tick</em>. The foot is not sitting flat.</p>
+<blockquote><h2>You cannot keep guessing. You need a reliable, repeatable way to set this motor and gearbox truly in line - and to prove it is in line with real numbers, not a feeling - so this bearing stops dying.</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The No. 3 drive keeps eating the same bearing. Alignment has always been set by eye — a straight-edge across the coupling and a thumb run over the gap. When you rock the motor&rsquo;s front-left foot by hand it <strong>lifts off the base</strong>, a hair, then drops back with a little tick. The machine has been running and is still warm. Write down how you would get this drive properly in line, and how you would prove it — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the thing that must be fixed before any alignment can hold</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Get the laser on it and align it properly.&rdquo;</strong> The right instrument, reached for one step too early. Align a machine whose foot lifts and you have aligned it in one position; tighten that bolt and the whole frame twists into another.</p>
+<p>&bull; <strong>&ldquo;Shim the loose foot until it stops rocking, then align.&rdquo;</strong> Much closer, and it treats the one foot you happened to rock by hand. Feet are checked in turn, with numbers, because a foot that feels solid can still be carrying a gap — and a hand cannot tell 0.04&nbsp;mm from nothing.</p>
+<p>&bull; <strong>&ldquo;Fit a flexible coupling — it will absorb the misalignment.&rdquo;</strong> A flexible coupling tolerates misalignment; it does not remove the force. The bearing keeps being pulled every revolution and keeps dying, and now the cause is hidden behind a component that is supposed to help.</p>
+<p>&bull; <strong>&ldquo;Do it now while it is warm — no point waiting.&rdquo;</strong> Understandable and it will not hold. A hot machine has grown, and it shrinks as it cools, taking your alignment with it.</p>
+<p>&bull; <strong>&ldquo;Use the straight-edge more carefully.&rdquo;</strong> The method that produced this bearing. &ldquo;Square enough&rdquo; by eye is nowhere near square enough for a shaft turning twenty-five times a second.</p>
+<p>&bull; Two things have to be true before an alignment means anything, and both are unglamorous. The machine must be at the temperature it will actually run at, or as near as you can safely get, because you are aligning the shape it will hold in service rather than the shape it holds this minute. And <strong>every foot must sit flat first</strong>, checked one at a time with a feeler gauge and written down — because a foot that lifts turns the frame into a spring, and a spring will not hold a setting no matter how good the laser is. Only then does the instrument earn its keep, and its real value is not the alignment but the <strong>number</strong>: a before-and-after figure in the machine file, so the next person does not have to take anybody&rsquo;s word for it.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Lindiwe Mahlangu, the fitter, takes the No. 3 drive as her job for the morning. Pieter has locked it out. By the end of it the drive is proven in line to 0.03 mm, the buzz in the floor is gone, and the before-and-after report is stapled into the machine file - in about two and a half hours. Here is exactly how she gets there.</p>
+<p><strong>Make it safe, let it cool.</strong> She confirms the lock-out: M3 is isolated, the breaker is locked, and she hangs her own tag. The motor has been off for an hour and the casing is cool to the back of her hand - important, because a hot machine has grown slightly with the heat, and it will shrink as it cools and throw the alignment out. You align a machine at the temperature it will normally run, or as close as you safely can.</p>
+<p><strong>Clean and rough-align by hand.</strong> She wipes the motor feet, the gearbox feet and the steel base plate clean - grit under a foot reads exactly like soft foot and will fool her. She lays a straight-edge across the coupling and nudges the motor until it looks square by eye. This is only the rough-in, getting close so the laser has something to work with.</p>
+<p><strong>Check for soft foot, before anything else.</strong> She tightens all four motor hold-down bolts to the correct torque, then checks each foot in turn. She loosens one bolt and slides a feeler gauge - a set of thin metal blades of known thickness - into any gap under that foot, then re-tightens it. She works around all four:</p>
+<ul>
+<li>Front-left: <strong>0.30 mm</strong> gap. Lifts clearly.</li>
+<li>Front-right: <strong>0.04 mm</strong>. Almost flat.</li>
+<li>Rear-left: <strong>0.05 mm</strong>. Almost flat.</li>
+<li>Rear-right: <strong>0.00 mm</strong>. Flat.</li>
+</ul>
+<p>The plant limit for soft foot is <strong>0.05 mm</strong>. Front-left is six times over - her bad foot. She loosens the front-left bolt and slides the feeler around under it: the gap is even front-to-back, a clear gap all the way under - <strong>parallel</strong> soft foot, not angular. She cuts a stainless shim 0.30 mm thick, slips it under the front-left foot, and re-torques. She re-checks all four feet: every gap is now 0.03 mm or less, under the 0.05 mm limit. Soft foot is corrected. Only now will she believe the laser.</p>
+<p><strong>Mount the laser tool, enter the dimensions.</strong> She clamps the laser bracket on the motor shaft and the sensor bracket on the gearbox shaft, both just outside the coupling, and checks they are not fouling anything when the shafts turn. She switches on the tool and types in the three measurements it asks for: distance between the two measuring brackets, <strong>120 mm</strong>; distance from the sensor bracket to the front feet of the motor, <strong>180 mm</strong>; distance from the front feet to the back feet of the motor, <strong>350 mm</strong>. These distances let the tool turn the laser movement into a real "move this foot by this much" answer. Get them wrong and the move it tells you will be wrong, so she double-checks each one.</p>
+<p><strong>Take the readings.</strong> She rotates both shafts together slowly by hand - the tool asks her to stop at three positions, roughly 9 o'clock, 12 o'clock and 3 o'clock as she looks at the shaft end. At each stop she holds still and lets the reading settle.</p>
+<p><strong>Read the result and decide.</strong> The tool shows the misalignment at the coupling: vertical offset <strong>0.42 mm</strong> - the motor sits low; vertical angle <strong>0.18 mm</strong> across 100 mm - opening at the top; horizontal offset <strong>0.11 mm</strong> - motor sits to the east side; horizontal angle <strong>0.05 mm</strong> across 100 mm. Against the tolerance (offset 0.05 mm; angle 0.06 mm per 100 mm), the vertical numbers are badly out and the horizontal offset is out too. This is exactly the kind of pull that has been killing her bearing.</p>
+<p><strong>Make the correction the tool asks for.</strong> The tool does the sums and tells her exactly what to move, foot by foot. Vertical: add <strong>0.55 mm</strong> of shim under the front feet and <strong>0.20 mm</strong> under the back feet - this lifts the low motor and closes the angle in one move. Horizontal: move the front of the motor <strong>0.13 mm west</strong> and the back <strong>0.04 mm west</strong>. For the vertical move she loosens the bolts, adds the shims asked for (using as few clean shims as possible - a tall stack of thin shims is itself a kind of soft foot), and re-torques. For the horizontal move she loosens the bolts again and gently taps the motor across with a soft mallet against a jacking bolt until the front and back have moved west by the amounts asked, then re-torques.</p>
+<p><strong>Re-measure and prove it.</strong> She rotates the shafts and takes a fresh set of readings - you never trust a correction until you have re-measured it. The tool now shows vertical offset 0.03 mm, vertical angle 0.02 mm/100 mm, horizontal offset 0.02 mm, horizontal angle 0.03 mm/100 mm - <strong>all four inside the limit.</strong> She saves the report from the tool, the before and after readings, and staples the printout into the machine file so the next person can see this drive was aligned to 0.03 mm on this date, not "by eye".</p>
+<p><strong>Close out.</strong> She removes the brackets, refits the coupling guard, removes her lock and tag, and Pieter restarts the mill. The buzz through the floor plate is gone. The motor casing, after an hour of running, settles at a steady, even warmth - not the one-sided heat that had been cooking the bearing. The whole job, soft foot and all, took about two and a half hours. The last bearing change cost the plant four hours of dead mill plus R4 200 in parts. This drive does not eat another bearing.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>What problem is this solving?</strong> When one machine drives another - a motor turning a gearbox, a pump, a fan - the two shafts must point at each other almost perfectly. If they do not, every turn of the shaft bends the coupling and drags on the bearings. The machine looks like it is running fine. Inside, the bearings are being beaten to death - exactly what was happening to M3. Getting the two shafts to point truly at each other is called <strong>shaft alignment</strong>. Doing it accurately, with a measuring tool instead of by eye, is <strong>precision shaft alignment</strong>.</p>
+<p><strong>What are the two ways shafts can be out of line?</strong> There are only two, and a real machine usually has a bit of both. <strong>Offset misalignment</strong> - the two shafts run parallel, like two railway tracks, but one sits higher or further across than the other; the centre-lines are out of step. <strong>Angular misalignment</strong> - the two shafts point in slightly different directions, like an open pair of scissors; they would meet or cross if you carried the lines on. Each one has two directions too - up-and-down (vertical) and side-to-side (horizontal) - so you are really fixing four things at once. That is exactly the four numbers the laser gave Lindiwe: vertical offset, vertical angle, horizontal offset, horizontal angle.</p>
+<p><strong>What is "to tolerance"?</strong> A <strong>tolerance</strong> is the "close enough is good enough" limit. No shaft is ever perfect; the tolerance tells you how far out the shafts are allowed to be before the machine will suffer. Tolerances get tighter the faster the machine spins. A common, sensible guide for a machine like the Thornhill mill drive, running at 1 480 revolutions per minute (rpm - how many full turns the shaft makes each minute), is offset within <strong>0.05 mm</strong> (about half the thickness of a sheet of paper) and angle within <strong>0.06 mm for every 100 mm</strong> of coupling width. These numbers come from alignment standards used across industry - your own plant may set its own limits, and you always use the plant's number if it has one.</p>
+<p><strong>What tool do we use?</strong> A <strong>laser shaft alignment tool</strong>: two brackets that clamp onto the two shafts, each carrying a laser and a sensor. One shaft shines a laser line at the sensor on the other. As you slowly rotate both shafts together by hand, the tool watches exactly how the laser line moves, works out the offset and angle in both directions, and tells you in millimetres exactly how far and which way to move the machine - this is precisely what happened when Lindiwe rotated the shafts to 9, 12 and 3 o'clock in T2. A laser tool is far more accurate than a straight-edge and far quicker than the old "dial gauge" method. It is the right tool whenever a bearing or coupling keeps failing, whenever you have moved or replaced a motor, or whenever the plant requires precision alignment for important machines. It is <strong>not</strong> the right tool for rough first positioning - you still rough things in by hand first, as Lindiwe did - and it cannot fix a machine that is rocking on its feet.</p>
+<p><strong>What is soft foot, and why fix it first?</strong> <strong>Soft foot</strong> is when one or more of the machine's feet does not sit flat on its base - exactly what you felt when you rocked the motor's front-left foot back in T1. The name comes from the foot feeling "soft", like a wobbly table leg. Here is why it matters so much: the moment you tighten the bolt on a foot that is not flat, you bend the machine's own frame. The shaft inside twists with it. Now every alignment number the laser gives you is a lie, because the readings change every time you loosen or tighten that bolt. <strong>You must find and fix soft foot before you trust a single alignment reading.</strong> Always check it first - this is the step people skip, and it is the reason their "good" alignments do not hold. There are two common kinds. <strong>Parallel soft foot</strong> - a clear gap under the whole foot, like a leg too short; you fill the gap with thin metal spacers called <strong>shims</strong> (this was Lindiwe's front-left foot). <strong>Angular soft foot</strong> - the foot touches on one edge and lifts on the other, like a leg cut at a slant; you need a stepped or tapered shim, or to dress the base flat.</p>
+<p><strong>When does this technique fit?</strong> Use precision laser alignment and soft-foot correction when a coupling-end bearing, coupling or seal keeps failing for no obvious reason; when you have removed and refitted, or replaced, a motor or driven machine; or when the plant requires precision alignment on a critical machine. Do not reach for it when the coupling is a special flexible type the maker says needs no precision alignment, or when the real fault is something else entirely (imbalance, looseness, a bent shaft). Alignment fixes misalignment - it does not fix everything that shakes.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Work each task before you read the "what good looks like". Make a real decision and write down your numbers first - that is how the skill sticks. Print the job sheet below and fill it in at the machine, in order, top to bottom. Every blank is a step you must not guess. Do not skip down to the laser rows until the soft-foot block is signed off - that order is the whole technique.</p>
+<p><strong>The alignment job sheet</strong> (print and fill in at the machine): Machine / Date / Fitter / Speed (rpm); plant tolerance for offset and for angle (use the plant's own number if it has one).</p>
+<p><strong>A. Safe and cool</strong> - locked out, isolated, your own tag on; casing cool or at running temperature; all feet and the base wiped clean; roughed in by eye with a straight-edge.</p>
+<p><strong>B. Soft foot - do this BEFORE any laser reading.</strong> Tighten all feet to torque, then loosen one at a time and read the gap with a feeler gauge, for each of front-left, front-right, rear-left, rear-right: gap (mm); over limit?; even gap (parallel) or one-edge (angular)?; shim added (mm); re-check gap (mm). Soft foot signed off, every foot now under the limit? YES/NO - if NO, stop; do not trust the laser.</p>
+<p><strong>C. Tool dimensions</strong> (measure with tape and rule, double-check each): bracket-to-bracket (mm); sensor bracket to front feet (mm); front feet to back feet (mm).</p>
+<p><strong>D. Before reading, compare to tolerance</strong> - for vertical offset, vertical angle, horizontal offset and horizontal angle: measured value; in tolerance?; direction (low/high, east/west, opening top/side).</p>
+<p><strong>E. The move the tool asks for</strong> (vertical = shim; horizontal = tap across) - for front feet and back feet: vertical shim to add (mm); horizontal move sideways (mm + direction).</p>
+<p><strong>F. After reading - PROVE it.</strong> Re-measure all four; every one must pass: vertical offset, vertical angle, horizontal offset, horizontal angle - measured and in tolerance for each. All four inside the limit? YES/NO - if NO, correct again and re-measure; "three out of four" is not a pass.</p>
+<p><strong>G. Close out</strong> - report (before + after) saved into the machine file; brackets off, coupling guard refitted; lock and tag removed, machine handed back.</p>
+<p><strong>Task 1 - Read a soft-foot check.</strong> You tighten all four feet and check them. You get: front-left 0.02 mm, front-right 0.07 mm, rear-left 0.02 mm, rear-right 0.06 mm. The plant limit is 0.05 mm. Which feet are bad, and what do you do before touching the laser? Attempt it, then read on.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Front-right (0.07 mm) and rear-right (0.06 mm) are both over the 0.05 mm limit - the whole right-hand side is sitting high, or rather the right feet have a gap under them. You shim the two right-hand feet to close the gaps, re-check that all four are now under 0.05 mm, and only then mount the laser. You do <strong>not</strong> start taking alignment readings while two feet are out of limit - every reading would be untrustworthy.</p>
+</div>
+</details>
+<p><strong>Task 2 - Decide the kind of soft foot.</strong> You loosen one foot and run the feeler gauge under it. At the front edge the gap is 0.02 mm; at the back edge it is 0.22 mm. What kind of soft foot is this, and what is the fix? Attempt it, then read on.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>The gap is very different front to back (0.02 vs 0.22 mm), so the foot is touching on one edge and lifting on the other - this is <strong>angular</strong> soft foot, not parallel. A single flat shim will not fix it; it would only sit under the high edge and rock. You need a tapered or stepped shim, or the base under that foot dressed flat, so the foot makes full contact. A flat shim here is a common mistake.</p>
+</div>
+</details>
+<p><strong>Task 3 - Judge against tolerance.</strong> After your correction you re-measure a drive running at 1 480 rpm. You get: vertical offset 0.04 mm, vertical angle 0.05 mm/100 mm, horizontal offset 0.08 mm, horizontal angle 0.03 mm/100 mm. Tolerance is offset 0.05 mm and angle 0.06 mm/100 mm. Are you done? Attempt it, then read on.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Three of the four are inside the limit, but the <strong>horizontal offset is 0.08 mm against a 0.05 mm limit</strong> - out of tolerance. You are <strong>not</strong> done. You make the horizontal correction the tool asks for (a small sideways move), re-torque, and re-measure all four again. "Three out of four" is not a pass; every one of the four must be inside its limit.</p>
+</div>
+</details>
+<p><strong>Task 4 - Plan a full job in order.</strong> A pump-end seal keeps failing on a motor-driven water pump. You are sent to align it. Write the steps in the right order, from arriving at the machine to leaving it. Attempt it, then read on.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Lock out and let it cool to running temperature; clean all feet and the base; rough-align by eye; check and correct soft foot first; mount and zero the laser tool, enter the dimensions; take readings at three positions; read offset and angle in both directions, compare to tolerance; shim/move for vertical, then move for horizontal; re-measure and prove all four are in tolerance; save the report into the machine file; refit guard, remove lock-out, hand back. The two non-negotiables: soft foot before readings, and re-measure to prove the result before you walk away.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your alignment true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Alignment reads "good" but the bearing fails again within weeks.</strong> Soft foot was never checked or corrected; tightening the bad foot bent the frame and twisted the shaft. Always do the soft-foot check first. Get every foot under 0.05 mm before you trust any laser reading.</p>
+<p>&bull; <strong>Readings jump around and will not settle.</strong> Grit under a foot, a loose bracket, or you moved while reading. Clean every foot and the base; check the brackets are tight and not fouling; hold dead still and let each reading settle.</p>
+<p>&bull; <strong>The "move" the tool gives you makes the alignment worse.</strong> Wrong dimensions typed in (bracket spacing or foot distances), so the tool's sums are wrong. Re-measure the three distances with a tape and a rule, re-enter them carefully, and take fresh readings.</p>
+<p>&bull; <strong>You shim and re-shim but the foot still rocks.</strong> Angular soft foot treated with a flat shim - it only props the high edge. Use a tapered or stepped shim, or dress the base flat, so the whole foot makes contact.</p>
+<p>&bull; <strong>Aligned cold, but it goes out of tolerance once the mill is hot and running.</strong> Thermal growth - the machine grew unevenly as it heated. Align at running temperature where safe, or apply the maker's thermal-growth offset so it lands in tolerance when hot.</p>
+<p>&bull; <strong>A tall stack of thin shims under one foot, and the alignment will not hold.</strong> The shim stack itself flexes and acts like a new soft foot. Replace the stack with as few clean shims as possible - ideally one thicker shim instead of many thin ones.</p>
+<p>&bull; <strong>Coupling bolts loosen and the buzz comes back.</strong> Alignment was left out of tolerance, or the coupling was never re-checked after the move. Re-measure, bring all four numbers inside the limit, and re-check the coupling bolts to torque.</p>
+</div>
+</details>
+<p>You came onto the mill floor with a bearing that would not stop dying and a "that looks square enough" you could no longer trust. You can leave with a drive proven to 0.03 mm and a report in the machine file to show it. <strong>A precision alignment is not finished when the machine "looks square". It is finished when soft foot is gone, all four numbers are inside the tolerance, and the proof is saved in the machine file.</strong> Set it once, set it right, and the bearing lasts.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can run a precision laser shaft alignment with soft-foot correction to tolerance now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

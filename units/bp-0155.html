@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work requests arrive vague, duplicated or wrong - I cannot even tell what actually needs doing, and the whole system is choking on bad information at the front door; how do I fix this?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Work requests arrive vague, duplicated or wrong - I cannot even tell what actually needs doing, and the whole system is choking on bad information at the front door; how do I fix this?</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Felt Problem</h2>
+<p>You are Anathi, a works coordinator at a large processing plant. It is 9am on Monday and you are staring at the screen of new work requests. It feels less like a to-do list and more like a pile of riddles.</p>
+<ul>
+<li><strong>Request 7781:</strong> "Pump in Area 4 is broken." There are six pumps in Area 4. Which one? And does "broken" mean leaking, noisy, or not running at all? You cannot plan the job.</li>
+<li><strong>Request 7782:</strong> "Fix the thing on the packing line." The packing line is fifty metres long. What thing?</li>
+<li><strong>Requests 7783, 7784 and 7785:</strong> three different shift supervisors, all for the same fault - "Conveyor B making a loud squealing noise." Now you have three jobs in the system for one fault, and if you are not careful you will send three people, or order the same parts twice.</li>
+</ul>
+<p>You spend your morning phoning people and walking the plant floor, trying to translate vague clues into actual work. You are a planner, but you have become a full-time detective. The technicians are frustrated, the operators are not getting their problems fixed, and the system is choking.</p>
+<blockquote><h2>I cannot even tell what actually needs doing from these requests - the whole system is choking on bad information at the front door; how do I fix this?</h2></blockquote>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>Your first instinct is to fix the symptoms - to force the system to work. <strong>"I will chase down every requester for the real story."</strong> This works for a day or two, then you get nothing else done: you become a human translation service, it does not scale, the next batch of fifty requests is just as bad, and you are still the bottleneck. <strong>"I will get tough - a new form with twenty mandatory fields so nothing is missed."</strong> Asset number, sub-location, fault code, consequence score, suspected part... and the result? Nobody uses it. The form is so difficult that people stop raising jobs in the system altogether, catching technicians in the corridor or leaving sticky notes on your desk; the front door is now completely bypassed, and the chaos is worse. <strong>"Fine - I will just approve the mess and let the planners sort it downstream."</strong> But they cannot. Garbage in, garbage out: technicians are sent to Area 4 and have to call back "which pump?", the wrong work gets scheduled on a requester's bad guess, and the whole system is built on sand.</p>
+<p>So before you read on: the real fix is not to translate bad requests faster, nor to block them with bureaucracy. What is it?</p>
+<div class="yardstick-prompt"><label for="yardstick-m2">A quick prediction first: chasing requesters, a 20-field form, and 'let the planners sort it' all failed. Name the rule the whole system obeys, and where the single highest-leverage fix actually is.</label><textarea id="yardstick-m2" placeholder="e.g., the system can only be as good as...; so the fix is not downstream, it is at the..."></textarea></div>
+<div class="scratchpad"><label for="scratchpad-m2">My working</label><textarea id="scratchpad-m2" placeholder="Front door sets the ceiling? What/where/why? Need not a guessed solution? Screen + de-duplicate? Make the good request easy?"></textarea></div>
+<div class="hintbox" data-n="3" data-label-0="I&#039;m stuck - help me think" data-label-1="Another nudge" data-label-2="The clearest way to see it"><button type="button" class="hintbtn" onclick="amuHint(this)">I&#039;m stuck - help me think</button><div class="hintlayers" aria-live="polite"><div class="hint" hidden>It is 9am on Monday and I am staring at the screen of new work requests - it feels less like a to-do list and more like a pile of riddles. Request 7781: 'Pump in Area 4 is broken.' There are six pumps in Area 4 - which one, and does 'broken' mean leaking, noisy, or not running? I cannot plan the job. Request 7782: 'Fix the thing on the packing line.' The line is fifty metres long - what thing? Requests 7783, 7784 and 7785: three different shift supervisors, all for the same fault, 'Conveyor B making a loud squealing noise' - now there are three jobs for one fault, and if I am not careful I send three people or order the same parts twice. I spend the morning phoning people and walking the floor, trying to translate vague clues into actual work: I am a planner who has become a full-time detective, the technicians are frustrated, the operators are not getting fixed, and the system is choking. I cannot even tell what actually needs doing from these requests - how do I fix the information coming in the front door?</div><div class="hint" hidden>CHASE DOWN EVERY REQUESTER for the real story works for a day or two, then you get nothing else done: you become a human translation service, it does not scale, the next batch of fifty requests is just as bad, and you are still the bottleneck - you are fixing symptoms, not the source. FORCE A 20-FIELD MANDATORY FORM (asset number, sub-location, fault code, consequence score, suspected part...) so nothing is missed backfires: it is so heavy that nobody uses it, people stop raising jobs in the system and instead catch technicians in the corridor or leave sticky notes, and the front door is bypassed entirely - chaos worse than before. JUST APPROVE THE MESS AND LET THE PLANNERS SORT IT DOWNSTREAM fails on the oldest law there is - garbage in, garbage out: no downstream cleverness rescues a request that does not say what, where or why; technicians get sent to Area 4 and call back 'which pump?', the wrong work gets scheduled on a requester's bad guess, and the rework multiplies. The real fix is not to translate bad requests faster or block them with bureaucracy - it is to make a GOOD request the easy, normal way work enters.</div><div class="hint" hidden>The breakthrough is to stop fixing individual bad requests and fix the SOURCE: the entire work-management system can only ever be as good as the requests that enter it - no amount of clever planning or prioritising downstream rescues a job that was vague, duplicated or wrong from the start. So guard the FRONT DOOR. Five moves: (1) THE FRONT DOOR SETS THE CEILING - the quality of the request limits the quality of the whole process, so fix the source, not the downstream symptoms. (2) CAPTURE WHAT, WHERE AND WHY - a good request states WHAT is wrong (the symptom/condition), WHERE exactly (a specific asset and its ID, not 'the thing in area 3'), and WHY it matters (the risk or consequence if not done) - the 'minimum viable request' that can be understood without a detective hunt. (3) DESCRIBE THE NEED, NOT A GUESSED SOLUTION - coach requesters to describe the problem ('the floor is wet under the pump') rather than guess the fix ('replace the pump seal'), so the planner can diagnose the RIGHT solution (it might be a cracked pipe). (4) SCREEN AND DE-DUPLICATE AT INTAKE - one point of entry where a quick check merges the three 'squealing conveyor' jobs into one, spots a recurring fault and flags it for root-cause (not just another patch), and filters out what is not actually needed. (5) MAKE THE GOOD REQUEST THE EASY REQUEST - replace the 20-field monster with a simple, clean form (where is it, with a pick-list of assets; what is the problem; add a photo) so raising a good request is faster than shouting in the corridor. A work-management system is only as good as the requests that feed it; make a good request - clear what/where/why, the need not a guessed solution, de-duplicated - the easiest and only way work enters. (For managing the resulting backlog see bp-0122; for prioritising it see bp-0098.)</div></div></div>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">I've worked it out - show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>The breakthrough comes when you stop trying to fix individual bad requests and focus on the source. You realise the entire work-management system can only ever be as good as the requests that enter it - no amount of clever planning or prioritising downstream can rescue a job that was vague, duplicated or wrong from the start. Your mission is to guard the front door. Five moves:</p>
+<ul><li><strong>The front door sets the ceiling:</strong> the breakthrough is to stop firefighting individual bad requests and see the system whole: a work-management system can only ever be as good as the requests that enter it, because every step that follows - planning, prioritising, scheduling, doing the work, recording the history - inherits the quality of that first request. A brilliant planning team fed by 'fix the thing in area 3' still produces chaos; the cleverness downstream cannot rescue what was broken at the source. This is just the oldest rule in information: garbage in, garbage out. So the highest-leverage place to act is not the planners' desks or the technicians' vans - it is the FRONT DOOR, the moment a request is raised. Fix the quality of what comes in, and a hundred downstream problems you have been firefighting one by one simply stop being created. Guard the door, and you stop mopping the floor.</li><li><strong>Capture what, where and why:</strong> a request you can actually act on answers three plain questions, every time: WHAT is wrong (the symptom or condition - 'leaking', 'squealing', 'will not start', not just 'broken'), WHERE exactly (a specific asset and its ID or tag, not 'a pump in Area 4' when there are six), and WHY it matters (the consequence or risk if it is not done - a safety hazard, a stopped line, a slow leak). Those three - what, where, why - are the 'minimum viable request', the least information that lets a planner understand and judge the job without launching a detective hunt down the plant floor. Most of the morning you lost to phone calls was spent extracting exactly these three facts that should have arrived with the request. So name them as the standard, make them the required heart of every request, and the translation work that was eating your day disappears - because the information arrives complete.</li><li><strong>Describe the need, not a guessed solution:</strong> this is the subtle one that quietly causes the most wrong work: requesters naturally jump straight to a solution - 'replace the pump seal', 'order a new motor' - when what they have actually observed is a symptom - 'the floor is wet under the pump'. The trouble is that the guessed solution is often wrong (the water may be a cracked pipe, not the seal), but once it is written as the request, the system dutifully does it, the real fault remains, and the job comes back. So coach people to describe the NEED - what they see, hear, smell, what is or is not happening - and leave the diagnosis to the planner and technician who can find the right fix. Ask 'what is it doing?' rather than 'what part do you need?'. Capturing the honest symptom instead of a confident guess is the difference between fixing the problem and merely doing a task - and it is how you stop paying to solve the wrong thing.</li><li><strong>Screen and de-duplicate at intake:</strong> a clean system needs a single point of entry with a quick, light screen - at first it can simply be you, spending thirty seconds on each new request before it joins the queue. That tiny check does three powerful things. It DE-DUPLICATES: the three 'squealing Conveyor B' jobs from three shifts become one, so you do not dispatch three crews or order parts twice. It spots REPEATS: a fault that keeps coming back is not just another work order to raise - it is a signal to investigate the root cause (the realm of root-cause analysis), so you stop patching the same failure forever. And it FILTERS: the occasional request that is not actually needed, or belongs elsewhere, is caught before it clogs the works. A few seconds of screening at the door saves hours of duplicated, wasted and wrong work behind it - it is the cheapest, highest-return habit in the whole system.</li><li><strong>Make the good request the easy request:</strong> here is the move that makes all the others stick, and the one the 20-field form got exactly backwards: people will give you a good request only if a good request is the EASIEST thing to raise. If the proper channel is a slow, punishing form, they route around it - corridor conversations, sticky notes, shouting - and the front door is bypassed, which is worse than a bad request, because now the work is invisible. So design the path of least resistance to ALSO be the path of best information: a simple, clean form on a tablet on the floor with just the essentials - WHERE is it (a pick-list of assets, so the ID is captured without anyone typing it), WHAT is the problem (a free box for the symptom), and a button to add a PHOTO (a picture often says more than a paragraph). When raising a clear, complete request is faster than catching a technician in the corridor, people do it - and the front door fixes itself. Make the right way the easy way, and good information flows in on its own.</li></ul>
+<p>See the chaos drain away for Anathi. Clear, actionable requests start arriving: a specific asset ID, a real symptom, a photo. Planners can plan. Technicians are sent to the right place with the right parts to fix the right problem, first time. The backlog, now clean, can be managed properly, and the most important jobs prioritised effectively. She is no longer a detective translating riddles - she is running a system that works. <strong>A work-management system is only as good as the requests that feed it - garbage in, garbage out. To stop the chaos downstream, guard the front door upstream: make a good request - one that is clear on the what, where and why, describes the need rather than a guessed solution, and is checked for duplicates - the easiest and the normal way for work to enter. Fix the source, and a hundred downstream problems you were firefighting one by one simply stop being created.</strong></p>
+<p>(Once good requests are flowing, the resulting backlog still has to be managed - that is the work of bp-0122 - and the jobs in it prioritised - the work of bp-0098. This unit is about the quality of what enters in the first place.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You already know this one - picture a busy restaurant kitchen.</p>
+<details><summary>See the scribbled order that wrecks the service</summary>
+<div class="reveal-content">
+<p>A waiter scribbles an order saying "Table 9, the steak," and hands it to the chef. Chaos follows. Is that a fillet or a sirloin? Rare or well-done? With chips or salad? The chef has to stop, shout back at the waiter, or guess - and if they guess wrong, the food is sent back, the customer is unhappy, and the kitchen has wasted time and ingredients.</p>
+<p>The fix is not a more talented chef. The fix is a better front door: a simple, clear order pad. When the waiter writes the table number, the exact dish, how it should be cooked, and the sides, the request is complete, and the chef can cook the right meal, efficiently, the first time. The quality of the entire service depended on the quality of that first request - and your work orders, your tickets, your briefs are exactly that order pad, only with more zeros at stake.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>Look at the "front door" of your own work system - maintenance work orders, IT helpdesk tickets, project briefs, customer support requests. How much of your team's time is spent just trying to figure out what the request actually means? You can start to guard it today:</p>
+<ol>
+<li><strong>Define your "good request".</strong> What are the absolute minimum pieces of information needed to act? For most, it is simply WHAT is the problem, WHERE is it, and WHY does it matter. Write that standard down.</li>
+<li><strong>Coach the need, not the solution.</strong> Gently guide people to describe the symptom they see - ask "what is it doing?" rather than "what part do you need?" - so the right problem gets solved.</li>
+<li><strong>Start a screening habit.</strong> Before a request enters the main queue, have one person give it a quick review: does it make sense, and is it a duplicate of another? This simple check prevents enormous waste.</li>
+<li><strong>Make the right way the easy way.</strong> Look at how people submit requests; if the form is complicated or hard to find, design the simplest possible path to give you the clear information you need - a simple form people use beats a complex one they bypass.</li>
+</ol>
+<div class="goal-setter"><label for="learner-goal-text">The 'front door' of your own work system - where requests enter and become work (maintenance work orders, IT helpdesk tickets, project briefs, customer support requests): how clear, complete and de-duplicated is what arrives?</label><input type="text" id="learner-goal-text" class="goal-text" placeholder=""><label for="learner-goal-amount">Look at the front door of your own work system - maintenance work orders, IT tickets, project briefs, customer requests - and ask how much of your team's time is spent just trying to figure out what the request actually means. You can start to guard it today. DEFINE YOUR 'GOOD REQUEST': what are the absolute minimum pieces of information needed to act? For most it is simply WHAT is the problem, WHERE is it, and WHY does it matter - write that standard down. COACH THE NEED, NOT THE SOLUTION: gently guide people to describe the symptom they see ('what is it doing?') rather than guess the fix ('what part do you need?'), so the right problem gets solved. START A SCREENING HABIT: before a request enters the main queue, have one person give it a quick review - does it make sense, and is it a duplicate of another? - a check that prevents enormous waste. MAKE THE RIGHT WAY THE EASY WAY: look at how people submit requests; if the form is complicated or hard to find, design the simplest possible path to give you the clear information you need, because a simple form people use beats a complex one they bypass. A work-management system is only as good as the requests that feed it - garbage in, garbage out - so make a good request (clear what/where/why, the need not a guessed solution, de-duplicated) the easiest and only way work enters, and the chaos, rework and wrong-work downstream drain away. This is not bureaucracy; it is eliminating frustration and waste for everyone - the people raising the work, planning it and doing it - so the right work gets done, once. (For managing the resulting backlog, see bp-0122; for prioritising it once it is in, see bp-0098.)</label><div class="input-group"><span class="currency-symbol">R</span><input type="number" id="learner-goal-amount" placeholder="1" onchange="updateLearnerGoal()"></div></div>
+<p>Name the front door you will guard, the three things your "good request" must always contain, and the one change that would make raising a good request the easiest way in. (Working with an AMU facilitator? Design your minimum-viable-request and a simple intake form together.)</p>
+<p>By making every request clear and actionable from the start, you are not creating bureaucracy - you are eliminating frustration and waste for everyone: the people raising the work, the people planning it, and the people doing it. Guard the front door, and the right work gets done, once - which is how the person waiting on the other end of that work is actually served.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

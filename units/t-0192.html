@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tested at its worst moment</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Tested at its worst moment</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and two documents land on your desk in the same week.</p>
+<p>A <strong>supply agreement</strong> for the new dosing plant - reviewed by legal, ready for signature, nothing wrong with it. And a draft <strong>mutual-aid agreement</strong> with two neighbouring schemes, drawn up after last winter, generous and well meant.</p>
+<p>You sign neither.</p>
+<p>The dosing plant has a <strong>25-year design life</strong>. You read the supply agreement against that and find it covers <strong>five</strong>. Everything that matters to you - spares, support, the drawings and configuration files, what happens when the supplier discontinues the product - falls due in years six to twenty-five, and the agreement is silent on all of it.</p>
+<p>Then you read the mutual-aid agreement against the night it will actually be used, and find that <em>it assumes somebody can be telephoned</em>.</p>
+<p>Both documents are competently written. Neither was written by anyone who knew what the asset needs.</p>
+<blockquote><h2>I am not a lawyer, and I am the only person in this process who knows what these agreements have to survive. What do I specify before anyone drafts, and how do I test a draft that reads perfectly well?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Two agreements, both competently drafted, both on your desk to approve. The supply agreement covers price, delivery and the first year's warranty impeccably — and everything you actually care about falls due in <strong>years six to twenty-five</strong>: spares, technical support, the drawings and configuration files, what happens if the supplier is bought or discontinues the product. It is silent on all of it. The mutual-aid agreement reads perfectly well until you picture the night it would actually be used, and notice it <strong>assumes somebody can be telephoned.</strong> You are not a lawyer. You are the only person in this process who knows what these agreements have to survive. Write down what you would do — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why reading the draft cannot find this</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Send detailed comments back on the drafts.&rdquo;</strong> The natural move and it arrives too late. <strong>Once a document exists, everybody argues about the words in it instead of the ones that are missing</strong> — your comments will be negotiated line by line and the twenty-year obligations will never be added.</p>
+<p>&bull; <strong>&ldquo;Ask the lawyers to make it watertight.&rdquo;</strong> They already have. <strong>A lawyer can make almost any obligation binding and cannot know which obligations the asset needs</strong> — that is your contribution and it is the only part of this process that requires you.</p>
+<p>&bull; <strong>&ldquo;Add a general clause requiring reasonable ongoing support.&rdquo;</strong> Unmeasurable and therefore unenforceable at the moment it matters, which is fifteen years from now with different people on both sides.</p>
+<p>&bull; <strong>&ldquo;Refuse to sign until it is fixed.&rdquo;</strong> Legitimate leverage, and without a specification you would be refusing without being able to say what would satisfy you — which loses the argument and delays the plant.</p>
+<p>&bull; <strong>&ldquo;Read them again more carefully.&rdquo;</strong> Careful reading found neither omission. The telephone assumption is not written anywhere — it is what the clause takes for granted, and no amount of re-reading surfaces something that is absent.</p>
+<p>&bull; Two disciplines. The specification must arrive <strong>before anyone drafts</strong>, as <strong>a list rather than a commentary</strong>: for each obligation, what must be provided, over what period, measured how, and what happens if it is not. Performance at stated duty points and how it is verified; spares for a stated number of years; support with a defined response; drawings, software, configuration and <strong>data rights that survive the supplier</strong>; training for named roles; and a defined route if the supplier is acquired or exits. Notice that <strong>most of that list is about time</strong> — which is what a purchase negotiation is worst at, because the commercial conversation is price and delivery, both settled within a year, while <strong>every obligation that matters to you falls due long after everyone involved has moved on.</strong> Then the test that finds what reading cannot: walk the draft through <strong>the worst night it will ever be used in</strong>, clause by clause, asking whether each still functions under those conditions. That is what exposes the assumptions nobody wrote down deliberately — an available telephone, a working system, somebody on duty.</p>
+</div>
+</details>
+<p>Here is the specification and the test.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the method - what to specify, the life mismatch, the walk-through against the bad day, the hazard-agreement checklist, and what you sign or escalate.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. State what the agreement must achieve, in operational terms, before anyone drafts it</div><p class="cb-demo">A LAWYER CAN MAKE ALMOST ANY OBLIGATION BINDING. THEY CANNOT KNOW WHICH OBLIGATIONS THE ASSET NEEDS. That is your contribution, it is the only part of this process that requires you, and it must arrive BEFORE the drafting rather than as comments on a draft - because once a document exists, everybody argues about the words in it instead of the ones that are missing. WRITE A LIST, NOT A COMMENTARY. For each obligation: WHAT must be provided or done, OVER WHAT PERIOD, MEASURED HOW, and WHAT HAPPENS IF IT IS NOT. For the dosing plant that means performance guaranteed at stated duty points and verified how; spares and consumables available for a stated number of years; technical support with a defined response; drawings, software, configuration files and DATA RIGHTS that survive the supplier; training for named roles; and a defined route if the supplier is acquired, exits the market or discontinues the product. NOTICE THAT MOST OF THAT LIST IS ABOUT TIME, and time is the thing a purchase negotiation is worst at. The commercial conversation is about price and delivery, both of which are settled within a year. EVERY OBLIGATION THAT MATTERS TO YOU FALLS DUE LONG AFTER EVERYONE INVOLVED HAS MOVED ON, WHICH IS EXACTLY WHY NOBODY ELSE WILL RAISE IT.</p></div><div class="canvas-box"><div class="cb-label">2. The life mismatch - the asset outlives the agreement, so decide who carries that</div><p class="cb-demo">THIS IS THE STRUCTURAL PROBLEM AT THE HEART OF EVERY ACQUISITION AGREEMENT FOR A LONG-LIFE ASSET, AND IT IS NOT AN ACCIDENT OF ONE SUPPLIER. LONG DURATIONS BETWEEN DESIGN AND PRODUCTION, AND AN EXTENDED SERVICE LIFE OF 25 TO 30 YEARS, RUN COUNTER TO THE NOW 4 TO 7 YEAR SUPPORT CYCLE. The industry name for the consequence is DIMINISHING MANUFACTURING SOURCES AND MATERIAL SHORTAGES - the actual or potential loss of the manufacturers and suppliers you depend on. AT CORATHYL: the dosing plant has a 25-YEAR DESIGN LIFE. The supplier&#039;s support cycle is 5 YEARS and the defects liability period is 24 MONTHS. SO THE AGREEMENT COVERS 5 OF 25 YEARS - 20 PER CENT - AND LEAVES 80 PER CENT OF THE ASSET LIFE WITH NO CONTRACTUAL SUPPORT unless somebody writes it in now. COST THE GAP SO IT CAN BE ARGUED ABOUT. Critical spares run at R180,000 a year. Forced into a LAST-TIME BUY at year 5 to cover the remaining 20 years, the works pays R3.60 MILLION AT ONCE, against a present value of R1.767 MILLION for buying as needed - A PREMIUM OF R1.833 MILLION, OR 104 PER CENT. AND STATE THAT HONESTLY AS THE FLOOR: THAT IS THE MINIMUM, UNAVOIDABLE FINANCIAL PENALTY BEFORE STORAGE AND INSURANCE COSTS, BEFORE THE RISK OF HAVING BOUGHT THE WRONG SPARES FOR A FAILURE MODE NOBODY PREDICTED TWENTY YEARS OUT, AND BEFORE THE COST OF ACTUAL FAILURE IF THE PART SIMPLY CANNOT BE HAD. THEN CHOOSE A CLOSURE, DELIBERATELY: make the SUPPLIER responsible for managing obsolescence over the contract period including piece-part procurement; plan a TIMELY LAST-TIME BUY; require ALTERNATE PART QUALIFICATION and the data to do it; or ACCEPT THE RISK EXPLICITLY, in writing, with whoever has the authority to accept it. THE ONLY OPTION THAT IS NOT AVAILABLE IS CHOOSING BY DEFAULT.</p></div><div class="canvas-box"><div class="cb-label">3. Test the draft against the bad day - the failure has already happened</div><p class="cb-demo">NOBODY READS A CONTRACT ON A GOOD DAY. AN AGREEMENT IS TESTED AT ITS WORST MOMENT, so read the draft from inside that moment rather than from your desk. TAKE THE FAILURE THE AGREEMENT EXISTS FOR AND ASSUME IT HAS HAPPENED. The pump has failed in year 17. The storm has taken the power and the radio network with it. Now WALK IT THROUGH THE CLAUSES AND ASK FOUR QUESTIONS OF EACH. WHO ACTS - a named role that will still exist, not a person or a company department that may be reorganised. ON WHOSE AUTHORITY - and is that person reachable at 03:00 on a Sunday, because the clause that requires written authorisation from a manager who is not on call has just stopped working. WITHIN WHAT TIME, measured from what trigger - &#039;promptly&#039; and &#039;as soon as reasonably practicable&#039; are lawyer&#039;s words that mean nothing to a reservoir emptying in eight hours. AND DOES THE CLAUSE STILL FUNCTION GIVEN WHAT HAS FAILED - which is the question that catches the real defects, because agreements routinely depend on the very thing that is broken. A MUTUAL-AID AGREEMENT THAT ASSUMES SOMEBODY CAN BE TELEPHONED IS AN AGREEMENT FOR A DAY ON WHICH YOU DO NOT NEED IT. Write the walk-through down beside the draft. That document is worth more to your successor than the agreement itself, because it records what you tested and what you found.</p></div><div class="canvas-box"><div class="cb-label">4. The hazard agreement - triggers, real resources, and honest limits</div><p class="cb-demo">A MUTUAL-AID AGREEMENT HAS ITS OWN CHECKLIST, AND EVERY ITEM ON IT IS SOMETHING THAT HAS FAILED SOMEWHERE. THE TRIGGER: what condition activates it, stated so it can be recognised at the time rather than debated afterwards. WHO MAY INVOKE IT, and their deputy, and the deputy&#039;s deputy. WHAT IS COMMITTED - and this is where honesty is the whole thing. NAME THE ACTUAL RESOURCE, ITS CAPACITY AND ITS REAL AVAILABILITY: not &#039;skilled personnel&#039; but two operators qualified on this class of switchgear, of whom one is on leave in any given month; not &#039;emergency generation&#039; but a stated capacity at a stated voltage and phase that will physically connect to your plant. THE COST BASIS, agreed in advance, because negotiating rates during an emergency is how mutual aid turns into a dispute. LIABILITY AND INSURANCE for people working on somebody else&#039;s plant. COMMUNICATIONS WHEN THE NORMAL CHANNEL IS THE THING THAT FAILED - a second route that does not share a dependency with the first. THE STAND-DOWN: how the arrangement ends, because an emergency that never formally closes never releases anybody. AND A REVIEW DATE, since the resource you were promised may have been sold. NOW THE PART THAT IS ETHICAL RATHER THAN TECHNICAL, AND IT APPLIES TO WHAT YOU OFFER AS MUCH AS TO WHAT YOU ACCEPT. AN HONEST, CAVEATED YES OR A SWIFT NO IS ALWAYS MORE ETHICAL THAN AN EASY YES YOU CANNOT GUARANTEE. YOUR PROFESSIONAL DUTY IS TO REPRESENT YOUR OPERATIONAL CAPABILITY HONESTLY, NOT TO BE HELPFUL ON PAPER. A PROMISE OF AID THAT CANNOT BE DELIVERED IS A TRAP FOR YOUR NEIGHBOUR, NOT A SAFETY NET - because they will stop looking for a reliable alternative, and they will find out on the night.</p></div><div class="canvas-box"><div class="cb-label">5. What you sign, what you escalate, and what you record</div><p class="cb-demo">THREE THINGS CLOSE THIS OUT, AND THE THIRD IS THE ONE THAT IS ALWAYS SKIPPED. WHAT YOU SIGN: only within your delegation, and never because the meeting needs it today. If the agreement exceeds your authority, that is not an obstacle to be managed - it is the system working, and signing anyway transfers a decision to yourself that the organisation deliberately placed elsewhere. WHAT YOU ESCALATE: the residual risks you are recommending the organisation accept, stated plainly and quantified where you can. &#039;The agreement leaves 80 per cent of the asset life without contractual support; the minimum financial exposure if we are forced into a last-time buy is R1.83 million above the efficient cost; I recommend we accept this because the alternative supplier is worse on availability&#039; is a professional recommendation. &#039;Legal have reviewed it&#039; is not. AND WHAT YOU RECORD, WHICH COSTS YOU AN HOUR AND SAVES SOMEBODY A YEAR: WHY THE AGREEMENT SAYS WHAT IT SAYS. Which obligations you asked for and did not get, and what was accepted instead. Which failure modes you walked through and what you found. What you were told about the supplier&#039;s support horizon and by whom. Agreements are renewed by people who were not there, and a renewal negotiated without that record will quietly drop the hard-won clause because nobody can remember why it was fought for. THE AGREEMENT RECORDS WHAT WAS AGREED. ONLY YOUR NOTE RECORDS WHAT IT WAS FOR.</p></div></div>
+
+<p>Box 2 is the structural problem nobody raises in a purchase negotiation, and box 3 is the test that finds what reads well and will not work. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>An agreement is tested at its worst moment, not its best</strong> - so the only reading that counts is the one you do from inside the failure. Five questions:</p>
+<ul>
+<li><strong>What must this achieve, operationally?</strong> <strong>Specify before drafting.</strong> Once a document exists, everybody argues about the words in it instead of the ones that are missing.</li>
+<li><strong>How long does the asset live, and how long does the agreement?</strong> <strong>The life mismatch</strong>, costed, with one of four closures chosen deliberately.</li>
+<li><strong>Does this clause work when the failure has already happened?</strong> <strong>The walk-through</strong> - who acts, on whose authority, within what time, and does it still function given what has broken.</li>
+<li><strong>For a hazard agreement, is the resource real?</strong> <strong>Named capacity and honest availability</strong>, not categories of help.</li>
+<li><strong>What do I sign, escalate and record?</strong> <strong>Delegation, quantified residual risk, and the note that says why.</strong></li>
+</ul>
+<p><strong>The arithmetic that makes the missing clause visible.</strong> Long durations between design and production, and an extended service life of 25 to 30 years, <em>run counter to the now 4 to 7 year support cycle</em> - the asset routinely outlives its support by decades, and the industry name for the consequence is <strong>diminishing manufacturing sources and material shortages</strong>. At Corathyl the agreement covers 5 of 25 years: <strong>80 per cent of the asset life with no contractual support</strong>. Forced into a last-time buy at year five to cover the remaining twenty, the works pays <strong>R3.60 million at once</strong> against a present value of R1.767 million for buying as needed - <strong>a premium of R1.833 million, or 104 per cent</strong>.</p>
+<p><strong>And say plainly what that figure is.</strong> It is <em>the minimum, unavoidable financial penalty</em> - before storage and insurance, before the risk of having bought the wrong spares for a failure mode nobody predicted twenty years out, and before the cost of actual failure if the part simply cannot be had. The "buy as needed" comparison is generous to the bad contract, because it assumes the part will still exist to buy, <em>which is the entire risk</em>. Present it as the floor and you will never be accused of overstating it.</p>
+<p><strong>The ethical half, which applies to what you offer as much as what you accept.</strong> <strong>An honest, caveated yes or a swift no is always more ethical than an easy yes you cannot guarantee. Your professional duty is to represent your operational capability honestly, not to be helpful on paper. A promise of aid that cannot be delivered is a trap for your neighbour, not a safety net.</strong> They will stop looking for a reliable alternative on the strength of your signature, and they will discover the truth on the night, with their reservoir emptying.</p>
+<p>One honest boundary. You <em>specify and test</em>. You do not draft the legal instrument, you do not give legal advice, and you do not sign outside your delegation because the meeting needs it today. A lawyer makes an obligation binding; you make sure it is the right obligation.</p>
+<p>Does it scale? A lifeboat is not judged in the harbour. It is judged in the dark, in a swell, by cold people who have never used it, with one of the launch mechanisms already jammed. Every clause you accept is a piece of equipment that will be used exactly once, by somebody tired, on the worst night of their year.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A neighbouring industrial park offers Corathyl a mutual-aid agreement. It is generous, unprompted, and free.</p>
+<table>
+<tr><th>The offer, as drafted</th><th>Detail</th></tr>
+<tr><td>Clause 1</td><td>"Priority access to our on-site emergency generation capacity" in a regional power failure</td></tr>
+<tr><td>Clause 2</td><td>"Priority access to our skilled maintenance technicians"</td></tr>
+<tr><th>What the supporting documents show</th><th>Detail</th></tr>
+<tr><td>The generators</td><td>Output voltage and phase are incompatible with the water scheme's critical pumps</td></tr>
+<tr><td>The technicians</td><td>Server and network specialists, not qualified on high-voltage industrial switchgear</td></tr>
+<tr><td>The park's own continuity plan</td><td>Designates all generator capacity to its data centres</td></tr>
+<tr><td>Corathyl's own position</td><td>Has generators; holds 14 hours of diesel; refuelling contract lapsed last year</td></tr>
+</table>
+<ol>
+<li><strong>Do not redraft it.</strong> Write a memo to your manager instead. Say first why redrafting would be the wrong move.</li>
+<li><strong>Three failures.</strong> Identify precisely why each clause is worthless, and which is worse than worthless.</li>
+<li><strong>The useful offer.</strong> Specify what a genuinely valuable commitment from this neighbour would be.</li>
+<li><strong>Recommend.</strong> Sign, amend or decline - and say what you would offer them in return.</li>
+<li><strong>Your own house.</strong> The facts state Corathyl's refuelling contract has lapsed. How does this fact change your assessment of the overall risk, and where should your immediate priority lie?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, on why the offer is worse than worthless. Incompatible generators are useless; unqualified technicians are useless <em>and dangerous</em>, because people who are not competent on high-voltage switchgear may nonetheless be sent to it at three in the morning by somebody reading a clause. But the third failure is the one that matters most: <strong>"priority access" to capacity already committed elsewhere in the park's own continuity plan is not a shortfall, it is a contradiction.</strong> The agreement promises something the promisor has already promised to itself.</p>
+<p>Second, on the useful offer. The valuable commitment from this neighbour is almost certainly <em>not</em> equipment or people - it is <strong>a stated quantity of diesel, at an agreed rate, delivered within a stated time</strong>, because Corathyl has its own generators and knows how to run them. The generous offer was shaped by what the park has; a useful one is shaped by what Corathyl lacks. <em>Agreements drafted from the giver's inventory rather than the receiver's need are the commonest failure in mutual aid</em>, and they are almost always well meant.</p>
+<p>Third, the point of step 5 is to force a comparison of risks. The risk from the flawed mutual-aid agreement is a false sense of security for a future event. The risk from the lapsed refuelling contract is a direct, immediate, and certain failure of your existing continuity plan after just 14 hours. Your immediate priority must be renewing the internal contract. The insight is that an interesting external problem (negotiating with a neighbour) can easily distract from a boring but critical failure in your own housekeeping.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-specify_before_drafting">1. State what the agreement must achieve, in operational terms, before anyone drafts it</label><textarea id="cb-specify_before_drafting" data-key="t-0192:specify_before_drafting" placeholder="List the obligations the asset actually needs, over what period, measured how. This is your contribution and nobody else in the process can make it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_life_mismatch">2. The life mismatch - the asset outlives the agreement, so decide who carries that</label><textarea id="cb-the_life_mismatch" data-key="t-0192:the_life_mismatch" placeholder="Compare the asset design life with the supplier support period, cost the gap, and choose one of the four closures - deliberately, not by default."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-test_against_the_bad_day">3. Test the draft against the bad day - the failure has already happened</label><textarea id="cb-test_against_the_bad_day" data-key="t-0192:test_against_the_bad_day" placeholder="Take the failure the agreement exists for, assume it has occurred, and walk it through the clauses. Who does what, on whose authority, within what time - and does the clause still function?"></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-hazard_agreement_specifics">4. The hazard agreement - triggers, real resources, and honest limits</label><textarea id="cb-hazard_agreement_specifics" data-key="t-0192:hazard_agreement_specifics" placeholder="Trigger and who may invoke, what is genuinely committed and available, cost, liability, communications when the normal channel has failed, stand-down and review."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-sign_escalate_record">5. What you sign, what you escalate, and what you record</label><textarea id="cb-sign_escalate_record" data-key="t-0192:sign_escalate_record" placeholder="The boundary of your competence, the residual risks you are accepting on the organisation&#039;s behalf, and the record that tells a successor why the agreement says what it says."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now read an agreement for what it will fail to do.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Agreements fail politely, in years, and by then nobody remembers who accepted the clause.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Reading a draft for legal risk instead of operational risk.</strong> Legal have checked whether it binds. Only you can check whether it binds the right thing.</p>
+<p>&bull; <strong>Commenting on a draft instead of specifying beforehand.</strong> Once a document exists everybody argues about the words in it rather than the ones missing from it.</p>
+<p>&bull; <strong>Accepting a support period shorter than the asset life without saying so.</strong> Five years of cover on a twenty-five year asset is a decision. Make it one.</p>
+<p>&bull; <strong>Choosing the closure by default.</strong> Supplier obligation, last-time buy, alternate qualification, or explicit acceptance - the one option not available is not choosing.</p>
+<p>&bull; <strong>Clauses that depend on what has failed.</strong> A mutual-aid agreement assuming a working telephone is an agreement for a day you do not need it.</p>
+<p>&bull; <strong>"Promptly" and "as soon as reasonably practicable".</strong> Lawyer's words. A reservoir empties in eight hours.</p>
+<p>&bull; <strong>Committing categories instead of resources.</strong> "Skilled personnel" is not a commitment. Two operators qualified on this switchgear, one of whom is on leave each month, is.</p>
+<p>&bull; <strong>Promising what you cannot deliver.</strong> An honest caveated yes or a swift no beats an easy yes. A promise of aid that cannot be delivered is a trap for your neighbour, not a safety net.</p>
+<p>&bull; <strong>Drafting from the giver's inventory rather than the receiver's need.</strong> The commonest failure in mutual aid, and almost always well meant.</p>
+<p>&bull; <strong>No stand-down.</strong> An emergency that never formally closes never releases anybody.</p>
+<p>&bull; <strong>Signing outside your delegation because the meeting needs it today.</strong> That is not an obstacle being managed. It is the system working, and you overriding it.</p>
+<p>&bull; <strong>No record of why a clause exists.</strong> The renewal is negotiated by people who were not there, and the hard-won clause is quietly dropped.</p>
+</div>
+</details>
+<p>Onalenna could not sign either document, and neither was badly written. State what the agreement must achieve in operational terms before anyone drafts it, because your list is the only part of the process that requires you; compare the asset life against the support period, cost the gap, and choose the closure deliberately rather than by silence; test the draft from inside the failure it exists for, asking of every clause who acts, on whose authority, within what time, and whether it still works given what has broken; commit real resources with real availability rather than categories of help, and offer an honest no in preference to a comfortable yes; and record why the agreement says what it says, because it will be renewed by people who were not there. An agreement is tested at its worst moment, not its best - and the clause you did not ask for is the one that will be missing on the night. If you are working with an AMU Facilitator, take an agreement your organisation depends on and check how many years of the asset's life it actually covers.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can specify and test an agreement now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

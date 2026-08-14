@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every resource was listed, and none of them had a start date</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Every resource was listed, and none of them had a start date</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The SAMP is approved, and it is a good one. You are Onalenna, and you helped write it: the objectives are right, the new treatment module is properly justified, and the capital is in the programme. Month 48, in service.</p>
+<p>You read it again on a Friday afternoon and something is wrong that you cannot name. Every resource is listed. Every resource is affordable. Nobody who has read this plan has raised an objection, and you cannot find one either.</p>
+<p>Then you start writing dates in the margin, and the feeling turns cold.</p>
+<p>The plan says when everything is <em>needed</em>. It says nowhere when anything must <em>start</em>. The money has an approval cycle. The pumps have a lead time. And the four people who will have to run this module competently do not exist yet - not in this organisation, not on this shift, not anywhere - and they cannot be conjured in the final year, because competence is <strong>grown</strong>, not ordered.</p>
+<p>You are holding a plan that will fail in about three years. It will fail quietly, at the very end, in the month everyone expected to be celebrating. And it will fail in a way that will look, to everyone standing there, like the fault of whoever was running the works that month.</p>
+<blockquote><h2>My plan lists every resource it needs and can afford all of them, and I have just realised it cannot be delivered. How do I build a resourcing strategy that makes a set of promises actually true?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The promise is a new treatment module <strong>in service at month 48</strong>. The resourcing plan lists everything: capital, contractors, spares, tooling, four process controllers. It is fully costed and entirely affordable — nobody has underfunded anything. And then you notice: <strong>not one line has a date by which it must begin.</strong> The plan says when the module is needed and is silent on when anything must start. Those four controllers do not exist yet, and a controller who can actually run this module is grown over years, not hired in a month. Write down how you would make this set of promises true — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and where the real constraint sits</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;It is funded and listed — we are fine.&rdquo;</strong> Affordability and deliverability are different properties. A fully funded plan with no start dates is <strong>a budget wearing the costume of a strategy</strong>.</p>
+<p>&bull; <strong>&ldquo;Add contingency to the budget.&rdquo;</strong> Money is the one resource you are not short of. No amount of contingency compresses the years it takes to make a competent operator.</p>
+<p>&bull; <strong>&ldquo;Recruit the controllers nearer the time.&rdquo;</strong> Precisely the assumption that will fail. You would be recruiting four vacancies and receiving four people who cannot yet run the module — and discovering it in the commissioning month.</p>
+<p>&bull; <strong>&ldquo;Use contractors to cover the gap.&rdquo;</strong> A real fallback, and a permanent dependency if it is the plan rather than the bridge — you will be renting your own core capability for the life of the asset.</p>
+<p>&bull; <strong>&ldquo;Track it monthly and act if it slips.&rdquo;</strong> Watching without a start-by date tells you nothing is late right up to the moment everything is. There is no threshold to trip.</p>
+<p>&bull; The move is to work <strong>backwards from each dated promise</strong> — what must be in place for this to be true, and how long does that thing take to come into existence — which converts a list of costs into <strong>start-by dates you can actually manage</strong>. Two things surface that a costed list conceals entirely. Resources differ enormously in <strong>how long they take to exist</strong>, so the binding constraint is rarely the expensive one: money can often move quickly, while a person with a particular competence must be recruited, trained and given real experience. That capability is <strong>grown, not ordered</strong> — and it is what makes your month-48 promise a decision you must take this year. And <strong>capability is not headcount</strong>: four vacancies are not four people who can run this module, and a plan that counts posts has not counted what it needs. One further omission travels with all this — the module creates an <strong>obligation for the rest of its life</strong>, staffed, powered and maintained for decades, which a capital-shaped plan routinely leaves out. Otherwise the failure arrives quietly, at month 47, and looks like the fault of whoever is standing there.</p>
+</div>
+</details>
+<p>You stop asking what the plan costs and start asking when each part of it must begin. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the integrated resourcing strategy - the same promise, with a start date against every resource that must serve it.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What has been promised, and by when? (resourcing is downstream of objectives)</div><p class="cb-demo">Start from the promises, not the money. A resourcing strategy is DOWNSTREAM of objectives: the SAMP establishes the line of sight from organisational goals to asset management objectives, and resourcing without stated, DATED commitments is not a strategy at all - it is budgeting. So read the plan and pull out each commitment that will consume resources, with the date it must be met. The one on the table: a NEW TREATMENT MODULE IN SERVICE AT MONTH 48. That is the promise. Everything that follows exists to make it true - and notice that the plan states when the module is NEEDED and nowhere states when anything must START.</p></div><div class="canvas-box"><div class="cb-label">2. What does the promise consume? (size all three, not the easy one)</div><p class="cb-demo">Size all three against the promise. FINANCIAL: not only the capital but the OPERATING cost the asset creates for the rest of its life - the line that gets forgotten, because a module approved once is staffed, powered and maintained for thirty years. HUMAN: roles, numbers and above all COMPETENCES - this is capability, not headcount; four process controllers who can actually run this module is a different requirement from four vacancies. MATERIAL: spares, consumables, tooling and the supply chain to sustain them, not just the plant itself. NOTE: these three are the LO&#039;s axes and a deliberate simplification. ISO 55001 clause 7.1 requires the organisation to determine and provide the resources needed for the asset management system including financial, human, tools, TECHNOLOGY AND INFORMATION - so a real strategy carries those too.</p></div><div class="canvas-box"><div class="cb-label">3. When must each one start? (lead time, then work backward)</div><p class="cb-demo">This is the move that changes everything: every resource gets a LEAD TIME, and therefore a START-BY DATE derived BACKWARD from the commitment. Working back from month 48: commissioning takes 6 months, so the plant must be DELIVERED by month 42; long-lead procurement is 18 months, so the ORDER goes in by month 24; capital approval takes 12 months and must precede the order, so APPROVAL STARTS AT MONTH 12. Now the same discipline on people: four controllers must be COMPETENT by month 42, and internal development - recruit, train, assess, supervised practice - takes 30 months, so DEVELOPMENT ALSO STARTS AT MONTH 12. Read that again. The money and the people must both begin three years before the plant is needed. The plan has TWO critical paths, and only one of them was ever visible to the finance department.</p></div><div class="canvas-box"><div class="cb-label">4. Which one binds? (and the honest consequence if it cannot be solved)</div><p class="cb-demo">A plan is only as deliverable as its SCARCEST resource, so name which one binds. Here is the test that finds it. If capital approval slips three months you can escalate, lobby, expedite. If competence development slips three months you can do NOTHING - you cannot compress the years it takes to grow a person&#039;s skill. That asymmetry is what makes competence the fragile one, and it is why the scarcest resource is almost never the money. But do not turn that into a rule: ANALYSE every lead time rather than assuming, because in other settings it is a decade of regulatory approval, a bespoke item with a three-year manufacturing lead, or a volatile supply chain that binds first. THEN BE HONEST. If the binding constraint cannot be resolved, THE DATE MUST MOVE OR THE SCOPE MUST CHANGE. A resourcing strategy has exactly two acceptable outputs: it turns a wish into a plan, or it turns it into an honest renegotiation - early, while both are still possible.</p></div><div class="canvas-box"><div class="cb-label">5. One table, with owners and real contingencies (and the fallback that is not one)</div><p class="cb-demo">One table, one row per resource per promise: PROMISE, RESOURCE, QUANTITY, LEAD TIME, START-BY DATE, OWNER, CONTINGENCY. Without an owner a resource is everybody&#039;s problem, which is nobody&#039;s. And test every contingency against the clock, because this is where plans die quietly. The tempting plan here is to hire the four controllers externally - a 9-month cycle, so start at month 33, comfortably late and cheap. But the competence is scarce in the region. If that search fails at month 33 there are 9 months left to month 42, and the internal-development fallback needs 30. YOU ARE 21 MONTHS SHORT. A fallback whose own lead time exceeds the time remaining is not a fallback; it is a comfort blanket, and the module commissions with nobody licensed to run it. Then set the review rhythm, because lead times drift.</p></div></div>
+
+<p>Box 3 is the one to sit with. Capital approval starts at month 12. Competence development starts at month 12. The same day, three years before the plant is needed - and only one of those two was ever on anybody's programme. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A strategic plan is a set of <strong>promises</strong>, and resourcing is what makes them true. The technique works backward from each promise to find when every resource must begin, and which one binds. Five questions:</p>
+<ul>
+<li><strong>What has been promised, and by when?</strong> Resourcing is <em>downstream</em> of objectives - the SAMP carries the <strong>line of sight</strong> from organisational goals to asset management objectives, and resourcing without dated commitments is just budgeting.</li>
+<li><strong>What does the promise consume?</strong> Size all three: <strong>financial</strong> (capital <em>and</em> the operating cost the asset creates for its whole life), <strong>human</strong> (roles, numbers and <em>competences</em> - capability, not headcount), <strong>material</strong> (spares, consumables, tooling and the supply chain to sustain them). These three are the working axes; ISO 55001 clause 7.1 requires resources including financial, human, tools, <em>technology and information</em>, and a real strategy carries those too.</li>
+<li><strong>When must each one start?</strong> Every resource has a <strong>lead time</strong> and therefore a <strong>start-by date</strong>, derived <em>backward</em> from the commitment. This is the move that converts a list into a schedule, and it is why forward planning from today fails: it never discovers what should already have begun.</li>
+<li><strong>Which one binds?</strong> The plan is only as deliverable as its <strong>scarcest resource</strong>. Find it with the recovery test: which delay could you actually recover from? And if the binding constraint cannot be resolved, say so - <strong>the date must move or the scope must change</strong>.</li>
+<li><strong>Who owns it, and is the contingency real?</strong> One table with an owner per resource, and every fallback tested against the clock - because a contingency whose own lead time exceeds the time remaining is not a contingency.</li>
+</ul>
+<p><strong>The asymmetry that finds the binding constraint.</strong> If capital approval slips three months, you can escalate, lobby, expedite, borrow. If competence development slips three months, you can do nothing at all - there is no way to compress the years in which a person becomes genuinely good at running a plant. That is why the scarcest resource is almost never the money. But do not convert that into a new rule: <em>analyse</em> every lead time rather than assuming, because elsewhere it is a decade of regulatory approval, a bespoke item with a three-year manufacturing lead, or a volatile supply chain that binds first.</p>
+<p><strong>And a principle this unit will not soften.</strong> Human competence is not a commodity. It is grown through investment, mentorship and experience over years of a person's career. A plan that lists headcount as a resource to be acquired on a ninety-day notice period is not a plan; it is an abdication of responsibility. The role of the asset manager is to honour the human reality of lead time - ensuring that people are developed with foresight and dignity, not blamed for the failure of a plan that treated them as an afterthought.</p>
+<p>One honest boundary. You are aligning the three resource streams against dated commitments and naming what binds. You are not building the operating budget itself, not building the competency framework itself, and not designing the spares strategy itself - those are separate techniques, each of which you may already have. This one is what forces three separate good plans to meet in reality, on time.</p>
+<p>Does it scale? Think of a wedding on a fixed date. The money can be found late, the flowers ordered late, the cake made in a week. But the venue books eighteen months out, and no amount of budget, goodwill or effort moves that. Everyone who has planned one has learned the same lesson this technique teaches: you do not plan forward from today, you plan backward from the date - and the thing that binds is rarely the thing you were worrying about.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A municipal depot has committed to converting <strong>20 fleet vehicles to electric, in service at month 30</strong>. Commissioning and handover take 3 months. The resource picture:</p>
+<table>
+<tr><th>Resource</th><th>Requirement</th><th>Lead time</th></tr>
+<tr><td>Capital</td><td>R40m, through the normal approval cycle</td><td>9 months to approval</td></tr>
+<tr><td>Chargers and depot works</td><td>Order after approval</td><td>10 months from order</td></tr>
+<tr><td>Grid connection upgrade</td><td>Application to the distributor - the depot's existing supply cannot carry the load</td><td>36 months</td></tr>
+<tr><td>Technicians</td><td>6 with high-voltage EV competence</td><td>12 months internal development, or a 4-month external course</td></tr>
+</table>
+<ol>
+<li><strong>Work backward.</strong> Give the start-by date for every resource, from the month-30 commitment.</li>
+<li><strong>Name what binds.</strong> Which resource is the binding constraint, and by how much?</li>
+<li><strong>Apply the recovery test.</strong> For the two resources you did <em>not</em> name, say what you could actually do if each slipped by three months.</li>
+<li><strong>Be honest.</strong> State plainly whether the month-30 commitment can be met - and if it cannot, give the two options the plan's owner actually has.</li>
+<li><strong>Table it.</strong> Put the whole thing in one table with owners and a contingency you have tested against the clock.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> you have just been taught that the scarcest resource is almost never the money, and you may be about to reach for the people. Resist both reflexes and do the arithmetic on <em>every</em> line, including the boring one.</p>
+<p>The technicians are comfortable - a 4-month course, or 12 months to grow the competence properly, either of which fits. The money is comfortable. The binding constraint is the <strong>grid connection</strong>, and it does not merely bind: work it backward and the application needed to be lodged before the programme was ever conceived. This commitment cannot be met, and no amount of effort, escalation or goodwill changes that.</p>
+<p>Which means your real deliverable is not a plan. It is the honest renegotiation - move the in-service date, or reduce the scope to the number of vehicles the existing supply can actually charge - delivered now, while both options are still open, rather than in month 27 when only one of them is.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-read_promises">1. What has been promised, and by when? (resourcing is downstream of objectives)</label><textarea id="cb-read_promises" data-key="t-0162:read_promises" placeholder="Extract from the strategic plan the specific commitments that consume resources, each with its date - because resourcing without stated objectives is just budgeting."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-size_three">2. What does the promise consume? (size all three, not the easy one)</label><textarea id="cb-size_three" data-key="t-0162:size_three" placeholder="Size financial, human and material resources against each commitment - capability rather than headcount, and the operating cost the asset creates for the rest of its life."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-lead_times_backward">3. When must each one start? (lead time, then work backward)</label><textarea id="cb-lead_times_backward" data-key="t-0162:lead_times_backward" placeholder="Give every resource its lead time and derive a start-by date backward from the commitment - the discipline that turns a list into a schedule."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-name_binding">4. Which one binds? (and the honest consequence if it cannot be solved)</label><textarea id="cb-name_binding" data-key="t-0162:name_binding" placeholder="Name the scarcest resource - the plan is only as deliverable as that one - and if it cannot be resolved, say plainly that the date must move or the scope must change."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-table_owners">5. One table, with owners and real contingencies (and the fallback that is not one)</label><textarea id="cb-table_owners" data-key="t-0162:table_owners" placeholder="Bring it together: promise, resource, quantity, lead time, start-by date, owner, and a contingency whose own lead time actually fits the time remaining."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now tell the difference between a plan and a wish, before either becomes somebody's fault.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Resourcing strategies fail in ways that are invisible until the very end, which is what makes them dangerous.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Resourcing without dated objectives.</strong> Then it is budgeting, not strategy - and nothing can be worked backward from a promise nobody has written down.</p>
+<p>&bull; <strong>Sizing the capital and forgetting the operating cost.</strong> A module approved once must be staffed, powered and maintained for thirty years. The approval is the small number.</p>
+<p>&bull; <strong>Counting headcount instead of competence.</strong> Four vacancies and four people who can run the module are entirely different requirements, and only one of them keeps the plant safe.</p>
+<p>&bull; <strong>Assuming people can be acquired at short notice.</strong> The commonest cause of late-stage failure, and the least excusable, because it is knowable three years in advance.</p>
+<p>&bull; <strong>Planning forward from today.</strong> Forward planning never discovers what should already have started. Only backward planning does.</p>
+<p>&bull; <strong>Assuming you already know what binds.</strong> Usually competence - but sometimes a regulatory approval, a bespoke item, or a grid connection. Analyse every lead time; do not apply a rule of thumb to a plan people are relying on.</p>
+<p>&bull; <strong>A contingency whose lead time exceeds the time remaining.</strong> It looks like prudence on the page and is a comfort blanket in reality. Test every fallback against the clock.</p>
+<p>&bull; <strong>Treating an unresolvable constraint as something to work harder at.</strong> If it cannot be solved, the date moves or the scope changes. Effort is not a substitute for lead time, and pretending otherwise transfers the failure to the people at the end.</p>
+<p>&bull; <strong>No owner.</strong> A resource that is everybody's problem is nobody's, and it will be discovered late by whoever happens to need it.</p>
+</div>
+</details>
+<p>Onalenna's plan listed every resource and could afford all of them, and it was going to fail anyway. Read the promises and their dates; size money, people and materials against each one, remembering that capability is not headcount and that capital is the small number beside a lifetime of operating cost; give every resource its lead time and work backward to a start-by date; then name what binds, and if it cannot be solved say so early enough that the date or the scope can still move. Two acceptable outputs: a plan, or an honest renegotiation. And competence is grown over years of somebody's working life, which means the people are never the line item you settle last. If you are working with an AMU Facilitator, take one dated commitment your organisation has made and find the start-by date for its people. It is usually in the past.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can tell a plan from a wish now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not &quot;very reliable&quot; - a number, and how sure we are about it: how do I give a plant-level availability figure that shows how bad a bad year could be?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Not &quot;very reliable&quot; - a number, and how sure we are about it: how do I give a plant-level availability figure that shows how bad a bad year could be?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are standing in the site office at <strong>Kgosi Ridge Manganese</strong>, a new ore-processing plant outside Hotazel in the Northern Cape. It is 7 a.m. The morning is cold, and through the wall you can hear the test run of the primary crusher - a deep, steady rumble that drops to silence every so often, then starts again.</p>
+<p>In your hand is a one-page <strong>performance guarantee</strong> from the off-take contract. One line is highlighted in yellow: "The plant shall deliver a production availability of at least 95%." Fall below that and the penalty is <strong>R1.8 million for every percentage point, every year</strong>.</p>
+<p>Across the desk sits <strong>Naledi</strong>, the project sponsor. She is not angry, but she is tense - the bank wants the design signed off <strong>today</strong> so the long-lead equipment can be ordered. She slides a single sheet toward you: the proposed line is a <strong>crusher, then a conveyor, then a screen</strong>, in series. One stops, the line stops.</p>
+<p>"Engineering tells me each machine is 'very reliable'," she says. "But the crusher already tripped three times during the test this week. I need a number I can put my name next to. Not 'very reliable' - a number. And I need to know how sure we are about it."</p>
+<p>You feel the pull to do the easy thing: multiply three availability figures from the supplier brochures, get one tidy percentage, and hand it over. But you know the truth - those three numbers are averages, the crusher is still settling in, and a single point estimate hides how <em>wide</em> the real answer could be. If you guess high and the plant under-delivers, the penalty lands on Naledi's desk with your name on the calculation. The smell of fresh concrete and machine oil drifts in from the plant. The crusher goes quiet again.</p>
+<blockquote><h2>Not "very reliable" - a number, and how sure we are about it. How do I turn component reliability and repair times into a plant-level figure that shows how bad a bad year could be?</h2></blockquote>
+<p><strong>Before you read on, give Naledi a number.</strong> Three machines in series, supplier availability figures for each, a 95 per cent contract floor, R1.8 million a point, and the bank wants the design signed today. Write down what you would hand her and how you would work it out - your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the four numbers you could hand over, and what each one hides</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Multiply the three brochure availabilities.</strong> Fast, defensible on its face, and it gives one number - 97.2 per cent as it happens, which is right. What it cannot tell her is the only thing the contract cares about: how bad a bad year gets. A single figure has no bad year in it.</p>
+<p>&bull; <strong>Multiply them, then subtract a margin for safety.</strong> The instinct once you notice the first answer is thin, and the margin is invented. Whatever you subtract, somebody will ask where it came from, and the honest answer will be that you chose it.</p>
+<p>&bull; <strong>Quote the supplier figures and note they are averages.</strong> Honest, and it hands the problem back to Naledi in the same shape she gave it to you. She needs a number she can sign, and a caveat is not a number.</p>
+<p>&bull; <strong>Refuse until there is operating history.</strong> Correct in principle and the long-lead equipment order will not wait a year. Refusing to answer is also a decision, and it lands on somebody.</p>
+<p>&bull; What all four share is that they produce, at best, <strong>one number - the average year.</strong> But no year is the average year. Failures arrive when they arrive and repairs take as long as they take, and the plant's output is what falls out of that particular sequence. What Naledi actually needs is the <em>range</em> of years this design produces, and specifically its bad end - which is not something you can reach by adjusting a point estimate.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Instead of trusting one average, simulate the plant living a whole year - drawing a random time to failure and a random repair duration for every machine as it goes - and then do it ten thousand times. What comes back is not a figure but a distribution of years. Watch it run on the Kgosi Ridge line.</p>
+<p>The first is a <strong>Monte Carlo RAM model</strong> - a simulation that runs the plant's whole life, 10,000 times over, drawing random failures and repairs each time instead of trusting one average number. Run on the crusher-conveyor-screen line (8,760 simulated hours, 10,000 times), it gives a spread of production availability, not one figure:</p>
+<ul>
+<li><strong>P10 (a bad year):</strong> <strong>96.1%</strong> - only 1 year in 10 is worse.</li>
+<li><strong>P50 (the best estimate):</strong> <strong>97.2%</strong> - the middle outcome.</li>
+<li><strong>P90 (a good year):</strong> <strong>98.1%</strong> - only 1 year in 10 is better.</li>
+</ul>
+<p>The line is rated at 500 t/h, so ideal annual output (500 x 8,760) is 4,380,000 t. At P50 that is <strong>4,257,360 t/yr</strong>; at P10, the worst-credible case, <strong>4,209,180 t/yr</strong>. The contract floor is 95%. Even in a bad year you clear it by <strong>1.1 percentage points</strong>.</p>
+<p>See what ten thousand simulated years gave that the multiplication could not. <strong>The hand calculation and the simulation agree exactly on the middle - 97.2 per cent - which is the check that the model is sound. The number Naledi actually needed was the other one: 96.1 per cent in a bad year, which clears the 95 per cent floor by 1.1 points.</strong> That margin is the whole answer. Had the P10 come out at 94.6 the middle figure would have been identical and the design would have been unsignable, and no amount of care with a single average would ever have shown it. What she can put her name next to is not a percentage - it is a percentage with a bad year attached and a stated distance from the penalty.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You run the two analyses in eleven moves.</p>
+<ul>
+<li><strong>1. Draw the reliability block diagram.</strong> Sketch each machine in the order it sits, and mark series (any stop stops the line) or parallel/standby. Kgosi Ridge is Crusher -&gt; Conveyor -&gt; Screen, all in series - no standby, yet.</li>
+<li><strong>2. Gather MTBF and MTTR for each block.</strong> From supplier data and the commissioning log: Crusher 1,200 h MTBF / 18 h MTTR; Conveyor 800 h / 6 h; Screen 2,000 h / 12 h.</li>
+<li><strong>3. Choose the failure and repair distributions.</strong> Time-to-failure follows an exponential distribution at that MTBF (the standard, honest starting choice for random failures); repair time follows a lognormal distribution at that MTTR.</li>
+<li><strong>4. Run the simulation.</strong> Simulate one full year (8,760 h), 10,000 times: each run draws random failure and repair times for every block in turn, and tallies the uptime.</li>
+<li><strong>5. Read the availability distribution.</strong> The 10,000 simulated years give you P10, P50 and P90 - the spread you saw in T2.</li>
+<li><strong>6. Sanity-check against a hand calculation.</strong> Availability per block = MTBF &divide; (MTBF + MTTR): Crusher 1,200/1,218 = 0.9852; Conveyor 800/806 = 0.9926; Screen 2,000/2,012 = 0.9940. Series = 0.9852 x 0.9926 x 0.9940 = 0.9721 -&gt; <strong>97.2%</strong> - matching the simulation's P50 exactly. The hand calculation only ever gives you that one number; the simulation also gives you the P10, which is the number the contract actually cares about.</li>
+<li><strong>7. Translate to production and to the contract.</strong> Ideal annual output = rated throughput x 8,760 h. Compare expected and worst-credible tonnes against the contract floor.</li>
+</ul>
+<p>The ideas underneath. <strong>RAM</strong> stands for Reliability, Availability and Maintainability - how often a machine breaks, how fast you fix it, and the result: how much of the time it is ready to work. A <strong>Monte Carlo model</strong> answers "what is the full range of what could happen?" by rolling the dice thousands of times instead of trusting one average. <strong>P10/P50/P90</strong> answer "how bad could a bad year get, and how good could a good one be?" - not just "what is likely?". And note what this model does <em>not</em> answer. It takes each machine's reliability as a given and asks what the plant does with it; it cannot tell you whether a machine is itself getting better or worse as you fix it, which is the question those three crusher trips raise and a separate piece of work with its own arithmetic - <strong>t-0286</strong> is where that one lives. Running this model on numbers from a machine that is still settling in is exactly why step seven insists on saying which assumption the answer rests on.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Lift these two blank pro-formas onto a sheet of paper or a spreadsheet and run them on your own line and your own failure log. The headers ARE the steps - fill each one in, in order.</p>
+<p><strong>Pro-forma 1 - availability of a line.</strong> First sketch your reliability block diagram: each machine in order, marked series or parallel/standby. Then, one row per block, fill in: Block, Series or parallel?, MTBF (h), MTTR (h), Block availability = MTBF &divide; (MTBF + MTTR). Then roll up: series availability (multiply the block availabilities together); the worst block (your bottleneck); ideal annual output (rate x 8,760 h); expected output (ideal x series availability); worst-credible output (ideal x your P10 - run a Monte Carlo if you have buffers or standby); your contract or target floor; and whether you clear it, expected and worst-credible both. If you have any parallel or standby blocks or buffers, the hand calculation is a sanity check only - run the Monte Carlo for the real P10/P50/P90.</p>
+<p><strong>Your one-line answer:</strong> "Expected production availability ___%, worst-credible (P10) ___% against a floor of ___% - a margin of ___ points. The figure assumes ___, and the sanity check against the hand calculation agrees to ___."</p>
+<p>Now attempt these four on your own. Try each one before you open its reveal - that is where the skill is built.</p>
+<p><strong>Task 1 (warm-up).</strong> A single pump has MTBF = 500 h and MTTR = 8 h. What is its availability? Then: if a second, identical pump is added so the line needs only one of the two running (parallel redundancy), would availability go up or down, and roughly why?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>A = 500 &divide; (500 + 8) = <strong>0.9843 -&gt; 98.4%</strong>. With a parallel spare the line only stops when <strong>both</strong> pumps are down at once, which is rare, so availability goes <strong>up</strong> sharply, toward roughly 99.97%. Redundancy means a single failure no longer stops the line.</p>
+</div>
+</details>
+<p><strong>Task 2.</strong> A line is Feeder -&gt; Mill -&gt; Pump -&gt; Filter in series, rated 300 t/h, running 8,760 h/yr: Feeder 1,000 h MTBF / 5 h MTTR; Mill 600 h / 20 h; Pump 1,500 h / 8 h; Filter 900 h / 4 h. Compute each block's availability, the series availability, the expected annual tonnes, and the tonnes lost to downtime.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Feeder 1,000/1,005 = 0.9950; Mill 600/620 = 0.9677; Pump 1,500/1,508 = 0.9947; Filter 900/904 = 0.9956. Series = 0.9950 x 0.9677 x 0.9947 x 0.9956 = 0.9536 -&gt; <strong>95.4%</strong>. Ideal = 300 x 8,760 = 2,628,000 t. Expected &asymp; <strong>2,506,000 t</strong>. Lost &asymp; <strong>122,000 t/yr</strong>. The Mill, at 96.8%, is the bottleneck - it is where a buffer or redundancy would pay off, and where a full Monte Carlo model would earn its keep.</p>
+</div>
+</details>
+<p><strong>Task 3 - the number the contract cares about.</strong> A four-machine line in series simulates out at P50 96.4 per cent and P10 94.8 per cent. The contract floor is 95 per cent, with a penalty of R2.4 million per point per year. Your colleague reports "96.4 per cent, comfortably above the floor". What is wrong with that report, and what would you write instead?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>The report quotes the middle year and the contract is exposed in the bad one. At P10 the line is <strong>0.2 points below the floor</strong>, so roughly one year in ten carries a penalty of about R480,000 - and the sentence "comfortably above the floor" is describing a year that will often not happen. What to write instead: "Expected 96.4 per cent; worst-credible (P10) 94.8 per cent, which is 0.2 points <em>below</em> the 95 per cent floor and implies an expected penalty exposure of roughly R480,000 in about one year in ten. The design meets the floor on average and not at the bad end." A complete answer also names the fix worth pricing - a buffer or a standby on whichever machine has the lowest availability, because that is what pulls the bad end up.</p>
+</div>
+</details>
+<p><strong>Task 4 (stretch) - when the simulation and the hand calculation disagree.</strong> You run the model and get P50 = 91.7 per cent. The hand calculation of the same line - each machine's MTBF divided by MTBF plus MTTR, multiplied together - gives 95.8 per cent. Both were done carefully. What do you do, and what are the two most likely explanations?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p><strong>Stop and reconcile before reporting either.</strong> The hand calculation is the check on the simulation and a four-point disagreement means one of them is wrong about the plant. The two likeliest explanations: (1) the model contains something the hand calculation cannot represent - a repair crew that can only attend one machine at a time, a spare that takes days to arrive, a start-up sequence - in which case the simulation is right and lower, and you should say which of those effects is doing it; or (2) an input has been entered in the wrong units or the wrong place, most often an MTTR in days against MTBF in hours, in which case the simulation is simply wrong. A complete answer says which way to test it: strip the model back to the plain series case and see whether it reproduces 95.8 per cent. If it does, the difference is real and explainable. If it does not, the model has a fault and no result from it should leave your desk.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your model true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>You used the wrong failure distribution.</strong> This model assumes failures arrive at random, which holds for many complex systems in their useful life and does not hold for something dominated by wear-out - a liner, a belt, a tyre - or by infant mortality in a new machine. Run it on a wear-out problem and it will return a confident, wrong spread. If you know the failures come from something wearing out, this is not the tool.</p>
+<p>&bull; <strong>The inputs came from brochures for a machine still settling in.</strong> The model faithfully propagates whatever reliability you feed it. Say in the report which assumption the answer rests on, and whether the machine has yet demonstrated it.</p>
+<p>&bull; <strong>Your Monte Carlo P50 lands far from the hand-calculated series availability.</strong> Likely a modelling error - the wrong block connection (parallel coded as series or vice versa), wrong units (minutes vs hours), or too few simulation runs. Always do the hand sanity check: for a simple series line, the P50 must land near MTBF &divide; (MTBF + MTTR) multiplied across blocks. If it does not, the model is wrong, not reality.</p>
+<p>&bull; <strong>Availability looks suspiciously high.</strong> A buffer or standby may be modelled with infinite capacity, or repairs may start instantly with no crew or spares delay. Add a realistic logistic delay (waiting for crew, spares, permits) to MTTR - "time to repair" on site is rarely just the wrench time.</p>
+<p>&bull; <strong>The single availability number feels fragile in the meeting.</strong> You quoted only the mean and lost the spread. Always report P10, P50 and P90, not one number - the contract risk lives in the P10, not the average.</p>
+</div>
+</details>
+<p>You stood in that site office with a 95 per cent floor, R1.8 million a point, a bank waiting, and three supplier averages that multiply to a tidy number with no bad year in it. You can hand Naledi something she can sign: expected production availability 97.2 per cent, worst-credible 96.1, clearing the floor by 1.1 points - checked against the hand calculation to the decimal, with the assumption it rests on written beside it. <strong>A single number tells you about the average year, and nobody operates an average year.</strong> The figure that decides whether that contract is safe to sign is the one at the bad end, and you only get it by simulating the years rather than averaging the machines. (Working with an AMU facilitator? Bring one line's MTBF and MTTR figures and find its bad year together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can give a plant-level availability figure with its bad year attached.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

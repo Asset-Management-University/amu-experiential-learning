@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which one is alive</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Which one is alive</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and the ageing pressure vessel is due for inspection. You now know how to choose an inspection method, and you can read and sentence a radiograph. So you price the job properly - and stop.</p>
+<p>To examine that vessel by local methods means taking it out of service, draining it, scaffolding it and working weld by weld along many metres of seam. Weeks of outage, on a plant that supplies a town. And at the end of all of it you would hold a catalogue of every imperfection in the vessel, most of which have been sitting there for twenty years without moving a millimetre.</p>
+<p>That is not the question keeping you awake. You do not need to know what flaws <em>exist</em> in that vessel. You need to know whether any of them is <strong>alive</strong> - growing, right now, under load. And every method you have been taught looks at one small patch at a time and tells you only what is there.</p>
+<blockquote><h2>I can find out what flaws exist, at enormous cost, and still not know which ones are moving. Is there a way to listen to the whole vessel at once and let it tell me where it hurts?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The vessel is thirty years old and has been repaired more than once. It almost certainly contains several indications, and most of them have probably sat there, unchanged, for decades. Inspecting all of it, patch by patch, would cost more than the vessel is worth and take it out of service for weeks — and at the end you would have <em>an inventory</em>. That is not what is keeping you awake. You do not need to know what flaws exist in there. You need to know whether any of them is <strong>alive</strong> — growing, right now, under load. Every method you have been taught tells you only what is there. Write down how you would find that out — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and a method that runs backwards</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Inspect it all and accept the cost.&rdquo;</strong> Ruinous, and it still answers the wrong question. You would spend weeks and a fortune to learn what is present, and be no closer to knowing which of it is moving.</p>
+<p>&bull; <strong>&ldquo;Inspect the known spots and the likely areas.&rdquo;</strong> Aims your attention by history rather than by activity, and the crack that is growing is under no obligation to be somewhere you have looked before.</p>
+<p>&bull; <strong>&ldquo;Inspect twice, a year apart, and compare.&rdquo;</strong> Genuinely detects growth, and it costs you two full inspections and a year — and the year is the thing you may not have.</p>
+<p>&bull; <strong>&ldquo;Cover it in sensors and watch it.&rdquo;</strong> Closer than it sounds, and as stated it repeats the coverage problem: point sensors watching small patches of a large vessel, only now permanently.</p>
+<p>&bull; <strong>&ldquo;Derate it — run it at lower pressure and stop worrying.&rdquo;</strong> Buys real margin and gives up capacity for an unknown period, without ever telling you whether anything is wrong. It manages your ignorance rather than reducing it.</p>
+<p>&bull; What you want runs <strong>in the opposite direction to everything you have learned</strong>. Every method so far puts energy into the object and reads what comes back. This one puts <strong>nothing</strong> in: apply a load, and wait for the flaw itself to release energy as it moves. What you detect is therefore not a flaw's presence but <strong>its activity</strong> — you are not the interrogator, you are the sentinel — and it covers the <strong>whole vessel at once</strong> rather than a patch. Two things make it usable. The sound reaches different sensors at different moments, so <strong>the difference in arrival times tells you where it came from</strong>, which turns listening into a map and lets your expensive precise methods be aimed instead of spread. And the signature that matters is not loudness: it is <strong>emission that continues while the load is held steady</strong>, because nothing new is being asked of the vessel and something inside it is still moving. State its limit as plainly as its power, though — <strong>it finds, and it cannot size.</strong> It tells you where to look and never how bad it is, so it aims the other methods rather than replacing them.</p>
+</div>
+</details>
+<p>There is, and it works in the opposite direction to everything you have learned so far. Here is a finished report from one.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the monitoring report from a controlled proof test on that vessel - one page, five sections, ending in an instruction.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. The stimulus - what will make a flaw speak?</div><p class="cb-demo">Planned proof test to a stated procedure: ramp to 1200 kPa, HOLD for 10 minutes, ramp down. The hold is not padding - it is the most diagnostic part of the test. Every other method I have used puts energy INTO the vessel and reads what comes back. This one puts nothing in. I apply a load and wait for the flaw itself to release energy. I am not the interrogator here; I am the sentinel.</p></div><div class="canvas-box"><div class="cb-label">2. The array and the location - where did that come from?</div><p class="cb-demo">Two sensors on the seam, 4.00 m apart. Wave speed measured on the vessel itself: v = 3000 m/s. A significant burst arrives at sensor A 200 microseconds before sensor B. Offset from the midpoint = v x delta-t / 2 = 3000 x 0.000200 / 2 = 0.30 m, towards A. The midpoint is 2.00 m from A, so the source is at 2.00 - 0.30 = 1.70 m from sensor A.</p></div><div class="canvas-box"><div class="cb-label">3. The activity - what kind of sound was that?</div><p class="cb-demo">Cumulative hits plotted against pressure. Emission during the ramp is expected. What matters is this: the cluster near 1.70 m KEPT EMITTING throughout the 10-minute hold at constant pressure. Nothing new is being asked of the vessel, and something in it is still moving. Continuing emission at constant load is the alarming pattern - far more so than one loud hit during the ramp.</p></div><div class="canvas-box"><div class="cb-label">4. The structure&#039;s memory - the Felicity ratio</div><p class="cb-demo">Previous documented maximum test pressure: 1000 kPa. On this test, significant emission resumed at 800 kPa. Felicity ratio = 800 / 1000 = 0.80. Below 1.0, so the Kaiser effect has broken down: the vessel is emitting below a load it has already survived, which means damage has accumulated since. The acceptance threshold is NOT mine to invent - it is set by the governing standard for this class of structure, and 0.80 is compared against that.</p></div><div class="canvas-box"><div class="cb-label">5. The action - what has this established, and what has it not?</div><p class="cb-demo">ESTABLISHED: active, located damage at 1.70 m from sensor A, still growing at constant load, with a Felicity ratio of 0.80. NOT ESTABLISHED: how big it is. Acoustic emission locates and grades activity; it does not size. ACTION: send ultrasonics to that exact point on the seam to characterise and size the flaw, and set the re-test interval. Acoustic emission finds; the local methods measure.</p></div></div>
+
+<p>Read box 1 again, because it is the strangest sentence in this whole series. <em>She put nothing in.</em> Radiography, ultrasonics, dye penetrant, eddy current - every method so far sent energy into the part and read what came back. Here she applied a load and waited for the flaw to speak for itself. And because she was listening to the whole vessel at once, she did not have to guess where to look. It told her: 1.70 m from sensor A, and still talking while nothing was being asked of it. Let us take it apart.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>The method is called <strong>acoustic emission</strong>, and it is <em>passive</em>. It does not interrogate the structure; it listens for the elastic stress waves the structure releases itself when something inside it moves - a crack extending, a fibre breaking, plastic deformation, a leak. That single difference sets everything else:</p>
+<ul>
+<li><strong>What makes a flaw speak?</strong> Load does. A flaw that is not being stressed is completely silent, which is why acoustic emission is not something you do to an idle vessel - it is done during <strong>controlled stimulation</strong>, a planned, procedural proof or pressure test with ramps and holds. And the consequence is the thing worth carrying: this method finds flaws that are <em>active</em>. A large, stable flaw that is not growing may never make a sound.</li>
+<li><strong>Where did that come from?</strong> The wave reaches the nearer sensor first, and that head start locates it. Between two sensors, a source at the exact midpoint gives an arrival-time difference of zero; otherwise the offset from the midpoint is <em>v x delta-t / 2</em>, towards whichever sensor heard it first. Here: <em>3000 x 0.000200 / 2 = 0.30 m</em> towards A, so 2.00 - 0.30 = <strong>1.70 m from sensor A</strong>. Note what had to be true for that to mean anything - the wave speed was <em>measured on this vessel</em>, not looked up.</li>
+<li><strong>Does the structure remember?</strong> Bend a steel bar for the first time and it groans as its internal structure settles. Stop. Bend it again to exactly the same point - and this time it is silent, because it has already made every adjustment that load requires. The structure remembers its highest past stress. That silence on reloading has a name: the <strong>Kaiser effect</strong>. A sound structure emits nothing significant until you go beyond the load it has already survived.</li>
+<li><strong>Or is its memory broken?</strong> Now give that bar a small growing crack. Reload it, and the crack begins to open well <em>before</em> the old maximum. It groans early. Its memory has failed, because it is not the same bar any more. That is the <strong>Felicity effect</strong>, and you measure it with the <strong>Felicity ratio</strong>: the load at which significant emission resumes, divided by the previous documented maximum. Here <em>800 / 1000 = 0.80</em>. At 1.0 or above the Kaiser effect holds and the structure is behaving; below 1.0 it is speaking under a load it has already carried, and the lower the ratio the worse it is. Sit with what that means: <strong>you are not listening for noise, you are listening for silence - and the measurement is the exact load at which the silence breaks.</strong> One warning. The <em>acceptance threshold</em> for a Felicity ratio is not yours to invent; it is set by the governing standard for that class of structure, and your job is to compute the ratio and compare it against the value that standard states.</li>
+<li><strong>What kind of activity was it?</strong> Each hit carries <em>amplitude</em>, <em>counts</em> (threshold crossings), <em>duration</em>, <em>rise time</em> and <em>energy</em>. But no single hit decides anything. The <strong>pattern across the load cycle</strong> decides: emission that keeps coming during a constant-pressure <em>hold</em>, when nothing new is being asked of the vessel, is far more alarming than one loud burst during the ramp.</li>
+<li><strong>What if I am listening to the wind?</strong> Noise is the adversary - flow and hydraulic noise, mechanical rubbing, electrical interference, rain on the shell. Guard sensors, thresholds and filtering exist to reject it, and unrejected noise does not give you a vague result. It gives you a confident, precisely located, entirely fictitious flaw.</li>
+</ul>
+<p>Which leads to the rule that governs the whole method: <strong>acoustic emission finds; the local methods measure.</strong> It watches everything at once, in real time, and tells you <em>where</em> something is alive and <em>how</em> active it is. Then you send ultrasonics or radiography to that spot to characterise and size it.</p>
+<p>One honest boundary. You are learning to specify, witness and act on an acoustic emission test - to understand the report, challenge it, and direct what happens next. You are not learning to perform one, and you are not being certified to pass a structure on the strength of one. And the next action is <em>never</em> to size a flaw with this method.</p>
+<p>Does it scale? Radiography is photographing one branch to catalogue every knot and blemish on it; acoustic emission is putting your ear to the trunk while the wind blows, to hear which branch is actually creaking.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different vessel, monitored during a proof test. Two sensors 6.00 m apart along the seam. Wave speed measured on the structure: <strong>v = 5100 m/s</strong>. A significant burst arrives at sensor B <strong>200 microseconds</strong> before sensor A. The previous documented proof test went to <strong>2.5 MPa</strong>; on this test significant emission resumes at <strong>2.2 MPa</strong>.</p>
+<ol>
+<li><strong>Locate it.</strong> Compute the offset from the midpoint and state how far the source is from sensor B.</li>
+<li><strong>Read the memory.</strong> Compute the Felicity ratio and say in one sentence what it means about this vessel - and who decides whether that value is acceptable.</li>
+<li><strong>Separate the two lists.</strong> What has acoustic emission <em>established</em>? What has it <em>not</em> established?</li>
+<li><strong>Direct the next action.</strong> Name the method you would send, exactly where you would send it, and what you want back.</li>
+<li><strong>Guard the result.</strong> Name one noise source that could have produced that burst instead, and how you would rule it out.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> your step 3 must have something in the "not established" column. If you wrote down a flaw size, you used the wrong method to get it.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-stimulus">1. The stimulus - what will make a flaw speak?</label><textarea id="cb-stimulus" data-key="t-0131:stimulus" placeholder="State the planned, controlled load: the ramp, the hold, the limits. A flaw that is not being stressed makes no sound at all."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-locate">2. The array and the location - where did that come from?</label><textarea id="cb-locate" data-key="t-0131:locate" placeholder="Record the sensor spacing and the wave speed measured ON THIS STRUCTURE, then locate the source from the arrival-time difference."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-activity">3. The activity - what kind of sound was that?</label><textarea id="cb-activity" data-key="t-0131:activity" placeholder="Record amplitude, counts, duration and energy - then the pattern across the load cycle, which matters more than any single hit."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-memory">4. The structure&#039;s memory - the Felicity ratio</label><textarea id="cb-memory" data-key="t-0131:memory" placeholder="Divide the load at which significant emission RESUMED by the previous documented maximum load. Compare it against the value in the governing standard."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-action">5. The action - what has this established, and what has it not?</label><textarea id="cb-action" data-key="t-0131:action" placeholder="State plainly what the method found, what it cannot tell you, and where you are sending the follow-up."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now ask a structure which of its flaws are alive, instead of cataloguing all of them at ruinous cost.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>This method is powerful precisely because it is unlike the others, and that is also how it gets misused. Read these before you act on an acoustic emission report.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Sizing a flaw with it.</strong> Acoustic emission locates activity and grades it. It does not size. If a report gives you a flaw dimension derived from acoustic emission alone, that number was not measured - it was assumed.</p>
+<p>&bull; <strong>Reading silence as soundness.</strong> A large, stable, even critical flaw can be perfectly quiet, because nothing is moving. This method answers "what is active", not "what is there" - so it complements the local methods and never replaces them.</p>
+<p>&bull; <strong>Chasing ghosts.</strong> A test with poor noise rejection is worse than no test, because it produces a located, confident fiction and sends a crew to inspect a rubbing bracket. Always ask how noise was discriminated before you believe a location.</p>
+<p>&bull; <strong>Inventing the history.</strong> The Felicity ratio is a ratio to the previous maximum load, so it is meaningless without a documented, evidenced value for that load. "We think it went to about a thousand" is not a denominator.</p>
+<p>&bull; <strong>Damaging it to detect damage.</strong> The stimulus must stay within the design and procedural limits. Pushing harder to "make it talk" is not testing - and a structure that fails during its own examination has told you nothing you could use.</p>
+<p>&bull; <strong>Using a textbook wave speed.</strong> Speed varies with material, thickness, geometry and wave mode. A book value gives you a precise, confident, wrong location - and a crew scaffolded over the wrong metre of weld. Measure it on the structure.</p>
+<p>&bull; <strong>Judging by the loudest hit.</strong> One high-amplitude burst during a ramp may be nothing. A persistent low-amplitude stream during a constant-pressure hold is the one to act on. The pattern outranks the peak.</p>
+</div>
+</details>
+<p>Onalenna could not afford to catalogue every flaw in that vessel, and cataloguing them would not have answered her question anyway. Now you can ask the better one. Apply a controlled load, listen to the whole structure at once, locate what speaks, check whether the structure still remembers what it has already survived, and then send a measuring method to the exact place that answered you. You have finished this series with something quietly unusual: three ways of interrogating a structure, and the judgement to know which of them is honest about what it cannot see. If you are working with an AMU Facilitator, bring the inspection strategy for one real asset and see whether it has any way at all of telling you what is active.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can ask a structure what is alive.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

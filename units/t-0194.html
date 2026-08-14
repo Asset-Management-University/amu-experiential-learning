@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The saved litre that costs you money</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The saved litre that costs you money</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna. The twenty-year forecast puts demand past supply in year nine, and the report on your desk recommends a new abstraction and treatment scheme.</p>
+<p>You do not disagree with the forecast. What stops you is the other number: <strong>Corathyl loses 34 per cent of everything it produces</strong>, and nobody has costed getting that back before costing the new works.</p>
+<p>So you do the arithmetic, and two things come out of it. The first is that fixing the losses and running an efficiency programme would together free <strong>almost 18 per cent of system input</strong> - years of headroom, for a fraction of the capital.</p>
+<p>The second is stranger, and you cannot stop looking at it. Of the three things you costed, <em>two make money and one loses it</em>. And when you check the last decade of plans, the two that make money have been tried repeatedly. The one that loses money has been in every plan and has never once happened.</p>
+<blockquote><h2>Everyone calls all three of these demand management. Why does the utility keep doing two of them and never the third - and how do I write a strategy that survives that?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> System input is <strong>12,400 Ml</strong> a year and <strong>34 per cent</strong> of it — <strong>4,216 Ml</strong> — is never invoiced. Of that, <strong>2,700 Ml</strong> physically leaks away and <strong>1,516 Ml</strong> is delivered and used but never billed, which leaves <strong>8,184 Ml</strong> billed at <strong>R9.80</strong> a kilolitre. Recovering enough of that would defer building for years, for a fraction of the capital. Then the strange part: of the three things you costed, <strong>two make money and one loses it</strong> — and a decade of plans shows the two that make money attempted repeatedly, while the one that loses money has been in every plan and <strong>never once happened.</strong> Write down why, and what strategy would survive it — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the sign nobody put on the page</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Push harder on the third one — put it top of the plan.&rdquo;</strong> It has been top of the plan for a decade. Priority is not the constraint; something is defeating it every year after the plan is written, and until you can name that, promoting it again changes nothing.</p>
+<p>&bull; <strong>&ldquo;People are not committed to conservation.&rdquo;</strong> A description dressed as a cause, and it blames individuals for a pattern that is perfectly regular across ten years and several sets of people. Regular patterns usually have structural explanations.</p>
+<p>&bull; <strong>&ldquo;Do the two that pay — they release the volume anyway.&rdquo;</strong> Defensible for several years and it is the decision the organisation has already been making silently. Worth noticing that you would be ratifying an outcome nobody chose.</p>
+<p>&bull; <strong>&ldquo;Set a single target for total demand reduction.&rdquo;</strong> One target over three activities with opposite signs guarantees the easy profitable ones are used to hit it, and the third disappears inside an aggregate that looks satisfied.</p>
+<p>&bull; <strong>&ldquo;Build the new capacity — it is simpler.&rdquo;</strong> Spends capital to produce water you are already producing and failing to deliver or bill, and the losses continue at the new higher volume.</p>
+<p>&bull; Separate the three, because they have <strong>opposite financial signs</strong> and one name has been hiding it. What <strong>physically escapes</strong> was produced and never delivered; what is <strong>delivered and used but never invoiced</strong> — under-registering meters, meters unread, records that do not match connections, unauthorised connections — was produced <em>and</em> delivered; and what is <strong>correctly billed</strong> is a customer using water they pay for. Now look at the money. Recovering the first two turns produced water into revenue, so both <strong>pay for themselves</strong>. Reducing the third <strong>reduces the bill it was meant to reduce</strong> — it is the only one that costs the utility money to succeed at, which is exactly why it never survives a budget round, in any year, under any manager. Naming that plainly is the strategy's real work: <strong>an intention that runs against your own incentives must be protected explicitly, or it will not happen however sincerely it is written down.</strong> Then match the instruments to the kinds rather than to the name, and compare the whole against the cost of building — because releasing existing volume is usually years of headroom for a fraction of the capital.</p>
+</div>
+</details>
+<p>Here is the strategy that answers it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the demand management strategy - the three kinds of demand, what each one releases, which instrument acts on which, the money, and the comparison against building.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Separate the three kinds of demand - they have opposite financial signs</div><p class="cb-demo">EVERYTHING A UTILITY PUTS INTO ITS NETWORK ENDS UP IN ONE OF THREE PLACES, AND A DEMAND STRATEGY THAT DOES NOT SEPARATE THEM WILL QUIETLY DO ONLY THE EASY PARTS. FIRST, REAL LOSSES - water that physically leaves the system through leaks, bursts and overflows. It was produced and never delivered to anyone. SECOND, APPARENT LOSSES - water that was delivered and used, but never invoiced: under-registering meters, meters not read, billing records that do not match connections, and unauthorised connections. THIRD, GENUINE CONSUMPTION - water delivered, used and correctly billed, which a customer could use less of. The first two together are what the industry calls NON-REVENUE WATER, and it is not a marginal problem: TODAY BETWEEN 25 AND 50 PER CENT OF ALL DISTRIBUTED WATER GLOBALLY IS LOST OR NEVER INVOICED, THROUGH LEAKAGE, INACCURATE BILLING, INCORRECT METERING, ILLEGAL CONNECTIONS, DETERIORATING INFRASTRUCTURE AND POOR PRESSURE MANAGEMENT. AT CORATHYL THE SYSTEM INPUT IS 12,400 Ml A YEAR AND NON-REVENUE WATER IS 34 PER CENT - 4,216 Ml - which sits squarely inside that range. OF THAT, REAL LOSSES ARE 2,700 Ml AND APPARENT LOSSES ARE 1,516 Ml. BILLED CONSUMPTION IS THEREFORE 8,184 Ml, WHICH AT R9.80 A KILOLITRE IS R80.2 MILLION OF REVENUE. Production costs R3.20 a kilolitre. WRITE THE THREE NUMBERS DOWN SEPARATELY BEFORE YOU DESIGN ANYTHING, because the moment they are added together into one figure called &#039;water we could save&#039;, the strategy is already broken - and the next box shows why.</p></div><div class="canvas-box"><div class="cb-label">2. Size each one - the volume it releases, and what that volume is worth</div><p class="cb-demo">NOW PUT A VOLUME AND A DIRECTION OF MONEY AGAINST EACH ONE, AND THE PICTURE STOPS BEING COMFORTABLE. MEASURE A - CUT REAL LOSSES BY 30 PER CENT. That is 810 Ml a year no longer leaking away. But that water was never sold to anybody, so recovering it does not add a cent of revenue; the gain is the cost of producing it. AT R3.20 A KILOLITRE THAT IS R2.59 MILLION SAVED. MEASURE B - CUT APPARENT LOSSES BY HALF. That is 758 Ml a year that is already being produced, already being delivered and already being used, and which now appears on an invoice. AT R9.80 A KILOLITRE THAT IS R7.43 MILLION OF NEW REVENUE, and no additional water is treated to earn it. MEASURE C - CUT HOUSEHOLD CONSUMPTION BY 8 PER CENT THROUGH EFFICIENCY AND BEHAVIOUR. That is 655 Ml a year the utility no longer sells. IT SAVES R2.10 MILLION OF PRODUCTION COST AND LOSES R6.42 MILLION OF REVENUE: A NET LOSS OF R4.32 MILLION. LOOK AT WHAT YOU HAVE JUST WRITTEN DOWN. ALL THREE ARE CALLED DEMAND MANAGEMENT. B EARNS R7.43 MILLION AND C LOSES R4.32 MILLION, AND IN MOST STRATEGY DOCUMENTS THEY SIT IN THE SAME PARAGRAPH UNDER THE SAME HEADING WITH THE SAME PROGRAMME NAME. That is why the metering work always happens and the conservation work always stalls, and why nobody can ever quite explain the pattern. THE VOLUMES, MEANWHILE, ARE THE REASON TO DO ALL THREE: TOGETHER THEY FREE 2,223 Ml - 17.9 PER CENT OF SYSTEM INPUT - and that is water you do not have to build anything to obtain.</p></div><div class="canvas-box"><div class="cb-label">3. Match each intervention to the kind of demand it actually addresses</div><p class="cb-demo">NOW CHOOSE THE INSTRUMENTS, AND CHOOSE THEM AGAINST THE KIND OF DEMAND THEY ACTUALLY ACT ON. FOR REAL LOSSES, THE EVIDENCE IS SPECIFIC: A COMBINATION OF PRESSURE MANAGEMENT, ACTIVE DETECTION AND REPAIR, AND PIPELINE REPLACEMENT IS THE EFFECTIVE ANSWER - and pressure management is usually the cheapest of the three, because leakage rises with pressure and much of a network runs at more pressure than it needs overnight. ONE DOCUMENTED CASE USED SENSORS TO ADJUST PRESSURE TO REAL-TIME DEMAND AND CUT ENERGY CONSUMPTION BY 32 PER CENT AND WATER LOSSES BY 3.3 PER CENT WITHIN MONTHS. FOR APPARENT LOSSES THE INSTRUMENTS ARE ADMINISTRATIVE, NOT CIVIL: meter testing and replacement programmes, reconciling the connection register against the billing register, reading routes that are actually walked, and a lawful route for unauthorised connections to become authorised ones. NOTE THAT NONE OF THAT IS ENGINEERING, WHICH IS PRECISELY WHY IT IS SO OFTEN LEFT UNOWNED IN A DOCUMENT WRITTEN BY ENGINEERS. FOR GENUINE CONSUMPTION THE INSTRUMENTS ARE TARIFF DESIGN, EFFICIENT FITTINGS AND APPLIANCES, RETROFIT AND REBATE SCHEMES, EDUCATION, AND RESTRICTIONS ON THE HIGHEST-DISCRETION USES. AND HERE IS THE MISMATCH TO WATCH FOR, BECAUSE IT IS THE MOST COMMON FAILURE IN THIS WHOLE FIELD: A UTILITY LOSING A THIRD OF ITS WATER TO LEAKS AND BAD METERING RUNS A PUBLIC CAMPAIGN ASKING HOUSEHOLDS TO TAKE SHORTER SHOWERS. The campaign is cheap, visible and popular. It is also aimed at the one third of the problem that costs the utility money to solve, while the two thirds that would have paid for it go untouched - AND ASKING CUSTOMERS TO SAVE WATER YOU ARE LOSING YOURSELF IS THE FASTEST WAY TO LOSE THE STANDING TO ASK THEM ANYTHING.</p></div><div class="canvas-box"><div class="cb-label">4. Face the revenue arithmetic honestly - and design the tariff alongside the strategy</div><p class="cb-demo">THIS IS THE BOX THE FAILED STRATEGIES LEAVE OUT, AND LEAVING IT OUT IS WHY THEY FAILED. SAY IT PLAINLY IN THE DOCUMENT: A MEASURE THAT REDUCES CONSUMPTION ALSO REDUCES REVENUE. THIS IS NOT A FAILURE OF CONSERVATION; IT IS A FAILURE OF A TARIFF THAT IS NOT DESIGNED FOR IT. AN EFFECTIVE STRATEGY FACES THIS ARITHMETIC HONESTLY. IT DESIGNS THE TARIFF STRUCTURE SO THE UTILITY IS REWARDED FOR ACHIEVING CONSERVATION, NOT PUNISHED BY IT. THE FINANCIAL LOSS IS THE PROBLEM YOUR STRATEGY IS BUILT TO SOLVE. AT CORATHYL THE SOLUTION IS ALREADY SITTING IN BOX 2: MEASURE A SAVES R2.59 MILLION, MEASURE B EARNS R7.43 MILLION AND MEASURE C COSTS R4.32 MILLION, SO THE PACKAGE NETS R5.70 MILLION POSITIVE WHILE FREEING 17.9 PER CENT OF SYSTEM INPUT. THE PROFITABLE HALF PAYS FOR THE UNPROFITABLE HALF - BUT ONLY IF THEY ARE FUNDED AS ONE PACKAGE WITH ONE BUDGET AND ONE OWNER. Split them and the profitable half will be delivered, banked, and reported as a success, and the other half will be in next year&#039;s plan again. THE TARIFF INSTRUMENTS THAT MAKE THIS DURABLE: recovering the fixed cost of the network through a fixed charge rather than entirely through volume, so that selling less water does not dismantle the utility&#039;s ability to maintain the network; a rising block structure so that the highest-discretion use carries the highest rate; and DYNAMIC OR SEASONAL TARIFFS, WHICH ARE HIGHER WHEN USAGE IS HIGH AND LOWER OFF-PEAK, AND WHICH HELP UTILITIES REDUCE OPERATING COSTS BY PREVENTING OVER-INVESTMENT IN FACILITIES BUILT ONLY TO MEET PEAK DEMAND. NOW DESIGNING FOR EQUITY, WHICH IS NOT AN ADDENDUM TO THIS BOX BUT PART OF ITS ARITHMETIC. A TARIFF&#039;S FIRST PURPOSE IS TO FUND THE SERVICE. ITS SECOND IS TO DO SO FAIRLY. A DEMAND MANAGEMENT STRATEGY MUST ENSURE THAT THE COST OF SUSTAINABILITY DOES NOT FALL ON THOSE LEAST ABLE TO BEAR IT. YOUR STRATEGY MUST CONSIDER MEASURES LIKE A FREE BASIC WATER ALLOCATION OR A LIFELINE TARIFF TO PROTECT VULNERABLE HOUSEHOLDS WHILE STILL ENCOURAGING EFFICIENCY FROM HIGH-VOLUME USERS. A STRATEGY WITHOUT THIS CONSIDERATION IS INCOMPLETE. And be careful with two specific traps: A RISING BLOCK TARIFF READS HOUSEHOLD SIZE AS EXTRAVAGANCE, so a large household on one connection is charged as though it were a wasteful small one; and a rebate on efficient fittings is claimed by the people who can afford the fitting, which means a scheme funded by everyone is enjoyed by some. Say which households your instruments protect, and how you will know whether they were protected.</p></div><div class="canvas-box"><div class="cb-label">5. Compare against building, and state honestly what is deferred rather than avoided</div><p class="cb-demo">FINALLY, PUT THE STRATEGY BESIDE THE THING IT IS COMPETING WITH, BECAUSE THAT IS THE ONLY COMPARISON THE DECISION-MAKER ACTUALLY FACES. THE EVIDENCE IS FAVOURABLE AND YOU SHOULD USE IT: REDUCING NON-REVENUE WATER IS USUALLY MORE COST-EFFECTIVE THAN INCREASING WATER SUPPLY. AT CORATHYL THE THREE MEASURES FREE 2,223 Ml A YEAR AGAINST A FORECAST WHERE DEMAND OVERTAKES SUPPLY IN YEAR NINE, AND ON THAT FORECAST&#039;S OWN GROWTH RATE THEY PUSH THE CROSSING POINT OUT BY SEVERAL YEARS FOR A FRACTION OF THE CAPITAL OF A NEW ABSTRACTION AND TREATMENT SCHEME. STATE THE COMPARISON IN THE UNITS THE COUNCIL WILL ARGUE IN: RANDS OF CAPITAL, RANDS A YEAR OF OPERATING COST, MEGALITRES RELEASED, AND YEARS BOUGHT. AND NOW BE HONEST ABOUT WHAT YOU HAVE BOUGHT, BECAUSE THIS IS WHERE CREDIBLE STRATEGIES ARE DISTINGUISHED FROM POPULAR ONES. YOU HAVE BOUGHT YEARS, NOT A PERMANENT ANSWER. Demand management defers augmentation; only in a system whose demand has genuinely stopped growing does it avoid it. If your document implies otherwise, the first year the crossing point reappears will be the year everybody stops believing anything else in it. AND SAY WHAT HAPPENS IF IT ONLY PARTLY WORKS - because leakage reduction that is not maintained decays back, and behaviour change relaxes when a drought ends. STATE THE HOLDING CONDITION: WHAT ONGOING SPEND KEEPS THE SAVING, AND WHAT TRIGGER REOPENS THE AUGMENTATION DECISION. A saving you stop paying to hold is a saving you have already lost, and the worst outcome available here is a utility that deferred a scheme on the strength of a saving it then let decay.</p></div></div>
+
+<p>Box 4 is the one that failed strategies leave out. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>The cheapest litre is the one you never have to supply - but not every saved litre is worth the same, and two of them are worth opposite things.</strong> Five questions:</p>
+<ul>
+<li><strong>What kind of demand is this?</strong> <strong>Real losses, apparent losses, genuine consumption.</strong> Three different causes, three different owners, and they do not point the same way financially.</li>
+<li><strong>What does each one release, and what is that worth?</strong> <strong>Volume and money, separately.</strong> A litre you never sold is worth at least its production cost. A litre you sold but never invoiced is worth the tariff. A litre a customer stops buying is worth less than nothing.</li>
+<li><strong>Which instrument acts on which?</strong> <strong>Pressure, detection and replacement for leaks; metering and billing integrity for the unbilled; tariff, retrofit and education for consumption.</strong> Most organisations aim consumption measures at a losses problem.</li>
+<li><strong>Who pays for the half that costs money?</strong> <strong>The tariff, designed alongside the strategy - and designed so it does not fall on the poorest.</strong></li>
+<li><strong>What has this actually bought?</strong> <strong>Years, at a stated cost, with a stated holding condition.</strong> Deferral, not avoidance.</li>
+</ul>
+<p><strong>The arithmetic that explains a decade of unexplained behaviour.</strong> Three measures at Corathyl. Cutting <strong>real losses</strong> by 30 per cent frees 810 Ml and saves <strong>R2.59 million</strong> of production cost - water that was never sold, so there is no revenue in it. Cutting <strong>apparent losses</strong> by half puts 758 Ml of already-produced, already-delivered water onto an invoice: <strong>R7.43 million of new revenue</strong>, for no extra treatment. Cutting <strong>consumption</strong> by 8 per cent frees 655 Ml, saves R2.10 million of production cost and loses R6.42 million of revenue: <strong>a net loss of R4.32 million</strong>. Together they free <strong>2,223 Ml - 17.9 per cent of system input</strong>. <em>One programme name. Three financial signs. That is the whole mystery of the plans that never happened.</em></p>
+<p><strong>Say the uncomfortable part out loud, because hiding it is what kills these programmes.</strong> A measure that reduces consumption also reduces revenue. <em>This is not a failure of conservation; it is a failure of a tariff that is not designed for it.</em> An effective strategy faces this arithmetic honestly. It designs the tariff structure so the utility is rewarded for achieving conservation, not punished by it. <strong>The financial loss is the problem your strategy is built to solve</strong> - and at Corathyl it is solvable out of the strategy's own pocket, because A saves R2.59 million, B earns R7.43 million and C costs R4.32 million, so the package nets <strong>R5.70 million positive</strong>. But only if the three are funded together, as one package, with one budget and one owner. Split them and you will deliver the profitable half, bank it, report a success, and put the rest in next year's plan.</p>
+<p><strong>Designing for equity, which is part of the arithmetic and not a paragraph at the end.</strong> A tariff's first purpose is to fund the service. Its second is to do so fairly. A demand management strategy must ensure that the cost of sustainability does not fall on those least able to bear it. Consider measures like <strong>a free basic water allocation or a lifeline tariff</strong> to protect vulnerable households while still encouraging efficiency from high-volume users. A strategy without this consideration is incomplete. And know what your instruments do by default: a rising block tariff reads <em>household size</em> as extravagance, so nine people sharing one connection are charged as though they were a wasteful household of three; and a rebate on efficient fittings is claimed by those who can already afford the fitting.</p>
+<p>One honest boundary. You <em>build the strategy</em>. You do not set the tariff - that is a political decision made by people who answer to voters - and you do not decide whether the community should use less water. What your work does is make an honest, effective tariff <em>possible</em>, by putting the real arithmetic in front of the people who decide.</p>
+<p>Does it scale? Anyone running a business knows the difference between cutting waste, collecting a debt, and asking a customer to buy less. All three reduce what leaves the building. Only two of them are things you would ever volunteer for - and the third is exactly the one everybody has agreed is the right thing to do.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A small coastal town lives on seasonal tourism. You are its asset manager. <strong>Its network is in good condition</strong> - the losses everybody at Corathyl was worrying about barely exist here. The problem is a different shape entirely.</p>
+<table>
+<tr><th>Element</th><th>Figure</th></tr>
+<tr><td>Off-season demand</td><td>4.0 Ml a day, for about 42 weeks of the year</td></tr>
+<tr><td>Peak season demand</td><td>10.0 Ml a day, for about 10 weeks - 250 per cent of off-season</td></tr>
+<tr><td>Treatment capacity</td><td>10.5 Ml a day</td></tr>
+<tr><td>Annual volume supplied</td><td>1,876 Ml</td></tr>
+<tr><td>Annual plant utilisation</td><td>49 per cent of what the plant could produce</td></tr>
+<tr><td>Real losses</td><td>12 per cent</td></tr>
+<tr><td>Apparent losses</td><td>3 per cent - metering and billing are sound</td></tr>
+<tr><td>Peak demand growth</td><td>4 per cent a year</td></tr>
+<tr><td>Permanent residents</td><td>Lower average household income than the seasonal visitors</td></tr>
+<tr><td>On the table</td><td>A capacity upgrade, because peak exceeds capacity in year three</td></tr>
+</table>
+<ol>
+<li><strong>Split the demand.</strong> Size the three kinds and say what each would release. What is the honest verdict on the leak programme here?</li>
+<li><strong>Name the real problem.</strong> It is not the volume of water this town uses. Say precisely what the utility is actually buying capacity for.</li>
+<li><strong>Choose the instruments.</strong> Which of them act on the real problem, and which are simply the ones you learned at Corathyl?</li>
+<li><strong>The money.</strong> Who pays for this, and who currently pays for the idle nine months? Is that the same group?</li>
+<li><strong>The equity question.</strong> A seasonal tariff that suppresses peak demand falls on whom, and what protects the permanent residents?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, step 1 should kill the reflex. Losses are 12 per cent - about <strong>225 Ml a year</strong>, and on the peak day only 1.2 Ml. Recovering <em>every drop of it, perfectly, which nobody has ever done</em>, drops the peak day to 8.8 Ml and buys <strong>three extra years</strong> before capacity is exceeded. It is worth doing, it is cheap, and <em>it is not the answer</em>. A learner who arrives with the Corathyl answer has learned a technique instead of a way of thinking.</p>
+<p>Second, the real problem is <strong>the shape of the demand, not its size</strong>. The town is buying and maintaining 10.5 Ml a day of capacity to serve 4.0 Ml a day for forty-two weeks. The plant runs at 49 per cent utilisation for the year. <em>It is not a water problem. It is a peak problem</em>, and every rand of that upgrade is being spent on ten weeks.</p>
+<p>Third, the instruments follow from that, and the evidence points straight at them: <strong>dynamic or seasonal tariffs, which are higher when usage is high and lower off-peak, help utilities reduce operating costs by preventing over-investment in facilities built only to meet peak demand.</strong> Add storage that fills off-peak, restrictions on the highest-discretion peak uses, and efficiency requirements on the accommodation sector where the peak actually comes from. A general campaign asking everyone to use less water all year misses by ten weeks and forty-two.</p>
+<p>Fourth - and this is the step most answers skip - <strong>the peak users and the permanent payers are not the same people</strong>. The capacity exists for visitors; the standing cost of it sits in a tariff paid year-round by residents who earn less than the visitors do. That makes the seasonal tariff an <em>equity instrument as much as a demand one</em>, provided it is designed so the higher rate lands in the peak weeks and on high-volume use, with a free basic allocation or a lifeline block protecting the permanent household. Get that backwards - a flat rise for everyone - and you will have made the residents pay more to suppress a peak they did not create.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-separate_the_three">1. Separate the three kinds of demand - they have opposite financial signs</label><textarea id="cb-separate_the_three" data-key="t-0194:separate_the_three" placeholder="Split what you supply into real losses, apparent losses and genuine consumption. Different causes, different owners, and one of them earns money while another one costs it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-size_what_each_releases">2. Size each one - the volume it releases, and what that volume is worth</label><textarea id="cb-size_what_each_releases" data-key="t-0194:size_what_each_releases" placeholder="For each of the three, work out how much water a realistic programme would free, and then what that water is worth in money. Do not assume a saved litre is worth the tariff."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-match_intervention_to_kind">3. Match each intervention to the kind of demand it actually addresses</label><textarea id="cb-match_intervention_to_kind" data-key="t-0194:match_intervention_to_kind" placeholder="Choose interventions against the specific kind they act on. Most organisations apply consumption measures to what is really a losses problem, then wonder why nothing moves."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-face_the_revenue_and_design_the_tariff">4. Face the revenue arithmetic honestly - and design the tariff alongside the strategy</label><textarea id="cb-face_the_revenue_and_design_the_tariff" data-key="t-0194:face_the_revenue_and_design_the_tariff" placeholder="State plainly which measures earn and which cost. Then design the tariff so the utility is rewarded for conservation rather than punished by it - and so the cost does not fall on the poorest."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-compare_and_state_the_deferral">5. Compare against building, and state honestly what is deferred rather than avoided</label><textarea id="cb-compare_and_state_the_deferral" data-key="t-0194:compare_and_state_the_deferral" placeholder="Set the strategy against the supply scheme it competes with. Say what it buys in years, at what cost, and what happens if it only partly works."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now build a demand management strategy that survives its own arithmetic.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Demand strategies fail quietly, in the budget, a year after they are approved.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>One number called "water we could save".</strong> The moment the three kinds are added together, the strategy will do the profitable parts and report the total.</p>
+<p>&bull; <strong>Assuming a saved litre is worth the tariff.</strong> A litre recovered from a leak was never sold. It is worth <em>at least</em> its production cost (at Corathyl, a third of the tariff), and often more once other avoided costs like abstraction charges are counted.</p>
+<p>&bull; <strong>Consumption measures aimed at a losses problem.</strong> Asking customers to save water you are losing yourself is the fastest way to lose the standing to ask them anything.</p>
+<p>&bull; <strong>Hiding the revenue effect of conservation.</strong> It will be discovered in the first budget cycle, by someone who now distrusts the whole document.</p>
+<p>&bull; <strong>No tariff design alongside the strategy.</strong> Then success reduces income, the finance department is right to resist it, and the programme dies without anyone opposing it.</p>
+<p>&bull; <strong>Funding the three measures separately.</strong> The profitable one gets delivered, the package gets called a success, and the rest returns next year.</p>
+<p>&bull; <strong>A rising block tariff with no lifeline.</strong> It reads household size as extravagance and charges the poorest for being many.</p>
+<p>&bull; <strong>Rebates without reach.</strong> A scheme funded by every customer and claimed only by those who can afford the fitting.</p>
+<p>&bull; <strong>Comparing against nothing.</strong> Demand management has to be costed against the scheme it is competing with, in capital, operating cost, megalitres and years.</p>
+<p>&bull; <strong>Calling deferral avoidance.</strong> You bought years. The year the crossing point reappears, everything else in the document stops being believed.</p>
+<p>&bull; <strong>No holding condition.</strong> Leakage reduction decays and behaviour relaxes. A saving you stop paying to hold is one you have already lost - and you deferred a scheme on the strength of it.</p>
+</div>
+</details>
+<p>Onalenna had one programme name covering three different things. Separate real losses, apparent losses and genuine consumption before you design anything, because they have different causes, different owners and opposite financial signs; size what each one releases in volume and in money, and do not assume a saved litre is worth the tariff; match each instrument to the kind of demand it actually acts on, since aiming a public campaign at a leaking network is the most common failure in this field; then face the revenue arithmetic in the open - a measure that reduces consumption also reduces revenue, which is not a failure of conservation but of a tariff that was not designed for it - and design that tariff alongside the strategy, with a free basic allocation or a lifeline block so the cost of sustainability does not land on those least able to carry it. Finally, put the whole thing beside the scheme it is competing with and say honestly what it bought: years, at a stated cost, with a stated condition for holding them. <strong>The cheapest litre is the one you never have to supply. Just be clear which litre you are talking about, because one of them earns you money and one of them costs you money, and until your strategy says which is which, only one of them will ever happen.</strong> If you are working with an AMU Facilitator, take your organisation's current demand or efficiency programme and sort every measure in it into the three kinds. Then check which ones have actually been delivered.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build a demand management strategy now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

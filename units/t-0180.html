@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ninety sensors and nine thousand nodes</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Ninety sensors and nine thousand nodes</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and you have built a digital twin before. It was for a single pump set, and it worked beautifully - every bearing temperature, every flow, every vibration that mattered had an instrument on it, and the twin simply showed you what was true.</p>
+<p>Now the municipality has asked you to specify a digital twin for the town's water distribution network. <strong>850 km of mains. 62,000 connections. 18 pressure zones. A hydraulic model with 9,500 nodes.</strong></p>
+<p>So you start costing what you know how to do. An installed pressure logger is about <strong>R18,500</strong>. Instrumenting every node comes to <strong>R175,750,000</strong>, against a capital allocation of roughly <strong>R4 million</strong> - <em>forty-five times the money</em>. You stop before you finish the spreadsheet.</p>
+<p>Your instinct is that the project is impossible at this scale.</p>
+<p>It is not. You are being asked for a <em>different kind of thing</em>, and you have not noticed yet.</p>
+<blockquote><h2>I can afford ninety sensors for nine thousand five hundred nodes. What am I actually designing, and how do I specify it so that the people who build it build the right thing?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The network has about <strong>9,500 nodes</strong>. You started costing instrumentation at roughly R18,500 a node and stopped partway through the spreadsheet, because the total was heading past <strong>R175 million</strong> against a capital allocation of about <strong>R4 million</strong> — some forty-odd times the money. What you can afford is around <strong>90 pressure loggers</strong>. Meanwhile three people want three different things from this: one wants to locate leaks within minutes, one wants to manage pressure by zone, one wants a renewal list once a year. Your instinct is that the project is impossible at this scale. Write down what you would actually specify — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the sentence the whole specification turns on</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Tell them it cannot be done for the money.&rdquo;</strong> True of the thing you were costing and false of the thing being asked for. You would be declining a project on the basis of a specification nobody wrote.</p>
+<p>&bull; <strong>&ldquo;Do one zone properly as a pilot.&rdquo;</strong> Sensible-sounding, and it answers none of the three questions — a well-instrumented one per cent tells you about that one per cent, and the decisions are all network-wide.</p>
+<p>&bull; <strong>&ldquo;Ask for more money.&rdquo;</strong> Forty-fold. That is not a budget you argue for; it is a budget nobody would ever approve, and asking spends credibility you will need for the thing that is affordable.</p>
+<p>&bull; <strong>&ldquo;Put the ninety loggers where access is easiest and start collecting.&rdquo;</strong> Guarantees the sensors answer whichever question their locations happen to suit — which is to say, none of the three deliberately.</p>
+<p>&bull; <strong>&ldquo;Buy the platform and let the vendor work it out.&rdquo;</strong> Hands over the one judgement that is genuinely yours. Untold, a builder will build the kind that <em>reflects</em> — because that is the normal kind — and you will get a confident-looking picture of 9,500 nodes based on 90.</p>
+<p>&bull; Here is what you have not noticed: you are being asked for <strong>a different kind of thing.</strong> Fed by dense measurement, such a model <strong>reflects</strong> a system; fed by ninety sensors across 9,500 nodes it must <strong>infer</strong> it — and inference is a different object with different obligations. So <strong>write that down and put the number on it</strong>: 90 of 9,500 is <strong>under one per cent observed</strong>, and everything downstream depends on that sentence, including whether the builder builds the right thing. Then design <strong>from the decisions rather than from completeness</strong>, and notice that your three are genuinely incompatible — locating a leak wants fine resolution and minutes; managing pressure wants zones and hours; prioritising renewal wants attributes and a year. <strong>Those are three instruments wearing one name</strong>, so rank them, and specify the fidelity, resolution and update rate for each — including where the ninety go, which follows from the ranking and not from where access is easy. And last, the thing that makes an inferring model safe to act on: <strong>require it to show where it is confident and where it is guessing</strong>, or a plausible inference will be read as a measurement.</p>
+</div>
+</details>
+<p>Here is the specification that answers it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the portfolio twin specification - what it is for, what it actually is, what feeds it, where the few sensors go, and how honest it is required to be.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Start from the decisions - and accept that they need different fidelity</div><p class="cb-demo">NAME THE DECISIONS FIRST, AND RANK THEM. A portfolio twin that tries to answer every question at once answers none of them well, because the questions want different things from it. LEAK LOCALISATION needs high spatial resolution and updates every few minutes. PRESSURE MANAGEMENT needs zone-level resolution and updates hourly. RENEWAL PRIORITISATION needs pipe-level attributes and updates once a year. CAPACITY PLANNING needs demand scenarios, not live state at all. Those are four different instruments wearing one name. So rank them - here: 1. leak localisation, 2. pressure management, 3. renewal prioritisation - and SPECIFY THE FIDELITY, SPATIAL RESOLUTION AND UPDATE RATE FOR EACH. Everything that follows in this specification is downstream of this ranking, including where the sensors go. A twin designed without a ranked decision list is designed to somebody&#039;s idea of completeness, and completeness is not affordable.</p></div><div class="canvas-box"><div class="cb-label">2. State what this twin actually is - a model that INFERS, not a mirror that reflects</div><p class="cb-demo">THIS IS THE SENTENCE THE WHOLE SPECIFICATION TURNS ON, SO WRITE IT DOWN AND PUT A NUMBER ON IT. The network has 9,500 MODEL NODES. The affordable instrumentation is 90 PRESSURE LOGGERS. That is 0.95 PER CENT OF NODES - ONE MEASUREMENT PER 106 NODES, or 5 loggers per pressure zone across 18 zones. SO 99 PER CENT OF WHAT THIS TWIN TELLS ANYONE IS COMPUTED, NOT OBSERVED. A single-asset twin can be instrumented until it largely REFLECTS measurement, and its model refines what the sensors say. A portfolio twin is the other way round: THE MEASUREMENTS CONSTRAIN THE MODEL, and the model estimates pressures at the nodes that have no sensor on them. That is not a compromise, it is the design - inferring the unmeasured from the measured is the entire job. Specify the class of model that does the inferring - here, A CALIBRATED HYDRAULIC NETWORK MODEL - and stop pretending the sensor count is a budget problem. It is a fact about what kind of thing you are building.</p></div><div class="canvas-box"><div class="cb-label">3. Specify the data sources - and the rule for when they disagree</div><p class="cb-demo">A PORTFOLIO TWIN IS FED BY SOURCES THAT NOBODY DESIGNED TO WORK TOGETHER, so the specification must say how they are joined. For each source: OWNER, FORMAT, UPDATE RATE, SPATIAL RESOLUTION, KNOWN RELIABILITY. Telemetry from the loggers and flow meters (operations, minutes, point). The ASSET REGISTER - diameter, material, age (asset management, on change, pipe). The NETWORK MODEL geometry (planning, on revision, node). CUSTOMER METER readings (revenue, monthly, connection). WORK ORDERS - repairs, valve operations (maintenance, daily). Then THE PART THAT IS ALWAYS LEFT OUT: A MASTERSHIP RULE PER FACT, and a resolution process. THE CONFLICT WILL HAPPEN. The asset register says a trunk main is 300 mm ductile iron. The model will only calibrate if that same pipe behaves like a 250 mm pipe of much higher roughness. Customer complaints in that zone report low pressure. WHICH ONE IS MASTER - the as-built record, the calibrated model, or the reported reality? Write the rule: the CALIBRATED MODEL is master for hydraulic behaviour; the ASSET REGISTER is master for physical attributes; AND A DISAGREEMENT RAISES A WORK ORDER TO FIELD-VERIFY THE PIPE - because a model that fits by pretending a pipe is something it is not has hidden a real defect, probably a partially closed valve or a collapsed lining. A twin with no mastership rule does not have a data problem. It has an argument, every week, that nobody is empowered to settle.</p></div><div class="canvas-box"><div class="cb-label">4. Place the few sensors where they most constrain the model</div><p class="cb-demo">THIS IS THE REAL DESIGN ACT, AND IT IS THE ONE MOST OFTEN DELEGATED TO WHOEVER INSTALLS THE KIT. With one measurement per 106 nodes, WHERE those 90 loggers sit determines how much of the network the model can actually see. Place them WHERE THEY MOST REDUCE UNCERTAINTY IN THE DECISIONS FROM BOX 1: at ZONE BOUNDARIES and inlets, so each zone&#039;s inflow and head are constrained; at HYDRAULIC EXTREMITIES - the highest and furthest points, where pressure is lowest and where the model&#039;s error is largest; at points of HIGH SENSITIVITY, where a small modelling error produces a large pressure difference; and at HIGH-CONSEQUENCE nodes such as the clinic, the school and the reservoir feed. The 24 FLOW METERS go on the zone inlets, because a zone whose inflow is unmeasured cannot be mass-balanced and leakage in it cannot be estimated at all. AND WRITE DOWN WHAT YOU ARE REFUSING: not on the chamber beside the depot because the access is good; not clustered where the network is already well understood. LEFT UNSPECIFIED, SENSORS MIGRATE TO CONVENIENCE, and you end up with 90 measurements of the part of the network you never had to ask about.</p></div><div class="canvas-box"><div class="cb-label">5. Calibrate across varied conditions, hold data back to validate, and declare the uncertainty</div><p class="cb-demo">CALIBRATE ON TIME SERIES ACROSS MULTIPLE DAYS OF DIFFERENT HYDRAULIC FUNCTIONING - inflow, pressure and tank level over high and low demand, weekday and weekend, one pump set running and two - NOT on a single snapshot, because a model tuned to one hour of one day is tuned to one hour of one day. THEN HOLD MEASUREMENTS BACK. Reserve about 15 PER CENT of the loggers - 14 of the 90 - as a VALIDATION SET the calibration never touches, so 76 loggers fit the model and 14 test it against readings it has never seen. Without a hold-out, the only evidence the twin works is that it reproduces the data it was fitted to, which is not evidence. AND THEN DECLARE THE UNCERTAINTY, WHICH IS A SAFETY REQUIREMENT AND NOT A REFINEMENT. Operational decisions taken on this twin change what comes out of people&#039;s taps. So the specification must state: ALL DATA PRESENTED TO USERS MUST BE CLEARLY LABELLED. DIRECT SENSOR READINGS SHALL BE LABELLED &#039;MEASURED&#039;. ALL VALUES DERIVED FROM MODEL CALCULATION SHALL BE LABELLED &#039;INFERRED&#039; AND DISPLAYED WITH A QUANTIFIED UNCERTAINTY BOUND - for example &#039;Pressure: 312 kPa (INFERRED, +/- 21 kPa)&#039;. A twin that shows an inferred value in the same typeface and with the same confidence as a measured one will be trusted hardest exactly where it deserves it least.</p></div></div>
+
+<p>Box 2 is the one that changes everything, and boxes 3 to 5 are what follow from taking it seriously. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A single-asset twin and a portfolio twin differ <strong>in kind, not in scale</strong>. One reflects measurement; the other <strong>infers an entire system from a handful of it</strong>. Five questions:</p>
+<ul>
+<li><strong>What decisions must it serve, and in what order?</strong> <strong>Decision-led fidelity</strong>. Leak localisation, pressure management and renewal planning want different resolutions and different update rates. Rank them, or you will be designing for completeness, and completeness is what costs R175 million.</li>
+<li><strong>How much of this is computed rather than observed?</strong> <strong>Inference against measurement</strong>. 90 loggers against 9,500 nodes is 0.95 per cent - one measurement per 106 nodes, 5 per zone - so <strong>99 per cent of the twin's output is inferred</strong>. The measurements constrain the model; the model estimates the pressure at every node that has no sensor on it.</li>
+<li><strong>What feeds it, and who wins when two sources disagree?</strong> <strong>Federation and mastership</strong>. Telemetry, the asset register, the model geometry, customer meters, work orders - five owners, five update rates, five ideas of the truth. Name a master for each fact and a process for the conflict, because the conflict is certain.</li>
+<li><strong>Where do the few sensors go?</strong> <strong>Placement for observability</strong>. Zone boundaries, hydraulic extremities, points of high sensitivity, high-consequence nodes. Not where the access is easy - which is where they go if this box is left blank.</li>
+<li><strong>How do you know it works, and does it say how sure it is?</strong> <strong>Calibration, validation and declared uncertainty</strong>. Calibrate across varied operating conditions, hold 15 per cent of the loggers back to test against readings the model has never seen, and label every value MEASURED or INFERRED with a bound.</li>
+</ul>
+<p><strong>The arithmetic that makes the point.</strong> 90 loggers over 9,500 nodes is 0.95 per cent, or one measurement per 106 nodes. Hold 14 of them back for validation and you are calibrating a 9,500-node model on <strong>76 measurements - 0.8 per cent of it</strong>. That sounds impossible until you see what the model contributes: it already knows the pipe network, the elevations, the mass balance and the physics of flow, so the sensors are not describing the network, they are <em>pinning down the few things the physics cannot tell you</em> - roughness, real demand distribution, which valves are actually open. That is why placement matters more than count, and it is why the same 90 loggers can produce a good twin or a useless one.</p>
+<p><strong>And the requirement that is not negotiable.</strong> This twin will be used to make decisions about supply to real households - which zone to throttle overnight, where to dose, which main to shut. A user who reads an inferred pressure as a measured one is being misled by the instrument. So the specification mandates that <strong>direct sensor readings are labelled MEASURED, and every model-derived value is labelled INFERRED and displayed with a quantified bound</strong>, for example "Pressure: 312 kPa (INFERRED, +/- 21 kPa)". <strong>A twin that lies about its own certainty is not a tool, it is a trap</strong> - and it will be trusted hardest exactly where it deserves it least.</p>
+<p>One honest boundary. You are <em>specifying</em> the portfolio twin - the decisions it serves, the data it needs, how those sources federate, where the sensors go, and how it is calibrated, validated and declared. You are not building the hydraulic model, not writing the calibration routines, and not selecting the platform. Your document is what the modellers, integrators and operators build from.</p>
+<p>Does it scale? A weather service does not put a thermometer in every street. It puts a few hundred well-sited stations into a physical model of the atmosphere, and the model tells you the temperature at your house - which nobody measured. You accept that forecast because it comes with a confidence attached to it. Your network twin is the same instrument, and it owes its users the same honesty.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A district municipality asks you to specify a digital twin for its <strong>electricity distribution network</strong>. What you are given:</p>
+<table>
+<tr><th>Item</th><th>Figure</th></tr>
+<tr><td>Medium-voltage feeder network</td><td>320 km, 41,000 connections</td></tr>
+<tr><td>Feeder groups</td><td>12</td></tr>
+<tr><td>Nodes in the network model</td><td>4,600</td></tr>
+<tr><td>Affordable instrumentation</td><td>48 voltage loggers, 16 feeder current meters</td></tr>
+<tr><td>Existing sources</td><td>Asset register (assets dept, on change); network model (planning, on revision); prepaid meter sales (revenue, daily); outage call log (call centre, live); protection relay events (operations, live)</td></tr>
+<tr><td>Standing complaint</td><td>Low voltage at the ends of two rural feeders, reported for years, never quantified</td></tr>
+</table>
+<ol>
+<li><strong>Decisions.</strong> Rank the three decisions this twin must serve, and give each one a required resolution and update rate.</li>
+<li><strong>Inference ratio.</strong> Compute it - percentage of nodes measured, nodes per measurement, loggers per feeder group - and write the sentence that goes at the top of the specification.</li>
+<li><strong>Federation.</strong> Tabulate the sources with owner, update rate and resolution, then state a mastership rule for at least one fact that two sources will disagree about.</li>
+<li><strong>Placement.</strong> Allocate the 48 voltage loggers and 16 current meters against your ranked decisions, and say explicitly what you are refusing to instrument.</li>
+<li><strong>Validation and honesty.</strong> Define the calibration conditions, the hold-out set, and the labelling requirement for inferred values.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, your step 2 arithmetic should come out at <strong>1.04 per cent of nodes measured, one measurement per 96 nodes, 4 loggers per feeder group</strong> - and a 15 per cent hold-out is 7 loggers, leaving 41 to calibrate on. If your inference ratio is not written into the specification in plain language, the specification does not yet say what the thing is.</p>
+<p>Second, the standing complaint is the trap and the gift together. The rural feeder ends are exactly where the model is least constrained and the consequence is highest, so placement should send loggers there - but placing loggers to <em>confirm</em> a complaint is different from placing them to <em>constrain the model</em>, and a good answer knows which argument it is making.</p>
+<p>Third, in step 3, notice how quickly you need a rule. The prepaid sales say a feeder serves 3,100 paying connections; the asset register lists 3,850 connections on it; the model was built from the register. Which is master for load - and what does the twin do with the difference, given that it is either unmetered supply, a stale register, or both?</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-decision_led_fidelity">1. Start from the decisions - and accept that they need different fidelity</label><textarea id="cb-decision_led_fidelity" data-key="t-0180:decision_led_fidelity" placeholder="Rank the few decisions the twin must serve, and state the resolution and update rate each one needs, because a twin built to serve every decision equally serves none of them well."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-inference_not_mirror">2. State what this twin actually is - a model that INFERS, not a mirror that reflects</label><textarea id="cb-inference_not_mirror" data-key="t-0180:inference_not_mirror" placeholder="Quantify how much of the twin&#039;s output is computed rather than observed, and put that number in the specification where every user will see it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-federation_and_mastership">3. Specify the data sources - and the rule for when they disagree</label><textarea id="cb-federation_and_mastership" data-key="t-0180:federation_and_mastership" placeholder="List every source with its owner, update rate, spatial resolution and reliability, then state which source is master for each fact and what happens when two of them contradict each other."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-sensor_placement">4. Place the few sensors where they most constrain the model</label><textarea id="cb-sensor_placement" data-key="t-0180:sensor_placement" placeholder="Sensors go where they most reduce uncertainty in the ranked decisions - not where access is easy, which is where they end up if you do not write this down."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-calibrate_validate_declare">5. Calibrate across varied conditions, hold data back to validate, and declare the uncertainty</label><textarea id="cb-calibrate_validate_declare" data-key="t-0180:calibrate_validate_declare" placeholder="Calibrate on time series across genuinely different operating conditions, reserve measurements the model has never seen for validation, and require every inferred value to be labelled and bounded."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now specify a twin for something far too large to measure.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Portfolio twins fail in ways that make them look more impressive and less true.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Designing a mirror instead of a model.</strong> The instinct from single-asset work. It ends either in an unaffordable sensor bill or in a twin that only covers the small part you could instrument.</p>
+<p>&bull; <strong>Building for every decision at once.</strong> Leak localisation and renewal planning want different resolutions and different update rates. Unranked, the twin is designed to somebody's idea of completeness.</p>
+<p>&bull; <strong>Leaving the inference ratio out of the specification.</strong> If users are not told that 99 per cent of what they see is computed, they will assume it is observed. That assumption is on you, not on them.</p>
+<p>&bull; <strong>Sensors placed where access is easy.</strong> The default outcome when placement is unspecified. You get 90 measurements of the part of the network you already understood.</p>
+<p>&bull; <strong>Calibrating on a single snapshot.</strong> A model tuned to one hour of one day is tuned to one hour of one day. Varied operating conditions or it is not calibrated.</p>
+<p>&bull; <strong>No hold-out set.</strong> Without measurements the calibration never saw, the only evidence the twin works is that it reproduces what it was fitted to. That is not evidence.</p>
+<p>&bull; <strong>Inferred values shown like measured ones.</strong> The safety failure. Label them, bound them, and make the difference visible in the interface rather than in an appendix.</p>
+<p>&bull; <strong>No mastership rule.</strong> Two sources disagree, nobody is empowered to settle it, and the argument recurs every week until people stop using the twin.</p>
+<p>&bull; <strong>Calibrating away a real defect.</strong> If the model only fits when a 300 mm main behaves like a 250 mm one, you may have found a closed valve or a collapsed lining. Raise a work order rather than a fudge factor.</p>
+<p>&bull; <strong>Forgetting the network changes.</strong> Mains are replaced, zones are re-valved, demand moves. A twin nobody maintains does not become obviously wrong. It becomes confidently wrong.</p>
+</div>
+</details>
+<p>Onalenna could not afford to measure the network, so she specified something that infers it. Rank the decisions the twin must serve and give each the fidelity and update rate it needs; state plainly that 90 measurements against 9,500 nodes means 99 per cent of the output is computed, not observed; list every data source with its owner, rate and resolution, and name a master for each fact together with the process for when they disagree; place the few sensors where they most constrain the model rather than where access is easy; calibrate across genuinely varied conditions, hold data back to validate against readings the model has never seen, and label every inferred value with its uncertainty. A portfolio twin is not a mirror of the assets. It is a model of them, constrained by a few well-chosen truths - and it owes its users an honest account of which is which. If you are working with an AMU Facilitator, take any dashboard your organisation relies on and mark each figure on it as measured or inferred.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can specify a twin for a portfolio now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

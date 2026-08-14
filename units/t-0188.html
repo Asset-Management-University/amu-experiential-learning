@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two truths about the same asset</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Two truths about the same asset</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and the auditors have a question you cannot answer.</p>
+<p>The works replaced its control equipment last year and booked an <strong>R11.16 million write-off</strong>. The auditors want to know why. Nothing failed early. Nobody bought badly. The equipment was replaced in the tenth year, which is exactly when the engineers had always said it would need replacing.</p>
+<p>The write-off exists because the depreciation policy says the asset lasts <strong>twenty</strong> years and the equipment says <strong>ten</strong> - and no document anywhere reconciles those two numbers.</p>
+<p>So you are asked to write the depreciation policy properly. And when you go looking for the rest of the policy set, you find there isn't one. <em>No investment policy. No procurement policy. No acquisition strategy.</em> Every big-money decision this works has ever made was made on judgement, precedent, and who argued hardest.</p>
+<blockquote><h2>An R11 million loss appeared out of a rule rather than a failure, and I have just discovered we have no written rules for any of our money decisions. How do I write a set that holds together instead of four documents that contradict each other?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> An <strong>R11 million</strong> loss has appeared on the books. Nothing failed. Nothing was wasted. A set of assets still running perfectly well reached the end of the period finance writes them down over, so the ledger now says they are worth nothing while the plant says they have years left. Then you go looking for the rest of the rules and find <strong>there aren't any</strong> — no investment policy, no procurement policy, no acquisition strategy. Every large money decision this works has ever made was made on judgement, precedent, and who argued hardest. Write down how you would write a set of rules that holds together — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the decision nobody thinks is a decision</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Download a standard policy set and adapt it.&rdquo;</strong> The obvious shortcut, and a borrowed set <strong>governs the decisions of the organisation it was written for</strong>. You would inherit thresholds, approval levels and asset classes shaped by somebody else's plant, and spend two years discovering which clauses do not fit.</p>
+<p>&bull; <strong>&ldquo;Fix the depreciation policy — that is what caused the loss.&rdquo;</strong> Necessary and the smallest part of it. The write-down is the symptom that made the absence visible; the three missing policies govern decisions with far more money in them.</p>
+<p>&bull; <strong>&ldquo;Leave it to finance — it is their ledger.&rdquo;</strong> How you arrived here. The lives were set by people with no engineering input, and handing it back guarantees the two truths persist and diverge further.</p>
+<p>&bull; <strong>&ldquo;Write the four policies — investment, procurement, acquisition, depreciation.&rdquo;</strong> Right list, wrong starting point. Written to those headings you get four documents that each read well and contradict each other at the seams, which is the failure this unit is named for.</p>
+<p>&bull; <strong>&ldquo;Set approval thresholds and get on with it.&rdquo;</strong> Governs who signs and not how anything is decided — and a threshold chosen without knowing how often each kind of decision arises will either paralyse the routine ones or wave through the rare expensive ones.</p>
+<p>&bull; Start from <strong>the money decisions this organisation actually makes</strong>: who decides, at what value, and how often. Approving a capital project, a handful a year, from R400,000 to R40 million. Choosing between replacing and refurbishing, perhaps twenty times a year and mostly unrecorded. Deciding whether to build, buy, lease or share — rarely, and never written down. Buying a specific item, hundreds of times a year. And setting the period an asset is written down over, once per class. Now look at what that list tells you: the decision made <strong>most often</strong> has the least at stake each time, the one made <strong>most rarely</strong> has the most, and <strong>the one nobody thinks of as a decision quietly governs all of them</strong> — because the period an asset is written down over determines what everything appears to cost, and therefore which options look affordable. Write the rules to that list rather than to headings. Then the clause that stops the two truths: <strong>reconcile the lives in the ledger to the lives in the plant</strong>, and where they cannot be reconciled, record the divergence explicitly rather than letting it surface one day as an R11 million surprise.</p>
+</div>
+</details>
+<p>Here is the policy set, and the reconciliation that stops the two truths.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the interlocking set - the decisions first, then the four rules that govern them, and the clause that keeps the ledger honest about the plant.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Map the money decisions this organisation actually makes - before drafting any policy</div><p class="cb-demo">DO NOT START FROM A TEMPLATE. A borrowed policy set governs the decisions of the organisation it was written for. START FROM THE DECISIONS THIS ORGANISATION ACTUALLY MAKES ABOUT ASSET MONEY: who decides, at what value, and how often. At Corathyl the real list is short and specific. APPROVE A CAPITAL PROJECT - four or five a year, values from R400,000 to R40 million, currently signed by the works manager up to R2m and the council above it. CHOOSE BETWEEN REPLACING AND REFURBISHING - perhaps twenty times a year, mostly unrecorded. DECIDE WHETHER TO BUILD, BUY, LEASE OR SHARE A CAPABILITY - rarely, and never written down. BUY A SPECIFIC ITEM - hundreds of times a year. SET THE LIFE OVER WHICH AN ASSET IS WRITTEN DOWN - once per asset class, by finance, with no engineering input. NOW NOTICE WHAT THE LIST TELLS YOU. The decision made most often (buying) has the least value at stake per event; the decision made most rarely (build or buy) has the most; and THE DECISION NOBODY THINKS OF AS A DECISION - setting the useful life - QUIETLY GOVERNS ALL OF THEM, because it determines what things appear to cost. Write the list before you write a word of policy, because the list is what tells you which four rules you need and where they will meet.</p></div><div class="canvas-box"><div class="cb-label">2. The investment policy - how a proposal is judged, gated and approved</div><p class="cb-demo">THE INVESTMENT POLICY ANSWERS ONE QUESTION - SHOULD WE DO THIS AT ALL - and it must answer it the same way in March as in November. FOUR THINGS. THE EVALUATION METHOD: which analysis is required at which value, so a R500,000 pump does not need the treatment a R40 million scheme does, and a R40 million scheme cannot escape it. Reference the corpus techniques rather than restating them - discounted cash flow, life-cycle cost, equivalent annual cost, and the gated front-end loading approach for large schemes. THE HURDLE, AND ITS BASIS. A hurdle rate with no stated basis is a number somebody once said. State where it comes from - the cost of capital, a municipal borrowing rate, a policy premium for risk - AND STATE WHEN IT DOES NOT APPLY, because a statutory or safety-driven project is not optional and must not be forced through a return test it was never meant to pass. That exemption belongs in the policy, named and bounded, or every such project will be dressed up with invented benefits to clear a hurdle it should never have faced. THE EVIDENCE: what must accompany a proposal - the options considered, including doing nothing, the assumptions, and who owns the benefit after approval. THE AUTHORITY: who approves at what value, and who may not. AND WRITE DOWN WHAT HAPPENS TO A PROPOSAL THAT FAILS, because if the answer is that it comes back next month in a different shape, the hurdle is theatre.</p></div><div class="canvas-box"><div class="cb-label">3. The acquisition strategy - build, buy, lease or share, and on what logic</div><p class="cb-demo">THIS IS THE RARE DECISION WITH THE MOST AT STAKE, AND IT IS THE ONE MOST OFTEN MADE BY DEFAULT. The acquisition strategy states what the organisation BUILDS, BUYS, LEASES OR SHARES, and why. THE LOGIC HAS TO BE WRITTEN OR IT WILL BE RE-ARGUED EVERY TIME. Build where the capability is core, the requirement is specific to you, and you can sustain it - and be honest that sustaining it means competence, spares and succession, not just the initial build. Buy where the market does it better and the requirement is standard. Lease where the technology moves faster than your renewal cycle or the demand is uncertain. Share where a neighbouring organisation faces the same problem and neither can justify the whole cost - which for municipal utilities is more often available than it is used. THEN STATE THE STANDARDISATION RULE AND ITS COST. A strategy that mandates standard off-the-shelf equipment from approved suppliers controls spares, training and inventory, and it is usually right - BUT IT ALSO EXCLUDES A BETTER ANSWER WHEN ONE APPEARS. So write the exception: who may approve a departure, on what evidence, and what must be done about spares and competence if they do. A STANDARDISATION RULE WITH NO EXCEPTION ROUTE DOES NOT PREVENT DEPARTURES - IT PREVENTS THEM FROM BEING DECLARED.</p></div><div class="canvas-box"><div class="cb-label">4. The procurement policy - thresholds, competition and integrity</div><p class="cb-demo">THE PROCUREMENT POLICY TURNS A DECISION INTO A PURCHASE, and its whole design problem is proportionality. SET THE THRESHOLDS AND WHAT EACH REQUIRES: below one figure, a single quotation; above it, three; above another, formal tender. SET SUPPLIER QUALIFICATION: who may be bid, and what pre-qualification requires. REFERENCE THE INTEGRITY CONTROLS RATHER THAN REBUILDING THEM - the corpus already teaches counterfeit-part controls placed along a mapped supply chain, and supply-chain security assessment against the four threat categories; this policy says WHERE THOSE CONTROLS ARE MANDATORY, at which values and for which item classes. NOW THE TEST THAT MATTERS MORE THAN ANY THRESHOLD, AND ALMOST NOBODY APPLIES IT: IS THE COMPLIANT ROUTE FASTER THAN THE URGENT ONE? If three bids take eleven working days and an emergency order takes one, then every genuinely pressing need becomes an emergency, and after a while so does every need that somebody wants to move quickly. The policy has not been broken; it has been routed around, and the register of emergency orders is the evidence. So DESIGN THE COMPLIANT ROUTE TO BE USABLE - standing offers for common items, pre-qualified panels, delegated authority at low values - and then make the emergency route narrow, logged and reviewed. A policy that people must evade to do their jobs teaches them that policies are obstacles, which is the most expensive lesson in this box.</p></div><div class="canvas-box"><div class="cb-label">5. The depreciation policy - and the reconciliation that stops the two truths</div><p class="cb-demo">HERE IS WHERE THE ACCOUNTING AND THE ENGINEERING MUST AGREE ABOUT PHYSICAL REALITY, AND WHERE MOST ORGANISATIONS QUIETLY HOLD TWO TRUTHS. A USEFUL LIFE IS NOT AN ACCOUNTING PREFERENCE. Asset useful lives are determined ON A SOUND TECHNICAL BASIS, using industry-accepted engineering standards and evidence of asset performance, and are varied from engineering principles ONLY WHERE THERE IS REASONABLE AND DEMONSTRABLE EVIDENCE TO JUSTIFY THE VARIANCE. FIRST, COMPONENTISE - identify and separately record the parts that have different useful lives, and depreciate each over its own. Corathyl holds R248 MILLION accounted for as ONE class, straight line over 20 years: R12.40 MILLION a year. Componentised on engineering lives: CIVIL STRUCTURES R153.76m over 60 years, R2.563m; MECHANICAL PLANT R52.08m over 15 years, R3.472m; ELECTRICAL AND CONTROL R22.32m over 10 years, R2.232m; PIPEWORK R19.84m over 40 years, R0.496m - R8.763 MILLION a year, R3.64m LESS. NOW THE CONSEQUENCE, WHICH IS WHY THIS IS NOT AN ACCOUNTING PREFERENCE. The electrical and control component must be replaced at year 10, because ten years is its life. Under the single 20-year policy it is half depreciated, so R11.16 MILLION IS WRITTEN OFF ON REPLACEMENT. The mechanical plant at year 15 writes off R13.02 MILLION. R24.18 MILLION OF WRITE-OFF ACROSS ONE CYCLE, CREATED BY A POLICY RATHER THAN BY ANY ENGINEERING FAILURE - nothing broke early and nobody bought badly. Be precise about what changes: THE CAPITAL COST OF THE REPLACEMENT ITEM IS IDENTICAL EITHER WAY. What changes is the reported result, the provision built up beforehand, and therefore whether the replacement was ever expected or funded. SO WRITE TWO CLAUSES. WHO OWNS THE USEFUL LIFE: engineering proposes it on technical evidence, finance applies it, and a change requires both. AND THE RECONCILIATION: THE LIFE USED FOR REPORTING AND THE LIFE USED FOR RENEWAL PLANNING MUST BE THE SAME NUMBER, OR THE DIFFERENCE MUST BE DOCUMENTED AND JUSTIFIED. Two numbers in two systems with nothing reconciling them is not a discrepancy - it is an organisation holding two truths about the same asset, and the one in the ledger is the one that gets funded.</p></div></div>
+
+<p>Box 1 is what stops this being a template exercise, and box 5 is where the money was actually lost. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Financial policies are <strong>an interlocking system</strong>, and when the accounting policy for asset life contradicts the engineering reality, the organisation makes decisions on a false set of numbers. Five questions:</p>
+<ul>
+<li><strong>Which money decisions does this organisation actually make?</strong> <strong>Decision-point mapping.</strong> A borrowed policy set governs somebody else's decisions. And the decision nobody thinks of as a decision - setting the useful life - quietly governs all the others, because it determines what things appear to cost.</li>
+<li><strong>Should we do this at all?</strong> <strong>The investment policy</strong> - method by value, a hurdle with a stated basis, the named exemption for statutory and safety work, and what happens to a proposal that fails.</li>
+<li><strong>Should we build it, buy it, lease it or share it?</strong> <strong>The acquisition strategy</strong> - the rare decision with the most at stake, and the standardisation rule with its exception route.</li>
+<li><strong>How do we buy it?</strong> <strong>The procurement policy</strong> - thresholds, competition, qualification, and the test almost nobody applies: <em>is the compliant route faster than the urgent one?</em></li>
+<li><strong>How do we account for it?</strong> <strong>Componentisation, ownership of the useful life, and the reconciliation.</strong></li>
+</ul>
+<p><strong>The arithmetic that turns an accounting choice into an engineering finding.</strong> R248 million as one class over twenty years is R12.40m a year. Componentised on engineering lives - civils R153.76m/60yr, mechanical R52.08m/15yr, electrical and control R22.32m/10yr, pipework R19.84m/40yr - it is <strong>R8.763m a year</strong>. But the number that matters is not the annual charge. It is what happens at replacement: the electrical component reaches the end of its <em>ten-year</em> life half depreciated, so <strong>R11.16m is written off</strong>; the mechanical plant writes off <strong>R13.02m</strong> at year fifteen. <strong>R24.18 million across one cycle, created by a policy rather than by any engineering failure.</strong></p>
+<p><strong>Be precise about what does and does not change, because this is where the argument gets won or lost.</strong> The capital cost of the replacement item is <em>identical</em> either way; componentising does not reduce the price of the new plant. What changes is the reported result, the provision built up before the replacement, and therefore <em>whether anyone expected the replacement or funded it</em>. A policy claiming twenty years does not merely mis-state the past; it tells next year's budget process that no renewal is due.</p>
+<p><strong>And the clause the whole unit exists for.</strong> A useful life is <em>not</em> an accounting preference. Useful lives are determined on a sound technical basis, using industry-accepted engineering standards and evidence of asset performance, and varied from engineering principles only where there is reasonable and demonstrable evidence to justify the variance. So the policy must say <strong>who owns the useful life</strong> - engineering proposes on technical evidence, finance applies, a change needs both - and it must require that <strong>the life used for reporting and the life used for renewal planning are the same number, or the difference is documented and justified</strong>. Two numbers in two systems with nothing between them is not a discrepancy. It is an organisation holding <em>two truths about the same asset</em> - and the one in the ledger is the one that gets funded.</p>
+<p>One honest boundary. You draft the set and you test the interlock. The board or council <em>adopts</em>. Finance owns the accounting treatment, and you must not tell them how to apply a standard - your contribution is the technical evidence for the life, and the demand that one number be used consistently.</p>
+<p>Does it scale? A hospital that records a patient's weight in one system and their drug dose in another, with nothing reconciling them, has not made an administrative error. It has created two accounts of one body, and the dose is calculated from whichever one the prescriber happens to open. Your ledger and your renewal plan are those two systems.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different organisation has all four policies. They are written, adopted and current. A critical production pump now needs replacing, and the policies cannot all be obeyed.</p>
+<table>
+<tr><th>Policy</th><th>What it requires</th></tr>
+<tr><td>Investment</td><td>15 per cent internal rate of return, and a full business case above R2 million</td></tr>
+<tr><td>Acquisition strategy</td><td>Standard off-the-shelf equipment from approved suppliers, to control spares and training</td></tr>
+<tr><td>Procurement</td><td>Three competitive bids above R500,000</td></tr>
+<tr><td>Depreciation</td><td>Single 15-year straight line for all "general plant"</td></tr>
+<tr><th>The two options</th><th>Detail</th></tr>
+<tr><td>New-technology pump</td><td>R2.5 million. 30 per cent IRR over 15 years on energy savings. New design, <strong>sole supplier</strong>, not on the approved list</td></tr>
+<tr><td>Like-for-like standard pump</td><td>R1.8 million. 10 per cent IRR. Standard, approved supplier, three bids available</td></tr>
+<tr><td>The existing pump</td><td>16 years old. Book value zero. Finance sees only the difference in capital</td></tr>
+</table>
+<ol>
+<li><strong>Test each option against each policy.</strong> Build the four-by-two grid and mark every pass and fail.</li>
+<li><strong>Name the collision.</strong> State it in one sentence.</li>
+<li><strong>Quantify what the collision costs.</strong> Work out what the organisation gives up by taking the compliant option.</li>
+<li><strong>The zero book value.</strong> Why does finance being "indifferent" matter, and what does the zero tell you about the depreciation policy?</li>
+<li><strong>Fix the set.</strong> Propose the smallest change to the policies that lets the right decision be made, and say what you would <em>not</em> change.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, on the collision. The good investment is procedurally non-compliant and the poor investment is procedurally safe - <em>and both outcomes are exactly what the policies were written to produce</em>. Nobody drafted them badly in isolation. They were never tested against a single decision together, which is the whole lesson of box 1.</p>
+<p>Second, on the cost. Work back from the IRRs. Over fifteen years the new pump's 30 per cent return on R2.5m implies an annual net benefit of about <strong>R0.765m</strong>; the standard pump's 10 per cent on R1.8m implies about <strong>R0.237m</strong>. So <strong>R0.7 million more capital buys roughly R0.53 million a year</strong> - close to R7.9 million of undiscounted benefit across the life. A procurement rule written to protect against overspending is about to cost eleven times the sum it protects.</p>
+<p>Third, on the zero. The pump is sixteen years old against a fifteen-year policy life, so it is fully depreciated and carries no book value. That means <em>replacing it produces no write-off</em>, which is why finance is indifferent - and indifference is the problem. A fully depreciated asset still in service is not free; it is an asset whose renewal has stopped appearing in any financial signal. <strong>The policy that produced Corathyl's R11 million write-off and the policy that produced this silence are the same defect</strong>, pointing in opposite directions: one raised an alarm that was not real, the other suppressed one that was. And in step 5, the smallest honest fix is not a new hurdle rate - it is an exception route in the acquisition strategy and the procurement policy, plus componentisation so the next renewal is visible before it arrives. Resist rewriting the investment policy; the 15 per cent hurdle worked correctly here.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-map_the_decisions">1. Map the money decisions this organisation actually makes - before drafting any policy</label><textarea id="cb-map_the_decisions" data-key="t-0188:map_the_decisions" placeholder="List the decisions about asset money that really get made here, who makes them and at what value. A policy set built from a template governs decisions you do not make and misses the ones you do."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-investment_policy">2. The investment policy - how a proposal is judged, gated and approved</label><textarea id="cb-investment_policy" data-key="t-0188:investment_policy" placeholder="State how a proposal is evaluated, the hurdle and its basis, what evidence must accompany it, and who may approve at what value."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-acquisition_strategy">3. The acquisition strategy - build, buy, lease or share, and on what logic</label><textarea id="cb-acquisition_strategy" data-key="t-0188:acquisition_strategy" placeholder="State how the organisation decides whether to build a capability, buy it, lease it or share it - and the conditions under which that answer changes."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-procurement_policy">4. The procurement policy - thresholds, competition and integrity</label><textarea id="cb-procurement_policy" data-key="t-0188:procurement_policy" placeholder="Set the thresholds, the competition required at each, supplier qualification, and the integrity controls - and check the compliant route is not slower than the urgent one."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-depreciation_and_reconciliation">5. The depreciation policy - and the reconciliation that stops the two truths</label><textarea id="cb-depreciation_and_reconciliation" data-key="t-0188:depreciation_and_reconciliation" placeholder="Componentise on engineering lives, say who owns the useful life, and require that the life used for reporting and the life used for renewal planning are the same number or the difference is documented."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now write money rules that hold together.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Financial policies fail by being individually reasonable.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Drafting the four policies without mapping the decisions.</strong> You end up governing decisions the organisation does not make and missing the ones it does.</p>
+<p>&bull; <strong>Never testing the set against a single real decision.</strong> Each policy passes alone. The collision only appears when one event stresses all four.</p>
+<p>&bull; <strong>A hurdle rate with no stated basis.</strong> A number somebody once said, defended for years afterwards because nobody can remember where it came from.</p>
+<p>&bull; <strong>No exemption for statutory and safety work.</strong> Force it through a return test and people will invent benefits to clear a hurdle the project should never have faced.</p>
+<p>&bull; <strong>A compliant route slower than the urgent one.</strong> Then everything becomes urgent. The policy is not broken, it is routed around, and the emergency-order register is the evidence.</p>
+<p>&bull; <strong>A standardisation rule with no exception route.</strong> It does not prevent departures. It prevents them from being declared.</p>
+<p>&bull; <strong>A single asset class because it is simpler.</strong> It is simpler, and it hides every renewal that falls due before the class life expires.</p>
+<p>&bull; <strong>A useful life set for reporting convenience.</strong> Lives rest on a sound technical basis and vary from engineering only on demonstrable evidence. Otherwise the ledger is describing an asset that does not exist.</p>
+<p>&bull; <strong>Two different lives in two systems.</strong> Not a discrepancy - two truths about one asset, and the ledger's version is the one that gets funded.</p>
+<p>&bull; <strong>Treating componentisation as an accounting exercise.</strong> It is an engineering statement about what wears out when, written in the language finance uses.</p>
+<p>&bull; <strong>Assuming a fully depreciated asset is a cheap one.</strong> Its renewal has simply stopped appearing in any financial signal.</p>
+<p>&bull; <strong>Claiming componentisation saves money.</strong> It does not save a rand of capital. It changes what was expected and provided for, which is worth more.</p>
+</div>
+</details>
+<p>Onalenna was asked about a loss that no failure had caused. Map the money decisions your organisation actually makes, and notice that setting the useful life is one of them; write the investment policy with a hurdle whose basis is stated and a named exemption for work that is not optional; write the acquisition strategy so the build, buy, lease or share logic is settled once, with an exception route that lets departures be declared; write the procurement policy so the compliant route is genuinely usable, because a rule people must evade teaches them that rules are obstacles; and componentise the depreciation policy on engineering lives, say who owns the useful life, and require one number for reporting and renewal or a documented reason for two. Financial policies are a system, not a shelf of documents. And when the ledger and the plant disagree about how long something lasts, the organisation is holding two truths about the same asset - and it will fund the wrong one. If you are working with an AMU Facilitator, find out what useful life your organisation's ledger assumes for its shortest-lived plant, and ask an engineer whether it is true.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can write money rules that agree with the plant now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

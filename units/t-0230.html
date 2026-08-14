@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The plan, not the pick</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The plan, not the pick</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You have done the hard parts. You have a goal - a number, years away, that means freedom. You have found some money to invest, month after month. You even know that spreading your money matters, that you should not put it all in one place.</p>
+<p>And then you freeze. Because it feels as though the next step is to <em>pick</em> - to choose the one right share, the one clever fund, the winning bet - and the fear of picking wrong is bigger than the hope of picking right. Everyone who seems to win sounds as if they know a secret you do not: a tip, an inside track, a knack for spotting the thing that will go up. You do not have the secret, so you do nothing, and the money sits, and the years pass.</p>
+<p>Here is the relief: there is no secret, and you were never meant to pick. What you build is a <em>plan</em> - a simple, repeatable system that turns the frightening act of "investing" into a calm handful of decisions you make once and then keep.</p>
+<blockquote><h2>I have a goal and money to invest, but I freeze because I think I have to pick the right thing and I am terrified of picking wrong. How do I actually build a long-term plan?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> You have a goal, a rough date, and money sitting in an account earning almost nothing. It has been sitting there for <strong>three years</strong>. Every time you get close, the same thought stops you: the people who do this well have a knack for spotting the thing that will go up, and you do not have it. Last month a colleague talked confidently about something he had picked, and you nodded and felt further behind than before. You are not reckless and you are not lazy — you are waiting to feel ready. Write down what you would actually build — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the belief underneath the paralysis</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Research until I know enough to choose well.&rdquo;</strong> This is what the last three years were. The reading has no natural end, because the thing you are trying to become certain about is not knowable — so the research is not preparation, it is the paralysis wearing a productive costume.</p>
+<p>&bull; <strong>&ldquo;Ask somebody who knows what they are doing.&rdquo;</strong> Sensible, and note what you would be asking for: a pick. You would be outsourcing the very act you believe is the task, and you would still not know whether the answer was any good.</p>
+<p>&bull; <strong>&ldquo;Copy what my colleague did.&rdquo;</strong> His situation, his timescale and his circumstances are not yours, and you are hearing about the choice he mentioned rather than the ones he does not. Copying a pick is picking, with less information.</p>
+<p>&bull; <strong>&ldquo;Keep it safe where it is — at least it cannot go wrong.&rdquo;</strong> Understandable, and it is a decision rather than the absence of one: three years have already passed, and doing nothing has had a cost you did not choose but have paid anyway.</p>
+<p>&bull; <strong>&ldquo;Wait until I have more money to make it worth doing.&rdquo;</strong> The amount is not what is stopping you and it never was. The same belief will be waiting at the larger amount, with more at stake.</p>
+<p>&bull; Here is the relief, and it is the whole unlock: <strong>there is no secret, and you were never meant to pick.</strong> What you build is <strong>a plan rather than a guess</strong> — a system of a few decisions, each following from the one before, <strong>made once and then maintained.</strong> You are not trying to be clever; you are building something that works <strong>whether or not you are clever</strong>, which is precisely what somebody without a knack for spotting winners needs. Start with what the money is <strong>for and by when</strong>, because the horizon is the hinge everything turns on — money needed in three years and money needed in thirty are genuinely different problems with different answers, and settling that settles most of what follows. Then <strong>how much goes in and how regularly</strong>, which is the part most within your control and does most of the work over long periods. And then two <strong>disciplines</strong> that matter more than any single choice: keep going when it is uncomfortable, and leave it alone. Both are hard for the same reason — <strong>the moments when abandoning the plan feels most sensible are exactly the moments when doing so costs most</strong> — which is why they are practised rather than decided.</p>
+</div>
+</details>
+<p>It is five decisions and two disciplines. Let us build it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you construct a long-term investment plan - a system that connects your goal to your money through five decisions you make once and two disciplines you practise for the long run.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. A plan, not a pick - the mental shift</div><p class="cb-demo">START WITH THE MENTAL SHIFT, BECAUSE IT IS THE WHOLE UNLOCK: IT IS A PLAN, NOT A PICK. Most people believe investing is about choosing the winning share or the clever fund - that somewhere there is a RIGHT ANSWER and their job is to guess it, and the fear of guessing wrong makes them freeze and do nothing. A PLAN IS THE OPPOSITE OF A GUESS. It is a SYSTEM: a chain of a few decisions, each following from the one before, that you MAKE ONCE AND THEN MAINTAIN. You are not trying to be clever - YOU ARE BUILDING SOMETHING THAT WORKS WHETHER OR NOT YOU ARE CLEVER, so that the frightening word &#039;investing&#039; becomes a calm series of choices. Its job is to work, so you do not have to guess. The whole technique is this: FIVE DECISIONS YOU MAKE ONCE, AND TWO DISCIPLINES YOU PRACTISE FOR THE LONG RUN - and once you see it that way, the paralysis lifts, because there was never a winner you had to spot.</p></div><div class="canvas-box"><div class="cb-label">2. Decisions 1-2: goal, horizon, contribution</div><p class="cb-demo">DECISIONS ONE AND TWO: YOUR GOAL, YOUR HORIZON, AND YOUR CONTRIBUTION. Start with what the money is FOR and BY WHEN - the wealth target, the Freedom Number, you set when you defined what freedom means for you. That target sets your TIME HORIZON, and THE HORIZON IS THE HINGE ON WHICH THE WHOLE PLAN TURNS: a long horizon - years, decades - lets you bear more of the short-term ups and downs in exchange for MORE LONG-TERM GROWTH, because you have time to ride out the dips. Then your CONTRIBUTION: how much you put in, regularly. This is NOT a new number to agonise over - it is the amount you freed up when you found your savings-rate gap and your highest-impact change. REGULAR CONTRIBUTIONS ARE THE ENGINE THE WHOLE PLAN RUNS ON, because it is consistency over time, not any single deposit, that compounds into wealth. Goal sets horizon; horizon sets how much risk you can carry; and the contribution is what you feed the system, month after month.</p></div><div class="canvas-box"><div class="cb-label">3. Decisions 3-5: spread it, shelter it, fill it</div><p class="cb-demo">DECISIONS THREE, FOUR AND FIVE: SPREAD IT, SHELTER IT, AND FILL IT - three quick moves that each follow from the horizon. SPREAD IT, your ASSET ALLOCATION: decide how to divide the money across the major asset classes, and because your horizon is long you can TILT TOWARD GROWTH rather than leaving it all in cash. Then DIVERSIFY within that, so that NO SINGLE HOLDING GOING WRONG CAN SINK YOU - do not put it all in one basket. HOW YOU ALLOCATE AND DIVERSIFY HAS A LARGER EFFECT ON YOUR LONG-RUN RESULT THAN ANY INDIVIDUAL PICK you could obsess over - which is exactly why the pick matters less than you fear. SHELTER IT: put the contributions into a TAX-FREE SAVINGS ACCOUNT first, because tax saved is one of the highest-impact, lowest-effort gains a long-term saver can capture, and it is worth the most to the small investor. FILL IT: choose a LOW-COST, DIVERSIFIED VEHICLE to fill the allocation. Every one of these follows from the last - goal set the horizon, horizon set the risk you can carry, risk set the allocation, allocation and tax position guide the selection. THERE WAS NEVER A MOMENT WHERE YOU HAD TO GUESS A WINNER.</p></div><div class="canvas-box"><div class="cb-label">4. Discipline 1: rebalance and glide</div><p class="cb-demo">DISCIPLINE ONE: REBALANCE AND GLIDE. The plan is built; now it is MAINTAINED, and maintenance is light - this is not a full-time job. REBALANCE: every so often - ONCE A YEAR IS PLENTY - check whether a strong run in one asset class has quietly pushed your mix away from the allocation you chose, and NUDGE IT BACK to your chosen split. And GLIDE: as the goal draws near, GRADUALLY SHIFT THE PLAN TOWARD SAFETY, so that a crash in the final stretch cannot undo years of patient growth - you do not want the market falling hard the year before you need the money out of a full-growth position. That is the whole of the upkeep: A YEARLY LOOK, A SMALL CORRECTION, AND A SLOW MOVE TO SAFETY NEAR THE END. Light-touch, deliberate, and done on a calendar rather than on a feeling.</p></div><div class="canvas-box"><div class="cb-label">5. Discipline 2: stay the course - the behavioural bedrock</div><p class="cb-demo">DISCIPLINE TWO IS THE ONE THAT DECIDES EVERYTHING, BECAUSE THE REAL MONEY IS WON OR LOST IN BEHAVIOUR, NOT BRILLIANCE: STAY THE COURSE. The single biggest mistake an investor makes is SELLING IN A CRASH - the market falls, fear takes over, they sell to stop the pain, and in doing so they TURN A TEMPORARY PAPER DIP INTO A PERMANENT, LOCKED-IN LOSS and miss the recovery that almost always follows. The deepest purpose of having a plan is to DECIDE IN ADVANCE what you will do, so that fear in a downturn and hype in a boom cannot decide for you in the moment. AND THE HONEST, FREEING TRUTH FOR ANYONE WHO THINKS THIS IS NOT FOR THEM: A PLAN IS NOT ABOUT THE SIZE OF THE INVESTMENT; IT IS ABOUT THE CONSISTENCY OF THE HABIT. A R100 CONTRIBUTION, INVESTED REGULARLY IN A DIVERSIFIED, LOW-COST, TAX-SHELTERED VEHICLE, IS A REAL LONG-TERM PLAN. IT IS NOT A POOR IMITATION OF A RICH PERSON&#039;S PORTFOLIO. STARTED EARLY, CONSISTENCY BEATS SIZE. And one honesty the whole plan rests on: INVESTING ALWAYS INVOLVES RISK. A LONG-TERM PLAN DOES NOT REMOVE THAT RISK, BUT IT HELPS YOU MANAGE IT. ITS PURPOSE IS TO ENSURE THAT SHORT-TERM MARKET MOVEMENTS DO NOT DERAIL YOUR LONG-TERM GOALS. WE DO NOT PROMISE RETURNS; WE HELP YOU BUILD A SYSTEM FOR THE JOURNEY.</p></div></div>
+
+<p>Boxes 2 and 3 are the five decisions. Boxes 4 and 5 are the two disciplines - and Box 5 is where the real money is won or lost. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A long-term investment plan is a system you build once and keep, not a series of bets you place. Staying the course matters more than any pick you make.</strong> It is five decisions you make once, and two disciplines you practise for the long run:</p>
+<ul>
+<li><strong>What is this, really?</strong> <strong>A plan, not a pick.</strong> A system that connects your goal to your money - its job is to work, so you do not have to guess.</li>
+<li><strong>Decision 1-2: Goal, horizon, contribution.</strong> What the money is for and by when, and how much you put in regularly. The horizon is the hinge; the contribution is the engine.</li>
+<li><strong>Decision 3-5: Spread it, shelter it, fill it.</strong> Allocate across asset classes and diversify; put it in a tax-free account first; choose a low-cost vehicle to fill the allocation.</li>
+<li><strong>Discipline 1: Rebalance and glide.</strong> Nudge the mix back to your chosen allocation now and then, and move toward safety as the goal draws near.</li>
+<li><strong>Discipline 2: Stay the course.</strong> The single biggest mistake is selling in a crash. Decide in advance what you will do, so fear and hype do not decide for you.</li>
+</ul>
+<p><strong>First, the mental shift: it is a plan, not a pick.</strong> Most people believe investing is about choosing the winning share or the clever fund - that somewhere there is a right answer and their job is to guess it. A plan is the opposite of a guess. It is a <em>system</em>: a chain of a few decisions, each following from the one before, that you make once and then maintain. You are not trying to be clever; you are building something that works whether or not you are clever, so that the frightening word "investing" becomes a calm series of choices. Let us make the five decisions.</p>
+<p><strong>Decisions one and two: your goal, your horizon, and your contribution.</strong> Start with what the money is <em>for</em> and <em>by when</em> - the wealth target, the Freedom Number, you set when you defined what freedom means for you. That target sets your <em>time horizon</em>, and the horizon is the hinge on which the whole plan turns: a long horizon - years, decades - lets you bear more of the short-term ups and downs in exchange for more long-term growth, because you have time to ride out the dips. Then your <em>contribution</em>: how much you put in, regularly. This is not a new number to agonise over - it is the amount you freed up when you found your savings-rate gap and your highest-impact change. Regular contributions are the engine the whole plan runs on, because it is consistency over time, not any single deposit, that compounds into wealth.</p>
+<p><strong>Decisions three, four and five: spread it, shelter it, and fill it.</strong> Now you shape where the money goes, in three quick moves that each follow from the horizon. <em>Spread it</em> - your <strong>asset allocation</strong>: decide how to divide the money across the major asset classes, and because your horizon is long you can tilt toward growth rather than leaving it all in cash. Then <strong>diversify</strong> within that, so that no single holding going wrong can sink you - the principle you already know, do not put it all in one basket. How you allocate and diversify has a larger effect on your long-run result than any individual pick you could obsess over, which is precisely why the pick matters less than you fear. <em>Shelter it</em> - put the contributions into a <strong>tax-free savings account</strong> first, because tax saved is one of the highest-impact, lowest-effort gains a long-term saver can capture, and it is worth the most to the small investor. And <em>fill it</em> - choose a <strong>low-cost, diversified vehicle</strong> to fill the allocation, using the way you learned to evaluate and select an investment product. Notice that every one of these follows from the last: the goal set the horizon, the horizon set how much risk you can carry, the risk set the allocation, and the allocation and tax position guide the selection. There was never a moment where you had to guess a winner.</p>
+<p><strong>Discipline one: rebalance and glide.</strong> The plan is built; now it is maintained, and maintenance is light. <em>Rebalance</em>: every so often - once a year is plenty - check whether a strong run in one asset class has quietly pushed your mix away from the allocation you chose, and nudge it back. And <em>glide</em>: as the goal draws near, gradually shift the plan toward safety, so that a crash in the final stretch cannot undo years of patient growth. That is the whole of the upkeep - a yearly look, a small correction, and a slow move to safety near the end.</p>
+<p>Discipline two is the one that decides everything, because this is where the real money is won or lost - in behaviour, not brilliance. <strong>Stay the course.</strong> The single biggest mistake an investor makes is <em>selling in a crash</em>: the market falls, fear takes over, they sell to stop the pain - and in doing so they turn a temporary paper dip into a permanent, locked-in loss, and they miss the recovery that almost always follows. The deepest purpose of having a plan is to <strong>decide in advance</strong> what you will do, so that fear in a downturn and hype in a boom cannot decide for you in the moment. And here is the honest, freeing truth for anyone who thinks this is not for them: <strong>a plan is not about the size of the investment; it is about the consistency of the habit. A R100 contribution, invested regularly in a diversified, low-cost, tax-sheltered vehicle, is a real long-term plan. It is not a poor imitation of a rich person's portfolio. Started early, consistency beats size.</strong> You do not need a lump sum, a large salary, or a secret to begin - you need a system and the patience to keep it.</p>
+<p>And one honesty that the whole plan rests on. <strong>Investing always involves risk. A long-term plan does not remove that risk, but it helps you manage it. Its purpose is to ensure that short-term market movements do not derail your long-term goals. We do not promise returns; we help you build a system for the journey.</strong> Diversification and staying the course are not a guarantee against loss - they are how you carry an unavoidable risk across a long horizon without being thrown off by it.</p>
+<p>Does it scale? This is how you pursue any long, uncertain goal you cannot control day to day - your health, a career, a decades-long project. Set the destination and the horizon, put something in consistently, spread your effort so one setback cannot end you, protect what you can protect cheaply, and then - above all - decide in advance how you will behave when it gets frightening, so that the plan, not the panic, carries you through. The system you build once and keep will outperform the cleverness you try to summon in the moment, every time.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is your situation. Your goal is a Freedom Number about <strong>25 years away</strong>, and you have freed up <strong>R500 a month</strong> to invest. Construct your plan using the five decisions and two disciplines.</p>
+<ol>
+<li><strong>Goal and horizon.</strong> State the goal and the horizon, and say in a line why a 25-year horizon lets you tilt toward growth rather than keeping it all in cash.</li>
+<li><strong>Allocation and diversification.</strong> Propose an allocation (a mix of growth and defensive assets) and say why it is diversified - why no single thing going wrong can sink it.</li>
+<li><strong>Shelter and vehicle.</strong> Which tax-advantaged account do the contributions go into first, and why? What kind of vehicle fills the allocation?</li>
+<li><strong>The rule.</strong> Write the one-line promise you will make to yourself to keep from selling in the next market crash.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, goal and horizon: the goal is the Freedom Number 25 years out, and a 25-year horizon is long enough to ride out the market's dips, so you can carry more short-term ups and downs in exchange for more long-term growth - which is why an all-cash holding would actually be the risky choice here, quietly losing ground to inflation over 25 years.</p>
+<p>Second, allocation and diversification: a growth-tilted mix (more in growth assets, some in defensive) that is spread widely, so that no single company, sector or holding failing can sink the plan. The mark of a real answer is that the reasoning is about the <em>horizon justifying the tilt</em> and the <em>spread removing single-point risk</em> - not about picking a winner.</p>
+<p>Third, shelter and vehicle: the R500 goes into a <strong>tax-free savings account</strong> first, because sheltering the growth from tax is one of the highest-impact, lowest-effort gains over 25 years and it is worth the most to a small, regular investor; and a <em>low-cost, diversified vehicle</em> fills the allocation, so costs do not quietly eat the returns.</p>
+<p>Fourth, the rule: something like <em>"When the market falls, I will not sell; I will keep contributing, because a dip is when my regular contribution buys the most, and selling would turn a paper loss into a real one."</em> The mark of a real answer is that it decides the behaviour <em>now</em>, in the calm, so that fear cannot decide it later.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-a_plan_not_a_pick">1. A plan, not a pick - the mental shift</label><textarea id="cb-a_plan_not_a_pick" data-key="t-0230:a_plan_not_a_pick" placeholder="Most people think investing is choosing the winning share or clever fund - that there is a right answer and their job is to guess it. A plan is the opposite of a guess: a system, a chain of a few decisions each following from the last, that you build once and maintain. You are not trying to be clever; you are building something that works whether or not you are clever, so the frightening word &#039;investing&#039; becomes a calm series of choices. It is five decisions made once, and two disciplines practised for the long run."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-goal_horizon_contribution">2. Decisions 1-2: goal, horizon, contribution</label><textarea id="cb-goal_horizon_contribution" data-key="t-0230:goal_horizon_contribution" placeholder="Start with what the money is for and by when - your Freedom Number. That sets your TIME HORIZON, the hinge of the whole plan: a long horizon lets you bear more short-term ups and downs for more long-term growth, because you have time to ride out the dips. Then your CONTRIBUTION - how much you put in regularly. This is not a new number to agonise over; it is the amount you freed up in your savings-rate work. Regular contributions are the engine compounding runs on - consistency over time, not any single deposit, builds wealth."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-spread_shelter_fill">3. Decisions 3-5: spread it, shelter it, fill it</label><textarea id="cb-spread_shelter_fill" data-key="t-0230:spread_shelter_fill" placeholder="Three quick moves, each following from the horizon. SPREAD IT (asset allocation): divide across the major asset classes, and because your horizon is long you can tilt toward growth; then DIVERSIFY so no single holding can sink you. How you allocate matters more to your long-run result than any pick. SHELTER IT: put contributions into a tax-free savings account first - tax saved is a high-impact, low-effort gain worth the most to a small investor. FILL IT: choose a low-cost, diversified vehicle for the allocation. Each follows from the last - no guessing a winner."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-rebalance_and_glide">4. Discipline 1: rebalance and glide</label><textarea id="cb-rebalance_and_glide" data-key="t-0230:rebalance_and_glide" placeholder="The plan is built; maintenance is light. REBALANCE: once a year is plenty - check whether a strong run in one asset class has pushed your mix away from the allocation you chose, and nudge it back. GLIDE: as the goal draws near, gradually shift the plan toward safety, so a crash in the final stretch cannot undo years of patient growth. That is the whole upkeep - a yearly look, a small correction, and a slow move to safety near the end."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-stay_the_course">5. Discipline 2: stay the course - the behavioural bedrock</label><textarea id="cb-stay_the_course" data-key="t-0230:stay_the_course" placeholder="This decides everything - the real money is won or lost in behaviour, not brilliance. The single biggest mistake is SELLING IN A CRASH: turning a temporary paper dip into a permanent, locked-in loss and missing the recovery. The plan&#039;s deepest purpose is to DECIDE IN ADVANCE what you will do, so fear and hype cannot decide for you. And the freeing truth: a plan is not about the size of the investment; it is about the consistency of the habit. A R100 contribution, invested regularly in a diversified, low-cost, tax-sheltered vehicle, IS a real long-term plan. Investing always involves risk; a plan manages it, it does not remove it - we do not promise returns."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When your plan connects your goal to your money through the five decisions, and you have written the rule that keeps you in your seat through the next storm, <strong>save it</strong> - it is yours. You can now construct and keep a long-term investment plan.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A long-term investment plan is a system you build once and keep, not a series of bets you place. Staying the course matters more than any pick you make.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Treating investing as stock-picking.</strong> The plan, not the pick, does the work. You are building a system, not guessing a winner.</p>
+<p>&bull; <strong>Chasing a hot tip.</strong> The secret everyone seems to have does not exist. A tip is a bet; a plan is a system. Trust the system.</p>
+<p>&bull; <strong>Not diversifying.</strong> One holding going wrong should never be able to sink you. Spread the money so no single failure ends the plan.</p>
+<p>&bull; <strong>Skipping the tax shelter.</strong> Tax saved is a high-impact, low-effort gain, worth the most to the small investor. Use the tax-free account first.</p>
+<p>&bull; <strong>Paying high costs.</strong> Fees quietly eat returns over decades. Choose low-cost vehicles; the difference compounds against you otherwise.</p>
+<p>&bull; <strong>Never rebalancing or gliding.</strong> Check the mix once a year and nudge it back, and move toward safety as the goal nears so a late crash cannot undo it.</p>
+<p>&bull; <strong>Selling in a crash.</strong> The biggest mistake there is - it turns a paper dip into a locked-in loss and misses the recovery. Decide in advance that you will hold.</p>
+<p>&bull; <strong>Thinking you need a lump sum.</strong> A small amount invested consistently is a real plan. Consistency beats size; started early, small wins.</p>
+<p>&bull; <strong>Believing a plan removes risk.</strong> It does not - it helps you carry risk across a long horizon. No one can promise returns; the plan is a system for the journey.</p>
+</div>
+</details>
+<p>You froze because you thought you had to pick the right thing and were terrified of picking wrong. You never did. A long-term investment plan is five decisions you make once - your goal and horizon, your regular contribution, your spread across assets, your tax shelter, your low-cost vehicle - and two disciplines you keep for the long run: rebalance and glide, and above all stay the course. <strong>A long-term investment plan is a system you build once and keep, not a series of bets you place - and staying the course matters more than any pick you make.</strong> Build the system, promise yourself you will hold through the storms, and then let time and consistency do the work that no clever guess ever could.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can construct a long-term investment plan now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

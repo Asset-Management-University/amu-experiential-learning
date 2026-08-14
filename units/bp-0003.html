@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I can&#039;t say where my money goes</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>I can&#039;t say where my money goes</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Felt Problem</h2>
+<p>You are Muhammad, 21 years old. You work at your Uncle Yusuf's shop, earning a wage of <strong>R4,500 a month</strong>. You live with your parents and give them money for board, but you keep the rest. You promised yourself that this year, you would finally save up for a pair of sneakers you've been wanting, which cost <strong>R2,200</strong>. But every month seems to end the same way: with almost nothing left.</p>
+<p>It's the last weekend of the month. Your cousin Khalid, who is always starting new side-hustles, messages you: <em>"How's that saving going? You putting money away yet?"</em></p>
+<p>You feel a familiar knot in your stomach. You want to say yes. You feel like you're careful. You don't make big, crazy purchases. But when you open your banking app to check, the number staring back at you is <strong>R40</strong>.</p>
+<p>Forty rand. Until your next payday.</p>
+<p>Your thumb scrolls up through the month's transactions. A taxi pass. Airtime. A few groceries here, a takeaway there. A pair of trainers from a sports shop. Nothing looks like a mistake. Each payment made sense at the time. You would probably make each one again.</p>
+<p>But somewhere between your R4,500 wage landing and this moment, the money just... vanished. You can't say <em>how</em>. You only know it's gone, and your savings goal feels further away than ever.</p>
+<p>You think: <em>I just need to earn more.</em> It's the easy thought. Ask Uncle Yusuf for a raise, find a weekend job. Khalid's message sits there, unread. Before you can honestly answer him, you first have to answer the question for yourself.</p>
+
+<div class="goal-setter"><label for="learner-goal-text">Muhammad is saving R2,200 for new sneakers. Make it personal - what is one thing <strong>you</strong> are saving for?</label><input type="text" id="learner-goal-text" class="goal-text" placeholder=""><label for="learner-goal-amount">And what does it cost?</label><div class="input-group"><span class="currency-symbol">R</span><input type="number" id="learner-goal-amount" placeholder="2200" onchange="updateLearnerGoal()"></div></div>
+
+<div class="nav">
+<span></span>
+<button type="button" class="btn" onclick="amuNext()">Next &#9656;</button>
+</div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>You are Muhammad. You have <strong>R40</strong> in your account, and you don't know why. You open your banking app and look at the whole month in one go. This is what you see:</p>
+
+<div class="bank-statement" id="bank-statement"><div class="header"><div class="account-name">BANK ACCOUNT &middot; &bull;&bull;&bull;&bull; 3847</div><div class="balance-label">Available balance</div><div class="balance-amount">R40</div></div><div class="body"><div class="section-header">This month&#39;s transactions</div><div class="money-in"><span class="desc">Wage - Uncle Yusuf</span><span class="amount">+R4,500</span></div><div class="transaction" data-category="board"><span class="desc"><span class="date">01</span>Board to parents</span><span class="amount">R1,500</span></div><div class="transaction" data-category="transport"><span class="desc"><span class="date">01</span>Monthly taxi pass</span><span class="amount">R800</span></div><div class="transaction" data-category="comms"><span class="desc"><span class="date">02</span>Airtime + data</span><span class="amount">R350</span></div><div class="transaction" data-category="food"><span class="desc"><span class="date">03</span>Supermarket</span><span class="amount">R280</span></div><div class="transaction" data-category="food"><span class="desc"><span class="date">05</span>Fried-chicken takeaway</span><span class="amount">R85</span></div><div class="transaction" data-category="food"><span class="desc"><span class="date">08</span>Corner cafe</span><span class="amount">R65</span></div><div class="transaction" data-category="food"><span class="desc"><span class="date">12</span>Grocery shop</span><span class="amount">R115</span></div><div class="transaction" data-category="food"><span class="desc"><span class="date">15</span>Burger takeaway</span><span class="amount">R95</span></div><div class="transaction" data-category="food"><span class="desc"><span class="date">17</span>Food delivery app</span><span class="amount">R120</span></div><div class="transaction" data-category="personal"><span class="desc"><span class="date">19</span>Sports shop</span><span class="amount">R420</span></div><div class="transaction" data-category="food"><span class="desc"><span class="date">21</span>Food shop</span><span class="amount">R180</span></div><div class="transaction" data-category="cash"><span class="desc"><span class="date">22</span>ATM cash</span><span class="amount">R200</span></div><div class="transaction" data-category="personal"><span class="desc"><span class="date">24</span>Haircut</span><span class="amount">R100</span></div><div class="transaction" data-category="personal"><span class="desc"><span class="date">25</span>Movies</span><span class="amount">R150</span></div></div></div>
+
+<blockquote>
+<h2>Where did my money go?</h2>
+</blockquote>
+
+<p>Look at the list. Really look. The answer is in there, but not in the way you think. Before moving on, have a real go at finding it.</p>
+
+<div class="yardstick-prompt">
+<label for="yardstick-m2">Before you calculate, make a quick prediction. What do you expect to find?</label>
+<textarea id="yardstick-m2" placeholder="e.g., 'I bet the problem is that one big purchase...' or 'I think it's just lots of small things...'"></textarea>
+</div>
+
+<div class="scratchpad">
+<label for="scratchpad-m2">My calculations</label>
+<textarea id="scratchpad-m2" placeholder="Use this space to work things out..."></textarea>
+</div>
+
+<div class="hintbox" data-n="3" data-label-0="I&#039;m stuck - help me think" data-label-1="Give me a clearer nudge" data-label-2="Just one last push"><button type="button" class="hintbtn" onclick="amuHint(this)">I&#039;m stuck - help me think</button><div class="hintlayers" aria-live="polite"><div class="hint" hidden><p>Look at that long list of 14 payments. It's a jumble. How could you rearrange it to make it shorter and easier to understand?</p></div><div class="hint" hidden><p>Are these fourteen payments really fourteen different <em>kinds</em> of spending? Or do some of them belong together in the same pile? Try putting the ones that are alike into groups.</p></div><div class="hint" hidden><p>Now, add up the total for each group you made. Lay the totals next to each other. Does one group's total seem much bigger than you would have guessed? That's the one worth a closer look.</p></div></div></div>
+
+<div class="nav">
+<button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button>
+<button type="button" class="btn" onclick="amuNext()">I've made my attempt - show the worked solution &#9656;</button>
+</div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>So, what did you find?</p>
+<p>If you started putting the payments into groups and adding them up, you did the exact thing required. There was no other way to turn that long list into a short, clear answer. That move - gathering scattered items into groups and totalling each one - is the core skill here. The name we give it matters less than the instinct that led you to it.</p>
+
+<h3>Where the month actually went</h3>
+<p>Here is one way to group the transactions. Your groups might be different, and that's okay. Any honest grouping reveals the same shape.</p>
+<ul><li><strong>Board to parents:</strong> R1,500</li><li><strong>Transport (taxi pass):</strong> R800</li><li><strong>Airtime &amp; data:</strong> R350</li><li><strong>Personal (clothes, fun):</strong> R670 (R420 + R100 + R150)</li><li><strong>Cash (untracked):</strong> R200</li><li><strong>Food (groceries &amp; takeaways):</strong> <strong>R940</strong></li></ul>
+<p><strong>Take a breath. This number isn't a judgement. It's a starting point.</strong></p>
+<p>The total money out was <strong>R4,460</strong>. With R4,500 coming in, the R40 left in the account makes perfect sense. There's no mystery, just maths.</p>
+<p>But there is a surprise.</p>
+<p>It wasn't the board or the taxi pass; you knew about those. The surprise was the <strong>R940 on food</strong>. Seven small, innocent-looking payments at the supermarket, a takeaway, the corner cafe, and others. Each one felt like nothing at the time. You had never seen them all added together before. They were a major leak, hiding in plain sight.</p>
+
+<p>You made a prediction before you started. Did you expect one big purchase, or lots of small ones? Many people expect a single big mistake - here the truth was the opposite: seven small, ordinary food swipes that nobody had ever added up.</p>
+
+<p>Click below to see that R940 leak highlighted on the statement.</p>
+<button class="btn ghost m3-reveal-btn" onclick="highlightFoodItems()">Show me the R940 food spending &amp;#9656;</button><div id="m3-statement-slot" class="m3-statement-slot"></div>
+
+<h3>The tool that makes the invisible visible</h3>
+<p>This simple act - listing all money in and all money out over a period, sorted into groups - is called a <strong>money tracker</strong> (or a cash flow statement). It's not a plan for the future, not yet. It's an honest record of what already happened.</p>
+<p>It's the only tool that can reliably answer the question, "Where does my money go?" You cannot manage what you have not measured.</p>
+<blockquote>
+<p><strong>The method:</strong> When you can't see where something goes, don't guess. Gather the scattered pieces, sort them into your own groups, and total each one. The answer is in the totals.</p>
+</blockquote>
+
+<div class="nav">
+<button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button>
+<button type="button" class="btn" onclick="amuNext()">Next &#9656;</button>
+</div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You found the move once. Now let's see if it travels. Here is a different world, a different scale, but the same deep problem. Read each part, do the work it asks, then click to reveal the insight.</p>
+
+<p>Meet <strong>Fatima</strong>. She runs a tiny community soup kitchen from a church hall, funded by a single local donor. The donor sends a monthly donation of <strong>R2,000</strong> by bank transfer into the kitchen's account. Fatima withdraws this as cash for a petty-cash tin to pay for daily needs. But for the second month in a row, the tin is running dry by the third week, and she has to go back to ask for more money to get through.</p>
+<p>She is terrified. If she cannot show exactly where the R2,000 went, she is afraid the donor will think she is careless - or even dishonest, that she's stealing - and stop funding the kitchen the community depends on. This fear is the emotional driver.</p>
+
+<p>She empties the tin and finds a mixed pile of printed till slips and handwritten notes for cash payments:</p>
+
+<div class="slip-pile" role="list" aria-label="A pile of receipts from the petty cash tin"><div class="slip printed" role="listitem"><div class="slip-source">SUPERMARKET</div><div class="slip-row"><span class="slip-item">Maize meal 25kg</span><span class="slip-amount">R300</span></div></div><div class="slip handwritten" role="listitem"><div class="slip-row"><span class="slip-item">Bakkie hire - bulk shop</span><span class="slip-amount">R150</span></div></div><div class="slip printed" role="listitem"><div class="slip-source">GROCERY SHOP</div><div class="slip-row"><span class="slip-item">Spinach &amp; onions</span><span class="slip-amount">R350</span></div></div><div class="slip handwritten" role="listitem"><div class="slip-row"><span class="slip-item">Corner shop - tea, sugar, milk</span><span class="slip-amount">R150</span></div></div><div class="slip printed" role="listitem"><div class="slip-source">SUPERMARKET</div><div class="slip-row"><span class="slip-item">Rice 20kg</span><span class="slip-amount">R220</span></div></div><div class="slip printed" role="listitem"><div class="slip-source">GAS DEPOT</div><div class="slip-row"><span class="slip-item">9kg refill</span><span class="slip-amount">R300</span></div></div><div class="slip handwritten" role="listitem"><div class="slip-row"><span class="slip-item">Bakkie hire - veg market</span><span class="slip-amount">R140</span></div></div><div class="slip printed" role="listitem"><div class="slip-source">GROCERY SHOP</div><div class="slip-row"><span class="slip-item">Tomatoes &amp; carrots</span><span class="slip-amount">R260</span></div></div><div class="slip handwritten" role="listitem"><div class="slip-row"><span class="slip-item">Bakkie hire - top-up run</span><span class="slip-amount">R130</span></div></div></div>
+
+<details>
+<summary>Step 1: Why the slips are not the answer</summary>
+<div class="reveal-content">
+<p>Fatima has every single slip and note, so she can prove she didn't steal anything. But just laying out a pile of receipts for the donor doesn't answer the real question: <strong>Why does the tin keep running dry?</strong> The slips tell her <em>where</em> the rands went, but not <em>what</em> keeps draining the tin. This is exactly like you with your banking app: you could see every payment, but you still couldn't see the leak. The slips are not the answer; the insight is hidden.</p>
+</div>
+</details>
+
+<details>
+<summary>Step 2: Find the hidden leak</summary>
+<div class="reveal-content">
+<p><strong>Your turn:</strong> Before you read on, group and total those nine items for her. Which group total would surprise Fatima the way the R940 on food surprised you?</p>
+
+<details>
+<summary>Click to see the breakdown</summary>
+<div class="reveal-content">
+<p>The slips and notes reconcile perfectly: they total R2,000. Her expected costs are all there: food and supplies total R1,580. But the three bakkie-hire payments - R150, R140 and R130 - add up to <strong>R420</strong> on transport. That's the hidden drain.</p>
+<p>This insight is everything. Now Fatima can go to the donor and explain honestly: "The food and supplies budget is right, but I was spending R420 on bakkie runs without realising it because the food kept running out." And better yet, she can fix it. She speaks to a church member with a bakkie, who agrees to do the big bulk runs as a volunteer. The leak is plugged, and the R2,000 will now last the whole month.</p>
+</div>
+</details>
+</div>
+</details>
+
+<p><strong>The deep lesson:</strong> The surface changes - a donor's tin, not a bank app - but the problem is identical. Money leaks away unseen when it is never grouped and totalled. The danger lives in the <strong>sum nobody ever adds up</strong>. And notice: nobody told you or Fatima to "group and total." You both figured out that was the move. That's the part that travels.</p>
+
+<div class="nav">
+<button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button>
+<button type="button" class="btn" onclick="amuNext()">Next &#9656;</button>
+</div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>Your problem was never really about having only R40. It was about <em>managing your money by feel</em>, where every choice made sense on its own, but the total was a painful mystery. That problem lives everywhere. The move you just practised - gather, group, total - is yours to use now.</p>
+
+<div class="recalled-goal-box">
+<p>Remember that goal you set? You wanted to save <strong id="recalled-goal-amount">R2,200</strong>.</p>
+<p>Now that you can see the R940 leak that was hiding in small food purchases, how does that goal feel? A little more possible? The money tracker gives you the map to find that cash in your own spending.</p>
+</div>
+
+<p>Here is how to apply this in your own life:</p>
+<ol>
+<li><strong>Catch your own hidden leak.</strong> Open your real banking app. Take last month's statement. Don't just scan it - get a piece of paper or open a spreadsheet and do exactly what you did for Muhammad. Group every transaction and total each group. It's the simplest grid: each group down one side, its total beside it - that's all a money tracker is.</li>
+<li><strong>Find the surprise.</strong> Which group total genuinely surprises you? Is it takeaways? Subscriptions? Data? That's your R940. That's the number you've never seen before because you only ever saw the small pieces.</li>
+<li><strong>Make one change.</strong> You don't have to fix everything at once. Now that you see the leak, what is one small, different choice you can make this month? That's how you start redirecting that leaked money towards your goal.</li>
+</ol>
+
+<p>This is where the real work begins. Do it on your own statement, then make it stick: tell someone you trust what you found - what you expected, what the numbers actually said, and the one change you will make. Saying it out loud is how a plan becomes a promise. (And if you are working with an AMU facilitator, bring it there too.) <em>The understanding you carry into your own life is the real prize - and in time, the wisdom you gain is what makes this path clearer for those who come after you.</em></p>
+
+<div class="nav">
+<button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button>
+<span class="done">&#10003; You've worked the whole problem.</span>
+</div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

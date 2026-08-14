@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A promise cast in concrete</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A promise cast in concrete</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The design was cheap to build. It looked right on the drawing, it came in on budget, and it was signed off. And now it will be expensive to live with for twenty years.</p>
+<p>Every repair on the main pump means a permit and a broken-out wall. Every routine sample means an operator leaning over an open channel. The strainer that needs cleaning every day sits behind a fixed guard that takes two people and a permit to open - so the cleaning quietly stops happening. None of this was a construction fault. It was designed in, and no one caught it, because no one walked the drawing as the person who would have to live with it. The fault was a line on a page that became a two-decade burden.</p>
+<blockquote><h2>The design looked fine on the drawing and came in cheap - so why is it a costly, dangerous misery to operate and maintain? How do I appraise a design before it is built, when a fault is still just a line on a page?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> It came in cheap and it looked clean on the drawing. Two years on: the pump cannot be withdrawn without dismantling pipework, so a bearing change is a permit job with scaffolding and two people instead of an hour with one. The strainer must be opened to reach the instrument behind it. And the monthly inspection on the upper walkway has quietly stopped happening — nobody decided that, it just became something people did not get to, because getting there is unpleasant and slightly frightening. None of it is a construction fault; it was all built exactly as drawn. Nobody ever walked that drawing as the fitter who would live with it. Write down how you would appraise a design before it is built — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what is actually being appraised</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Have the engineers check it more carefully.&rdquo;</strong> They did check it, and it is technically correct — it does what it was designed to do. Technical correctness and operability are different questions, and only one of them was asked.</p>
+<p>&bull; <strong>&ldquo;Specify better in the tender.&rdquo;</strong> Necessary and insufficient — a specification lists requirements, and these faults live in the <em>arrangement</em>: what sits in front of what, and how much room is left. That is visible on a drawing and invisible in a clause.</p>
+<p>&bull; <strong>&ldquo;Fix it now — modify the pipework.&rdquo;</strong> You will have to, at many times what it would have cost as a line on a page. That ratio is the entire argument for appraising earlier.</p>
+<p>&bull; <strong>&ldquo;Award on whole-life cost rather than capital.&rdquo;</strong> Right in principle and it needs somebody able to see, in a drawing, that this arrangement costs two people and a permit every time. Without that reading, whole-life cost is a formula fed by guesses.</p>
+<p>&bull; <strong>&ldquo;Tell the crew the inspection is mandatory.&rdquo;</strong> The inspection stopped because reaching it is unpleasant and unsafe-feeling. Insisting harder produces either a resented task or a signed sheet, and one of those is worse than the gap.</p>
+<p>&bull; The great error is appraising a design on <strong>how it looks and what it costs to build</strong> — when the build cost is the small part, and the great majority of what this asset will cost across its life was settled while it was still on paper. <strong>And it is not only money that was fixed at design.</strong> What was also decided is the daily working life of everybody who operates and maintains it: whether they work in safety or in danger, with reasonable effort or with heroics, <strong>with dignity or with a permit and a crowbar.</strong> A design is <strong>a promise cast in steel and concrete about the next twenty years of other people's work</strong>, and that promise is what you are appraising — not a drawing. So judge it against <strong>what it will be</strong>, on criteria that are human as much as technical: can it be operated and maintained without putting people in harm; can an ordinary person run it without awkward or dangerous reaches; and can the things that must be maintained actually be <strong>reached, isolated, removed and replaced</strong> — because maintainability is a design property, not a matter of later effort. And you find these faults by <strong>walking the drawing in the shoes of the people who will live with it</strong>, which is the thing nobody did. On paper every one of them was free.</p>
+</div>
+</details>
+<p>A design is a promise about decades - so you appraise it not for elegance, but for how it will be operated, maintained, and lived with. Let us learn how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you appraise an asset design - seeing that a design is a promise about decades, judging it against the whole-life human criteria, walking it through the eyes of the people who will run and maintain and live beside it, and catching the faults the drawing hides while they are still cheap to fix.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. A design is a promise about decades</div><p class="cb-demo">The great error is to appraise a design on how it LOOKS on the drawing and what it costs to BUILD. But the build cost is the small part. A COMMON RULE OF THUMB IN ASSET MANAGEMENT HOLDS THAT 80 PER CENT OR MORE OF AN ASSET&#039;S WHOLE-LIFE COST IS FIXED DURING ITS DESIGN. THE DECISIONS YOU MAKE ON PAPER DETERMINE THE COST IN REALITY FOR DECADES. And it is not only money that is fixed at design - it is the daily working life of every person who will operate and maintain the thing: whether they work in safety or in danger, with reasonable effort or with heroics, with dignity or with a permit and a crowbar. A DESIGN IS A PROMISE CAST IN STEEL AND CONCRETE about the next twenty years of other people&#039;s work. You are not appraising a drawing; you are appraising that promise.</p></div><div class="canvas-box"><div class="cb-label">2. The whole-life human criteria</div><p class="cb-demo">You judge a design against what it WILL BE, not how it looks. SAFETY: can it be operated and maintained without putting people in harm? OPERABILITY: can an ordinary operator run it without heroics or awkward, dangerous reaches? MAINTAINABILITY - this is a design property, appraised against clear criteria: CAN IT BE ACCESSED, ISOLATED, CLEANED, TESTED, AND REPAIRED WITH REASONABLE EFFORT? WHOLE-LIFE COST: the cost to operate and maintain it over its whole life, which DWARFS the capital cost and is mostly locked in here. And ENVIRONMENTAL AND SOCIAL FIT: its footprint, and its effect on the community that lives alongside it and depends on what it produces. A design that scores beautifully on capital cost and elegance and badly on these has FAILED the appraisal, not passed it.</p></div><div class="canvas-box"><div class="cb-label">3. Walk the design, human-centred</div><p class="cb-demo">Here is the move that separates a real appraisal from a paper one, and it is the HUMAN-CENTRED, design-thinking contribution: before you sign off, you WALK THE DESIGN THROUGH THE EYES OF THE PEOPLE WHO WILL LIVE WITH IT. You EMPATHISE - you stand where the maintainer will stand (&#039;to change this pump I would have to remove that wall&#039;), where the operator will stand (&#039;the only sample point is at head height over an open channel&#039;), where the neighbour will stand (&#039;the discharge runs past the allotments&#039;). You TEST THE HARD TASKS - you walk through the pump replacement, the daily clean, the annual inspection with the people who will actually do them, and you watch where the design fights them. A PURELY TECHNICAL REVIEW CHECKS THAT THE NUMBERS ARE RIGHT; A HUMAN-CENTRED APPRAISAL CHECKS THAT A HUMAN BEING CAN ACTUALLY LIVE WITH THE RESULT.</p></div><div class="canvas-box"><div class="cb-label">4. Surface what the drawing hides</div><p class="cb-demo">The costliest and cruellest design faults are precisely the ones a technical review CANNOT see, because they are not errors in the calculation - they are the lived consequences of a correct calculation laid out without regard for the person. A DESIGN THAT IS TECHNICALLY ELEGANT BUT DIMINISHES THE PERSON WHO MUST OPERATE OR MAINTAIN IT IS A FAILED DESIGN. A PUMP THAT REQUIRES A MAINTAINER TO CRAWL INTO A CONFINED, HOT SPACE IS A FAILURE. A SAMPLE POINT THAT FORCES AN OPERATOR TO LEAN OVER AN UNGUARDED CHANNEL IS A FAILURE. THE APPRAISAL IS NOT COMPLETE UNTIL THE DESIGN PASSES THE DIGNITY TEST. None of these is visible as a fault on the drawing; all are obvious the moment you stand where the person will stand.</p></div><div class="canvas-box"><div class="cb-label">5. The verdict - honour the people</div><p class="cb-demo">So the verdict is not &#039;is this design technically elegant?&#039; but the one question that governs the whole appraisal: DOES THIS DESIGN HONOUR THE PEOPLE WHO WILL LIVE WITH IT? And the mercy of appraising early is this: WHEN YOU CATCH A FAULT ON PAPER, THE FIX IS A LINE ON A DRAWING; catch it after the concrete is poured, and the fix is a DEMOLITION CREW, or twenty years of people paying for it with their effort and their safety. A design either honours the people who will live with it, or it burdens them - and your appraisal decides which. Fix it on paper, not in concrete, and never sign off a design that diminishes the people who must run and maintain it.</p></div></div>
+
+<p>Box 2 is the criteria you judge against. Box 3 is the human-centred method that makes them real. Box 4 is what it surfaces. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A design either honours the people who will live with it, or it burdens them - and your appraisal decides which, while the fix is still an eraser and not a demolition crew.</strong> A design is a decision about the daily reality of other people's lives; appraise it accordingly. Five questions:</p>
+<ul>
+<li><strong>What am I really appraising?</strong> <strong>A promise about decades.</strong> Most of the whole-life cost, and all of the daily human experience of the asset, are fixed at design - not at build.</li>
+<li><strong>Against what?</strong> <strong>The whole-life human criteria.</strong> Safety, operability, maintainability, whole-life cost, and environmental and social fit - not elegance, and not build cost alone.</li>
+<li><strong>How do I see them?</strong> <strong>Walk it human-centred.</strong> Stand where the operator, the maintainer, and the neighbour will stand; empathise, and test the hard tasks with the people who will do them.</li>
+<li><strong>What does that catch?</strong> <strong>The faults the drawing hides.</strong> The wall you must break to reach the pump; the guard that stops the daily clean; the sample tap over an open channel - obvious on foot, invisible on paper.</li>
+<li><strong>What is the verdict?</strong> <strong>Does it honour the people?</strong> Fix it on paper, not in concrete, and do not sign off a design that diminishes the people who must run and maintain it.</li>
+</ul>
+<p><strong>A design is a promise about decades.</strong> The great error is to appraise a design on how it looks on the drawing and what it costs to build. But the build cost is the small part. <strong>A common rule of thumb in asset management holds that 80 per cent or more of an asset's whole-life cost is fixed during its design. The decisions you make on paper determine the cost in reality for decades.</strong> And it is not only money that is fixed at design - it is the daily working life of every person who will operate and maintain the thing: whether they work in safety or in danger, with reasonable effort or with heroics, with dignity or with a permit and a crowbar. A design is a promise cast in steel and concrete about the next twenty years of other people's work. You are not appraising a drawing; you are appraising that promise.</p>
+<p><strong>The whole-life human criteria.</strong> So you judge a design against what it will be, not how it looks. <em>Safety:</em> can it be operated and maintained without putting people in harm? <em>Operability:</em> can an ordinary operator run it without heroics or awkward, dangerous reaches? <em>Maintainability:</em> this is a design property, appraised against clear criteria - can it be accessed, isolated, cleaned, tested, and repaired with reasonable effort? <em>Whole-life cost:</em> the cost to operate and maintain it over its whole life, which dwarfs the capital cost and is mostly locked in here. And <em>environmental and social fit:</em> its footprint, and its effect on the community that lives alongside it and depends on what it produces. A design that scores beautifully on capital cost and elegance and badly on these has failed the appraisal, not passed it.</p>
+<p><strong>Walk the design, human-centred.</strong> Here is the move that separates a real appraisal from a paper one, and it is the human-centred, design-thinking contribution: before you sign off, you walk the design through the eyes of the people who will live with it. You <em>empathise</em> - you stand where the maintainer will stand ("to change this pump I would have to remove that wall"), where the operator will stand ("the only sample point is at head height over an open channel"), where the neighbour will stand ("the discharge runs past the allotments"). You <em>test the hard tasks</em> - you walk through the eighteen-month pump replacement, the daily clean, the annual inspection, with the people who will actually do them - and you watch where the design fights them. A purely technical review checks that the numbers are right; a human-centred appraisal checks that a human being can actually live with the result.</p>
+<p><strong>Surface what the drawing hides - and honour the people.</strong> The costliest and cruellest design faults are precisely the ones a technical review cannot see, because they are not errors in the calculation - they are the lived consequences of a correct calculation laid out without regard for the person. <strong>A design that is technically elegant but diminishes the person who must operate or maintain it is a failed design. A pump that requires a maintainer to crawl into a confined, hot space is a failure. A sample point that forces an operator to lean over an unguarded channel is a failure. The appraisal is not complete until the design passes the dignity test.</strong> So the verdict is not "is this design technically elegant?" but the one question that governs the whole appraisal: <strong>does this design honour the people who will live with it?</strong> And the mercy of appraising early is that when you catch a fault on paper, the fix is a line on a drawing; catch it after the concrete is poured, and the fix is a demolition crew, or twenty years of people paying for it with their effort and their safety.</p>
+<p>Does it scale? This is how you evaluate any design that other people will have to live inside - a building, a form, a process, a rule. Ask not "is it clever?" or "is it cheap to set up?" but "who will have to use and maintain this every day for years, and what will it cost them in effort, safety and dignity?" - and then go and stand where they will stand before you decide. The person who designs and the person who maintains are connected through the asset; a good appraisal is you refusing to let the design forget it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Onalenna hands you a proposed design for a small chemical-dosing station at Corathyl. The drawing shows the layout, the key equipment, and the access points, and it is on budget. Your job is to appraise the promise, not the drawing.</p>
+<p><strong>Two facts about the life of this asset:</strong> an operator takes a chemical sample here every day; and the primary dosing pump fails and must be replaced roughly every eighteen months.</p>
+<p><strong>On the drawing you notice:</strong> the sample tap is mounted high on the wall, directly above the open dosing tank; and the dosing pump is installed in a recess boxed in by pipework on three sides, with a fixed guard across the front.</p>
+<ol>
+<li><strong>Walk the design.</strong> Appraise it as (a) the operator taking the daily sample and (b) the maintainer replacing that pump - stand where each of them stands.</li>
+<li><strong>Surface the faults.</strong> Name at least two faults not obvious from a purely technical review - one operability/safety, one maintainability.</li>
+<li><strong>Name the cost.</strong> For each fault, describe the whole-life cost in money (downtime, labour), risk (safety), and human experience (difficulty, indignity).</li>
+<li><strong>Give the verdict.</strong> State your verdict against the one question - does this design honour the people who will work here - and recommend the specific changes required.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the walk: as the <em>operator</em>, taking a daily sample from a tap mounted high over an open tank means reaching and leaning over an open chemical surface every single day. As the <em>maintainer</em>, replacing a pump boxed in by pipework on three sides behind a fixed guard means dismantling surrounding pipework and removing the guard every eighteen months just to reach it.</p>
+<p>Second, the faults: an <strong>operability/safety fault</strong> - the sample point forces a daily reach over an open chemical tank, a splash-and-fall hazard designed into a routine task; and a <strong>maintainability fault</strong> - the pump has no access clearance and no removal path, so a routine, predictable replacement becomes a major strip-down every time.</p>
+<p>Third, the cost: the sample point costs little money but carries a daily safety risk and a quiet indignity (an operator made to do something unsafe to do their job), and safety risk repeated daily for years is how incidents eventually happen. The pump access costs real money and time - hours of extra labour and days of extra downtime at every failure, multiplied across a twenty-year life - plus the frustration and rushed corner-cutting that cramped, awkward maintenance breeds.</p>
+<p>Fourth, the verdict: this design does not yet honour the people who will work here, so it is not approved as drawn - but both faults are cheap to fix on paper. Move the sample point to a safe, reachable location away from the open tank (or enclose the tank and pipe the sample to an accessible tap), and give the pump a clear access route and removal clearance with the guard designed for tool-free, one-person access. Fixed on the drawing, this is a good design; built as drawn, it is a twenty-year burden. Fix it now, while the fix is an eraser.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-design_is_a_promise">1. A design is a promise about decades</label><textarea id="cb-design_is_a_promise" data-key="t-0247:design_is_a_promise" placeholder="The great error is appraising a design on how it looks on the drawing and what it costs to build. But the build cost is the small part. A common rule of thumb holds that 80 per cent or more of an asset&#039;s whole-life cost is fixed at design - the decisions on paper determine the cost in reality for decades. And it is not only money: the daily working life of every operator and maintainer is fixed here too - safe or dangerous, reasonable effort or heroics, dignity or a permit and a crowbar. You are not appraising a drawing; you are appraising a promise about the next twenty years of other people&#039;s work."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-whole_life_criteria">2. The whole-life human criteria</label><textarea id="cb-whole_life_criteria" data-key="t-0247:whole_life_criteria" placeholder="Judge a design against what it will be, not how it looks. SAFETY: can it be operated and maintained without putting people in harm? OPERABILITY: can an ordinary operator run it without heroics or dangerous reaches? MAINTAINABILITY (a design property): can it be accessed, isolated, cleaned, tested and repaired with reasonable effort? WHOLE-LIFE COST: the operate-and-maintain cost over the whole life, which dwarfs the capital cost and is mostly locked in here. ENVIRONMENTAL AND SOCIAL FIT: its footprint and its effect on the community it serves. A design that scores well on capital cost and elegance and badly on these has FAILED the appraisal."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-walk_it_human_centred">3. Walk the design, human-centred</label><textarea id="cb-walk_it_human_centred" data-key="t-0247:walk_it_human_centred" placeholder="The move that separates a real appraisal from a paper one - the human-centred, design-thinking contribution. Before you sign off, walk the design through the eyes of the people who will live with it. EMPATHISE: stand where the maintainer will stand (&#039;to change this pump I must remove a wall&#039;), the operator (&#039;the only sample point is over an open channel&#039;), the neighbour (&#039;the discharge runs past the allotments&#039;). TEST THE HARD TASKS: walk the pump replacement, the daily clean, the annual inspection with the people who will do them, and watch where the design fights them. A technical review checks the numbers; a human-centred appraisal checks that a human can live with the result."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-surface_what_the_drawing_hides">4. Surface what the drawing hides</label><textarea id="cb-surface_what_the_drawing_hides" data-key="t-0247:surface_what_the_drawing_hides" placeholder="The costliest and cruellest faults are the ones a technical review cannot see - not errors in the calculation, but the lived consequences of a correct calculation laid out without regard for the person. The wall you must break to reach the pump; the guard that stops the daily clean happening; the sample tap over an open channel. None is visible as a fault on the drawing; all are obvious the moment you stand where the person will stand. A design that is technically elegant but diminishes the person who must operate or maintain it is a failed design."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-verdict_honour_the_people">5. The verdict - honour the people</label><textarea id="cb-verdict_honour_the_people" data-key="t-0247:verdict_honour_the_people" placeholder="The verdict is not &#039;is this design technically elegant?&#039; but the one question that governs the whole appraisal: DOES THIS DESIGN HONOUR THE PEOPLE WHO WILL LIVE WITH IT? And the mercy of appraising early is that when you catch a fault on paper, the fix is a line on a drawing; catch it after the concrete is poured, and the fix is a demolition crew, or twenty years of people paying for it with their effort and safety. Fix it on paper, not in concrete - and do not sign off a design that diminishes the people who must run and maintain it."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you can appraise a design by walking it as the people who will live with it - surfacing the faults the drawing hides and fixing them on paper - <strong>save it</strong>. You can now appraise the promise, not just the drawing, and make a design honour the people it serves.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A design is a promise about decades - so appraise it against the whole-life human criteria, walk it as the people who will live with it, and never sign off a design that fails the one question: does this honour the people who will operate and maintain it?</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Appraising the drawing, not the promise.</strong> Elegance and capital cost are the small part. Most of the whole-life cost and all of the daily human experience are fixed at design - appraise for the twenty years, not the picture.</p>
+<p>&bull; <strong>Judging by build cost.</strong> The cheapest to build is often the costliest to own. Weigh the operate-and-maintain cost over the whole life, which dwarfs the capital cost.</p>
+<p>&bull; <strong>Skipping the people.</strong> A design review without the operators and maintainers in the room misses the faults only they can see. Walk it human-centred, or you appraise blind.</p>
+<p>&bull; <strong>A technical-only review.</strong> Correct numbers can still lay out a safety trap or a maintenance nightmare. The calculation being right is not the design being livable.</p>
+<p>&bull; <strong>Designing in a dignity trap.</strong> A pump that needs a maintainer to crawl into a hot, cramped space, or a control that makes an operator lean over moving machinery, is a failed design however elegant. The dignity test is not optional.</p>
+<p>&bull; <strong>Deferring the fix to after build.</strong> On paper the fix is a line; in concrete it is a demolition crew, or people paying for it for two decades. Catch it while it is still cheap.</p>
+<p>&bull; <strong>Treating maintainability as an afterthought.</strong> Access, isolation, cleaning, testing and repair are design properties, decided now. Leaving them for the people on the ground to solve later is leaving them an impossible job.</p>
+</div>
+</details>
+<p>The design looked right and cost little to build, and it will punish the people who run and maintain it for twenty years - because it was appraised as a drawing, not as a promise. Now you can appraise the promise. Remember that most of the whole-life cost and all of the daily human experience are fixed here, on paper; judge the design against safety, operability, maintainability, whole-life cost and its fit with the community; walk it as the operator, the maintainer and the neighbour to surface the faults no drawing shows; and fix them now, while the fix is an eraser. <strong>A design either honours the people who will live with it or it burdens them - so appraise the promise, not the drawing, and do not let the design forget the person who must maintain it.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can appraise an asset design now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

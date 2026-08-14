@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build a Reliability Block Diagram: turn a system&#039;s parts into one honest number, and prove which part to spend on</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Build a Reliability Block Diagram: turn a system&#039;s parts into one honest number, and prove which part to spend on</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is a Monday morning at the <strong>gas depot that supplies Tank You</strong> - the wholesaler across the road from Yusuf's shop. You are standing on the gantry above the cylinder-filling line, clipboard in hand, looking down at the steel skid that turns bulk LPG into the full 9 kg cylinders your drivers deliver all day. The gantry grating buzzes faintly under your boots as the pump runs, and the air carries the sharp, eggy tang of the odourant they mix into the gas.</p>
+<p>The line is simple to look at. Bulk gas comes in, runs through <strong>one transfer pump</strong>, past <strong>one filter</strong>, through <strong>one mass-flow meter</strong>, and into the filling head. Four boxes in a row. That is the whole train.</p>
+<p>On the clipboard is the maintenance log for the last eight months. You read down the right-hand column and your stomach tightens. The transfer pump has tripped and stopped the line <strong>three separate times</strong> since January. Each stoppage idled the line for most of a shift while the standby fitter, Sphesihle, was called in and worked through it. The filter has clogged <strong>twice</strong>. The head has failed <strong>once</strong>. The meter has never failed. When any one of those four boxes stops, the whole line stops - and when the line stops, no cylinders get filled, and your drivers stand around with empty vans.</p>
+<p>The plant manager, <strong>Nolwandle</strong>, finds you on the gantry. She is calm but she is pressing. "We are quoting a new contract - a wholesaler who wants <strong>400 cylinders a day, every weekday</strong>. I need to promise them we will get through the shift <strong>at least 95 times in 100.</strong> Before I sign, I need a number I can stand behind. Not a feeling. A number." She taps the skid rail. "And if this line can't hold 95, I need to know exactly <em>which box</em> is dragging us down, so we spend the upgrade money in the right place - not on a guess."</p>
+<p>You have the failure history. What you do not have is a way to turn four boxes and a column of numbers into one honest figure for the whole line - and a way to point at the single box that is hurting you most, rather than the one that shouts loudest.</p>
+<blockquote><h2>Four boxes, four columns of failures, and a promise due before Nolwandle signs. How do I turn parts I know about into one number for the whole line - and prove which box to spend on?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Pump 3 failures, filter 2, head 1, meter 0, in about 170 shifts; a 95-in-100 promise; and money for one upgrade. Write down what you would tell Nolwandle and where you would spend - your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the five answers, and what each one does with those four boxes</summary>
+<div class="reveal-content">
+<p>&bull; <strong>"The pump is obviously worst - bolt a second pump on it."</strong> The instinct on the gantry, and it happens to point at the right box for the wrong reason: three failures is a count, not a rate, and it says nothing about what the <em>line</em> will do. It also gives Nolwandle no number, which was the thing she asked for.</p>
+<p>&bull; <strong>"Add up the failures - six in 170 shifts, so about 96 per cent."</strong> Close to the truth by luck rather than method, and it breaks the moment two boxes fail in the same shift or a box fails twice. Counting stoppages tells you about the past; it does not let you test a fix before you buy it.</p>
+<p>&bull; <strong>"Average the four boxes' reliabilities."</strong> Tempting and wrong in a way that matters: an average puts the line somewhere in the middle of its boxes, and a line where everything must work is always <em>worse</em> than its worst box. This answer will flatter the line every single time.</p>
+<p>&bull; <strong>"Upgrade all four - then we are certain."</strong> Certain of the cost, at least. Last year somebody upgraded the meter, which had never failed, and the line was no more reliable the week after than the week before. Money at a box that was not the problem.</p>
+<p>&bull; <strong>"Tell Nolwandle we cannot promise anything without more data."</strong> Cautious, and it is eight months of real history - the honest move is to use it and state its limits, not to withhold a number until a perfect one exists that never will.</p>
+<p>&bull; Each of these five answers treats the four boxes as a <em>list</em>. The boxes are not a list; they are a <strong>chain</strong>. Because every box is needed, the line's number comes from combining them by the shape they are joined in, not by counting or averaging. Getting the shape right reveals two things at once: one honest figure for the whole line, and a ranking that says exactly which box the upgrade rand should go to. It also lets the fix be tested on paper first, which is what turns a hunch into a case.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Here is the method run start to finish on the depot filling line, with the real numbers off your clipboard.</p>
+<p><strong>Step 1 - Define the system and what "success" means.</strong> The system is the cylinder-filling line. Success is: bulk LPG flows all the way to the filling head so a cylinder can be filled. The period is <strong>one weekday shift of 8 hours</strong> - the unit Nolwandle's contract is written in.</p>
+<p><strong>Step 2 - List the blocks and how they connect.</strong> Walking the skid, the train is four parts, each needed for flow: transfer pump, filter, mass-flow meter, filling head. Ask of each: <em>if this stops, does filling stop?</em> For all four the answer is yes, so they are all in series - four boxes in a single line:</p>
+<blockquote><p>[ Pump ] -- [ Filter ] -- [ Meter ] -- [ Head ]</p></blockquote>
+<p><strong>Step 3 - Put a reliability number on each block, per shift.</strong> Over the last 8 months the plant worked about 170 shifts. Reliability for one shift = (shifts survived) &divide; (total shifts):</p>
+<table>
+<tr><th>Block</th><th>Failures in 170 shifts</th><th>Shifts survived</th><th>R per shift</th></tr>
+<tr><td>Pump</td><td>3</td><td>167</td><td>167 &divide; 170 = <strong>0.982</strong></td></tr>
+<tr><td>Filter</td><td>2</td><td>168</td><td>168 &divide; 170 = <strong>0.988</strong></td></tr>
+<tr><td>Meter</td><td>0</td><td>170</td><td>170 &divide; 170 &asymp; <strong>0.999</strong></td></tr>
+<tr><td>Head</td><td>1</td><td>169</td><td>169 &divide; 170 = <strong>0.994</strong></td></tr>
+</table>
+<p>(0.999 rather than a flat 1.000 for the meter - "never failed yet" is not the same as "can never fail". Being a little humble here keeps the model honest.)</p>
+<p><strong>Step 4 - Combine the blocks: the series multiply.</strong> Because the four are in series, multiply the four reliabilities: 0.982 x 0.988 x 0.999 x 0.994. Working across - 0.982 x 0.988 = 0.970; 0.970 x 0.999 = 0.969; 0.969 x 0.994 = <strong>0.963</strong>. The filling line, as built, has about a <strong>96.3% chance of getting through a shift with no stoppage.</strong></p>
+<p>Notice what the shape did, because it is the whole reason for drawing it. The line came out <em>worse than every single one of its boxes</em> - worse than the pump's 0.982, which was the worst box on the list. That is what a series does, always: each box is another chance to stop, so the more boxes in the chain, the lower the whole. An average of the four would have said 0.991 and been comfortably wrong.</p>
+<p><strong>Step 5 - Find the single point of failure.</strong> In a series line, every block is a single point of failure - any one stops the lot. So the real question is which one hurts most. Rank the blocks; lowest number is worst:</p>
+<table>
+<tr><th>Block</th><th>R per shift</th><th>Rank (worst first)</th></tr>
+<tr><td><strong>Pump</strong></td><td><strong>0.982</strong></td><td><strong>1 - worst</strong></td></tr>
+<tr><td>Filter</td><td>0.988</td><td>2</td></tr>
+<tr><td>Head</td><td>0.994</td><td>3</td></tr>
+<tr><td>Meter</td><td>0.999</td><td>4 - best</td></tr>
+</table>
+<p>The transfer pump is the weakest link. The instinct on the gantry was right about <em>which</em> box - but now you can prove it, and prove the meter upgrade last year was money in the wrong place.</p>
+<p><strong>Step 6 - Test the fix on paper before spending.</strong> What if you add a second, identical transfer pump in parallel, so filling continues on one pump while the other is down? The pump pair stops only if both pumps fail at once. Each pump has R = 0.982, so each fails with chance (1 - 0.982) = 0.018. Pump-pair reliability = 1 - (0.018 x 0.018) = 1 - 0.000324 = <strong>0.99968</strong>. Redraw and recombine - the pump block is replaced by the pump pair: System R = 0.99968 x 0.988 x 0.999 x 0.994. Working across - 0.99968 x 0.988 = 0.9877; 0.9877 x 0.999 = 0.9867; 0.9867 x 0.994 = <strong>0.9808</strong>.</p>
+<p>Per-shift reliability rises from <strong>96.3% to 98.1%</strong> - the stoppage rate roughly halves, from about 1 shift in 27 to about 1 in 52. And that is the answer to Nolwandle's actual question, which was never just "what is the number": as built, the line clears her 95 by a single point and a bad shift arrives every five or six weeks, which is a thin thing to sign against. One parallel pump on the one box that deserved it makes the promise comfortable. You have a number, and you know exactly where the upgrade rand goes.</p>
+<p>Define success, draw the blocks, number them, multiply by shape, rank, test the fix - that whole chain is the <strong>Reliability Block Diagram</strong> method. Now the blueprint, so you can run it on anything.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>What you just watched run is a <strong>Reliability Block Diagram</strong>, or <strong>RBD</strong> - a picture-plus-arithmetic method for turning what you know about each part of a system into one honest number for the whole system. Here is the thinking behind each move.</p>
+<p><strong>Why draw blocks joined by function, not by pipework?</strong> You connect the blocks the way <em>success</em> flows, not the way the pipes are bolted. Ask of every block: <em>if this one part stops, does the whole job stop?</em> Yes, and it belongs in <strong>series</strong> - like the pump, filter, meter and head above, where every block is needed. No, something else carries on, and it belongs in <strong>parallel</strong> - like the standby pump pair in Step 6. Series and parallel are not two methods; they are the two answers to that one question, and the question is always the same.</p>
+<p><strong>What number goes on each block?</strong> <strong>Reliability (R)</strong> is the chance, between 0 and 1, that the block does its job over a stated period without failing - R = 0.95 means a 95% chance of getting through the period with no failure, the way Step 3 turned the pump's three failures in 170 shifts into R = 0.982. One period, chosen once, used for every block: mixing "per shift" for one block and "per year" for another is the commonest way this method goes quietly wrong.</p>
+<p><strong>Why multiply, and why differently for series and parallel?</strong> For <strong>series</strong>, multiply the blocks' numbers together - System R = R1 x R2 x R3 x ... - because the job only succeeds if every block works, the way Step 4 multiplied all four reliabilities down to 0.963. That is also why a series is always worse than its worst block: you are multiplying numbers below 1, so every extra block drags the answer down. For <strong>parallel</strong>, it is easier to work with the chance of <em>failing</em>: the chance a block fails is (1 - R), the group only fails if all of them fail, so you multiply the failure chances and subtract from 1 - System R = 1 - [(1 - R1) x (1 - R2) x ...] - exactly how Step 6 turned two 0.982 pumps into a 0.99968 pair. Two so-so units in parallel beat either one alone; two good units in series are worse than either one alone. Get the shape wrong and the answer moves the wrong way.</p>
+<p><strong>Why chase the weakest link, not the loudest failure?</strong> In a pure series line, every block is a single point of failure, so the one worth your money is the block with the <em>lowest</em> R - the way Step 5 ranked all four blocks and proved the pump, not a hunch, was the true weak link, and Step 6 proved a parallel spare on that one block was worth the spend.</p>
+<p><strong>When does RBD fit - and when does it need care?</strong> It fits systems you can break into parts that are clearly "working" or "failed", where you have, or can estimate, a reliability figure per part - most plant, fleet, utility and process lines. It needs care when failures are <em>not</em> independent - a shared power supply that takes out three "redundant" units at once is not really redundant; when a part degrades gradually rather than failing cleanly; or when the same part appears in more than one path, which needs more advanced methods. RBD assumes blocks fail independently of each other; if they do not, the simple multiplying overstates how good you are. Note that honestly.</p>
+<p>Two neighbouring questions have their own units. Whether the figure you should be quoting is this per-period reliability at all, or the fraction of <em>hours</em> the system is up - which are different numbers answering different promises, and can be identical while describing opposite operations - is <strong>t-0291</strong>. And a group where the job needs <em>most</em> of its units rather than all of them or any one of them, which is where a lot of real plant sits, is <strong>t-0292</strong>.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Do each task before reading its feedback. Get a pencil and actually do the multiplying - the skill is in the doing, not the reading.</p>
+<p><strong>Task 1 - A simple series of three (warm-up).</strong> The Tank You bakkie's pre-trip safety check before a delivery run depends on three things in series: the battery (R = 0.99), the regulator valve (R = 0.97), and the leak sensor (R = 0.95). All three must work for the van to be cleared to load. Compute the system reliability for one run. Which block is the single point of failure to attack first?</p>
+<details><summary>Try it yourself, then check what good looks like</summary>
+<div class="reveal-content">
+<p>Series, so multiply: 0.99 x 0.97 x 0.95 = <strong>0.912</strong>, about a 91% chance of passing the check with no fault. Note it is below the worst block (0.95) - that is the series doing what a series does. Every block is a single point of failure, and the weakest is the <strong>leak sensor at 0.95</strong> - attack that first. Good answers state the shape ("series &rarr; multiply"), show the arithmetic, and name the lowest-R block, not the one that "feels" worst.</p>
+</div>
+</details>
+<p><strong>Task 2 - Add a parallel pair.</strong> The plant's standby generator and the grid feed power the line. The line keeps running if either the grid (R = 0.90) or the generator (R = 0.85) is up - they are in parallel. Compute the reliability of the power supply to the line.</p>
+<details><summary>Try it yourself, then check what good looks like</summary>
+<div class="reveal-content">
+<p>Parallel &rarr; work with failure chances. Grid fails 1 - 0.90 = 0.10; generator fails 1 - 0.85 = 0.15. Both fail together = 0.10 x 0.15 = 0.015. System R = 1 - 0.015 = <strong>0.985</strong>. Two so-so sources (0.90 and 0.85) in parallel give a <em>better</em> combined figure (0.985) than either alone - that is what redundancy buys. A common slip is to multiply 0.90 x 0.85 (that is the series answer, 0.765, and wrong here).</p>
+</div>
+</details>
+<p><strong>Task 3 - Series and parallel together (mixed system).</strong> A second filling line has: a power supply that is the parallel pair from Task 2 (R = 0.985), feeding a single pump (R = 0.96), feeding a single filling head (R = 0.98), all in series after the power block. Draw the diagram in words and compute the whole-system reliability.</p>
+<details><summary>Try it yourself, then check what good looks like</summary>
+<div class="reveal-content">
+<p>First collapse the parallel power block to its single figure (0.985, already done). Then the system is three blocks in series: power(0.985) &rarr; pump(0.96) &rarr; head(0.98). Multiply: 0.985 x 0.96 x 0.98 = <strong>0.927</strong>. The method is <strong>collapse the parallel groups to single numbers first, then multiply the series chain.</strong> The single pump (0.96) is now the weakest link and the single point of failure to attack. Good answers do the parallel reduction before the series multiply, in that order.</p>
+</div>
+</details>
+<p><strong>Task 4 - Where to spend (the one that matters).</strong> Take the mixed system from Task 3 (power 0.985, pump 0.96, head 0.98, system 0.927). You have money for exactly one improvement: (a) a parallel spare on the pump, or (b) a parallel spare on the head. Compute the new system reliability for each, and say which you buy and why.</p>
+<details><summary>Try it yourself, then check what good looks like</summary>
+<div class="reveal-content">
+<p>(a) Pump pair = 1 - (0.04 x 0.04) = 0.9984. System = 0.985 x 0.9984 x 0.98 = <strong>0.9638</strong>. (b) Head pair = 1 - (0.02 x 0.02) = 0.9996. System = 0.985 x 0.96 x 0.9996 = <strong>0.9452</strong>. <strong>Buy (a), the pump spare</strong> - it lifts the system by 3.7 points against 1.8, because it was the weakest block, and a spare is worth most where the block is worst. This is the whole point of ranking before spending: both options are genuine improvements, and one is worth twice the other for the same money.</p>
+</div>
+</details>
+<p><strong>Now take your own system</strong> - a line, a fleet, a pumpset, a power feed, a process train - and run the same six steps on it. Don't summarise the depot example; fill in your own numbers, on paper or in a spreadsheet.</p>
+<p><strong>Step 1 - pin the period and the meaning of "success", in one sentence.</strong> Name the system. State what "success" means (one sentence - what counts as working?). Pick ONE period (shift / run / day / year) and keep it throughout.</p>
+<p><strong>Steps 2-3 - list every block, wire it by function, and put a number on it.</strong> For each part ask: <em>if only this stops, does the whole job stop?</em> Yes &rarr; series. No (something else carries on) &rarr; parallel. For each block, record: is it a single point of failure (Y/N); its shape (series / parallel); failures in the period; periods survived &divide; total = R. Never-failed block? Don't write 1.000 - use one "pretend" failure for caution, as was done with the meter.</p>
+<p><strong>Step 4 - collapse each parallel group to one number first, then multiply the series chain.</strong> Parallel group reliability = 1 - [(1 - R_a) x (1 - R_b) x ...]. Then System R = the collapsed chain multiplied block by block. Sanity-check it: your answer must come out <em>below</em> your worst series block. If it does not, the shape is wrong somewhere.</p>
+<p><strong>Step 5 - rank to find the weakest link</strong> (lowest number = worst; that is your single point of failure). Does System R clear your target, and by how much? A target cleared by a single point is not the same as a target cleared comfortably - say which you have.</p>
+<p><strong>Step 6 - test the fix on paper before you spend a cent.</strong> Take only the worst-ranked block and re-do Step 4 with it improved (a parallel spare gives a new pair R = 1 - (1 - R)&sup2;). Which block will you improve, and how? What is its new R after the fix? What is the new System R once you re-multiply the chain? Was it worth it - state the stoppage rate before and after.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your Reliability Block Diagram true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>System reliability comes out higher than the best single block?</strong> You added reliabilities, or multiplied a parallel group as if it were series. In series the system is always <em>worse</em> than its weakest block. Re-check the shape: series &rarr; multiply (answer drops); parallel &rarr; use 1 - (product of failure chances) (answer rises). The series answer can never beat the weakest block.</p>
+<p>&bull; <strong>Parallel result looks wrong, too low?</strong> You multiplied the reliabilities (R1 x R2) instead of working with failure chances. For parallel, multiply the (1 - R) failure chances together, then subtract from 1 - never multiply the R's directly for parallel.</p>
+<p>&bull; <strong>Wired the diagram from the pipework?</strong> You drew the physical layout, not the functional success path, so a part that does not stop flow ended up in series by mistake. For every block ask: "if only this fails, does the whole job stop?" Yes &rarr; series. No (something else carries on) &rarr; parallel. Function flow, not pipe flow.</p>
+<p>&bull; <strong>Averaged the blocks instead of multiplying them?</strong> An average always lands in the middle of the blocks, and a series is always below its worst one. If your system number sits between your blocks' numbers, you have averaged something.</p>
+<p>&bull; <strong>A "redundant" pair is no more reliable in practice than one unit?</strong> The two units are not independent - a shared power feed, shared valve or shared operator takes both out together. RBD assumes independent failures. Find and remove the shared cause, or model that shared part as its own series block in front of the pair. Honest redundancy needs independent failure paths.</p>
+<p>&bull; <strong>You upgraded a block and nothing improved?</strong> You spent on a strong block (high R) instead of the weakest link. Rank all blocks by R and spend on the lowest one - that is the single point of failure dragging the system. The meter that never fails is the last place to spend.</p>
+<p>&bull; <strong>Numbers drift, don't reconcile between people?</strong> Mixed periods - one person used "per shift", another "per year", another "per run". Fix one period and one definition of "success" up front, and put every block's number on that same basis before you multiply.</p>
+</div>
+</details>
+<p>You came onto the gantry with a hunch and a maintenance log you could not turn into a promise. You can leave with the method that does it every time: define success, draw the blocks by function, number each one, multiply by shape, rank the weakest link, and test the fix on paper before you spend a rand of it. On the depot line that turned "the pump feels worst" into a proven 96.3% per-shift reliability - lower than every single box, because that is what a chain does - a true single point of failure, and a parallel-spare fix that lifts it to 98.1%: the number Nolwandle can sign against, and the case for spending on exactly the right box.</p>
+<p>Note honestly where RBD needs care: it assumes each block fails independently of the others, degrades cleanly rather than gradually, and appears in only one path of the diagram. Where those do not hold, treat the number as a starting estimate, not a guarantee.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build a Reliability Block Diagram and turn a system's parts into one honest number - and prove which part to spend on.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

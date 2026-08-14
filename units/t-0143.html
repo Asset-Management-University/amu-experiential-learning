@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>We told them; we did not ask them</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>We told them; we did not ask them</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and the board has approved an expansion - a new wellfield and a pipeline to carry the water. The pipeline has to cross the land of a farming community that lives along the river. The engineering is finished. The plan for the people is simple: hold a town-hall meeting to inform the community, hand over a goodwill cheque for the inconvenience, and start work.</p>
+<p>And it is already unravelling. Word reached the community before any meeting did - outsiders have decided to run a pipeline through their fields. The cheque, when it was mentioned, did not read as generosity; it read as being bought. Now the community is organising to stop the project, and they have every reason to.</p>
+<p>You sit with it and see what you did. You treated the community as an obstacle to be managed, not as people whose land it is and whose agreement you needed. "Engagement" was a formality bolted on <em>after</em> the decision - a notification, not a request. And underneath the discomfort is a plain gap in your competence: you do not actually know what a lawful, genuine host-community process is supposed to look like.</p>
+<blockquote><h2>My project is technically sound and it is about to be stopped by the very people it was never really offered to. How do I engage a host community so that I earn their genuine agreement - the way the law and basic respect both require - instead of just telling them what I have already decided?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The route is fixed, the authorisation is nearly through, and the pipeline crosses the farming community's land. What you arranged was a town-hall meeting to explain the plan, and a goodwill payment — both offered sincerely, by people who believed they were doing the decent thing. The community is not against the pipeline. They are against having been told. And underneath your discomfort is a plain gap: you do not actually know what a proper process is supposed to look like. Write down how you would have gone about this — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the one-sentence test</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Hold the meeting and explain it better.&rdquo;</strong> The meeting is not the problem; what it is <em>for</em> is the problem. Explaining a settled decision more clearly is still explaining a settled decision.</p>
+<p>&bull; <strong>&ldquo;Increase the payment.&rdquo;</strong> Look carefully at what that is. Money offered while the decision is pending, to people who have not agreed, is not a gift — it is pressure, whatever it is called, and raising it makes it more so.</p>
+<p>&bull; <strong>&ldquo;Get the legal permissions and proceed.&rdquo;</strong> May be lawful and will not build the pipeline. A community that was not asked can stop a project by a dozen means that have nothing to do with permits, and you would be starting a relationship you must maintain for decades from the worst possible position.</p>
+<p>&bull; <strong>&ldquo;Find community leaders and get their agreement.&rdquo;</strong> Half right and the shortcut that fails. The assent of whoever was easiest to reach is not the community's decision, and it tends to fracture the community as well as your project.</p>
+<p>&bull; <strong>&ldquo;Send them the full impact assessment.&rdquo;</strong> Disclosure that satisfies a file and not a person. A complete technical document that nobody can act on is not information; it is the appearance of it.</p>
+<p>&bull; Everything turns on one distinction, and it has a one-sentence test. Asking for views on a decision already taken, and seeking an agreement that <strong>could genuinely be refused</strong>, are different things — so ask: <strong>could they still say no?</strong> If not, then whatever you run is not the thing you are calling it, however sincere and however well attended. Where the second is required, four conditions all have to hold, and failing one voids the rest. It happens <strong>before</strong> anything is fixed or authorised, with time for the community to run <strong>its own way of deciding</strong> rather than react to your deadline. What you disclose is <strong>genuinely usable</strong> — the real impacts on their land and water, in a form people can act on. There is <strong>no coercion</strong>, including the polite kind you had already arranged. And the agreement you seek is <strong>the community's own</strong>. Your route was fixed first, so all four were already lost — which is the honest answer to why a technically sound project is about to be stopped by the people it was never offered to.</p>
+</div>
+</details>
+<p>There is a standard for exactly this, and a law that now makes it a duty. Here is the engagement brief, worked for the pipeline.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the host-community engagement brief Onalenna should have written before the route was ever fixed.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Do I need their agreement, or only to inform them? (consultation vs consent)</div><p class="cb-demo">The pipeline must cross the farming community&#039;s land. That is not a project you can simply announce - it needs their genuine agreement, which means CONSENT, not consultation. Consultation is asking for input on a decision you have already made; consent is seeking a real yes, which means they could also say no. The whole plan so far - a town-hall to &#039;inform&#039; them and a goodwill cheque - was built for consultation. This project legally and ethically needs consent, and the two are not the same thing at all.</p></div><div class="canvas-box"><div class="cb-label">2. Am I engaging freely, early, openly enough to seek genuine consent? (the four elements of FPIC)</div><p class="cb-demo">Free, Prior and Informed Consent (from the UN Declaration on the Rights of Indigenous Peoples), made concrete. PRIOR: engage BEFORE any authorisation or ground is broken, with enough time for the community to run its own decision process - not a week before the diggers arrive. INFORMED: full, ACCESSIBLE disclosure of the route, the impacts on farmland and water, the risks and the real benefits - in a form people can actually use, not a technical report. FREE: no coercion, and no cheque dangled as a gift that is really pressure. CONSENT: seek genuine collective agreement. Fail any one element and the &#039;consent&#039; you get is not consent.</p></div><div class="canvas-box"><div class="cb-label">3. What does the law actually oblige me to do? (the PIA host-community regime)</div><p class="cb-demo">For the energy sector our graduates enter, the Petroleum Industry Act 2021 turns host-community development from charity into law. The operator must establish a HOST COMMUNITIES DEVELOPMENT TRUST; contribute 3% of its actual OPERATING EXPENDITURE (opex) of the previous year into it - three per cent of what it spends to operate, NOT of profit; and deliver a HOST COMMUNITY DEVELOPMENT PLAN through that trust, overseen by the regulator (the Nigerian Upstream Petroleum Regulatory Commission, NUPRC). So the &#039;goodwill cheque&#039; is exactly the wrong instrument: development is owed, structured, and accountable through a trust - not handed over at a manager&#039;s discretion to smooth a decision.</p></div><div class="canvas-box"><div class="cb-label">4. What goes in the brief? (the engagement brief itself)</div><p class="cb-demo">The one-page brief: WHO - the host community whose land and water the project affects, and how it is legitimately represented. THE FPIC PROCESS - the prior/informed/free/consent steps and a timeline that starts before authorisation. THE LEGAL OBLIGATIONS - the development trust, the 3% opex contribution, the development plan, and who oversees them. ALIGNMENT - how the development plan reflects what THIS community actually asked for. And the GRIEVANCE MECHANISM - a defined, accessible route to raise and resolve disputes, so the first disagreement has somewhere to go other than a blockade.</p></div><div class="canvas-box"><div class="cb-label">5. Is this genuine, or performative? (the honesty test)</div><p class="cb-demo">The test that decides everything: could this process genuinely change the route, the terms, or even stop the project - or is the decision already locked and the engagement staged to get it through? If it is the latter, it is performative FPIC, and communities recognise theatre faster than anyone. Genuine engagement earns a SOCIAL LICENCE - the community&#039;s real acceptance that lets the project proceed and endure. Performative engagement buys resentment that resurfaces as delay, protest and blockade for the life of the asset. The brief is only worth the paper if the answer to &#039;could they still say no?&#039; is yes.</p></div></div>
+
+<p>Look at box 5, because it is the one that judges all the others. Every fine word about process is worthless if the answer to "could this community still say no?" is no - because then the engagement is theatre, and people know theatre when they see it. The whole brief is built to make the first four boxes real, not performed. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>This whole unit turns on one distinction, so start there. <strong>Consultation</strong> is asking a community for input on a decision you have already made. <strong>Consent</strong> is seeking their genuine agreement - which means they could also say no. Onalenna's cheque felt like an insult because it was consultation dressed as generosity: it told, it did not ask. Five questions build the real thing:</p>
+<ul>
+<li><strong>Do I need their agreement, or only to inform them?</strong> For a project on or across a community's land, you need their agreement - <em>consent</em>, not a notice. Getting this first question wrong makes everything after it a formality.</li>
+<li><strong>Am I engaging freely, early and openly enough to seek genuine consent?</strong> The international standard is <strong>Free, Prior and Informed Consent</strong> (FPIC), and each word is a test. <em>Prior</em>: engage before any authorisation or ground-breaking, with time for the community's own decision process. <em>Informed</em>: full, <em>accessible</em> disclosure of route, impacts, risks and benefits - not a technical report nobody can use. <em>Free</em>: no coercion, and no gift that is really pressure. <em>Consent</em>: seek genuine collective agreement. Fail any one element and what you have is not consent.</li>
+<li><strong>What does the law actually oblige me to do?</strong> For the energy sector FUPRE graduates enter, the <strong>Petroleum Industry Act</strong> (2021) makes host-community development a legal duty, not charity. The operator must set up a <strong>Host Communities Development Trust</strong>, contribute <strong>3% of its actual operating expenditure</strong> - what it spends to operate, not its profit - into that trust, and deliver a <strong>Host Community Development Plan</strong> through it, under the oversight of the regulator (the Nigerian Upstream Petroleum Regulatory Commission, NUPRC). That is precisely why a discretionary goodwill cheque is the wrong instrument: development here is owed, structured and accountable.</li>
+<li><strong>What goes in the brief?</strong> The engagement brief pulls it together: who the community is and how legitimately represented; the FPIC process and a timeline that begins before authorisation; the legal obligations and how they are met; how the development plan reflects what <em>this</em> community actually asked for; and a <strong>grievance mechanism</strong> - a defined, accessible route to raise and resolve disputes, so the first disagreement has somewhere to go other than a blockade.</li>
+<li><strong>Is this genuine, or performative?</strong> The honesty test, and the one that matters most: could this process actually change or stop the project? If the decision is locked and the engagement is staged to push it through, it is performative - and communities detect that immediately. Genuine engagement earns a <strong>social licence to operate</strong>; performance buys resentment that returns as delay and protest for the life of the asset.</li>
+</ul>
+<p>One honest boundary. Your job as the engineer is to make sure the project plan includes a compliant, genuine engagement process <em>from the start</em>. You are not the lawyer interpreting the Act, and not the community-liaison officer running the meetings - you are the technical authority confirming that the project's foundation includes a valid, ethical and legal process for earning the community's acceptance. And FPIC is not a manipulation technique: the entire point is genuine consent, and the Act's obligations are law, not a gesture you may skip.</p>
+<p>Does it scale? Telling a community about a pipeline you have already decided on is like building a shed on your neighbour's lawn and then offering them money for the trouble; preparing an FPIC-compliant brief is like going to your neighbour first, with the plans, asking permission and agreeing the terms before a single nail is hammered - only the second is a relationship, and here only the second is lawful.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different project: a new access road to a treatment works must run through a host community's grazing land.</p>
+<ol>
+<li><strong>Consent or consultation?</strong> Does this project need the community's consent or only their consultation - and why?</li>
+<li><strong>One FPIC element, made concrete.</strong> Choose one of Free, Prior, Informed or Consent, and describe exactly how you would meet it for this road.</li>
+<li><strong>One legal obligation.</strong> State one host-community obligation the Petroleum Industry Act would place on an energy operator here, with the correct basis (remember: 3% of operating expenditure, not profit).</li>
+<li><strong>The grievance mechanism.</strong> Write one line describing how a community member could raise and have a dispute resolved.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> re-read your step 1. If you argued the project needs only consultation because it is "for the community's own good", check yourself - the benefit of a project is decided <em>with</em> the community, not assumed on their behalf. A project on their land needs their consent, however good you believe it to be.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-consent_or_consultation">1. Do I need their agreement, or only to inform them? (consultation vs consent)</label><textarea id="cb-consent_or_consultation" data-key="t-0143:consent_or_consultation" placeholder="Decide honestly whether the project can proceed on the community&#039;s genuine agreement, or whether you are only planning to notify them. For a project on or across their land, the answer is consent."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-fpic_process">2. Am I engaging freely, early, openly enough to seek genuine consent? (the four elements of FPIC)</label><textarea id="cb-fpic_process" data-key="t-0143:fpic_process" placeholder="Make each element of Free, Prior, Informed, Consent concrete for this project. If any one fails, the consent is not valid."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-pia_obligations">3. What does the law actually oblige me to do? (the PIA host-community regime)</label><textarea id="cb-pia_obligations" data-key="t-0143:pia_obligations" placeholder="Set out the statutory host-community obligations. For the Nigerian energy sector this is the Petroleum Industry Act - development as a legal duty, through a trust, not an ad-hoc gift."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-brief">4. What goes in the brief? (the engagement brief itself)</label><textarea id="cb-brief" data-key="t-0143:brief" placeholder="Assemble the host-community engagement brief: who the community is and how represented, the FPIC process and timeline, the legal obligations and how met, the development-plan alignment, and a grievance mechanism."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-genuine_or_performative">5. Is this genuine, or performative? (the honesty test)</label><textarea id="cb-genuine_or_performative" data-key="t-0143:genuine_or_performative" placeholder="Test the brief against one question: could this process actually change or stop the project? If the decision is already locked, the engagement is theatre - and communities detect theatre immediately."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now bring a community into a project as a partner whose agreement you have genuinely earned, instead of an obstacle you tried to manage.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Host-community engagement fails in a small number of very consistent ways, and each one is a way of turning consent back into a formality.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Engagement bolted on after the decision.</strong> The original error. If the route, the terms and the timing are already fixed, you are notifying, not consenting - and "prior" has already failed before the first meeting.</p>
+<p>&bull; <strong>A cheque or gift used to buy agreement.</strong> An inducement dressed as generosity fails the "free" test. Development owed through a lawful trust is respect; a discretionary payment to smooth a decision is pressure, and it is read as exactly that.</p>
+<p>&bull; <strong>Disclosure that is complete but not accessible.</strong> Handing over a technical report is not informing a community. "Informed" means the disclosure is in a form the people can actually understand and use to decide.</p>
+<p>&bull; <strong>Confusing consultation with consent.</strong> The single most common and most costly error. Asking for input is not the same as seeking a yes that could also be a no - and communities feel the difference immediately.</p>
+<p>&bull; <strong>Treating the legal duty as optional charity.</strong> The trust, the 3% of operating expenditure and the development plan are obligations under the Act, not favours. Skipping or improvising them is a breach, not a saving.</p>
+<p>&bull; <strong>No grievance mechanism.</strong> Without a defined route to raise a dispute, the first disagreement has nowhere to go but escalation - and a blockade is what a missing grievance mechanism looks like in practice.</p>
+<p>&bull; <strong>Performative FPIC.</strong> Running the whole process while the real decision is already locked. It is the most cynical failure and the most easily detected; it converts a community that might have said yes into one that never will.</p>
+</div>
+</details>
+<p>Onalenna's pipeline was sound in every way except the one that stopped it: the people whose land it crossed were told, not asked. Now she can do it properly - decide honestly whether the project needs consent, meet every element of free, prior and informed consent, treat the legal obligations as the duties they are, write the brief with a real grievance route, and pass the one test that matters: could they still say no? A project done to a community gets blocked; a project done with a community earns the licence to endure. If you are working with an AMU Facilitator, take one real project and ask the blunt question first - are we planning to ask this community, or only to tell them?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can earn a community's consent now, not assume it.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

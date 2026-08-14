@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No one else to call</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>No one else to call</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The one workshop that can refurbish your bespoke pump impellers to the tolerance the duty demands is failing you. Their last three refurbished impellers came back and failed early, and early impeller failure means the plant's reliability - the thing your whole asset-management strategy turns on - is now at risk.</p>
+<p>And you are stuck. There is <em>no one else to call</em>: they are the sole source, the only firm with the skill and the certification, and building an alternative would take years. You have sent the angry letters. You have quoted the penalty clauses. It has changed nothing - because the workshop is not failing out of laziness or bad faith. They genuinely lack a capability the job now needs, and no letter, no penalty, no amount of pressure can conjure into existence a skill that is simply not there.</p>
+<p>You cannot switch them. You cannot force them. And the reliability of a plant a town depends on is bleeding away while you argue.</p>
+<blockquote><h2>My most critical supplier cannot do what I need, and there is no one else and no way to force them - so how do I get the capability I depend on when it does not yet exist?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> One workshop in the province can rebuild these pumps, and standing up an alternative would take years. Their rebuilds keep coming back early. You have sent the warning letters. You have invoked the penalty clauses. Nothing has changed — and when you visit, it is obvious why: they are decent people trying hard, and the skill this job now needs is simply <strong>not in that building.</strong> You cannot switch them. You cannot force them. And the reliability of a plant a town depends on is bleeding away while you argue. Write down what you would do — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the one that is not on most people's list</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Escalate — stronger letters, bigger penalties.&rdquo;</strong> More of what has already failed twice. <strong>You cannot enforce a capability that is not there</strong>: penalties can push a capable but complacent supplier to try harder, and they cannot create a skill nobody in the workshop possesses.</p>
+<p>&bull; <strong>&ldquo;Find another supplier.&rdquo;</strong> There is not one, and building one takes years you do not have. Repeating that there ought to be an alternative does not produce one.</p>
+<p>&bull; <strong>&ldquo;Bring it in house.&rdquo;</strong> Sometimes right, and it is the same problem wearing your own uniform: you would be creating a capability from nothing, at cost, on your own premises, having declined to create it where it nearly exists.</p>
+<p>&bull; <strong>&ldquo;Accept the rebuild quality and manage around it.&rdquo;</strong> Pays for the shortfall forever in early failures and lost availability, and quietly makes a town's water supply the thing that absorbs it.</p>
+<p>&bull; <strong>&ldquo;Terminate and deal with the consequences.&rdquo;</strong> Removes the only supplier you have as a punishment for lacking something nobody asked them to have until now.</p>
+<p>&bull; When a supplier falls short there are exactly <strong>three</strong> things available, and knowing which fits is the whole first move. <strong>Replace</strong> them. <strong>Manage</strong> them, monitoring against the contract and enforcing with measures and penalties. Or <strong>develop</strong> them — invest in their capability so they become able to supply what you need. Most buyers reach only for the first two, and for an ordinary replaceable supplier that is perfectly adequate. <strong>For the critical supplier both evaporate</strong>: replacement is not available, and management cannot manufacture a missing skill. So the third is the only real option, and it should be chosen <strong>deliberately rather than arrived at in defeat</strong> — which means accepting two uncomfortable things. It is <strong>an investment in somebody else's business</strong>, justified because their capability <em>is</em> your reliability. And you can only afford it for the <strong>strategic few</strong>, so it demands an honest judgement about which suppliers genuinely warrant it — not everyone who disappoints you.</p>
+</div>
+</details>
+<p>Here is the third option nobody reached for.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you build a capability a critical supplier does not yet have - seeing the three options, assessing against your strategy, focusing on the strategic few, developing collaboratively, and holding it as a partnership.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Select, manage, or develop - and for a critical supplier, only one is real</div><p class="cb-demo">WHEN A SUPPLIER FALLS SHORT, YOU HAVE EXACTLY THREE THINGS YOU CAN DO, AND KNOWING WHICH ONE FITS IS THE WHOLE FIRST MOVE. YOU CAN SELECT a better one - switch suppliers. YOU CAN MANAGE their performance - monitor them against the contract and enforce it with metrics and penalties. OR YOU CAN DEVELOP them - invest in their capability so they become better at supplying you. Most buyers reach only for the first two, and for an ORDINARY supplier they are perfectly fine: if a replaceable supplier underperforms, switch or enforce. BUT NOW LOOK AT THE CRITICAL, HARD-TO-REPLACE SUPPLIER - the sole maker of a bespoke part, the one firm with the certification, the specialist you cannot swap overnight - AND WATCH THE FIRST TWO OPTIONS EVAPORATE. SELECTING IS NOT AVAILABLE: there is no one else to switch to, and standing up an alternative takes years you do not have. AND MANAGING DOES NOT WORK, FOR A REASON THAT IS THE HEART OF THIS UNIT: YOU CANNOT ENFORCE A CAPABILITY THAT IS NOT THERE. Penalties and angry letters can push a capable-but-lazy supplier to try harder, but they CANNOT CREATE IN AN INCAPABLE SUPPLIER A SKILL THEY DO NOT POSSESS - you can fine the impeller workshop into bankruptcy and still not have a balanced impeller, because the balance was never a question of effort. SO FOR THE CRITICAL SUPPLIER, DEVELOPMENT IS OFTEN THE ONLY REAL OPTION: a deliberate, collaborative investment in their capability, so that a supplier who cannot meet your need today can meet it tomorrow. The trapped feeling of the sole-source supplier who simply cannot do the job is exactly the moment the third option stops looking soft and starts looking like the only way out.</p></div><div class="canvas-box"><div class="cb-label">2. Assess against your strategy - the specific gap, not generic betterment</div><p class="cb-demo">DEVELOPMENT IS NOT &#039;MAKE THE SUPPLIER VAGUELY BETTER&#039; - IT IS DISCIPLINED, AND IT STARTS WITH AN ASSESSMENT, BUT AN ASSESSMENT AGAINST A PRECISE STANDARD: WHAT YOUR ASSET-MANAGEMENT STRATEGY AND OBJECTIVES ACTUALLY REQUIRE. This is the exact requirement of the outcome - a supplier development assessment BASED ON the physical asset-management strategy and objectives - and it is what stops development from being a vague goodwill exercise. If your strategy turns on RELIABILITY, you assess and develop their QUALITY and their LEAD-TIME. If it turns on SUSTAINABILITY, their ENVIRONMENTAL PRACTICE. If on COST, their EFFICIENCY. You hold the supplier&#039;s actual capability up against that strategic requirement and you find THE SPECIFIC GAP - not &#039;they are not good enough&#039;, which tells you nothing you can act on, but a NAMED SHORTFALL. For the impeller workshop, the assessment does exactly this: it reveals the gap precisely - the workshop has NO WAY TO VERIFY THE IMPELLER BALANCE to the tolerance the duty demands, and NO CONTROLLED PROCEDURE FOR THE COATING. That precision is everything, because YOU CAN ONLY DEVELOP A CAPABILITY YOU HAVE NAMED: &#039;reduce your defect rate to this&#039;, &#039;add balance verification&#039;, &#039;hold this certified stock&#039;, &#039;introduce this test&#039;. The assessment identifies the concrete, measurable capabilities that SHOULD be developed, and the strategy justifies WHY they matter - and only with the gap named that precisely can you build a development plan that closes it rather than a wish that the supplier improve.</p></div><div class="canvas-box"><div class="cb-label">3. Develop the strategic few</div><p class="cb-demo">SUPPLIER DEVELOPMENT IS EXPENSIVE - IT COSTS YOUR TIME, YOUR STANDARDS, YOUR TRAINING, SOMETIMES YOUR MONEY - SO YOU DO NOT SPREAD IT EVENLY ACROSS EVERY SUPPLIER YOU HAVE. That would be both unaffordable and wasteful. YOU AIM IT AT THE STRATEGIC FEW: the CRITICAL, HIGH-IMPACT SUPPLIERS where a capability gap actually THREATENS your continuity of supply, your quality, your cost, or your operational performance, AND where SWITCHING IS HARD. Both conditions matter. The impeller workshop qualifies on both counts - it is critical to the reliability your strategy depends on, AND it is impossible to replace - which is precisely why it earns the investment. BY CONTRAST, A COMMODITY SUPPLIER YOU COULD SWAP TOMORROW DOES NOT QUALIFY: if a replaceable, low-impact supplier underperforms, you SELECT (switch) or MANAGE (enforce) - you do NOT pour development effort into building up a supplier you do not even need to keep. This is a discipline learners often miss: development is not a kindness you extend to every supplier who struggles, it is a strategic investment reserved for the relationships where it pays off, and SPENDING DEVELOPMENT EFFORT ON THE REPLACEABLE AND THE TRIVIAL IS A WASTE THAT STARVES THE CRITICAL FEW OF THE ATTENTION THEY NEED. So map your suppliers by impact and by how hard they are to replace, and THE FIRST ACT OF GOOD SUPPLIER DEVELOPMENT IS DECIDING WHICH SUPPLIERS DESERVE IT - the strategic, hard-to-replace few, and not the rest.</p></div><div class="canvas-box"><div class="cb-label">4. Develop collaboratively, and proactively</div><p class="cb-demo">NOW THE DOING, AND ITS TWO DEFINING QUALITIES - MISS EITHER AND IT IS NOT REALLY DEVELOPMENT. FIRST, COLLABORATIVELY: DEVELOPMENT IS A JOINT EFFORT, NOT AN INSTRUCTION. The concrete moves: you SHARE YOUR ACCEPTANCE STANDARD so the supplier knows exactly what &#039;good&#039; means (you would be amazed how often a supplier fails simply because no one ever told them the real target); you TRAIN their people in the skill or the method; you run JOINT IMPROVEMENT on the process, working the problem together rather than lobbing requirements over the wall; and sometimes you CO-INVEST in the equipment they need to reach your standard. In the example, Onalenna funds the balance-check rig AND gives the workshop a longer, stabler contract so the investment is genuinely worth their while - because a supplier will not sink money into a capability for a customer who might leave next quarter. SECOND, PROACTIVELY: the mature version of this builds capability BEFORE the failure, not after. REACTIVE DEVELOPMENT SCRAMBLES TO FIX A SUPPLIER ONCE THEIR GAP HAS ALREADY HURT YOU - the breakdown has happened, the reliability is already lost, and now you rush to help; PROACTIVE DEVELOPMENT IDENTIFIES THE GAP IN A CRITICAL RELATIONSHIP AND CLOSES IT BEFORE IT BECOMES A BREAKDOWN. Reactive is better than nothing and sometimes unavoidable, but PROACTIVE IS THE GOAL - it is the difference between firefighting your supply chain and stewarding it, between a supply base you are always rescuing and one you have deliberately built to be capable. Collaborative and proactive together turn &#039;supplier development&#039; from a slogan into a capability the supplier actually gains and you actually rely on.</p></div><div class="canvas-box"><div class="cb-label">5. It is a partnership - look at your own side, and never squeeze</div><p class="cb-demo">END ON THE INTEGRITY OF IT, BECAUSE THIS IS WHERE SUPPLIER DEVELOPMENT IS EITHER A GENUINE PARTNERSHIP OR A DISGUISED EXPLOITATION, AND AMU&#039;S PEOPLE-FIRST STANCE EXTENDS ALL THE WAY INTO THE SUPPLY CHAIN. THREE NON-NEGOTIABLES. FIRST: A SUPPLIER IS A PARTNER, NOT A SERVANT. DEVELOPMENT IS DONE WITH A SUPPLIER, NOT TO THEM. IT IS A MUTUAL INVESTMENT IN A SHARED FUTURE. A ONE-WAY DEMAND IS PRESSURE, AND PRESSURE ALONE DOES NOT BUILD CAPABILITY. The workshop got better because Onalenna invested in them and gave them a stable future, not because she shouted louder - the collaboration WAS the mechanism. SECOND: BEFORE YOU ASSESS A SUPPLIER&#039;S CAPABILITY, ASSESS YOUR OWN PRACTICES. A SUPPLIER STRUGGLING WITH QUALITY MAY BE STARVED OF CASH BY YOUR PAYMENT TERMS. A SUPPLIER FAILING TO INVEST MAY SEE NO FUTURE IN YOUR SHORT-TERM CONTRACTS. LOOK AT YOUR OWN SIDE OF THE RELATIONSHIP FIRST. Very often the &#039;supplier problem&#039; is partly a buyer problem - and the cheapest, fastest development you can do is to fix how YOU treat them: pay on time, contract for long enough that investment makes sense, stop changing the requirement every month. THIRD: DEVELOPMENT IS AN INVESTMENT IN A RELATIONSHIP, NOT A PRELUDE TO A SQUEEZE. USING A DEVELOPMENT PROGRAMME TO MAKE A SUPPLIER MORE EFFICIENT AND THEN DEMANDING A PRICE CUT THAT CAPTURES ALL THE GAIN IS EXPLOITATION. IT BREAKS TRUST AND ENSURES THE SUPPLIER WILL NEVER PARTNER WITH YOU AGAIN. Develop a supplier and then take all the value, and you have not built a capability - you have burned a partner and taught the whole market not to trust you. Share the benefit, own your side of the relationship, and develop with people rather than at them - and you build a supply base that makes your whole operation stronger without making anyone in it smaller.</p></div></div>
+
+<p>Box 1 is the option people forget exists. Box 5 is what keeps development from becoming exploitation. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>For a critical supplier, you cannot enforce a capability that is not there; you must build it, together.</strong> Five questions:</p>
+<ul>
+<li><strong>What can I do about a failing supplier?</strong> <strong>Select, manage, or develop.</strong> Switch to a better one, enforce the contract, or invest in their capability. For a critical sole source, only the third is real.</li>
+<li><strong>Develop toward what?</strong> <strong>Assess against your asset-management strategy.</strong> Not generic betterment - the specific capability your objectives require, and the specific gap.</li>
+<li><strong>Which suppliers?</strong> <strong>The strategic few.</strong> The critical, high-impact, hard-to-replace ones - not a commodity supplier you could swap tomorrow.</li>
+<li><strong>How do I develop them?</strong> <strong>Collaboratively, and proactively.</strong> Shared standards, training, joint improvement, co-investment - building capability before the failure, not after.</li>
+<li><strong>What keeps it honest?</strong> <strong>It is a partnership, not a demand.</strong> Look at your own side first, develop with them not to them, and never develop then squeeze.</li>
+</ul>
+<p><strong>Select, manage, or develop - three options, and for a critical supplier only one is real.</strong> When a supplier falls short, you have exactly three things you can do. You can <em>select</em> a better one - switch suppliers. You can <em>manage</em> their performance - monitor them against the contract and enforce it with metrics and penalties. Or you can <em>develop</em> them - invest in their capability so they become better at supplying you. Most buyers reach only for the first two, and for an ordinary supplier they are fine. But look at what happens with a <strong>critical, hard-to-replace supplier</strong> - the sole maker of a bespoke part, the one firm with the certification, the specialist you cannot swap overnight. <em>Selecting is not available</em> - there is no one else to switch to. And <em>managing does not work</em> - because you cannot enforce a capability that is not there. Penalties and angry letters can push a capable-but-lazy supplier to try harder, but they cannot create in an incapable supplier a skill they do not possess; you can fine the impeller workshop into bankruptcy and still not have a balanced impeller. For the critical supplier, <strong>development is often the only real option</strong>: a deliberate, collaborative investment in their capability, so a supplier who cannot meet your need today can meet it tomorrow.</p>
+<p><strong>Assess against your strategy - the specific gap, not generic betterment.</strong> Development is not "make the supplier vaguely better." It is disciplined, and it starts with an <em>assessment</em> - but assessment against a precise standard: <strong>what your asset-management strategy and objectives actually require</strong>. If your strategy turns on reliability, you assess and develop their <em>quality</em> and their <em>lead-time</em>; if it turns on sustainability, their <em>environmental practice</em>; if on cost, their <em>efficiency</em>. You compare the supplier's capability against that requirement and you find the <em>specific gap</em> - not "they are not good enough" but a named shortfall you can act on. For the workshop, the assessment reveals the gap precisely: they have no way to <em>verify the impeller balance</em> to the tolerance the duty demands, and no <em>controlled procedure for the coating</em>. That precision matters, because you can only develop a capability you have named: "reduce your defect rate to this," "add balance verification," "hold this certified stock" - concrete, measurable capabilities the assessment identifies and the strategy justifies.</p>
+<p><strong>Develop the strategic few.</strong> Supplier development is expensive - it costs your time, your standards, your training, sometimes your money - so you do <em>not</em> spread it evenly across every supplier. You aim it at the <strong>strategic few</strong>: the critical, high-impact suppliers where a capability gap actually threatens your continuity of supply, your quality, your cost or your operational performance, <em>and</em> where switching is hard. The impeller workshop qualifies on both counts - critical to reliability, and impossible to replace. A commodity supplier you could swap tomorrow does <em>not</em> qualify: if they underperform, you select or manage, you do not invest in developing them. Spending development effort on the replaceable and the trivial is a waste that starves the critical few of the attention they need. The first act of good supplier development is deciding <em>which</em> suppliers deserve it.</p>
+<p><strong>Develop collaboratively, and proactively.</strong> Now the doing, and its two defining qualities. First, <em>collaboratively</em>: development is a joint effort, not an instruction. You <em>share your acceptance standard</em> so they know exactly what "good" means; you <em>train</em> their people; you run <em>joint improvement</em> on the process; sometimes you <em>co-invest</em> in the equipment they need (Onalenna funds the balance-check rig and gives the workshop a longer, stabler contract so the investment is worth their while). Second, <em>proactively</em>: the mature version of this builds capability <em>before</em> the failure, not after - reactive development scrambles to fix a supplier once their gap has already hurt you, while proactive development identifies the gap and closes it in a critical relationship <em>before</em> it becomes a breakdown. Reactive is better than nothing; proactive is the goal - it is the difference between firefighting your supply chain and stewarding it.</p>
+<p>One honest boundary, and it is where this becomes a matter of integrity, not just technique. <strong>A supplier is a partner, not a servant. Development is done with a supplier, not to them. It is a mutual investment in a shared future. A one-way demand is pressure, and pressure alone does not build capability.</strong> The workshop got better because Onalenna invested in them and gave them a stable future, not because she shouted louder. Two more truths ride with this, and they matter as much as the method. <strong>Before you assess a supplier's capability, assess your own practices. A supplier struggling with quality may be starved of cash by your payment terms. A supplier failing to invest may see no future in your short-term contracts. Look at your own side of the relationship first.</strong> Very often the "supplier problem" is partly a buyer problem, and the cheapest development you can do is to fix how <em>you</em> treat them. And finally: <strong>development is an investment in a relationship, not a prelude to a squeeze. Using a development programme to make a supplier more efficient and then demanding a price cut that captures all the gain is exploitation. It breaks trust and ensures the supplier will never partner with you again.</strong> Develop a supplier and then take all the value, and you have not built a capability - you have burned a partner and taught the whole market not to trust you.</p>
+<p>Does it scale? A manager whose junior keeps making the same mistake has the same three options - replace them, discipline them, or <em>develop</em> them - and for a good person with a fixable gap, developing (teach the skill, give the tools, invest the time) is almost always the right and the cheapest answer, while shouting builds nothing. And the same honesty applies: before blaming the junior, ask whether your own instructions, tools or deadlines set them up to fail. Building capability in the people and firms you depend on, rather than just demanding it, is how a plant and a team both actually improve.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is your situation. A <strong>sole-source specialist foundry</strong> casts a critical, bespoke valve body you cannot get anywhere else. Their castings have started arriving with porosity defects that cause leaks - and leaks threaten the <em>safety and reliability</em> that are the heart of your asset-management strategy. You have sent two warning letters; nothing has improved.</p>
+<ol>
+<li><strong>Why not select or manage?</strong> In a line each, say why switching suppliers and enforcing the contract are not the answer here.</li>
+<li><strong>Assess the gap.</strong> Against your reliability/safety strategy, name the <em>specific</em> capability gap you would look for (not "they are bad" - a named shortfall).</li>
+<li><strong>Develop it.</strong> Name the capabilities to develop and one <em>collaborative</em> action for each.</li>
+<li><strong>Your own side.</strong> Name one thing <em>you, as the buyer,</em> could change in your own practice to make it easier for this foundry to succeed.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, why not select or manage: <em>selecting</em> is out because they are a <strong>sole source</strong> - there is no one else casting this bespoke body, and building an alternative takes years the plant does not have; <em>managing</em> is out because the letters and penalties cannot <strong>create a casting capability the foundry does not have</strong> - you cannot enforce your way to a defect-free process that does not yet exist.</p>
+<p>Second, the specific gap: against a reliability and safety strategy, the porosity points to a named shortfall - for example, <strong>no controlled degassing or pouring procedure, and no non-destructive testing (such as radiography) to catch porosity before the casting ships</strong>. That is a specific, developable gap, not a vague "poor quality."</p>
+<p>Third, develop it: capabilities to develop might be <em>process control of the melt and pour</em> (collaborative action: share your acceptance standard and run a joint process-improvement on the degassing) and <em>defect detection before dispatch</em> (collaborative action: co-invest in or arrange access to NDT, and train their people to use and interpret it). Concrete, named, and done <em>with</em> them.</p>
+<p>Fourth, your own side: something like <em>"offer a longer-term contract so the foundry can justify investing in the degassing equipment and the NDT, instead of the short orders that make such investment pointless for them"</em> - or fixing late payment, or stabilising your requirements. The mark of a real answer is that it looks honestly at how the <em>buyer's</em> practices may be part of the problem, and takes ownership of changing them.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-select_manage_or_develop">1. Select, manage, or develop - and for a critical supplier, only one is real</label><textarea id="cb-select_manage_or_develop" data-key="t-0225:select_manage_or_develop" placeholder="When a supplier falls short you have three options: select a better one (switch), manage their performance (enforce the contract), or develop them (invest in their capability). For an ordinary supplier the first two suffice. But for a critical, hard-to-replace sole source, selecting is impossible (no one else) and managing fails (you cannot enforce a capability that is not there) - so development is often the only real option."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-assess_against_your_strategy">2. Assess against your strategy - the specific gap, not generic betterment</label><textarea id="cb-assess_against_your_strategy" data-key="t-0225:assess_against_your_strategy" placeholder="Development starts with an assessment - but against a precise standard: what your asset-management strategy and objectives actually require. Reliability strategy -&gt; develop their quality and lead-time; sustainability -&gt; their environmental practice. Compare the supplier&#039;s capability against that requirement and find the specific, named gap (not &#039;not good enough&#039; but &#039;no balance verification&#039;, &#039;no controlled coating process&#039;) - because you can only develop a capability you have named."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-develop_the_strategic_few">3. Develop the strategic few</label><textarea id="cb-develop_the_strategic_few" data-key="t-0225:develop_the_strategic_few" placeholder="Supplier development is expensive - your time, standards, training, sometimes money - so you do not spread it evenly. Aim it at the strategic few: the critical, high-impact suppliers where a capability gap threatens your continuity, quality, cost or operational performance, AND where switching is hard. A commodity supplier you could swap tomorrow does not qualify - if they underperform, select or manage. The first act of good development is deciding which suppliers deserve it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-develop_collaboratively_and_proactively">4. Develop collaboratively, and proactively</label><textarea id="cb-develop_collaboratively_and_proactively" data-key="t-0225:develop_collaboratively_and_proactively" placeholder="Two defining qualities. Collaboratively: development is a joint effort, not an instruction - share your acceptance standard, train their people, run joint improvement, sometimes co-invest in the equipment they need (and give a longer contract so the investment is worth their while). Proactively: build capability BEFORE the failure, not after. Reactive development scrambles once the gap has hurt you; proactive closes it before it becomes a breakdown."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_partnership_and_your_own_side">5. It is a partnership - look at your own side, and never squeeze</label><textarea id="cb-the_partnership_and_your_own_side" data-key="t-0225:the_partnership_and_your_own_side" placeholder="Development is done WITH a supplier, not to them - a mutual investment in a shared future; a one-way demand is just pressure, and pressure does not build capability. Before you assess a supplier&#039;s capability, assess your own practices - a supplier starved of cash by your payment terms or seeing no future in your short contracts is often your problem, not theirs. And development is not a prelude to a squeeze: making a supplier efficient then capturing all the gain is exploitation that ends the partnership."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When the critical supplier's gap is named against your strategy and the plan to build it is collaborative and fair, <strong>download or save it</strong> - it is yours. You can now build a capability you depend on rather than demand one.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>You cannot enforce a capability that is not there. For the critical supplier you cannot switch, the only path is to build the capability together.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Trying to select when there is no alternative.</strong> For a genuine sole source, switching is a fantasy. Face that development, not replacement, is the real option.</p>
+<p>&bull; <strong>Enforcing a capability that is not there.</strong> Penalties push a lazy supplier; they cannot create a skill an incapable one lacks. Build the capability, do not just demand it.</p>
+<p>&bull; <strong>Developing every supplier equally.</strong> Development is expensive; spread thin it helps no one. Aim it at the strategic, hard-to-replace few.</p>
+<p>&bull; <strong>Developing a supplier you could replace tomorrow.</strong> If selecting or managing would work, use them. Save development for the suppliers where the gap truly matters and switching is hard.</p>
+<p>&bull; <strong>A one-way list of demands.</strong> Requirements with no support behind them are pressure, not development, and pressure does not build a capability. Share standards, train, invest.</p>
+<p>&bull; <strong>Reactive-only development.</strong> Fixing a supplier after they have hurt you is better than nothing, but the goal is proactive - build the capability before the failure.</p>
+<p>&bull; <strong>Assessing against nothing.</strong> "Be better" is not a target. Assess the supplier against what your asset-management strategy actually requires, and name the specific gap.</p>
+<p>&bull; <strong>Ignoring your own side.</strong> Short contracts, late payment and shifting requirements often cause the "supplier problem". Look at your own practices before you judge theirs.</p>
+<p>&bull; <strong>Develop, then squeeze.</strong> Building a supplier up and then taking all the gain in a price cut is exploitation. It breaks trust and ends the partnership. Share the benefit.</p>
+</div>
+</details>
+<p>The one workshop that could refurbish the impellers was failing, and there was no one else to call and no letter that could force a capability that simply did not exist. So reach for the option people forget: when you cannot select a better supplier and cannot manage an incapable one into compliance, you develop them - a deliberate, collaborative investment in their capability, assessed against what your asset-management strategy actually requires, aimed at the strategic few where the gap truly threatens you and switching is hard, and built proactively through shared standards, training, joint improvement and sometimes co-investment. <strong>You cannot enforce a capability that is not there - you have to build it, together - and you do it as a partner, looking first at whether your own contracts and payment terms are the real cause, and never developing a supplier only to squeeze away the gain.</strong> The next time a critical supplier cannot do what you need and there is no one else, stop writing the angry letter - and start building, with them, the capability you both need them to have.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build a supplier's capability now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

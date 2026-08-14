@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The chlorine drifts every time the flow swings, and I have been written up for a reading I could not prevent - I cannot stand here with a test bottle every five minutes. How do I build a system that senses, decides and acts on its own?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The chlorine drifts every time the flow swings, and I have been written up for a reading I could not prevent - I cannot stand here with a test bottle every five minutes. How do I build a system that senses, decides and acts on its own?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is 14:00 on a hot Thursday and you are standing on the steel walkway above the clear-water channel at <strong>Fairwater Water Works</strong>, the small municipal plant that cleans river water for about <strong>18,000 homes</strong>. One key step is chlorine dosing - a measured amount of chlorine added to kill bacteria before the water reaches taps, with a target of <strong>0.8 mg/L</strong> of free chlorine at the outlet and a legal range of 0.5 to 1.0 mg/L.</p>
+<p>In your hand is a paper logbook. The last entry, in the operator <strong>Keabetswe</strong>'s neat writing, reads: <em>"12:00 - chlorine 0.9 mg/L - pump 55%."</em> You dip the test bottle, wait for the colour to settle, and read the comparator: <strong>0.4 mg/L</strong>. Below the legal floor. For two whole hours, water leaving this plant has been under-dosed, and nobody knew. The afternoon flow has climbed to <strong>115 litres per second</strong> - nearly triple the morning's quiet 40 - but the pump is still where Keabetswe left it at noon, pushing the same dose into far more water.</p>
+<p>She folds her arms. "Every shift it's the same fight," she says. "I set it, I walk away, the flow moves, and the number drifts. I cannot stand here with a test bottle every five minutes. I have a plant to run." There is real strain in her voice - she has been written up once already for an out-of-range reading, and the plant manager wants answers by Friday.</p>
+<p>You feel the pull to just turn the pump up now and move on. But you know the trap: in three hours the flow will fall back to 60 litres per second, the dose will be far too strong, and someone will be tasting bleach at the kitchen tap. Manual guessing, every two hours, against a flow that never holds still - it cannot hold the line. The dose has to follow the flow and the measured chlorine <em>on its own</em>, second by second, the way Keabetswe never can by hand.</p>
+<blockquote><h2>The chlorine drifts every time the flow swings, and I was written up for a reading I could not prevent. How do I build a system that senses the process, decides, and acts on its own - holding the dose on target without a person on the walkway with a test bottle?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The chlorine has to sit at <strong>0.8&nbsp;mg/L</strong> at the outlet. The channel flow swings anywhere between <strong>0 and 150&nbsp;L/s</strong> and never holds still. Keabetswe walks out with a test bottle <strong>every two hours</strong> and adjusts the dosing pump by hand. She has just been written up for a reading she could not have prevented. Write down what you would build so the dose holds — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what they all leave in the loop</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Test more often — every thirty minutes instead of every two hours.&rdquo;</strong> More of the thing that is already failing. The flow changes faster than any human schedule, so a tighter vigil narrows the gap without ever closing it, and costs Keabetswe her whole shift.</p>
+<p>&bull; <strong>&ldquo;Dose a bit heavier so it never drops below target.&rdquo;</strong> Trades one failure for the opposite one: at low flow the same dose puts the chlorine over the limit, and now the reading is wrong in the direction that is harder to defend.</p>
+<p>&bull; <strong>&ldquo;Set the pump to a fixed rate matched to the average flow.&rdquo;</strong> Correct on average and wrong almost all the time, because the flow is essentially never at its average — that is the whole problem.</p>
+<p>&bull; <strong>&ldquo;Put an alarm on it so somebody knows when it drifts out.&rdquo;</strong> That tells you afterwards. Keabetswe already <em>is</em> the alarm, and being the alarm is exactly what she was written up for.</p>
+<p>&bull; <strong>&ldquo;Train the operator better.&rdquo;</strong> This answer has already been given, in the form of a written warning, for a drift no vigilance could have prevented.</p>
+<p>&bull; Every one of them leaves a person inside a loop that is faster than a person. The move is to <strong>close the loop</strong>: something measures the chlorine continuously, something compares it against the target and works out the error, something acts on the dosing pump, and then it measures again — so the dose follows the flow second by second, which is the one thing Keabetswe can never do by hand. Notice what that does to her job rather than to her: she stops being the mechanism and becomes the person who watches it and can step in, which is where a human belongs in a loop like this. And it is ordinary engineering, not magic — an instrument chosen to survive the actual water, a valve sized for the actual dosing flow, a controller that knows what on-target looks like.</p>
+</div>
+</details>
+<p>You need a reliable, repeatable way to build a control system that senses, decides, and acts - on its own. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>What you need is an <strong>instrumented process control system</strong>: the standard engineering answer to a process that must hold a measured value on target while conditions keep changing. It has four jobs - <strong>sense</strong> (instruments turn a physical quantity into a signal), <strong>decide</strong> (a controller compares the measurement to the target, the <em>setpoint</em>, and works out the <em>error</em>), <strong>act</strong> (a valve or pump changes the process), and <strong>show and connect</strong> (a screen lets a human watch and step in; a data link carries readings onward) - run continuously as a <em>closed control loop</em>: measure, compare, act, measure again. Watch Keabetswe and the technician Oratile build it on the chlorine dosing line.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Sense (the instruments and their signal)</div><p class="cb-demo">The loop must know two things: the channel flow (the disturbance) - a magnetic flow meter, no moving parts to clog in conductive water, range 0-150 L/s, 4-20 mA; and the free chlorine at the outlet (the controlled variable) - an amperometric analyser, 0-2 mg/L, 4-20 mA. The 0.8 mg/L target maps to 4 + (0.8/2.0) x 16 = 10.4 mA, so the controller knows on-target at a glance. (Pressure and tank level are sensed too, but for protection alarms, not the main loop.)</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Act (size the final control element)</div><p class="cb-demo">The worst-case dosing flow (a small metering flow of dilute hypochlorite) is Q = 0.4 gpm, pressure drop dP = 16 psi across the valve, hypochlorite specific gravity about 1.2: Cv = 0.4 x sqrt(1.2 / 16) = 0.4 x sqrt(0.075) = 0.4 x 0.274 = 0.11. They do NOT pick a valve rated at 0.11 (fully open, nothing left to control); they choose one with a rated Cv of 0.25, so at worst case it runs at 0.11 / 0.25 = 44% open - comfortably inside the band, with room to act.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Decide (tune the PID controller)</div><p class="cb-demo">By the Ziegler-Nichols closed-loop method: raise pure-proportional gain until the output just oscillates steadily - the ultimate gain Ku = 4.5, ultimate period Pu = 90 s. Then Kp = 0.6 x Ku = 2.7, Ti = Pu/2 = 45 s, Td = Pu/8 = 11.25 s (rounded to 11, trimmed small because the chlorine signal is noisy). Through the same 40-to-115 L/s morning swing that drifted the manual system to 0.4 mg/L, the tuned loop now holds chlorine between 0.74 and 0.86 mg/L - inside target, never near the legal floor.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Draw it and place it (ISA-5.1 diagrams, ISA-95 levels)</div><p class="cb-demo">ISA-5.1 balloon tags: FT-101 (flow transmitter), AT-102 (analyser transmitter), AIC-102 (the PID controller), FV-102 (the dosing valve) - the first letter is the measured variable, the rest its function. On the ISA-95 Purdue model: Level 0 the process; Level 1 the field devices (FT/AT/FV); Level 2 control (the PLC and SCADA); Level 3 operations reporting; Level 4 business systems. The non-negotiable rule: the billing software at Level 4 must NEVER be able to move the chlorine valve - data flows up, control stays low.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Build it and connect it (PLC, HMI, data pipeline)</div><p class="cb-demo">Oratile&#039;s PLC reads FT-101 and AT-102, runs the PID (setpoint 0.8, Kp 2.7 / Ti 45 / Td 11) with a flow feed-forward, drives FV-102, and on a low chlorine tank or a line-pressure leak raises an alarm and holds the valve safe - scanning every 100 ms, 600 times a minute, against the single reading Keabetswe used to take every two hours. Her SCADA HMI shows a clean mimic with live flow, chlorine and valve-%, the setpoint, an Auto/Manual switch, colour-banded alarms (red below 0.5 or above 1.0), and a 24-hour trend so a drift is a visible slope long before it alarms. The readings publish over OPC UA to the reporting system, and via MQTT to a cloud dashboard.</p></div></div>
+
+<p>See what the loop did. The flow tripled, and the dose followed it - the chlorine held between 0.74 and 0.86 mg/L through a swing that, by hand, had drifted the plant below the legal floor for two hours. <strong>And see the mission in it, because this is not automation for its own sake - it is two acts of care at once. First, the people downstream: 18,000 homes drink this water, and an under-dose lets bacteria through while an over-dose is bleach at a child's kitchen tap, so holding the band, second by second, is a public-health duty no two-hourly test bottle could ever discharge. Second, the operator: Keabetswe was set an impossible vigil and then written up for failing it - blamed for not being in two places at once - and the loop does not replace her, it frees her. The machine takes the relentless, repetitive watching that no human can sustain, and gives her back the judgement only a human can bring: she now oversees a plant instead of chasing one number with a bottle.</strong> One rule guards it all: control is kept apart from the business systems, so the billing software can never move the chlorine valve - data flows up, commands stay low. The cost of the system is the measure of what safe water is worth; the aim is the line held, the people safe, and the operator freed for real work.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You build the loop in five moves - sense, act, decide, then draw it, then build it.</p>
+<ul>
+<li><strong>1. Sense.</strong> Choose the instruments and their signals - the variable you hold, the disturbance that moves it.</li>
+<li><strong>2. Act.</strong> Size the final control element so it has room to control.</li>
+<li><strong>3. Decide.</strong> Tune the PID controller - fast enough to hold, stable enough not to oscillate.</li>
+<li><strong>4. Draw it and place it.</strong> The ISA-5.1 diagrams, and the ISA-95 levels that keep control low.</li>
+<li><strong>5. Build it and connect it.</strong> The PLC logic, the operator's screen, the data link upward.</li>
+</ul>
+<p>The ideas underneath. The whole thing is a <em>closed control loop</em>: it measures, compares to the <em>setpoint</em>, acts on the <em>error</em> (setpoint minus measurement), and measures again, forever. The <em>4-20 mA</em> signal is the field standard - a live zero, so a broken wire reads 0 mA and is instantly a fault, not a false reading. The <em>Cv</em> (flow coefficient, the heart of ISA 75.01) sizes a valve, kept between 20% and 80% of travel so it has room to act. The <em>PID controller</em> sets its output from three terms - <em>P</em> reacts to the error now, <em>I</em> removes the stubborn offset P leaves behind, <em>D</em> dampens overshoot (kept small on a noisy signal) - tuned by a recognised method such as <em>Ziegler-Nichols</em>. The <em>P&ID</em> and loop diagrams (ISA-5.1) let anyone read the plant; the <em>ISA-95 Purdue model</em> sorts everything into levels so control (low) is kept apart from business systems (high). A <em>PLC</em> runs the logic; a <em>SCADA HMI</em> is the operator's screen; <em>feed-forward</em> nudges the dose the moment the flow moves, before the error even appears; an <em>interlock</em> holds the plant safe on a fault. It fits any process with a measured variable that must be held against disturbances - dosing, heating, pressure, level, flow; it does not fit a one-off manual job or a simple on/off task (a tank that needs only a float switch does not need a tuned PID) - match the tool to the job.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Take a process of <em>your</em> own that drifts off target when conditions change - a dose, a temperature, a level, a pressure - and build its loop. Choose the sensors and the controlled variable; size the final control element to sit mid-travel; tune the PID and watch it hold through a real disturbance; draw the ISA-5.1 diagram and place each part on the ISA-95 levels; then write the PLC logic, the operator's screen, and the data link.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-sense">Step 1 - Sense (the instruments and their signal)</label><textarea id="cb-sense" data-key="t-0018:sense" placeholder="SENSE - select the measuring instruments: what the loop must know, and which instrument reads it reliably in this process. Pick the controlled variable (what you hold on target) and the main disturbance (what keeps pushing it off). Use the 4-20 mA standard signal - its live zero (4 mA = lowest) means a broken wire reads 0 mA and shows instantly as a fault, not a false &#039;zero&#039;."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-act">Step 2 - Act (size the final control element)</label><textarea id="cb-act" data-key="t-0018:act" placeholder="ACT - size the final control element (here a control valve) so it has room to control. Using the flow coefficient Cv (the heart of ISA 75.01): Cv = flow x sqrt(specific gravity / pressure drop). Never size a valve to run fully open - it would have no travel left to act. The rule: the normal operating point should sit between 20% and 80% of the valve&#039;s travel."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-decide">Step 3 - Decide (tune the PID controller)</label><textarea id="cb-decide" data-key="t-0018:decide" placeholder="DECIDE - tune the controller so it responds well: fast enough to hold target, stable enough not to oscillate. A PID controller acts on the ERROR (setpoint minus measurement): P reacts to the error now, I removes the stubborn offset P leaves behind, D dampens overshoot (kept small on a noisy signal). Tune by a recognised method, then watch it hold through a real disturbance."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-draw_place">Step 4 - Draw it and place it (ISA-5.1 diagrams, ISA-95 levels)</label><textarea id="cb-draw_place" data-key="t-0018:draw_place" placeholder="DRAW IT and PLACE IT - draw the P&amp;ID and loop diagrams to the ISA-5.1 standard so any engineer can read the plant and trace any fault end to end; then map every part onto the ISA-95 Purdue levels, so you know what sits where and - the key safety rule - what may talk to what. Control commands stay low; data flows up."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-build_connect">Step 5 - Build it and connect it (PLC, HMI, data pipeline)</label><textarea id="cb-build_connect" data-key="t-0018:build_connect" placeholder="BUILD IT and CONNECT IT - write the PLC logic that runs the loop, build the operator&#039;s screen, and validate the data link upward. The PLC scans forever: read the sensors, run the PID, add a feed-forward (nudge the dose up the moment the flow rises, before the chlorine even falls), drive the valve, and hold safe on an interlock. The screen shows the operator the STATE of the process at a glance, with a manual override always to hand."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines keep the loop trustworthy. First, <strong>leave the valve room to control, and leave the operator a manual override</strong> - a valve sized to run fully open has nowhere to go when demand rises, and a loop with no Auto/Manual switch traps the operator the moment something unexpected happens; the automation must extend the person's reach, never remove their hand. Second, <strong>keep control apart from everything that is not control</strong> - the single most important line in the whole architecture is that the business and reporting systems can read the process but can never command it; data flows up to the dashboards, commands stay down at the plant, and a tuned, well-drawn loop is worth nothing if a billing query can swing a chlorine valve.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your control loop true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Leave the valve room to control.</strong> Size it to run mid-travel (20-80%), never fully open. A valve with no travel left cannot act when the process moves.</p>
+<p>&bull; <strong>A live zero, so a fault looks like a fault.</strong> The 4-20 mA standard means a broken wire reads 0 mA and alarms - not a false "zero" the controller trusts.</p>
+<p>&bull; <strong>Tune for stable, not just fast.</strong> A gain pushed too high oscillates and overshoots. The aim is to hold the line through a disturbance, calmly - test it against a real swing.</p>
+<p>&bull; <strong>Control stays low; data flows up.</strong> Keep the loop apart from business systems. The reporting layer may read the process; it must never command it.</p>
+<p>&bull; <strong>Automate to free the operator, not to trap them.</strong> Always leave an Auto/Manual override and a clear view of the state. The loop extends the person's reach; it does not take their hand off the plant.</p>
+</div>
+</details>
+<p>You came onto the walkway with a drifting reading, a flow that never holds still, and an operator written up for a number she could not chase fast enough. You can leave with a loop that chases it for her: the sensors chosen, the valve sized to sit mid-travel, the PID tuned to hold 0.8 mg/L through a tripled flow, the diagrams drawn and the levels placed so no billing query can touch the valve, and a clean screen that lets her see the whole plant at a glance. <strong>A closed loop that senses, decides, and acts on its own, second by second - holding the line so the people downstream are safe and the operator is freed to do real work.</strong> That is what control engineering is for: not to take the human out, but to take the impossible vigil off her - so the machine does the watching it can do without rest, and the person does the judging only a person can. (Working with an AMU facilitator? Bring one drifting process and design its loop together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can design and implement a closed-loop instrumented process control system now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

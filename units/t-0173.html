@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every control is a claim</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Every control is a claim</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>Your team built a dashboard, and it is beautiful. Twelve charts. Filters on everything. Colour-coded, responsive, updating nightly. You are Onalenna, and you were proud of it.</p>
+<p>Nobody uses it.</p>
+<p>Not out of resistance - when you ask, people are apologetic and vague, until a planner finally says the honest thing: <em>I couldn't work out what I was supposed to do differently after looking at it.</em> All that data, all that work, and it changed no decision anybody was making.</p>
+<p>Then the worse thing happens.</p>
+<p>The one person who <em>does</em> use it - a manager preparing next year's budget submission - stops you in the corridor to show you what he found. There it is on the screen: a clear, clean relationship between maintenance spend and unplanned downtime. More spend, more downtime. He is about to recommend cutting the maintenance budget, and he is pleased, because for once he has evidence.</p>
+<p>The chart is correct. The data is clean. The tool did exactly what it was built to do.</p>
+<p>And the conclusion is exactly backwards.</p>
+<blockquote><h2>My dashboard is ignored by the people who need it and trusted by the one person it is misleading. How do I design an instrument that changes the right decision - and does not quietly assert things the data cannot support?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Nobody opens it. Not resistance — the planners simply never go there, and the twelve charts you built have been admired once and ignored since. Except by one executive, who has found the chart plotting maintenance spend against downtime and read it exactly as it appears: <strong>more spend, more downtime.</strong> He is about to recommend cutting the maintenance budget, and he is pleased, because for once he has evidence. The chart is correct. The data is clean. The tool did exactly what it was built to do. Write down how you would design an instrument that changes the right decision — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what a chart asserts whether you meant it or not</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Add a note explaining the relationship is not causal.&rdquo;</strong> A caption against a picture, and the picture wins. He has already formed the conclusion; a footnote reads as the author defending a chart that disagrees with him.</p>
+<p>&bull; <strong>&ldquo;Take that chart down.&rdquo;</strong> Removes this instance and leaves the practice. Every other pairing on the dashboard is making claims too, and you have not yet asked what they say.</p>
+<p>&bull; <strong>&ldquo;Train people to interpret the dashboard properly.&rdquo;</strong> Asks every viewer to supply the thinking the design left out — and he is not misreading it. <strong>He is reading exactly what it says.</strong></p>
+<p>&bull; <strong>&ldquo;Add more context — more charts around it.&rdquo;</strong> Twelve charts is the reason nobody opens it. More is the direction that caused the first half of your problem.</p>
+<p>&bull; <strong>&ldquo;Go and argue him out of it.&rdquo;</strong> You may have to, today. But you would be arguing against your own instrument, and it will still be there next quarter saying the same thing to somebody else.</p>
+<p>&bull; Both halves have one root: it was built <strong>outward from the data that happened to exist</strong> rather than backward from a decision somebody makes. That is why it is ignored — not resistance, <strong>irrelevance</strong>, which is the commonest fate of these things by a wide margin. And the dangerous half: <strong>a display makes claims whether you intended them or not.</strong> Putting two quantities side by side <em>asserts a relationship</em>, and a reader will find cause in the arrangement — so a correct chart on clean data can lead a capable person to a conclusion that is exactly backwards, because what is actually driving both quantities is not on the screen at all. Hence the duty: <strong>every control and every juxtaposition is a claim, and you own what it will be read to assert</strong> — which means asking what else could produce this pattern <em>before</em> you publish it. So design from the decision outwards: name the decision, who makes it, how often, and what they would do differently. Design for <strong>that one person</strong>, in layers — what they see at a glance, what they can drill into, and <strong>what you deliberately leave out</strong>. That last layer is what separates an instrument from a data dump.</p>
+</div>
+</details>
+<p>You design it backwards from the decision, and you learn what your controls are actually saying. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the dashboard design - built from the decision outwards, with every control interrogated.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Start from the DECISION, not the data</div><p class="cb-demo">Before you open the dataset, answer four questions. WHICH DECISION does this dashboard serve? WHO makes it? HOW OFTEN? And WHAT WOULD THEY DO DIFFERENTLY as a result of looking at it? A dashboard that answers no question anybody actually has will be admired in the meeting where it is presented and never opened again, and that is the commonest outcome by a wide margin - not resistance, just irrelevance. Here: the decision is which pumps go on next quarter&#039;s overhaul list; it is made by the maintenance planner, quarterly, currently from a spreadsheet of run hours; and what should change is that the list is built from condition and consequence rather than from hours alone. Everything in the dashboard now has to earn its place against that sentence, and most candidate charts will not.</p></div><div class="canvas-box"><div class="cb-label">2. Design for that one person (and leave things out)</div><p class="cb-demo">Design for the PRIMARY USER, not for yourself and not for everybody. Three layers: what they must see AT A GLANCE (the handful of things that shape the decision - here, the pumps ranked by a combined condition and consequence view); what they may DRILL INTO when something looks wrong (one pump&#039;s history, its failure modes, its recent work); and what is DELIBERATELY LEFT OUT. That last layer is the one that separates a decision instrument from a data dump. TWELVE CHARTS IS NOT THOROUGHNESS - IT IS AN UNWILLINGNESS TO DECIDE WHAT MATTERS, and it transfers that work to a user who has less context than you do and thirty seconds to spend. If a chart does not change the decision named in box 1, it is not neutral clutter; it is competing for attention with the charts that do.</p></div><div class="canvas-box"><div class="cb-label">3. Every control is a claim - and a what-if slider claims CAUSALITY</div><p class="cb-demo">Every interactive element makes an assertion the user will believe instantly. A FILTER claims these subsets are comparable. A TREND LINE claims this continues. And A WHAT-IF SLIDER CLAIMS THIS CAUSES THAT, BY THIS MUCH. Watch what that means here. Five years of data: spend R8.0m/9.5/11.0/12.5/14.0m against downtime of 420/500/560/585/600 hours. FIT IT NAIVELY and the slope is +29.7 HOURS PER R1m - so a slider built on it tells the user that spending an extra million buys thirty more hours of downtime, which is an instruction to CUT the maintenance budget. BUT PRODUCTION HOURS ROSE from 6,200 to 9,100 across those same years. Normalise to downtime per 1,000 production hours and the rates are 67.7, 71.4, 71.8, 69.6, 65.9 - a slope of -0.36 PER R1m. THE RELATIONSHIP REVERSES. The confounder was production volume, which drove both the spend and the raw downtime. Same data, same tool, opposite recommendations - and the dangerous one is the one that appears if nobody thought about it.</p></div><div class="canvas-box"><div class="cb-label">4. Put the uncertainty and the assumptions on the face of it</div><p class="cb-demo">An instant, precise-looking answer is the most persuasive thing a computer can produce, and precision is not accuracy. So SHOW THE UNCERTAINTY - a range rather than a single number, because a what-if output given to one decimal place invites a confidence the data cannot support. And put the ASSUMPTIONS ON THE FACE OF THE DASHBOARD, not in a document nobody will open: what was normalised and why, which confounders were considered, the period the data covers, and the sample size. A NECESSARY NOTE ON THIS EXAMPLE: this is a simplified five-point dataset to make the principle clear. A real-world causal claim would require a larger dataset and more rigorous statistical validation. Our purpose here is not to build a perfect model, but to understand how the DESIGN of the dashboard presents the model&#039;s claims.</p></div><div class="canvas-box"><div class="cb-label">5. Test it on the person who must decide - and be willing to refuse</div><p class="cb-demo">Put it in front of the person from box 1 and WATCH THEM USE IT WITHOUT HELPING. The urge to explain will be enormous; resist it, because in production you will not be standing there. Then ask one question: what would you now do differently? If they cannot answer, the dashboard has failed regardless of how it looks. Remove whatever they never looked at. And then the professional judgement this unit exists for. AS THE DESIGNER OF A DECISION INSTRUMENT, YOU HAVE AN ETHICAL DUTY OF CARE. A DASHBOARD THAT IS CONFUSING WILL BE IGNORED. A DASHBOARD THAT IS MISLEADING IS DANGEROUS. IF YOUR DESIGN, THROUGH A SLIDER OR A CHART, ASSERTS A CAUSAL RELATIONSHIP THAT THE DATA DOES NOT SUPPORT, YOU ARE BUILDING A TOOL FOR MAKING BAD DECISIONS. WHERE THE DATA IS AMBIGUOUS OR THE RELATIONSHIP IS MERELY CORRELATIONAL, YOUR PRIMARY RESPONSIBILITY IS TO PREVENT THE USER FROM CONCLUDING A FALSE CAUSALITY. THIS MAY REQUIRE YOU TO REFUSE TO BUILD A WHAT-IF CONTROL, EVEN IF THE USER ASKS FOR IT. AN HONEST CHART IS ALWAYS BETTER THAN A DISHONEST SLIDER.</p></div></div>
+
+<p>Box 3 is the one to read twice. The same five years of data, the same tool, and two opposite recommendations - and the one that appears by default is the one that would cut maintenance on a water treatment works. Nobody has to be careless for that to happen. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A dashboard is not a display of data. It is a <strong>decision instrument</strong> - so you design it backwards from the decision it must serve, and every interactive control you add is a claim about how the world works that the user will believe instantly and completely. Five questions:</p>
+<ul>
+<li><strong>What decision does it serve?</strong> Named, with the person, the frequency, and what would change. Everything else must earn its place against that sentence.</li>
+<li><strong>Who is it for?</strong> One primary user; three layers - at a glance, drill into, and <em>deliberately left out</em>. Twelve charts is not thoroughness, it is an unwillingness to decide what matters.</li>
+<li><strong>What is each control claiming?</strong> A <strong>filter</strong> claims comparability. A <strong>trend line</strong> claims continuation. A <strong>what-if slider</strong> claims <em>causality</em>, with a magnitude. So test the relationship for <strong>confounding</strong> before you build a control on it - the naive fit here says more spend causes more downtime, and normalising for production volume reverses it.</li>
+<li><strong>What does the user not know?</strong> Show <strong>uncertainty</strong> as a range, and put the normalisation, the confounders considered, the period and the sample size on the face of the dashboard.</li>
+<li><strong>Does it work?</strong> Watch a real user without helping, ask what they would do differently, remove what they never looked at - and be willing to decline a control the data cannot support.</li>
+</ul>
+<p><strong>A necessary note on the example.</strong> This is a simplified five-point dataset to make the principle clear. A real-world causal claim would require a larger dataset and more rigorous statistical validation. Our purpose here is not to build a perfect model, but to understand how the <em>design</em> of the dashboard presents the model's claims.</p>
+<p><strong>And the responsibility that comes with building one.</strong> As the designer of a decision instrument, you have an ethical duty of care. A dashboard that is confusing will be ignored. A dashboard that is misleading is dangerous. If your design, through a slider or a chart, asserts a causal relationship that the data does not support, you are building a tool for making bad decisions. Where the data is ambiguous or the relationship is merely correlational, your primary responsibility is to prevent the user from concluding a false causality. This may require you to refuse to build a "what-if" control, even if the user asks for it. <strong>An honest chart is always better than a dishonest slider.</strong></p>
+<p>One honest boundary. You are designing and building the <em>instrument</em>. You are not cleaning the dataset behind it, not building the predictive model it may display, and not making the decision it serves. Note also that this unit teaches the design discipline rather than any particular framework - the thinking transfers between tools, and the syntax does not matter nearly as much as knowing what you have just asserted.</p>
+<p>Does it scale? An aircraft instrument panel is not a display of everything the aircraft knows. It is a ruthless hierarchy built around the decisions a pilot must make in seconds, with the things that matter most placed where the eye goes first and everything else deliberately absent - and every needle on it is calibrated, because an instrument that reads confidently and wrongly is worse than no instrument at all.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A water utility wants a dashboard for its <strong>leak reduction programme</strong>. The dataset holds, per district metered area: pipe length and material, average pressure, number of reported bursts, water lost, repair crew hours spent, and the year each area's mains were last renewed.</p>
+<p>The intended user is the <strong>network manager</strong>, who decides each year which district areas get pressure management and which get mains renewal - a budget of about R30m against far more candidates than can be funded.</p>
+<ol>
+<li><strong>The decision.</strong> Write the decision sentence: who, how often, what changes.</li>
+<li><strong>Three layers.</strong> Name what goes at a glance, what is drill-down, and two things you will deliberately leave out even though the data supports them.</li>
+<li><strong>Interrogate the controls.</strong> For each of these, state what it claims and whether the claim is safe: (a) a filter by pipe material; (b) a trend line on bursts per year projected three years forward; (c) a what-if slider on average pressure predicting bursts.</li>
+<li><strong>The confounder hunt.</strong> Older areas tend to be both higher-pressure and older-pipe. What does that do to the pressure slider, and what would you have to normalise or control for before building it?</li>
+<li><strong>Decide.</strong> Say whether you would build the pressure what-if, and if not, what you would build instead that is honest and still useful.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, in step 2, if you could not bring yourself to leave anything out, go back. Leaving things out is the design; everything else is arrangement.</p>
+<p>Second, control (c) is the one that matters. Pressure management genuinely does reduce bursts - this is real engineering, not a spurious relationship - but that is exactly what makes the slider dangerous. A real effect plus a confounded dataset produces a plausible number that is wrong by an unknown amount, and it will be believed <em>because</em> the underlying physics is sound. Being right in principle is not the same as being right in magnitude, and a slider reports magnitude.</p>
+<p>Third, step 5 has no single correct answer, and that is the point. "I would not build the slider; I would show bursts against pressure as a scatter with each point labelled by pipe age, and let the manager see the confounding for himself" is a strong answer. So is building it with an explicit range and a stated assumption. What is <em>not</em> a strong answer is building a clean single-number slider because the framework made it easy and the manager asked for it.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-start_from_decision">1. Start from the DECISION, not the data</label><textarea id="cb-start_from_decision" data-key="t-0173:start_from_decision" placeholder="Name the decision the dashboard must serve, who makes it, how often, and what would change - before opening any data."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-design_for_one_person">2. Design for that one person (and leave things out)</label><textarea id="cb-design_for_one_person" data-key="t-0173:design_for_one_person" placeholder="Decide what they must see at a glance, what they may drill into, and what is deliberately excluded."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-controls_are_claims">3. Every control is a claim - and a what-if slider claims CAUSALITY</label><textarea id="cb-controls_are_claims" data-key="t-0173:controls_are_claims" placeholder="Recognise what each interactive element asserts, and test any causal claim for confounding before building a control on it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-show_uncertainty">4. Put the uncertainty and the assumptions on the face of it</label><textarea id="cb-show_uncertainty" data-key="t-0173:show_uncertainty" placeholder="Show ranges rather than single numbers, and state the normalisation, the confounders considered, the period and the sample size on the dashboard itself."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-test_and_refuse">5. Test it on the person who must decide - and be willing to refuse</label><textarea id="cb-test_and_refuse" data-key="t-0173:test_and_refuse" placeholder="Watch a real user without helping, remove what they never looked at, and decline to build controls the data cannot support."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now build an instrument people use, that tells them the truth.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Dashboards fail in two directions: ignored, or believed when they should not be.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Starting from the data.</strong> You will build what the dataset makes easy rather than what the decision needs, and the result will be admired once and never opened again.</p>
+<p>&bull; <strong>Designing for yourself.</strong> You know what every chart means. The user has thirty seconds and less context, and will not ask.</p>
+<p>&bull; <strong>Twelve charts and no hierarchy.</strong> Not thoroughness - a refusal to decide what matters, handed to somebody less equipped to decide it.</p>
+<p>&bull; <strong>Filters that imply false comparability.</strong> A filter quietly says these subsets can be compared. Often they cannot.</p>
+<p>&bull; <strong>Trend lines run past the data.</strong> An extrapolation is a claim that the mechanism continues, made in a visual language that looks like observation.</p>
+<p>&bull; <strong>A what-if slider on a correlational relationship.</strong> The central failure. It asserts cause and magnitude, instantly and persuasively, and the user has no way to see that it is guessing.</p>
+<p>&bull; <strong>No uncertainty shown.</strong> An instant precise number is the most convincing thing a computer produces, and precision is not accuracy.</p>
+<p>&bull; <strong>Assumptions in a document instead of on the screen.</strong> Nobody opens the document. The dashboard is what they read.</p>
+<p>&bull; <strong>Never watching a real user.</strong> You will discover in production what a ten-minute observation would have told you.</p>
+<p>&bull; <strong>Building a control because the framework made it easy.</strong> Ease of implementation is not evidence of validity, and it is the reason most bad controls exist.</p>
+</div>
+</details>
+<p>Onalenna's dashboard was ignored by the people who needed it and trusted by the one person it was misleading. Start from the decision rather than the data, and name who makes it and what would change; design for that one person in three layers, and treat what you leave out as the design; interrogate every control for the claim it makes, remembering that a what-if slider asserts causality with a magnitude; show uncertainty and put your assumptions on the face of it; then watch a real user, and be willing to refuse a control the data cannot support. A dashboard is a decision instrument, and an honest chart is always better than a dishonest slider. If you are working with an AMU Facilitator, take a dashboard your organisation already has and ask the only question that matters about it: what decision does it change, and who has changed one because of it?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build an instrument that tells the truth now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

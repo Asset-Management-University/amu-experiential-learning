@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The thirty-year headache</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The thirty-year headache</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The new pump station was delivered on time and on budget. There was a ribbon, and a photograph, and the project team moved on to the next job, proud of a clean delivery. By every measure the project was a success.</p>
+<p>Then the operations crew inherited it. The first routine service revealed the problem: to lift the new pump for an overhaul, you have to bring in a mobile crane, and there is no access for one - the building went up around the pump with no thought to ever getting it out again. There are no isolation points where you need them, the spares were never ordered, and the manuals are a box of drawings nobody can follow. Every service that should take a shift now takes a costly shutdown.</p>
+<p>The project optimised for the opening day. Nobody in the room was speaking for the thirty years after it - and now the plant will pay, every service, for the rest of the asset's life, for a bit of designed-in access that would have cost almost nothing to include.</p>
+<blockquote><h2>The project hit every target and still handed us an asset we can barely maintain. How do I run an asset project so that the thing it delivers is good not just on opening day, but for its whole life?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The project came in <strong>on time, on budget and to specification.</strong> Everybody was congratulated. Now you own it: there is no clearance to withdraw the pump shaft without dismantling the pipework, the isolation valve can only be reached from scaffolding, and the as-built drawings do not match what is in front of you. A service that should take one shift now takes a <strong>costly shutdown</strong>, and it will take one every year for the next thirty. Nobody cut a corner. The access that would have prevented all of it would have cost almost nothing to design in. Write down how you would run such a project so the asset is good for its whole life — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and who was missing from the room</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Write maintainability into the specification.&rdquo;</strong> Necessary and, alone, insufficient — specifications get traded during design when time and cost press, and a clause with nobody in the room to defend it is the first thing to go.</p>
+<p>&bull; <strong>&ldquo;The project manager should have thought about it.&rdquo;</strong> They were measured on time, cost and specification, and they delivered all three. Asking somebody to optimise for something they are not accountable for works occasionally and never reliably.</p>
+<p>&bull; <strong>&ldquo;Fix it now — retrofit the access.&rdquo;</strong> You will have to, and it will cost many times what it would have cost as a line on a drawing. That ratio is the whole argument.</p>
+<p>&bull; <strong>&ldquo;Accept it — every project involves compromises.&rdquo;</strong> True, and this was not a compromise: a compromise is a trade somebody weighed. Nobody weighed this, because nobody was speaking for the thirty years.</p>
+<p>&bull; <strong>&ldquo;Review the drawings more carefully at handover.&rdquo;</strong> Catches the paperwork and not the geometry. By handover the concrete is poured; a review at that point can only document what you have been given.</p>
+<p>&bull; Start by naming what this is, because it decides how it is run. <strong>Operations is ongoing and repetitive</strong> and settles into a rhythm that carries it. <strong>A project is temporary and unique</strong>, delivers a one-off result and dies when it is done — so it never gets a rhythm, has no last-time to copy, and is often staffed by people assembled for this job and then dispersed. It must therefore be given <strong>deliberate structure imposed from outside</strong>, because nothing internal holds it together: left alone a project does not settle, <strong>it drifts</strong> — scope creeps, schedule slips, cost climbs. Second, its constraints <strong>genuinely compete</strong>, so it cannot be optimised for all of them and the balance must be chosen and stated rather than discovered late. And third, the one this failure turns on: <strong>every party in that room was measured on the opening day.</strong> Whole-life considerations lose every argument they are not explicitly represented in — so somebody must be given the job of speaking for the thirty years, with standing to hold the line, because it costs almost nothing designed in and a fortune retrofitted.</p>
+</div>
+</details>
+<p>Here is how you manage the project and guard the life.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you run an asset creation or refurbishment project - seeing that it is not operations, moving it through a lifecycle, balancing the competing constraints, building the right team, and guarding the whole life of the asset.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. A project is not operations</div><p class="cb-demo">START BY NAMING WHAT YOU ARE DEALING WITH, BECAUSE IT DECIDES HOW YOU RUN IT. OPERATIONS IS ONGOING, REPETITIVE, STEADY-STATE WORK - the same tasks recurring day after day until they settle into a rhythm, and the rhythm itself carries them; you improve operations by tuning a steady process. A PROJECT IS SOMETHING ELSE ENTIRELY: A TEMPORARY ENDEAVOUR WITH A DEFINED BEGINNING AND END THAT DELIVERS A UNIQUE RESULT - build the new pump station, refurbish the ageing line, install the new system - AND IT DIES WHEN IT IS DONE. That difference is not academic wordplay; it changes everything about how you must manage it. BECAUSE A PROJECT IS TEMPORARY AND UNIQUE, IT NEVER GETS A STEADY RHYTHM TO SETTLE INTO, so it cannot be carried by habit the way operations can - there is no established routine to lean on, no last-time to copy exactly, and the team is often assembled for this one job and then dispersed. A project must therefore be given a DELIBERATE STRUCTURE, imposed on purpose from the outside, because nothing internal will hold it together. Left to run itself, a project does not find its own rhythm and settle - IT DRIFTS: the scope creeps, the schedule slips, the cost climbs, and what is finally delivered falls short of what was promised, usually with everyone surprised. The whole discipline of project management exists for this one reason - to supply the deliberate structure that a temporary, unique endeavour cannot generate for itself. The next two boxes are the two halves of that structure: a lifecycle that moves it through phases, and a balancing of constraints that keeps it honest.</p></div><div class="canvas-box"><div class="cb-label">2. The lifecycle - phases, not drift</div><p class="cb-demo">THE FIRST HALF OF THE DELIBERATE STRUCTURE IS A LIFECYCLE: THE PROJECT MOVES THROUGH DEFINED PHASES INSTEAD OF SLIDING ALONG AS ONE UNDIFFERENTIATED PUSH. INITIATE: decide WHY the project exists and whether it is even worth doing - this is the discipline of NOT STARTING A BAD PROJECT, of testing the justification before a rand is spent, and it is the cheapest place to stop a mistake. PLAN: define the scope (what is and is not included), the schedule, the cost, and the risks, and - crucially - how they fit together into one coherent plan rather than four separate documents. EXECUTE: do the actual work of building or refurbishing. MONITOR AND CONTROL: continuously compare reality against the plan and CORRECT THE DRIFT WHILE YOU STILL CAN - not at the end when the money is spent and it is too late, but early and often, when a small correction is still cheap. CLOSE: hand the asset over properly, and capture what was learned so the next project starts wiser. HERE IS THE PATTERN WORTH KNOWING: THE TWO PHASES TEAMS MOST LOVE TO SKIP ARE THE FIRST AND THE LAST. They rush past INITIATION, impatient to be doing, straight into a project nobody has properly justified - and they skimp on CLOSEOUT, declaring victory at handover and dumping the asset on operations with no manuals, no training, no captured lessons. Both skips are quiet - nobody notices them on the day - and both are expensive later, the first because you built the wrong thing efficiently, the second because you handed over an orphan. A project run through its full lifecycle, initiation to closeout, is a project that advances on purpose instead of drifting and then surprising everyone.</p></div><div class="canvas-box"><div class="cb-label">3. The competing constraints - you cannot fix them all</div><p class="cb-demo">THE SECOND HALF OF THE STRUCTURE IS THE BALANCING ACT, AND IT IS THE SINGLE TRUTH MOST OFTEN WISHED AWAY IN A PROJECT MEETING. EVERY PROJECT JUGGLES COMPETING CONSTRAINTS - SCOPE, TIME, COST, QUALITY, AND THE RISK RUNNING THROUGH ALL OF THEM - AND THEY TRADE OFF AGAINST ONE ANOTHER. You cannot fix all of them at once, because they are linked: SQUEEZE THE SCHEDULE AND EITHER THE SCOPE MUST SHRINK, THE COST MUST RISE (more people, overtime), OR THE QUALITY AND COMMISSIONING RISK MUST BE ACCEPTED. THERE IS NO FREE SQUEEZE. When a sponsor says &#039;it must be done sooner, for the same money, with nothing left out, to the same standard,&#039; they are asking for something the world does not offer - and the professional response is NOT to nod and hope, but to MAKE THE TRADE-OFF VISIBLE AND CHOOSE IT ON PURPOSE: &#039;we can hold the date if we defer these two items, or if we add a second crew for this much, or if we accept a compressed commissioning with this reliability risk - which do you want?&#039; That sentence is the craft. UNDERNEATH THE BALANCING SIT THE AREAS YOU MUST ACTIVELY MANAGE ACROSS THE WHOLE PROJECT, START TO FINISH: the scope, the schedule, the cost, the quality, the risk, the resources, the procurement, the stakeholders, and the communications. Each needs attention throughout - not once at the start - and, above all, they must be INTEGRATED INTO ONE COHERENT PLAN rather than run as separate silos that surprise each other. That integration is the real craft of project management; the specific tools for parts of it - a critical-path schedule, a responsibility matrix, a progress trend chart - are the subject of their own techniques, and this frame is what holds them together and points them at the same goal.</p></div><div class="canvas-box"><div class="cb-label">4. The investment project team - people with contributions</div><p class="cb-demo">A PROJECT IS DELIVERED BY A TEAM, AND THE OUTCOME IS HEAVILY DECIDED BY WHO IS IN THAT TEAM - ITS COMPOSITION IS FAR MORE THAN AN ORGANOGRAM. Know the core roles by their CONTRIBUTION, not their rank. THE SPONSOR owns the &#039;why&#039; and the money: they justify the project, secure the funding, clear the organisational path, and make the big go/no-go and trade-off calls; without an engaged sponsor a project has no air cover and stalls. THE PROJECT MANAGER owns the DELIVERY: the plan, the schedule, the budget, the risks, and the day-to-day balancing of the competing constraints - they are the one holding the whole thing together and driving it to completion. THE TECHNICAL AND DELIVERY DISCIPLINES do the design and the work - the engineers, the contractors, the specialists who actually create or refurbish the asset. AND THE PIECE THAT ASSET PROJECTS SO OFTEN FORGET: THE OPERATIONS AND ASSET-MANAGEMENT VOICE, who owns the LIFE of the thing after the project team has gone home - the people who will run it and maintain it for decades. NOW THE DIGNITY THAT MUST TRAVEL WITH THIS, AND IT IS NON-NEGOTIABLE: A PROJECT TEAM IS A GROUP OF PEOPLE WITH DISTINCT CONTRIBUTIONS TO A SHARED GOAL, NOT A HIERARCHY OF ROLES. The sponsor is not &#039;better&#039; than the maintainer; the project manager is not &#039;above&#039; the operator. Each brings something the others cannot, the team succeeds or fails together, and the fastest way to a failed asset is a team where some voices are treated as senior and others as decoration. Compose the team by asking what contributions the whole life of this asset will need in the room - and then make sure every one of those contributions has a person, and every person has a real voice.</p></div><div class="canvas-box"><div class="cb-label">5. The whole-life voice - the asset manager, from day one</div><p class="cb-demo">HERE IS THE ASSET-MANAGEMENT HEART OF THE WHOLE UNIT, THE THING THAT SEPARATES AN ASSET PROJECT FROM ANY OTHER PROJECT. FOR AN ASSET PROJECT, THE HANDOVER IS NOT THE FINISH LINE - THE ASSET LIVES FOR DECADES AFTER THE PROJECT TEAM DISBANDS, and THE SINGLE MOST EXPENSIVE MISTAKE IN ASSET PROJECTS IS ONE DELIVERED ON TIME AND ON BUDGET THAT IS A NIGHTMARE TO OPERATE AND MAINTAIN FOR ITS WHOLE LIFE - because the project was optimised for the ribbon-cutting and no one in the room was optimising for the thirty years after. THIS IS PRECISELY WHY THE ASSET-MANAGEMENT PRACTITIONER BELONGS ON THE TEAM FROM INITIATION, AS AN EQUAL - NOT CONSULTED LATE, NOT HANDED THE KEYS AT THE END WHEN EVERY DECISION IS ALREADY POURED IN CONCRETE. Their contribution is the WHOLE-LIFE VOICE: OPERABILITY (can it actually be run, safely and sensibly?), MAINTAINABILITY (the crane access to lift the pump, the isolation points, the room to work - designed in, because it cannot be added later without breaking the building open), the SPARES that must be identified and ordered before the first failure not after it, the INFORMATION and manuals and TRAINING that operations need to take it on, and a HANDOVER that gives operations a SUPPORTABLE asset rather than an unmaintainable orphan. A project team with no one speaking for the operating life will faithfully deliver an asset that meets every project target and fails its actual purpose. NOW THE DIGNITY, WHICH IS THE POINT: THE PROJECT MANAGER AND THE ASSET MANAGER ARE NOT ADVERSARIES. THEY ARE PARTNERS IN A NECESSARY, PRODUCTIVE TENSION. THE PROJECT MANAGER&#039;S FOCUS IS ON DELIVERING THE ASSET. THE ASSET MANAGER&#039;S FOCUS IS ON THE LIFE OF THE ASSET. BOTH ARE RIGHT. BOTH ARE NECESSARY. A SUCCESSFUL PROJECT SERVES BOTH. The tension between &#039;get it done now&#039; and &#039;make it last for decades&#039; is not a fight for one side to win; held well and early, it is exactly the friction that produces an asset both delivered AND supportable. A PROJECT IS JUDGED ON ITS DELIVERY; AN ASSET IS JUDGED ON ITS LIFE - AND THE ASSET MANAGER IS THE PERSON IN THE PROJECT ROOM WHOSE JOB IS TO MAKE SURE THE SECOND IS NEVER QUIETLY SACRIFICED TO THE FIRST.</p></div></div>
+
+<p>Box 3 is the trade-off you can never wish away. Box 5 is the reason the asset manager sits at the table from day one. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A project is judged on its delivery; an asset is judged on its life. Your job is to make sure the first enables the second.</strong> Five questions:</p>
+<ul>
+<li><strong>Is this a project, or operations?</strong> <strong>A project is temporary, with a defined end and a unique result.</strong> It never gets a rhythm to settle into, so it needs deliberate structure, not habit.</li>
+<li><strong>What structure moves it forward?</strong> <strong>A lifecycle:</strong> initiate, plan, execute, monitor and control, close. Phases, so it advances instead of drifting.</li>
+<li><strong>What am I balancing?</strong> <strong>Competing constraints - scope, time, cost, quality, risk - that trade off.</strong> You cannot fix all at once; squeeze one and another moves.</li>
+<li><strong>Who is in the room?</strong> <strong>Sponsor, project manager, the disciplines, and the operations/asset voice</strong> - people with contributions to a shared goal, not boxes on a chart.</li>
+<li><strong>Who guards the life?</strong> <strong>The asset-management practitioner, from initiation</strong> - the whole-life voice for operability, maintainability, spares, information and a supportable handover.</li>
+</ul>
+<p><strong>A project is not operations.</strong> Start by naming what you are dealing with, because it decides how you run it. <em>Operations</em> is ongoing, repetitive, steady-state work - the same tasks recurring until they settle into a rhythm, and the rhythm carries them. <strong>A project is a temporary endeavour with a defined beginning and end that delivers a unique result</strong> - build the new pump station, refurbish the ageing line - and it <em>dies when it is done</em>. That difference is not academic: because a project is temporary and unique, it never gets a steady rhythm to settle into, so it cannot be carried by habit the way operations can. It must instead be given a <em>deliberate structure</em>, imposed on purpose, or it will drift - late, over budget, and short of what it promised. A project left to run itself does not run; it unravels.</p>
+<p><strong>The lifecycle - phases, not drift.</strong> The first half of that structure is a lifecycle: the project moves through defined phases instead of sliding along. <em>Initiate</em> - decide why, and whether the thing is even worth doing (the discipline of not starting a bad project). <em>Plan</em> - define the scope, the schedule, the cost, the risks, and how they fit together. <em>Execute</em> - do the work. <em>Monitor and control</em> - compare reality to the plan and correct the drift while you still can, not at the end when it is too late. <em>Close</em> - hand the asset over properly and capture what was learned. The two phases teams most love to skip are the first and the last: rushing past <em>initiation</em> into a project nobody has justified, and skimping on <em>closeout</em> so the asset is dumped on operations with no handover and the lessons are lost. Both skips are expensive, and both are quiet.</p>
+<p><strong>The competing constraints - you cannot fix them all.</strong> The second half of the structure is the balancing act, and it is the truth most often wished away. Every project juggles <strong>competing constraints - scope, time, cost, quality, and the risk running through them - and they trade off against one another.</strong> You cannot fix all of them at once: <em>squeeze the schedule and either the scope must shrink, the cost must rise, or the quality and commissioning risk must be accepted.</em> There is no free squeeze. When a sponsor says "it must be done sooner, for the same money, with nothing left out, to the same standard," they are asking for something the world does not offer, and the professional response is not to nod and hope but to make the trade-off <em>visible and choose it on purpose</em>. Underneath the balancing sit the areas you must <em>actively manage</em> across the whole project - the scope, the schedule, the cost, the quality, the risk, the resources, the procurement, the stakeholders and the communications - each needing attention start to finish, integrated into one coherent plan rather than run as separate silos. That integration is the craft; the specific tools for parts of it - a critical-path schedule, a responsibility matrix, a progress trend - are covered by their own techniques, and this unit is the frame that holds them together.</p>
+<p><strong>The investment project team - people with contributions.</strong> A project is delivered by a team, and its composition is more than an organogram. A <em>sponsor</em> owns the "why" and the money, clears the path, and makes the big calls. A <em>project manager</em> owns the delivery - the plan, the constraints, the day-to-day balancing. The <em>technical and delivery disciplines</em> do the design and the work. And - the piece that asset projects forget - the <em>operations and asset-management voice</em>, who owns the life of the thing after the project ends. <strong>A project team is a group of people with distinct contributions to a shared goal, not a hierarchy of roles</strong> - the sponsor is not "better" than the maintainer; each brings something the others cannot, and the team succeeds or fails together.</p>
+<p>One honest boundary. The asset-management practitioner and the project manager can look like opponents - one guarding the deadline and the budget, one guarding the operating life - but they are not. <strong>The project manager and the asset manager are not adversaries. They are partners in a necessary, productive tension.</strong> <strong>The project manager's focus is on delivering the asset. The asset manager's focus is on the life of the asset. Both are right. Both are necessary. A successful project serves both.</strong> The tension between "get it done now" and "make it last for decades" is not a fight to be won by either side - it is exactly the friction that, held well and early, produces an asset that is both delivered <em>and</em> supportable. Held badly, or too late, it produces the thirty-year headache.</p>
+<p><strong>The whole-life voice - why the asset manager is there from day one.</strong> Here is the asset-management heart of the whole unit. For an asset project, <em>the handover is not the finish line - the asset lives for decades after the project team disbands</em>, and the single most expensive mistake in asset projects is one delivered on time and on budget that is a nightmare to operate and maintain for its whole life. That is why the asset-management practitioner belongs on the team <strong>from initiation, as an equal - not consulted late, not handed the keys at the end</strong>. Their contribution is the whole-life voice: <em>operability</em> (can it actually be run?), <em>maintainability</em> (the access to lift the pump, the isolation points, the room to work), the <em>spares</em> that must be ordered before, not after, the first failure, the <em>information</em> and manuals and training that operations need, and a <em>handover</em> that gives operations a supportable asset rather than an unmaintainable orphan. A project team with no one speaking for the operating life will faithfully deliver an asset that meets every project target and fails its actual purpose. <strong>A project is judged on its delivery; an asset is judged on its life - and the asset manager is the person in the project room whose job is to make sure the second is never quietly sacrificed to the first.</strong></p>
+<p>Does it scale? Someone building a house can hit the budget and the move-in date and still get a home that is miserable to live in - no storage, a kitchen you cannot work in, a roof that will cost a fortune to reach when it leaks - because they managed the <em>build</em> and nobody managed the <em>living</em>. The couple who walk each room asking "how will we actually use this for twenty years?" are doing exactly what the asset manager does on a plant project. A build and a life are the same lesson: the handover is the beginning of the asset's story, not the end.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is a brief. A plant needs to <strong>refurbish an ageing pump train</strong>, replacing it with a new, higher-capacity set, before the dry season. The deadline is tight. The proposed project team is: a <em>sponsor</em>, a <em>project manager</em>, and two <em>engineering disciplines</em> - and no one from operations or maintenance.</p>
+<ol>
+<li><strong>Project or operations?</strong> In one sentence, say why this is a <em>project</em>, not an operational task.</li>
+<li><strong>The squeeze.</strong> The sponsor insists the deadline cannot move. Name one trade-off the project manager must now put on the table - in scope, cost, or quality/risk - because the schedule cannot be squeezed for free.</li>
+<li><strong>Who is missing.</strong> Name the critical voice absent from this team, and one <em>whole-life requirement</em> they would add to the project scope.</li>
+<li><strong>The tension.</strong> In one honest sentence, state the tension between the project manager's primary goal and the missing member's primary goal.</li>
+<li><strong>The phase at risk.</strong> With a tight deadline, which lifecycle phase is most likely to be skipped or skimped - and what does the plant inherit if it is?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> five things.</p>
+<p>First, why a project: it is a <strong>temporary endeavour with a defined end that delivers a unique result</strong> (the refurbished pump train) - unlike the ongoing, repetitive work of running the plant - so it needs a deliberate project structure, not the plant's operating rhythm.</p>
+<p>Second, the squeeze: because the schedule is fixed, something else must give. Legitimate trades include <em>reducing scope</em> (do the essential replacement now, defer the nice-to-haves), <em>adding cost</em> (a second crew or overtime to hold both date and scope), or <em>accepting a risk</em> (compressed commissioning, with the quality/reliability exposure named). The mark of a real answer is that it <em>names a specific give</em> - it does not pretend the deadline is free.</p>
+<p>Third, who is missing: the <strong>operations / asset-management voice</strong>. A whole-life requirement they would add: crane <em>access to lift the pump</em> for future overhauls, or the <em>isolation points</em> to service it safely, or the <em>spares holding</em> and the <em>manuals and operator training</em> for handover - any requirement that makes the new pump supportable for its life, not just installable for the opening.</p>
+<p>Fourth, the tension, honestly: <em>"The project manager needs to deliver the pump before the dry season within budget; the asset manager needs the pump to be safely operable and maintainable for the next thirty years - and hitting the first cheaply can quietly sacrifice the second."</em> Both goals are right; the sentence names the friction without casting either as the villain.</p>
+<p>Fifth, the phase at risk: with a tight deadline, teams skimp on <strong>closeout</strong> (and sometimes rush <em>initiation</em>). Skip closeout and the plant inherits an asset with no proper handover - no manuals, no training, no spares, no captured lessons - which is exactly how an on-time delivery becomes a thirty-year headache.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-a_project_is_not_operations">1. A project is not operations</label><textarea id="cb-a_project_is_not_operations" data-key="t-0216:a_project_is_not_operations" placeholder="Operations is ongoing, repetitive, steady-state - carried by rhythm. A project is a temporary endeavour with a defined beginning and end that delivers a unique result, and it dies when it is done, so it never gets a rhythm to settle into. It must be given a deliberate structure on purpose, or it drifts - late, over budget, short of what it promised."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_lifecycle">2. The lifecycle - phases, not drift</label><textarea id="cb-the_lifecycle" data-key="t-0216:the_lifecycle" placeholder="A project moves through defined phases: initiate (why, and is it worth doing), plan (scope, schedule, cost, risk, integrated), execute (do the work), monitor and control (compare to plan and correct while you still can), and close (hand over properly and capture the lessons). The two phases teams most love to skip are the first and the last, and both skips are quiet and expensive."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_competing_constraints">3. The competing constraints - you cannot fix them all</label><textarea id="cb-the_competing_constraints" data-key="t-0216:the_competing_constraints" placeholder="Every project juggles competing constraints - scope, time, cost, quality, and the risk running through them - and they trade off. You cannot fix all at once: squeeze the schedule and either scope shrinks, cost rises, or quality/commissioning risk is accepted. There is no free squeeze. Underneath sit the areas you actively manage start-to-finish: scope, schedule, cost, quality, risk, resources, procurement, stakeholders, communications - integrated into one plan."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_investment_project_team">4. The investment project team - people with contributions</label><textarea id="cb-the_investment_project_team" data-key="t-0216:the_investment_project_team" placeholder="A project is delivered by a team, and its composition is more than an organogram. A sponsor owns the why and the money and clears the path. A project manager owns the delivery and balances the constraints. The technical disciplines do the work. And - the piece asset projects forget - the operations and asset-management voice owns the life of the asset after the project ends. A team is people with distinct contributions to a shared goal, not a hierarchy of roles."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_whole_life_voice">5. The whole-life voice - the asset manager, from day one</label><textarea id="cb-the_whole_life_voice" data-key="t-0216:the_whole_life_voice" placeholder="For an asset project the handover is not the finish line - the asset lives for decades after the team disbands. The most expensive mistake is an on-time, on-budget asset that is a nightmare to operate and maintain. So the asset-management practitioner sits on the team from initiation as an equal, bringing operability, maintainability, spares, information and a supportable handover. The project manager and the asset manager are not adversaries - they are partners in a productive tension."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When the trade is named, the missing voice is at the table, and the handover is protected, <strong>download or save it</strong> - it is yours. You can now run a project that delivers an asset good for its whole life.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A project ends at handover. The asset's life begins there. The whole point of managing the project well is the decades that follow it.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Running a project like operations.</strong> A project is temporary and unique; it has no rhythm to carry it. Give it a deliberate structure - a lifecycle and a plan - or it drifts.</p>
+<p>&bull; <strong>Skipping initiation.</strong> Rushing into a project nobody has justified is how you deliver the wrong thing efficiently. Decide why, and whether it is worth doing, first.</p>
+<p>&bull; <strong>Skimping on closeout.</strong> Handover is where the asset is either set up to succeed or dumped on operations. No manuals, no spares, no lessons - no handover.</p>
+<p>&bull; <strong>Pretending a squeezed schedule is free.</strong> Fix the date and scope, cost, quality or risk must move. Name the trade and choose it on purpose; do not nod and hope.</p>
+<p>&bull; <strong>Managing scope, cost and quality as if independent.</strong> They are one system that trades off. Pull one lever and watch the others; integrate them into a single plan.</p>
+<p>&bull; <strong>Leaving the asset-management voice off the team - or bringing it in late.</strong> Operability and maintainability are designed in at the start or bolted on expensively later, if at all. Seat the whole-life voice from initiation.</p>
+<p>&bull; <strong>Delivering an unmaintainable on-time asset.</strong> Every project target met and the asset a nightmare to run is the most expensive success there is. Judge the project by the life it enables.</p>
+<p>&bull; <strong>Treating the team as a chart.</strong> A team is people with contributions to a shared goal, not a hierarchy of worth. The maintainer's voice counts as much as the sponsor's.</p>
+<p>&bull; <strong>Project manager and asset manager as adversaries.</strong> They are partners in a productive tension - delivery and life. Held early and together, the tension makes a good asset; held as a fight, it makes a headache.</p>
+</div>
+</details>
+<p>The new pump station was delivered on time and on budget and could barely be maintained, because the project optimised for the opening day and no one spoke for the life after it. So run an asset project as what it is: a temporary endeavour with a unique result and a defined end, given a deliberate structure - a lifecycle of initiate, plan, execute, control and close, never skipping the justification at the start or the handover at the end; balance the competing constraints of scope, time, cost, quality and risk honestly, naming the trade because no squeeze is free; build a team of people with real contributions to a shared goal, sponsor and project manager and disciplines and the operations voice together; and seat the asset-management practitioner at the table from initiation, as the whole-life voice for operability, maintainability, spares, information and a supportable handover. <strong>A project is judged on its delivery and an asset on its life, and the asset manager is the one in the room who makes sure the second is never quietly sacrificed to the first - not as the project manager's opponent, but as their partner in a necessary, productive tension.</strong> The next time a project celebrates its ribbon-cutting, remember that for an asset the ribbon is not the finish line - it is the first day of the life the whole project existed to serve.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build an asset for its whole life now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A receipt for an event, or a contract for a capability</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A receipt for an event, or a contract for a capability</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna. The course was a success by every measure the specification asked for. The trainer was good, the room was engaged, <strong>the feedback averaged 4.6 out of 5, and nine in ten passed the end-of-course quiz</strong>. Everyone signed it off. The invoice was paid.</p>
+<p>It was bought to do one thing: give twenty-two planners the ability to build a risk-based maintenance schedule. Six months on, you go looking for the schedules.</p>
+<p>You find <strong>five</strong>.</p>
+<p>Nobody did anything wrong. The trainer delivered exactly what was asked. The planners passed. The course did everything the specification required of it. <em>The specification required the wrong things.</em></p>
+<blockquote><h2>I paid for a capability and I got a good day out. How do I write a specification that buys the proof the gap has closed, instead of the proof that the course took place?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The course was bought to do one thing: give <strong>twenty-two planners</strong> the ability to build a risk-based maintenance schedule. It was delivered exactly as specified. Everybody attended, the feedback was excellent, and all twenty-two passed the end-of-course assessment. Six months on you go looking for the schedules and you find <strong>five</strong>. Nobody did anything wrong — the provider delivered what was asked and the planners met every requirement. Meanwhile the planners have no protected time for it, and their supervisor has never asked anybody for one. Write down what the specification should have required — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what you actually bought</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Use a better provider next time.&rdquo;</strong> This one delivered exactly what was asked, on time, to a standard everybody rated highly. A different provider given the same specification produces the same result.</p>
+<p>&bull; <strong>&ldquo;Run a refresher course.&rdquo;</strong> Buys the same thing again, in the hope that repetition converts it. If the first delivery did not produce schedules, a second will produce more passes.</p>
+<p>&bull; <strong>&ldquo;Test them harder at the end.&rdquo;</strong> A stiffer test on the day still measures what somebody can do in a classroom, on a prepared example, under a trainer's eye — which is not the thing you needed.</p>
+<p>&bull; <strong>&ldquo;The planners should have applied it — that is on them.&rdquo;</strong> Look at what is around them: no protected time, and a supervisor who has never asked for a schedule. Ability with nowhere to land is not a failure of will.</p>
+<p>&bull; <strong>&ldquo;Measure satisfaction and completion more carefully.&rdquo;</strong> Better measurement of attendance and approval — which were already excellent, and were excellent while nothing happened.</p>
+<p>&bull; What you bought was <strong>proof that an event occurred</strong>: attendance, satisfaction, a test passed on the day. What you needed was <strong>proof that a capability now exists in the workplace</strong>, and the specification never asked for it. So start by writing the gap as <strong>something people will be seen to do</strong>, not as a topic — a topic can be taught thoroughly without anybody afterwards being able to do anything. Not &ldquo;the planners need training in risk-based maintenance&rdquo; but &ldquo;twenty-two planners cannot currently build a risk-based maintenance schedule for a defined asset set to the standard this works needs, and they must be able to&rdquo;. Everything else derives from that sentence. Set the <strong>assessment at the level of behaviour rather than recall</strong> — the proof required is the thing itself, produced to the standard you need, which is a different purchase from a test at the end of a day. Let the inputs — duration, method, materials, who delivers it — become <strong>whatever serves that proof</strong>, which is what stops a course being bought by its shape. And then the part no provider can carry: <strong>own the transfer</strong>. Time, tools, permission and a supervisor who expects it sit inside your organisation, and a specification silent on them has bought a capability with nowhere to land.</p>
+</div>
+</details>
+<p>Here is the specification that answers it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the training course specification - the gap as a can-do, objectives as actions, assessment at the behaviour level, inputs in service of the proof, and the two owners of transfer.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. State the gap as a can-do - and take it as input, not as the work</div><p class="cb-demo">THIS UNIT DOES NOT START BY WORKING OUT WHAT THE GAP IS - THAT IS A TECHNIQUE OF ITS OWN, THE COMPETENCY FRAMEWORK, AND IT PRODUCES THE INPUT YOU START FROM HERE. Do the framework there: name the competencies a role needs, assess people against them by demonstrated evidence, and identify where the shortfall is. THIS UNIT BEGINS THE MOMENT YOU HAVE A NAMED GAP AND HAVE DECIDED THAT TRAINING IS THE RIGHT WAY TO CLOSE IT. So write the gap down, and write it as a CAN-DO, because the whole specification will be built on this sentence and a vague sentence here poisons everything downstream. NOT &#039;the planners need training in risk-based maintenance&#039;. THAT NAMES A TOPIC, AND A TOPIC CAN BE TAUGHT WITHOUT ANYONE EVER BEING ABLE TO DO ANYTHING. Instead: &#039;twenty-two planners cannot currently build a risk-based maintenance schedule for a defined asset set to the standard the works needs, and they must be able to.&#039; Name the people, the current state and the required state, all as OBSERVABLE ACTIONS - what a person who has closed the gap will be seen to DO that a person who has not cannot. At Corathyl the gap is exactly that: 22 planners, identified by the framework work, who cannot yet build a risk-based schedule. GET THIS SENTENCE AGREED BY THE PERSON WHO OWNS THE WORK THE PLANNERS DO, not just by the training budget-holder, because the person who owns the work is the only one who can say what &#039;to the standard the works needs&#039; actually means - and that standard, not the syllabus, is what the whole specification exists to reach.</p></div><div class="canvas-box"><div class="cb-label">2. Write the learning objectives as assessable actions, never as states of mind</div><p class="cb-demo">NOW TURN THE CAN-DO INTO LEARNING OBJECTIVES, AND WRITE EVERY ONE AS AN OBSERVABLE, ASSESSABLE ACTION. THIS IS NOT A STYLE PREFERENCE. AN OBJECTIVE YOU CANNOT ASSESS IS AN OBJECTIVE YOU CANNOT BUY, because you have no way to tell whether it was met. &#039;UNDERSTAND RISK-BASED SCHEDULING&#039; AND &#039;BE AWARE OF CRITICALITY&#039; ARE NOT OBJECTIVES - they name states inside a person&#039;s head that nobody can see, measure or hold a supplier to. Replace every &#039;understand&#039;, &#039;know&#039;, &#039;appreciate&#039; and &#039;be familiar with&#039; with a verb you could stand behind someone and watch: BUILD, CALCULATE, DIAGNOSE, PRODUCE, PRIORITISE, JUSTIFY, DECIDE. &#039;BUILD A RISK-BASED MAINTENANCE SCHEDULE FOR A GIVEN ASSET SET, PRIORITISING TASKS BY CRITICALITY AND RISK, AND JUSTIFY THE INTERVAL CHOSEN FOR EACH.&#039; That can be watched, judged and either met or not. Tie each objective back to the can-do in box 1 so there are no orphan objectives teaching things the gap did not require and no gaps the objectives do not cover. AND KEEP THE LIST SHORT AND REAL. A specification with thirty objectives is not thorough, it is unfocused, and it guarantees that the assessment - if there is one - samples a few and ignores the rest. Ask of every objective: if the learner could do THIS and nothing else, would the gap be meaningfully closed? If not, it is a supporting detail, not an objective, and it belongs in the content outline, not here. THE OBJECTIVES ARE THE SPECIFICATION&#039;S BACKBONE - the assessment in box 3 tests them, and the content in box 4 serves them, so if they are woolly, everything built on them is woolly too.</p></div><div class="canvas-box"><div class="cb-label">3. Specify the assessment at the behaviour level, where the gap actually lives</div><p class="cb-demo">THIS IS THE BOX THE WHOLE UNIT TURNS ON. TRAINING IS EVALUATED AT FOUR LEVELS, AND KNOWING THEM IS THE DIFFERENCE BETWEEN BUYING A CAPABILITY AND BUYING A GOOD DAY. LEVEL 1, REACTION: DID THE LEARNERS LIKE IT? - measured by the after-course survey everybody calls a SMILE SHEET. LEVEL 2, LEARNING: DID THEY LEARN IT IN THE ROOM? - the end-of-course test. LEVEL 3, BEHAVIOUR: DO THEY NOW DO IT DIFFERENTLY AT WORK? LEVEL 4, RESULTS: DID AN ORGANISATIONAL OUTCOME MOVE - fewer breakdowns, lower cost? AND HERE IS THE FINDING THAT MUST SIT AT THE CENTRE OF YOUR SPECIFICATION: ALMOST EVERY ORGANISATION MEASURES LEVEL 1, SAMPLES LEVEL 2, AND NEVER REACHES LEVEL 3 - WHICH IS EXACTLY WHERE THE COMPETENCE GAP LIVES. Worse, DECADES OF RESEARCH SHOW THE LEVELS ARE FAR MORE WEAKLY LINKED THAN ANYONE ASSUMES: A STRONG LEVEL 1 SCORE IS A POOR PREDICTOR OF WHETHER LEVEL 3 WILL HAPPEN. A course can be warmly reviewed, easily passed, and change nothing anyone does. SO SPECIFY THE ASSESSMENT AT LEVEL 3, IN CONTRACTUAL TERMS: WHAT the learner will demonstrate (a risk-based schedule built on a real asset set), ON WHAT (actual work, not a case study), WHEN (a stated time after the course - 60 days lets the skill meet the job), JUDGED BY WHOM (a named competent assessor who is not the trainer being paid) AGAINST WHAT STANDARD (the one from box 1). A smile sheet and a quiz can stay - they are cheap and they catch a bad trainer early - but THEY ARE NOT THE ACCEPTANCE CRITERION. THE ACCEPTANCE CRITERION IS THE LEVEL-3 DEMONSTRATION, because that is the only evidence that the thing you were buying actually exists.</p></div><div class="canvas-box"><div class="cb-label">4. Specify the inputs as servants of the output, not as substitutes for it</div><p class="cb-demo">NOW, AND ONLY NOW, SPECIFY THE INPUTS - and notice that they come FOURTH, because they are the servants of the proof, not the substance of the specification. Most specifications are nothing BUT this box, which is exactly why most training fails to transfer: the inputs became the whole document and the output was never named. Specify them, but specify each one AS A MEANS TO THE LEVEL-3 DEMONSTRATION. AUDIENCE: who exactly, at what starting level - a course pitched above or below the room transfers to nobody. DELIVERY METHOD: chosen for the capability, not for convenience or cost - a skill that must be DONE needs hands on a real tool with feedback, and no amount of lecture substitutes for the first supervised attempt; a three-day classroom course that ends without anyone having built a schedule has taught about scheduling, not scheduling. CONTENT OUTLINE: the topics, but framed as what they equip the learner to DO, and pruned of everything that does not serve an objective in box 2 - interesting-but-irrelevant content is not free, it is time stolen from practice. TRAINER COMPETENCE: what the trainer must be able to do and to have done, assessed as evidence, not as a list of certificates - and crucially, whether they can TEACH the doing, not just do it themselves, because the best practitioner in the country can be the worst possible teacher of a novice. WRITE THIS BOX LAST AND KEEP IT ON A LEASH: every line in it should be traceable to a line in box 2 or box 3. If you cannot say which objective a piece of content serves, it is not content, it is padding, and padding is what fills the days of a course that will not change anyone&#039;s Monday.</p></div><div class="canvas-box"><div class="cb-label">5. Specify the conditions for transfer - and say honestly who owns which half</div><p class="cb-demo">THE LAST BOX IS THE ONE ALMOST NO SPECIFICATION HAS, AND IT IS THE ONE THAT DECIDES WHETHER THE OTHER FOUR MATTER. TRANSFER TO THE JOB IS A SHARED RESPONSIBILITY, AND MAKING THE SUPPLIER SOLELY LIABLE FOR IT IS BOTH UNJUST AND INEFFECTIVE. A trainer can produce a planner who CAN build a risk-based schedule at the end of the course. Whether that planner DOES, sixty days later, depends on things only the EMPLOYER controls: whether they are given the TIME to do it rather than being pulled back into the old firefighting; whether they are given a REAL TASK to apply it to; and whether their DIRECT MANAGER expects, notices and supports the new behaviour rather than quietly preferring the old way that was faster last week. SO THE SPECIFICATION MUST WRITE BOTH SIDES OF THE BARGAIN. It states the supplier&#039;s obligation - produce learners who pass the level-3 demonstration - AND the EMPLOYER&#039;S OBLIGATIONS AS CONTRACTUAL PRECONDITIONS OF THAT ASSESSMENT: the time, the real task, the authority to apply the skill, and the manager who expects it. Then the acceptance mechanism is fair: a portion of the fee - a meaningful share, enough to shift the supplier&#039;s incentive from delivering a good day to producing a capable planner - is held against the level-3 demonstration, CONTINGENT ON THE EMPLOYER HAVING MET ITS SIDE. If the employer did not provide the conditions, the supplier is not penalised for a failure that was not theirs. THIS IS THE HONEST VERSION OF THE HOLDBACK: it makes proof-of-capability the thing being paid for, while refusing to blame the trainer for the organisation&#039;s own failure to make room for the new skill. Write the preconditions as plainly as the objectives, because the half of transfer the employer owns is the half most training silently assumes and never funds.</p></div></div>
+
+<p>Box 3 is where the gap actually closes. Box 5 is the half almost every specification leaves out. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A training specification's job is not to describe a course. It is to contractually define the proof that a competence gap has closed.</strong> Five questions:</p>
+<ul>
+<li><strong>What is the gap, as a can-do?</strong> <strong>Named competence, people, current and required state - all as observable actions</strong>, brought in from the competency framework, not worked out here.</li>
+<li><strong>What are the objectives?</strong> <strong>Assessable actions - build, calculate, diagnose, produce</strong> - never "understand" or "be aware of", because you cannot buy what you cannot assess.</li>
+<li><strong>How is it proven?</strong> <strong>At the behaviour level: a demonstration on real work, at a stated time, by a named assessor, against the standard.</strong> Not the smile sheet.</li>
+<li><strong>What inputs serve that?</strong> <strong>Audience, delivery, content, trainer - chosen for the demonstrated capability</strong>, written last and kept on a leash.</li>
+<li><strong>Who owns transfer?</strong> <strong>The employer's half - time, a real task, a manager who expects it - written in as contractual preconditions.</strong></li>
+</ul>
+<p><strong>The arithmetic of a course that passed everything except the only test that mattered.</strong> Corathyl bought the risk-based scheduling course for 22 planners: <strong>fee R6,600 a head is R145,200, and three days off the job at a loaded R2,800 a day is R184,800 - R330,000 in total</strong>. Reaction 4.6 out of 5; quiz pass rate 91 per cent, 20 of 22. Six months later, the planners actually building a risk-based schedule as part of the job: <strong>five, or 23 per cent</strong>. The nominal cost was <strong>R15,000 per trained planner</strong>; the real cost was <strong>R330,000 divided by five - R66,000 per planner who actually changed</strong>. The organisation paid the whole R330,000 against a 91 per cent pass rate and never once measured the 23 per cent that was the only number it was buying.</p>
+<p><strong>Why the pass rate lied, and where the truth lives.</strong> Training is evaluated at four levels: <em>reaction</em> (did they like it - the smile sheet), <em>learning</em> (did they learn it in the room - the quiz), <em>behaviour</em> (do they now do it at work), and <em>results</em> (did an outcome move). Almost every organisation measures the first, samples the second, and never reaches the third - <strong>which is exactly where the competence gap lives</strong>. And decades of research show the levels are far more weakly linked than anyone assumes: <em>a strong reaction score is a poor predictor of whether the behaviour will change</em>. A well-liked, easily-passed course that changes nothing is not an anomaly. It is the default. So the fix is to write the behaviour-level demonstration into the specification as the <strong>acceptance criterion</strong> - what the learner will build, on real work, sixty days out, judged by a competent assessor against the standard - and to hold a meaningful share of the fee against it, so the supplier is paid for producing a capable planner, not for delivering a good day.</p>
+<p><strong>And the half of transfer the employer owns - which the unit will not let you forget.</strong> A trainer can produce a planner who <em>can</em> build a schedule by Friday afternoon. Whether that planner still <em>does</em> it sixty days later depends on things only the employer controls: the time to do it instead of being pulled back into firefighting, a real task to apply it to, and a manager who expects and notices the new behaviour rather than quietly preferring last week's faster habit. So the specification writes both sides of the bargain, and the holdback is <em>contingent on the employer having met its preconditions</em>. Otherwise you have made the trainer liable for your own failure to make room for the skill - which is neither just nor effective. This matters for how the Corathyl story is read: <strong>the seventeen planners who did not transfer the learning did not fail. They were not given the conditions to transfer it. A system that does not measure what matters, and does not create the conditions for success, cannot expect success.</strong></p>
+<p>One honest boundary. You specify the required capability and the proof it exists; you do not deliver the training, and writing the specification does not itself close the gap. <em>A specification is a demand for a capability, not the capability.</em></p>
+<p>Does it scale? Anyone who has ever hired a tradesperson knows the difference between "I attended the plumbing course" and "the tap does not leak". You pay for the second, you check the second, and you would never dream of accepting a certificate of attendance in place of a working tap. A training specification is just that instinct, written down before the money is spent.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is a real draft specification - the kind written every day. A control-room team needs to be able to respond correctly to an alarm flood: recognise the initiating event, suppress the noise, and act on the true fault. The draft is thorough.</p>
+<table>
+<tr><th>Section</th><th>What the draft says</th></tr>
+<tr><td>Title</td><td>"Alarm Management Awareness Training"</td></tr>
+<tr><td>Aim</td><td>"To ensure operators understand alarm management principles and are aware of best practice"</td></tr>
+<tr><td>Duration</td><td>Two days, classroom</td></tr>
+<tr><td>Content</td><td>Nine modules: history of alarm management, the relevant standard, alarm philosophy, rationalisation, prioritisation, flood handling, human factors, case studies, and a review</td></tr>
+<tr><td>Trainer</td><td>"Minimum ten years' experience; recognised industry certification"</td></tr>
+<tr><td>Delivery</td><td>"Slides, group discussion, and a written case study exercise"</td></tr>
+<tr><td>Assessment</td><td>"End-of-course multiple-choice test (pass mark 70%) and a course feedback questionnaire"</td></tr>
+<tr><td>Success measure</td><td>"90% of delegates to pass the test and rate the course 4 or above out of 5"</td></tr>
+</table>
+<p>Your task, in three parts:</p>
+<ol>
+<li><strong>Define a contractual, behaviour-level acceptance criterion.</strong> What will an operator demonstrate, on what, when, judged by whom, against what standard?</li>
+<li><strong>Define the employer's obligations</strong> that must be met for that criterion to be fair and achievable.</li>
+<li><strong>Re-scope the inputs</strong> - the aim, the content, the delivery, the trainer requirement - so they serve your new acceptance criterion instead of standing in for it.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the acceptance criterion has to move the proof from the room to the desk. Something like: <em>within 45 days of the course, each operator, presented with a realistic simulated alarm flood on the actual console, correctly identifies the initiating event and takes the correct first three actions within a stated time, judged by a competent assessor who is not the trainer, against the site's alarm response standard.</em> If your criterion can be met by sitting a test, you have rewritten the smile sheet with more words.</p>
+<p>Second, the aim gives itself away. <em>"Understand principles and be aware of best practice"</em> cannot be assessed, cannot be bought, and cannot be failed - which is precisely why it is popular. Replace it with can-do verbs: <em>recognise, suppress, prioritise, act</em>.</p>
+<p>Third, the employer's obligations are the part the draft does not imagine exists. The operators need <strong>access to the console or a faithful simulator to practise on, protected time to do it, and a shift supervisor who runs the drill and backs the new response under real pressure</strong>. Without those, the best training in the world decays to nothing by the first busy night, and it will not have been the trainer's doing.</p>
+<p>Fourth, the re-scoped inputs should visibly shed weight. The two-day classroom becomes time with hands on the console; the nine modules lose "history of alarm management" and anything else that does not serve the four verbs; the trainer requirement gains the one thing the draft never asked - <em>evidence they can teach an operator to do this, not merely that they have done it themselves</em>; and the multiple-choice test survives only as a cheap early check on the trainer, never as the acceptance criterion. <strong>A shorter, sharper specification that names the proof beats a thorough one that describes the event.</strong></p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-state_the_gap_as_a_can_do">1. State the gap as a can-do - and take it as input, not as the work</label><textarea id="cb-state_the_gap_as_a_can_do" data-key="t-0199:state_the_gap_as_a_can_do" placeholder="Bring the named competence, the people and the required standard across from the competency framework. Write the gap as what people cannot yet do and must be able to do."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-objectives_as_assessable_actions">2. Write the learning objectives as assessable actions, never as states of mind</label><textarea id="cb-objectives_as_assessable_actions" data-key="t-0199:objectives_as_assessable_actions" placeholder="Each objective is something the learner will DO and someone can watch and judge. &#039;Understand&#039; and &#039;be aware of&#039; are not objectives, because nobody can assess them."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-assess_at_the_behaviour_level">3. Specify the assessment at the behaviour level, where the gap actually lives</label><textarea id="cb-assess_at_the_behaviour_level" data-key="t-0199:assess_at_the_behaviour_level" placeholder="Training evaluation has four levels: did they like it, did they learn it, do they now DO it at work, did an outcome move. The gap closes at the third, and that is what you must specify."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-inputs_serve_the_output">4. Specify the inputs as servants of the output, not as substitutes for it</label><textarea id="cb-inputs_serve_the_output" data-key="t-0199:inputs_serve_the_output" placeholder="Audience, delivery method, content outline, trainer competence - all chosen to produce the demonstrated capability. Describe them after the proof, and in service of it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-specify_transfer_and_who_owns_it">5. Specify the conditions for transfer - and say honestly who owns which half</label><textarea id="cb-specify_transfer_and_who_owns_it" data-key="t-0199:specify_transfer_and_who_owns_it" placeholder="The learner will only transfer the skill if the employer provides time, a real task, and a manager who expects it. Write the employer&#039;s half in, and make the acceptance test fair."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now specify training that buys a capability, not a certificate.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The most expensive training is the course that was excellent and changed nothing.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Specifying inputs and calling it a specification.</strong> A syllabus, a duration and a trainer's CV describe an event. They do not define a capability or its proof.</p>
+<p>&bull; <strong>Objectives written as "understand" and "be aware of".</strong> A state of mind cannot be assessed, so it cannot be bought or held to account. Use verbs you could stand behind someone and watch.</p>
+<p>&bull; <strong>The smile sheet as evidence.</strong> A reaction score tells you the day was pleasant. It tells you almost nothing about whether anyone will do the job differently.</p>
+<p>&bull; <strong>Stopping at the quiz.</strong> Passing a test in the room is the learning level. The gap lives one level further on, at behaviour, and that is where the acceptance criterion must sit.</p>
+<p>&bull; <strong>No behaviour-level demonstration.</strong> Without a proof on real work at a stated time, you have bought a certificate and hoped for a capability.</p>
+<p>&bull; <strong>Making the supplier liable for the employer's half.</strong> A trainer cannot give a learner time, a real task, or a supportive manager. Do not penalise them for the absence of things only you control.</p>
+<p>&bull; <strong>Leaving the employer's half unwritten.</strong> Time, a real task and an expecting manager are the conditions for transfer, and training that assumes them without funding them is training that will not transfer.</p>
+<p>&bull; <strong>Buying a course because it exists.</strong> Specify the capability first, then find the course that produces it. A course looking for a gap to fill will find yours whether it fits or not.</p>
+<p>&bull; <strong>Content for its own sake.</strong> Interesting-but-irrelevant material is not free. It is time stolen from the practice that would have made the skill stick.</p>
+</div>
+</details>
+<p>Onalenna paid R330,000 for a 91 per cent pass rate and a 23 per cent capability. Bring the gap in from the competency framework and write it as a can-do, agreed by the person who owns the work; turn it into learning objectives that are observable actions rather than states of mind, because you cannot buy what you cannot assess; specify the assessment at the behaviour level - a demonstration on real work, at a stated time, by a named assessor, against the standard - since that is the only evidence the gap has actually closed; specify the inputs last and keep them on a leash, every line traceable to an objective; and write in the employer's half of transfer as contractual preconditions, so the holdback is fair and the trainer is never blamed for the organisation's failure to make room for the skill. <strong>A specification that measures reaction and learning is a receipt for an event. A specification that measures behaviour is a contract for a capability.</strong> Take one course your organisation has bought and ask what its acceptance criterion actually was. If the answer is a pass rate and a feedback score, you have found the shape of the next specification.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can specify a training course now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

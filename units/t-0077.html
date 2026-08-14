@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build and manage a resource-loaded schedule for asset management work</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Build and manage a resource-loaded schedule for asset management work</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is a Tuesday in March at <strong>Mooirivier Alumina</strong>, a refinery on the edge of a small Mpumalanga town. You are the planner for the No.3 Calciner annual shutdown - the once-a-year window when the big rotary kiln is switched off, opened up, cleaned, repaired and started again. While it is off, the plant earns nothing. Every day it stays off costs the refinery about <strong>R1.4 million</strong> in lost product.</p>
+<p>You are standing at a long whiteboard in the planning office. The marker squeaks as you write. Pinned next to the board is the works order list the maintenance superintendent, <strong>Thandi</strong>, handed you this morning: <strong>214 separate jobs</strong>. Replace the burner. Reline a section of refractory brick. Inspect the gearbox. Re-tube the cooler. Each job has its own crew, its own parts, its own safe working order.</p>
+<p>Thandi leans in the doorway with her arms folded. "Management has given us <strong>fourteen days</strong>," she says. "Not fifteen. The board already announced the restart date to the customer." You can smell the warm dust and machine oil drifting in from the plant floor through the open window.</p>
+<p>You start sketching boxes and arrows on the whiteboard. Job 1, then Job 2, then Job 3. But it falls apart fast. You cannot reline the brick until the old brick is stripped out. You cannot strip the brick until the kiln has cooled. The crane crew can only be in one place at a time, and three jobs all want the crane on day two. You rub out a box, draw it again, and lose track of which jobs you have already placed. Your stomach tightens. There are 214 jobs and your whiteboard holds maybe twenty before it turns to spaghetti.</p>
+<p>You think, just for a second, about copying last year's plan and tweaking the dates. It would feel like progress. But last year the shutdown ran four days late, and you know in your gut that copying a late plan just buys you another late plan.</p>
+<blockquote><h2>Fourteen days. 214 jobs. One crane. A whiteboard is not going to hold this. You need a reliable way to lay out every job, lock down what must come before what, see which jobs decide the finish date, and check that you are not asking one crew to be in two places at once.</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Fourteen days. Two hundred and fourteen jobs. One crane, and three jobs that all want it on day two. The whiteboard held about twenty boxes before it turned to spaghetti, and last year&rsquo;s plan &mdash; the one you were about to copy &mdash; ran four days late. <strong>Write down how you would lay this out.</strong> Your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five answers, and what each one cannot tell you</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Copy last year&rsquo;s plan and adjust the dates.&rdquo;</strong> It would feel like progress and you already know the answer to it: <strong>last year&rsquo;s plan ran four days late.</strong> Copying a late plan buys another late plan, and it copies the reason without ever showing you what the reason was.</p>
+<p>&bull; <strong>&ldquo;Ask each foreman how long their jobs take and add it up.&rdquo;</strong> Their durations are the best information you have and adding them is the trap. <strong>Add all of it together and you get the cost of doing every job one after another, alone</strong> &mdash; which is not the shutdown, and is a number that will frighten you into the wrong decisions.</p>
+<p>&bull; <strong>&ldquo;Start with the crane &mdash; it&rsquo;s the constraint.&rdquo;</strong> A good instinct pointed at the wrong step. You cannot see who needs the crane when <strong>until the jobs are in an order</strong>, and the order is decided by what physically must finish before what &mdash; the kiln cools before the brick comes out, whatever the crane is doing.</p>
+<p>&bull; <strong>&ldquo;Get the whole team in a room and plan it together.&rdquo;</strong> Necessary for the durations and the dependencies, and it does not solve your problem. <strong>Twelve people around one whiteboard still cannot hold 214 jobs</strong>, and the thing you keep losing is which jobs you have already placed.</p>
+<p>&bull; <strong>&ldquo;Ask management for more days.&rdquo;</strong> Possibly the right ending, and you cannot ask yet. <strong>You do not know how many days you need</strong> &mdash; and an engineer who asks for more time without a number gets a no, while one who arrives with a chain of jobs and a finish date has an argument.</p>
+<p>Notice what you are actually missing, because it is not effort or willingness: a way to see <strong>which jobs decide the finish date</strong> and which merely have to happen &mdash; and those are very different lists.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Let us build the real thing for the No.3 Calciner shutdown. We will keep the example small enough to see every step - <strong>eight key activities</strong> drawn from the 214 - but the steps are identical at full size. We will use Primavera P6 language and note the MS Project word in brackets where it differs.</p>
+<p>These are the spine of the shutdown - the jobs the whole window turns on. Thandi and the trade foremen gave us the durations from experience.</p>
+<table>
+<tr><th>ID</th><th>Activity</th><th>Duration</th></tr>
+<tr><td>A</td><td>Cool down and isolate the kiln</td><td>1 day</td></tr>
+<tr><td>B</td><td>Erect scaffolding inside the kiln</td><td>1 day</td></tr>
+<tr><td>C</td><td>Strip out old refractory brick</td><td>3 days</td></tr>
+<tr><td>D</td><td>Inspect and repair the kiln shell</td><td>2 days</td></tr>
+<tr><td>E</td><td>Reline new refractory brick</td><td>4 days</td></tr>
+<tr><td>F</td><td>Cure the new brick lining</td><td>2 days</td></tr>
+<tr><td>G</td><td>Replace the burner</td><td>2 days</td></tr>
+<tr><td>H</td><td>Reinstate, dry out and start up</td><td>2 days</td></tr>
+</table>
+<p><strong>Step 1 - Build the WBS (the work list).</strong> In P6 we open a new project and create a WBS with three groups: <em>Shutdown Prep</em>, <em>Kiln Internals</em>, <em>Restart</em>. Then under each group we add the activities as rows. (In MS Project you do the same by typing task names and using the indent arrow to make them sit under a heading.) Activities A and B go under Shutdown Prep. C, D, E, F, G go under Kiln Internals. H goes under Restart. Now every job has a home. This grouping is not decoration - at the end of the shutdown you will report progress by group to management, and a clean WBS makes that one click.</p>
+<p><strong>Step 2 - Enter durations.</strong> In the Duration column we type each job's length: A = 1, B = 1, C = 3, and so on down to H = 2. If you simply added all eight durations together you would get <strong>17 days</strong>. Hold that number - it is the trap. Seventeen is what it costs if you did every job one after another, alone. The whole point of the next steps is that you do not have to.</p>
+<p><strong>Step 3 - Link the activities (the logic).</strong> This is where the schedule earns its keep. We ask, for each job: what must finish before this can start? We use Finish-to-Start links (P6 calls this FS; MS Project calls it the same).</p>
+<ul>
+<li>A &#8594; B (must isolate before you scaffold inside)</li>
+<li>B &#8594; C (scaffold before you strip brick)</li>
+<li>C &#8594; D (strip brick before you can see and repair the shell)</li>
+<li>D &#8594; E (repair shell before you reline brick)</li>
+<li>E &#8594; F (reline before you cure)</li>
+<li>F &#8594; H (cured lining before start-up)</li>
+<li><strong>G (replace burner)</strong> does not wait for the brick work. It only needs the kiln isolated. So we link A &#8594; G. The burner job runs in parallel with the brick chain.</li>
+<li>G &#8594; H as well (the burner must be in before start-up)</li>
+</ul>
+<p>Notice what just happened. The burner job (G) is no longer stuck behind the brick. It runs alongside it. That is the difference between 17 days and the real number.</p>
+<p><strong>Step 4 - Let the tool find the critical path.</strong> Now we press the schedule button (in P6, F9 / Schedule; in MS Project, the schedule recalculates automatically). The tool walks every chain and works out the longest one. Let us follow the two chains ourselves so you trust the answer:</p>
+<ul>
+<li><strong>Brick chain:</strong> A(1) + B(1) + C(3) + D(2) + E(4) + F(2) + H(2) = <strong>15 days</strong></li>
+<li><strong>Burner chain:</strong> A(1) + G(2) + H(2) = <strong>5 days</strong></li>
+</ul>
+<p>The longest chain is the brick chain at 15 days. That is the <strong>critical path</strong>: A &#8594; B &#8594; C &#8594; D &#8594; E &#8594; F &#8594; H. These jobs have <strong>zero float</strong>. The burner job G sits on a 5-day chain inside a 15-day window, so it has <strong>10 days of float</strong> - it can slip up to ten days before it threatens the finish.</p>
+<p>And here is the cold news: the critical path is 15 days, but management gave us 14. The schedule has just told us, honestly and on day one, that the plan as it stands lands one day late. A whiteboard would never have shown that cleanly. We will fix it in Your Turn - that one-day gap is the real work of planning.</p>
+<p><strong>Step 5 - Add resources and level them.</strong> We assign the crane crew to the jobs that need it: stripping brick (C) and relining brick (E). Because C and E are already in a chain (C before E), they never want the crane on the same day - no clash there. But suppose the burner job (G) also needed the crane on day two, the same day as the brick strip (C). P6 would flag the crane as <strong>over-allocated</strong> (more than 100% used). We press Level Resources, and because G has 10 days of float, P6 quietly pushes G a couple of days later so the crane does one job at a time. The finish date does not move, because we spent G's float, not the critical path's. That is resource levelling working for you.</p>
+<p><strong>Step 6 - Set the baseline, then track.</strong> On the morning the shutdown starts, we save a baseline (P6: Maintain Baselines &#8594; Save; MS Project: Set Baseline). The plan is now frozen as a reference photograph. On day four, Thandi reports the brick strip (C) finished half a day late. We type the real progress into the % complete field. P6 instantly shows the finish date sliding by half a day and paints C's chain red - because C is on the critical path, its slip is the whole project's slip. The burner job slipping, by contrast, would show as eating into float, not moving the finish. The schedule has turned a vague worry ("are we behind?") into one clear number you can take to the board.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>What is this thing, in plain words?</strong> A schedule is just an honest answer to one question: if these jobs depend on each other in these ways, when can the work actually finish? You are not guessing a date. You are letting the logic of the work tell you the date. Doing this for 214 jobs by hand is impossible to keep straight, so we use a tool built for exactly this. The two industry-standard tools are <strong>Primavera P6</strong> ("P6" is just the name of the version - the heavyweight tool used for big shutdowns, construction and large projects, made by Oracle) and <strong>Microsoft Project</strong> (often shortened to MS Project - a lighter, simpler tool, good for smaller jobs). They look different on screen, but they do the same five things, in the same order, as you just saw on the calciner shutdown. Learn the five things and you can drive either tool.</p>
+<p><strong>Why does one chain decide everything?</strong> Some jobs can slip a day or two and the shutdown still finishes on time, because other jobs are slower and you are waiting on them anyway - like the burner job G above. Other jobs cannot slip even one hour without pushing the whole finish date out - like every job on the brick chain. The chain of jobs that decides the finish date - the longest chain of must-follow-must work - is the <strong>critical path</strong> (think of it as the tightest string in the whole web: pull any job on it later, and the end date moves). The slack a non-critical job has - how long it can slip before it starts to matter - is <strong>float</strong>. A job on the critical path has zero float. That is the test: zero float means critical. Why does this matter so much? Because it tells you where to point your attention. You stop worrying equally about all 214 jobs and start guarding the 30 or so that actually control the date - exactly as G's 10 days of float versus the brick chain's zero float showed you in T2.</p>
+<p><strong>What are the five things the tool actually does?</strong> Each one is a step you just watched run on the calciner:</p>
+<ul>
+<li><strong>1. Build the work list (the WBS).</strong> "WBS" stands for Work Breakdown Structure - a fancy name for a simple idea: break the big shutdown into groups, and groups into individual jobs (called activities). Like chapters and paragraphs. (T2 Step 1: Shutdown Prep / Kiln Internals / Restart.)</li>
+<li><strong>2. Give each activity a duration.</strong> How long the job takes once it starts, in hours or days. (T2 Step 2: A=1 ... H=2, summing to the 17-day trap.)</li>
+<li><strong>3. Link the activities (logic / dependencies).</strong> Tell the tool what must come before what. Each link is a relationship; the most common kind is Finish-to-Start (the first must finish before the second can start). (T2 Step 3: the A-to-H chain, and G running in parallel.)</li>
+<li><strong>4. Add resources and level them.</strong> A resource is the crew, crane or machine a job needs. Levelling means: when two jobs both want the one crane on the same day, push one of them later so the crane is not double-booked - more plainly, stop asking one crew to be in two places at once. (T2 Step 5: the crane on C and E.)</li>
+<li><strong>5. Set a baseline, then track progress.</strong> A baseline is a frozen photograph of the plan on day zero. As the work runs, you mark each job's real progress, and the tool shows you whether you are ahead or behind that photograph. Without a baseline you have nothing to measure against. (T2 Step 6: Thandi's half-day slip on C.)</li>
+</ul>
+<p><strong>When does this fit - and when does it not?</strong> This technique fits when work has many jobs that depend on each other and a deadline that bites - shutdowns, turnarounds, big maintenance campaigns, construction. That is exactly Mooirivier's calciner. It does not fit a single quick job, or routine daily maintenance where the same five tasks happen every shift. Building a full P6 schedule for "change the filter" is wasted effort. A checklist is better there. Use the heavy tool when the dependencies are the hard part, not the doing.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Try each task below <strong>before</strong> you open its answer. Get a pencil and the eight-activity list from T2, or open P6 / MS Project if you have it. The struggle is the point.</p>
+
+<p><strong>Task 1 - Close the one-day gap (medium).</strong> The critical path is 15 days; you have 14. Thandi says the relining crew (job E, 4 days) can work a night shift and finish in 3 days instead of 4, but it costs overtime. Re-run the critical path in your head with E = 3. Does the shutdown now fit in 14 days? Which job would you spend the overtime money on, and why that one and not the burner job?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>With E = 3, the brick chain becomes 1+1+3+2+3+2+2 = <strong>14 days</strong>. It fits. You spend the overtime on <strong>E because E is on the critical path</strong> - shortening a critical job shortens the whole project. Spending the same overtime on the burner job (G) would change nothing, because G has 10 days of float to spare; you would pay money and move the finish date by zero days. The rule you have just used: only crashing the critical path moves the end date.</p>
+</div>
+</details>
+
+<p><strong>Task 2 - A new job lands (harder).</strong> Halfway through planning, the inspectors add a new mandatory job: Job X - gearbox seal replacement, 2 days. It can only start after the shell repair (D) and must finish before start-up (H). Insert X into the logic. Does it land on the critical path? Re-calculate the finish.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>X links D &#8594; X &#8594; H. Trace its chain: A(1)+B(1)+C(3)+D(2)+X(2)+H(2) = 11 days if it bypassed E and F - but X runs in parallel with the E &#8594; F brick-cure chain (both start after D). The brick chain D &#8594; E &#8594; F &#8594; H is 2+3+2+2 = 9 days after C; the X chain D &#8594; X &#8594; H is 2+2+2 = 6 days after C. The brick chain is still longer, so <strong>X is not critical</strong> - it has float and the 14-day finish holds. The lesson: adding a job does not automatically add time. Only a job that lands on (or creates a new longest) critical path moves the date. Always re-run the schedule and check.</p>
+</div>
+</details>
+
+<p><strong>Task 3 - Read the float to set your watch list (hardest).</strong> You are now running the live shutdown. You cannot personally watch all jobs. Using only the float values, which jobs do you check every single morning, and which can you check twice a week? Write your watch list and your reasoning.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Check the <strong>zero-float (critical) jobs every morning</strong> - the brick chain A, B, C, D, E, F, H - because any slip there is an immediate slip of the whole shutdown and the R1.4 million-a-day clock. Check the <strong>high-float jobs (the burner G, ~10 days float) twice a week</strong> - a small slip there costs nothing yet. Good planning is not watching everything equally; it is spending your attention where the float is lowest. If you wrote "watch everything the same," that is the whiteboard mindset the schedule exists to cure.</p>
+</div>
+</details>
+
+<p><strong>Do this yourself.</strong> You do not need P6 open to run this technique - you can run it on paper or in a spreadsheet first, then type it into the tool. Take <strong>your own</strong> piece of work that has many jobs and a deadline (a shutdown, a relocation, an install, a campaign), and fill in the blanks below. Each heading is a step of the technique, so working across the page <em>is</em> doing the procedure.</p>
+
+<p><strong>Step 1-2 - List your activities, group them, and give each a duration.</strong> One row per job. The Group column is your WBS.</p>
+<table>
+<tr><th>ID</th><th>Activity (what the job is)</th><th>WBS group</th><th>Duration</th><th>Resource it needs (crew / crane / machine)</th></tr>
+<tr><td>A</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>B</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>C</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>D</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+</table>
+<p><strong>Trap check - the sum-of-all-durations number:</strong> add every duration end to end = ______ days. This is the worst case (everything in one chain). Your real finish should come out shorter - if it does not, you have hidden the parallelism (see T5, Guardrail 5).</p>
+
+<p><strong>Step 3 - Link the logic.</strong> For each job write only what must finish before it can start. A job with nothing before it starts on day one; a job with nothing after it is an open end - check it is really the last job.</p>
+<table>
+<tr><th>Activity</th><th>What must finish first (predecessors)</th><th>Can it run in parallel with anything? (Y/N - which?)</th></tr>
+<tr><td>A</td><td></td><td></td></tr>
+<tr><td>B</td><td></td><td></td></tr>
+<tr><td>C</td><td></td><td></td></tr>
+<tr><td>...</td><td></td><td></td></tr>
+</table>
+
+<p><strong>Step 4 - Find the critical path and the float.</strong> Trace each chain from start to finish and add its durations. The longest chain is your critical path; every job on it has zero float. For every other job, its float = (longest chain length) - (its own chain length).</p>
+<table>
+<tr><th>Chain (list the activities in order)</th><th>Chain length (sum of durations)</th><th>Longest? (critical path)</th></tr>
+<tr><td></td><td></td><td></td></tr>
+<tr><td></td><td></td><td></td></tr>
+<tr><td></td><td></td><td></td></tr>
+</table>
+<p>Critical path (the zero-float chain): __________________________</p>
+<p>Critical-path length = your honest finish date: ______ days</p>
+<p>Your deadline: ______ days &#8594; Gap (finish - deadline): ______ days (positive = you are late; this is the real work of planning - close it by shortening a <strong>critical</strong> job)</p>
+<table>
+<tr><th>Activity</th><th>Its chain length</th><th>Float (longest - this chain)</th><th>On critical path? (float = 0)</th></tr>
+<tr><td>A</td><td></td><td></td><td></td></tr>
+<tr><td>B</td><td></td><td></td><td></td></tr>
+<tr><td>...</td><td></td><td></td><td></td></tr>
+</table>
+
+<p><strong>Step 5 - Spot resource clashes and level.</strong> List any day where one resource is wanted by two jobs at once. Move the job with the most float later - never a zero-float job, or the finish moves.</p>
+<table>
+<tr><th>Resource</th><th>Jobs that clash (want it same day)</th><th>Which job has float to move?</th><th>Levelled - clash gone? (Y/N)</th></tr>
+<tr><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<p><strong>Step 6 - Baseline and track.</strong> Before work starts, freeze the plan. Then each day update reality against it.</p>
+<table>
+<tr><th>Activity</th><th>Baseline (planned) duration</th><th>Actual / % complete</th><th>Ahead / behind vs baseline</th><th>On critical path? (watch daily)</th></tr>
+<tr><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<p>The watch list you have just built: check the zero-float (critical) jobs every morning; check the high-float jobs twice a week. That single rule - guard the lowest float - is the whole pay-off of the technique.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your schedule true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>The finish date will not move no matter what you shorten.</strong> Symptom: you keep crashing jobs and adding crews, but P6 shows the same end date. Cause: you are shortening jobs that are not on the critical path - you are spending float, not time. Fix: filter or colour the schedule to show zero-float activities only (P6: filter on Total Float = 0). Shorten those. Only the critical path moves the date.</p>
+<p>&bull; <strong>Everything looks fine, then on start day the dates are all wrong.</strong> Symptom: the plan looked sensible but collapses the moment work begins. Cause: missing logic links - a job with no predecessor floats free and the tool schedules it on day one whether that is sensible or not. Fix: check for open ends - every activity except the very first should have something before it, and every activity except the very last should have something after it. P6 has a Schedule Log that lists activities with no predecessor or successor. Fix the dangling jobs.</p>
+<p>&bull; <strong>P6 keeps flagging a resource as over-allocated even after levelling.</strong> Symptom: the crane still shows red (over 100%) after you pressed Level Resources. Cause: the clashing jobs are both on the critical path, so neither has float to absorb the move - levelling cannot move a zero-float job without pushing the finish. Fix: you have a genuine clash, not a paperwork one. Choose: hire a second crane, re-sequence so the two jobs do not overlap, or accept a later finish. The tool is telling you the truth - there is no free move here.</p>
+<p>&bull; <strong>You marked progress but cannot tell if you are ahead or behind.</strong> Symptom: you have % complete filled in, but no clear "behind by X days" number. Cause: no baseline was saved, so there is no frozen photograph to compare against. Fix: always save the baseline before work starts. If you forgot, you cannot recreate it honestly after the fact - note the lesson and baseline the next revision so future tracking has a reference.</p>
+<p>&bull; <strong>The total duration equals the sum of all the jobs (e.g. 17 days for eight jobs).</strong> Symptom: the schedule's finish matches adding every duration end to end. Cause: you have linked everything in one long chain - no parallel work. The burner job is stuck behind the brick job for no real reason. Fix: re-examine each link and ask does this really have to wait, or can it run alongside? Real shutdowns finish faster than the sum of their parts only because independent jobs run in parallel. If your finish equals the sum, you have hidden the parallelism.</p>
+</div>
+</details>
+<p>You came to the whiteboard with 214 jobs, a fourteen-day window and a marker that would not keep up. You can leave with a schedule that tells the truth on day one: a 15-day critical path against a 14-day deadline, a burner job with 10 days to spare, a crane that never double-books, and a baseline you can measure every morning's progress against. That is how a shutdown like Mooirivier's is planned well - not with boxes and arrows going to spaghetti, but with the logic of the work itself telling you the date, and your attention spent where the float is lowest.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build and manage a schedule in Primavera P6 or MS Project now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

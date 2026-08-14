@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building predictive-maintenance models for rotating equipment (feature engineering to RUL)</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Building predictive-maintenance models for rotating equipment (feature engineering to RUL)</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is <strong>04:50 on a Tuesday</strong> at the Klipdrift High-Lift Pump Station, just outside Witbank. You are the reliability engineer for <strong>Moreleta Water</strong>, the utility that pumps treated water up the ridge to three townships. Four big electric pumps sit in a row in the pump hall - green casings, each the size of a small car, humming under the strip lights. Pump 3 is the one that worries you.</p>
+<p>In your hand is the night-shift log sheet. The operator has written, in blue pen: <em>"Pump 3 - sounds rough since 02:00. Bearing temp 71 &deg;C (normal 58 &deg;C)."</em> Underneath, the standby pump note: <em>"Pump 1 standby unavailable - motor out for rewind till Friday."</em> So right now Pump 3 has no backup. If it fails, the upper-zone reservoir drops, and by mid-morning <strong>40,000 people</strong> open a tap and get air.</p>
+<p><strong>Thabo</strong>, the maintenance superintendent, walks in holding a coffee and a hard hat. He does not look calm. "We can pull Pump 3 now and strip it," he says, "but that is a full day down and we have no standby. Or we run it and pray. Which is it?" He is watching your face. Your name is on the maintenance plan that left Pump 1 stripped this week.</p>
+<p>You can feel the floor vibrating through your boots - a low buzz that was not there last month. Your first instinct is to grab the handheld vibration meter, take one reading, and decide on that single number. But you have done that before. Last year a "fine" reading on Monday became a seized bearing on Wednesday. One snapshot does not tell you how fast the damage is growing, or how many days you have left.</p>
+<p>You have years of sensor data sitting on the SCADA historian - vibration, temperature, current, flow - for every pump, every second, going back four years, including the three failures you have already lived through. Somewhere in that data is the pattern that says <em>this bearing is dying, and you have about N days</em>.</p>
+<blockquote><h2>Guessing is costing you sleep, money, and trust. You need a reliable, repeatable way to turn raw signal history into two clear answers: is this pump faulty, and how long until it fails?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Four years of history sits on the historian for four pumps — vibration sampled thousands of times a second, plus temperature, current and flow every minute. You have lived through <strong>three failures</strong> with known dates: an outer-race bearing, an inner-race bearing, and an imbalance after impeller wear. The pumps turn at <strong>1485&nbsp;rpm</strong>. Thabo wants two answers at 04:50: is this pump faulty, and how many days has he got. Write down how you would turn that history into those two answers — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why the second question is harder than the first</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Feed the raw signal into a model and let it learn.&rdquo;</strong> Thousands of samples a second of mostly-ordinary running, and a handful of failures. The model will learn what a normal pump looks like and be confident about everything else.</p>
+<p>&bull; <strong>&ldquo;Alarm when vibration crosses the standard&rsquo;s limit.&rdquo;</strong> That answers neither question. It fires late and says nothing about which fault or how long.</p>
+<p>&bull; <strong>&ldquo;Use the three failures as the training data.&rdquo;</strong> Three events cannot teach a model to recognise a fourth. But they can do something else entirely, which is the move: they let you <em>label</em> the history you already have, because you know what was happening and when.</p>
+<p>&bull; <strong>&ldquo;Compute the bearing defect frequencies and watch for those peaks.&rdquo;</strong> Strong, and it answers the first question well. It still does not put a number of days on anything.</p>
+<p>&bull; <strong>&ldquo;Ask the vendor for their predictive package.&rdquo;</strong> It will arrive knowing nothing about these four pumps, and the value is in the four years you already have.</p>
+<p>&bull; The two questions are genuinely different jobs and need different machinery. <em>Is it faulty</em> is recognition: turn raw signal into a handful of features that carry meaning — how rough it is overall, how <em>spiky</em> it is, and whether energy has appeared at the rhythms a defect produces (at 1485&nbsp;rpm the shaft turns 24.75 times a second, so a bearing&rsquo;s defect line lands at a known multiple of that). <em>How many days</em> is a different question: it needs the history from a healthy machine through to a known failure, which is exactly what your three lived failures give you. And there is a trap sitting in the middle of the data: there will be vastly more healthy windows than faulty ones, so a model that simply predicts &lsquo;healthy&rsquo; every time will score beautifully and be worth nothing. <strong>Which is why the last stage is not accuracy but cost</strong> — what a missed failure costs against what a false alarm costs — because that, and not a percentage, is what Thabo is actually deciding with.</p>
+</div>
+</details>
+<p>Here is the pipeline that answers Thabo's question.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Let us build the model that would have answered Thabo's 04:50 question, using the real Moreleta Water numbers, all five stages, start to finish.</p>
+<p><strong>Stage 1 - get clean, labelled signal.</strong> You pull the SCADA historian for all four pumps, four years. The vibration sensor on each pump's drive-end bearing samples at <strong>12,800 samples per second</strong>; temperature, motor current and flow are logged once a minute. You have lived through three failures with known timestamps - Pump 2 (outer-race, 2023), Pump 4 (inner-race, 2024), Pump 3 (imbalance after impeller wear, early 2025) - and you label every one-second window: 41,200 healthy windows, 2,400 outer-race, 2,600 inner-race, 2,300 imbalance. Far more healthy windows than faulty ones - a problem you will fix in Stage 3.</p>
+<p><strong>Stage 2 - engineer features.</strong> Take one window of Pump 2 vibration from 18 days before its 2023 failure. Time-domain: RMS = 4.1 mm/s (healthy baseline 2.0 mm/s; the ISO 20816 zone B/C boundary for this machine class is about 4.5 mm/s, so it is climbing toward "unsatisfactory"). Kurtosis = 6.8 (a clean signal sits near 3.0; 6.8 means sharp, repeated impacts - the fingerprint of a defect striking once per revolution). Frequency-domain: the pump turns at 1,485 rpm = 24.75 Hz, so the outer-race defect frequency (BPFO) is 3.05 x shaft speed = 75.5 Hz. The FFT shows a clear new peak at 75.5 Hz plus harmonics at 151 Hz and 226 Hz - amplitude 1.9 mm/s against a healthy 0.1 mm/s. This single feature both flags and names the fault: outer race. A spectrogram confirms the 75.5 Hz energy is steady across the second, not a one-off knock. You repeat this for every window: a tidy table of RMS, kurtosis, crest factor (peak divided by RMS), BPFO amplitude, BPFI amplitude, bearing temperature, motor current, plus the label.</p>
+<p><strong>Stage 3 - train the fault classifier.</strong> You start simple: a Random Forest on the seven features, tested on a pump it never trained on (train on Pumps 2 and 4, test on Pump 3 - the honest test, because in real life you predict on machines the model has not seen fail). You fix the imbalance from Stage 1 with class weighting. On the held-out pump: Random Forest scores 94% accuracy, 91% recall on faults, trains in 40 seconds, and you can explain a prediction (feature importance). A 1D-CNN on the raw signal scores 96% accuracy and 92% recall, but takes 3 hours on a GPU and is hard to explain. The CNN is barely better and far harder to defend to Thabo and the auditors - you choose the Random Forest. Its top feature by importance is BPFO amplitude, matching the physics: a reassuring sign it learned something real, not noise.</p>
+<p><strong>Stage 4 - build the RUL predictor with uncertainty.</strong> You take the three run-to-failure histories, where BPFO amplitude, RMS and temperature all rise as failure approaches, and train a gradient-boosting model to predict the 10th, 50th and 90th percentiles of days-to-failure (quantile regression) - a range, never a single number. Feed it Pump 3 as it stands right now: RMS 3.6 mm/s and rising 0.2 mm/s per week, kurtosis 5.4, bearing temp 71 &deg;C, BPFI amplitude elevated (an <em>inner</em>-race signature, not outer). The model returns a median RUL of <strong>9 days</strong>, with a 10th-90th percentile range of <strong>5 to 14 days</strong>. You plan to the cautious end: 5 days, not 9.</p>
+<p><strong>Stage 5 - cost-aware evaluation.</strong> You price the two mistakes with Finance: a false alarm (needless strip-down) costs parts R8,000 + labour R6,000 + a day of reduced redundancy &asymp; <strong>R14,000 each</strong>; a missed detection (unplanned failure) costs emergency repair R120,000 + a half-day supply interruption with regulator penalty R250,000 &asymp; <strong>R370,000 each</strong>. Over the test year the model produced 6 false alarms and missed 1 fault out of 12: 6 x R14,000 = R84,000, plus 1 x R370,000 = R370,000, for a model total of <strong>R454,000</strong>. Current calendar maintenance (strip every pump every six months whether it needs it or not) plus the two unplanned failures it failed to prevent last year cost <strong>R1,310,000</strong>. Net saving &asymp; <strong>R856,000 per year</strong> - the sentence that gets the project funded.</p>
+<p><strong>Back to 04:50.</strong> The model says Pump 3 has a median 9 days, cautious 5, with an inner-race signature - a slow degradation, not a sudden seize. You tell Thabo: run it under a reduced-speed limit and tight monitoring, do not strip it today; schedule the repair for Friday when Pump 1 comes back from rewind and you have redundancy again. You avoided both a needless day-down today and a 40,000-person outage. That is the whole point of the pipeline.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A predictive-maintenance model is fixing a machine <em>just before</em> it would have broken, not on a fixed calendar and not after it has already failed - by reading the machine's own warning signs from its sensors. Think of the build as a pipeline: raw signal goes in one end, two useful answers come out the other. Five stages, each teaching the question it answers, anchored to what you just watched happen to Pump 2 and Pump 3 above.</p>
+<ul>
+<li><strong>1. Get clean, labelled signal.</strong> <em>What can the model actually learn from?</em> Gather the sensor recordings (vibration, temperature, motor current, flow) and label them - which stretches were healthy, which were faulty, and, for runs that ended in failure, exactly when the failure happened. That failure date is gold; it lets you count backwards.</li>
+<li><strong>2. Feature engineering.</strong> <em>How do I turn thousands of wiggly values into something a model can learn from?</em> A raw vibration signal is just thousands of up-and-down values per second; a model learns better from a few meaningful summary numbers. That summarising is <strong>feature engineering</strong> - a feature is one measurable property of the signal. Three families: <strong>time-domain</strong> (RMS - root mean square, a fair measure of overall vibration energy; and kurtosis, which spikes on sudden sharp peaks, exactly what a chipped or pitted bearing produces); <strong>frequency-domain</strong> (the FFT - Fast Fourier Transform - splits a signal into the separate frequencies inside it, like splitting white light into a rainbow; bearings fail at known, calculable frequencies, BPFO for the outer race and BPFI for the inner race, the heart of vibration analysis under ISO 20816); and <strong>time-frequency</strong> (a spectrogram shows which frequencies appear at each moment, not just whether they are there at all).</li>
+<li><strong>3. Train a fault classifier.</strong> <em>Is it faulty, and which fault?</em> A classifier sorts each example into a category - healthy, outer-race fault, inner-race fault, imbalance - by learning from the features plus the true labels. For tabular features, a <strong>Random Forest</strong> (many simple decision trees combined and voting - robust, hard to fool) or gradient boosting is usually the strong, simple first choice. With lots of data and a wish for the model to learn its own features from the raw signal, use a <strong>1D-CNN</strong> (a deep-learning model that slides small filters along the signal to spot local patterns, like sharp bearing impacts) or an <strong>LSTM</strong> (built to remember sequences over time - good for slow trends). Deep learning earns its keep with lots of labelled data and complex patterns, and when you can afford GPUs; with a few hundred examples and three clear features, a Random Forest beats a neural network and is far easier to explain.</li>
+<li><strong>4. Build a Remaining-Useful-Life (RUL) predictor.</strong> <em>How long left?</em> RUL is the predicted time - in days, run-hours, or cycles - until the asset can no longer do its job. Train it on the run-to-failure histories: it learns how the features grow as a machine nears its known failure date, then predicts days remaining for a machine running today. A single RUL number is dangerous - "7 days" sounds precise but is really "somewhere between 4 and 11" - so build the model to report a <strong>prediction interval</strong>, a range, and plan to its cautious end.</li>
+<li><strong>5. Cost-aware evaluation.</strong> <em>Does the model actually save money?</em> A model that is 95% accurate can still lose money if its mistakes are the expensive kind. A <strong>false alarm</strong> (crying wolf on a fine pump) wastes a strip-down - parts, labour, lost availability. A <strong>missed detection</strong> (saying fine when the pump fails) costs an unplanned failure - emergency repair, outage, penalties. Write down the rand cost of each, multiply by how often the model makes each mistake, and compare the total against current calendar-maintenance cost. That number - money saved per year - is what justifies the project.</li>
+</ul>
+<p><strong>When this fits:</strong> rotating equipment, continuous sensors, at least a few real failures to learn from. <strong>When it does not:</strong> a brand-new asset with no failure history - you have nothing to learn from yet, so start with physics-based limits and collect data - or an asset so cheap that run-to-failure is simply the right strategy.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Work each task fully before you read the feedback. Try it on paper first.</p>
+<p><strong>Task 1 (warm-up) - read the time-domain clues.</strong> A healthy bearing window gives RMS 2.0 mm/s, kurtosis 3.1. A suspect window gives RMS 2.3 mm/s, kurtosis 7.9. Which feature is shouting "fault", and why?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Kurtosis is the loud signal. RMS rose only slightly (2.0 to 2.3), but kurtosis nearly tripled (3.1 to 7.9). Kurtosis spikes on sharp, sudden impacts - the tell-tale of a pitted or chipped bearing striking once per revolution - before overall energy (RMS) climbs much. Early bearing faults often show in kurtosis first and RMS later, so a "fine" RMS alone can fool you. This is exactly the trap from the Ache.</p>
+</div>
+</details>
+<p><strong>Task 2 - name the fault from the FFT.</strong> A pump turns at 1,500 rpm (25 Hz). Its inner-race defect frequency (BPFI) is calculated at 4.9 x shaft speed. The FFT shows a new, growing peak at 122.5 Hz. What fault is it, and how do you know?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>4.9 x 25 Hz = 122.5 Hz, which matches BPFI exactly - so the inner race is defective. State the calculation explicitly: bearing defects appear at specific, geometry-derived frequencies, which is why the frequency domain <em>names</em> the fault, not just flags it. Bonus: confirm with harmonics (245 Hz, 367.5 Hz) to rule out coincidence.</p>
+</div>
+</details>
+<p><strong>Task 3 - choose the model honestly.</strong> You have 380 labelled windows from two failures, eight clean engineered features, and a manager who must explain every callout to a regulator. A colleague wants to build an LSTM. What do you recommend, and why?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Recommend a Random Forest (or gradient boosting), not the LSTM. Only 380 examples is far too few to train a deep network well - it would overfit. The features are already clean and meaningful, so there is little for deep learning to discover. And a Random Forest gives feature importance, so you can explain each prediction to the regulator. Deep learning earns its keep only with lots of data and complex raw-signal patterns - not here.</p>
+</div>
+</details>
+<p><strong>Task 4 - plan to the uncertainty.</strong> Your RUL model returns a median of 12 days with a 10th-90th range of 6 to 20 days for a critical pump with no standby. How many days do you plan to, and how would your answer change if a standby pump were available?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>With no standby, plan to the cautious lower end - 6 days - because the cost of a miss (outage) is severe and you have no fallback. Never plan to the median alone: it has a 50% chance of being too late. With a standby available, the cost of a miss drops sharply, so you can reasonably plan nearer the median (say 12 days) and capture more remaining life - a cost-aware, not fear-driven, choice.</p>
+</div>
+</details>
+<p><strong>Task 5 (stretch) - make the cost case.</strong> A model gives 4 false alarms (R15,000 each) and 2 missed detections (R400,000 each) per year. Current calendar-based maintenance plus its uncaught failures cost R1,500,000 per year. Is the model worth deploying? Show the working.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Model cost = (4 x R15,000) + (2 x R400,000) = R60,000 + R800,000 = R860,000. Saving = R1,500,000 - R860,000 = R640,000 per year - yes, deploy it. Go further: the two missed detections dominate (R800,000 of the R860,000), so the highest-value next step is to reduce misses - lower the alarm threshold, accept a few more cheap false alarms - a deliberate trade, because a miss costs about 27x a false alarm.</p>
+</div>
+</details>
+<p><strong>Do this on your own asset.</strong> Pick one rotating asset you actually look after - a pump, fan, motor, compressor, gearbox - and run the same five stages with your own numbers. <strong>Stage 1:</strong> for each signal channel you hold (vibration, temperature, motor current, flow/load), note the sample rate, how far back it goes, how many failures you can point to with a known timestamp, and which healthy stretches you can mark. Gate: do you have at least one real failure with a timestamp? If not, collect data and use physics-based limits first. <strong>Stage 2:</strong> for each feature (RMS, kurtosis, crest factor, BPFO amplitude, BPFI amplitude, bearing temperature, and any channel of your own), write down what it catches, your healthy baseline, your latest reading, and whether it is rising - working out BPFO and BPFI as a multiple of your own shaft frequency in Hz. <strong>Stage 3:</strong> count your labelled windows (a few hundred with clean features points to a Random Forest; lots of data with raw-signal patterns makes deep learning worth considering); decide your honest split - train on which assets or failures, test on which the model has never seen; decide your class-imbalance fix if healthy windows dominate; and check whether your top feature matches the physics you expect, because if it does not, suspect leakage or noise. <strong>Stage 4:</strong> record your median RUL, your 10th and 90th percentile bounds, and which end you will actually plan to - the lower end if you have no standby, nearer the median if you do. <strong>Stage 5:</strong> price a false alarm and a missed detection in your own currency, multiply each by how often it happens per year, sum to a model total, and set that against your current calendar-maintenance cost plus its uncaught failures - the difference is your net saving, and the sentence you take to the budget meeting: "Deploying this on ____ saves approximately ____ per year."</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep this pipeline honest once it is running for real.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>99% accuracy that still misses real faults.</strong> Cause: class imbalance - far more healthy than faulty windows, so "always say healthy" looks accurate. Fix: score on recall for faults, not overall accuracy; apply class weighting or resampling. This is the Stage 1 imbalance, left unfixed.</p>
+<p>&bull; <strong>Great in testing, useless on a new pump.</strong> Cause: data leakage - windows from the same pump, even the same failure, ended up in both training and test sets. Fix: split by machine or failure event, never by random row. Test on a pump the model never trained on.</p>
+<p>&bull; <strong>FFT shows no clear defect peak on a known-faulty bearing.</strong> Cause: window too short for the resolution, or sampling rate too low to reach the defect frequency. Fix: ensure the sample rate is at least about 2.5x the highest defect frequency you care about; use a longer window for finer frequency resolution.</p>
+<p>&bull; <strong>RUL prediction jumps wildly day to day.</strong> Cause: single-window noise, with no smoothing of the degradation trend. Fix: smooth features over a rolling window - a daily median, say - before feeding the RUL model; trust the trend, not one reading.</p>
+<p>&bull; <strong>Deep learning won't beat the Random Forest, no matter what.</strong> Cause: too little data for the network's size; it is overfitting. Fix: use the simpler model - that is the correct outcome, not a failure. Add more failure data before revisiting deep learning.</p>
+<p>&bull; <strong>Kurtosis high but the pump is genuinely fine.</strong> Cause: an external knock, a loose sensor, or electrical noise contaminated the window. Fix: check sensor mounting and grounding; confirm the spike repeats across windows and at a defect frequency before believing it.</p>
+<p>&bull; <strong>Model flags faults; maintenance ignores them.</strong> Cause: predictions are a black box no one trusts. Fix: show why - the feature importance and the matching defect frequency - so the call is explainable, and report uncertainty so people can plan, not panic.</p>
+<p>&bull; <strong>Beautiful model, finance won't fund it.</strong> Cause: you reported accuracy, not money. Fix: re-evaluate in rands - cost per false alarm times its rate, plus cost per miss times its rate, against current spend. The saving is the argument.</p>
+</div>
+</details>
+<p>You came into the pump hall at 04:50 with one rough reading and a superintendent waiting on an answer. You can leave with a pipeline that turns four years of raw signal into two honest numbers - is it faulty, and how many days - and a rand figure that gets the project funded: about R856,000 a year. <strong>Turn raw sensor history into a fault call you can name, a remaining-life range you can plan to, and a saving you can defend in rands</strong> - the difference between guessing on one snapshot reading and knowing, with the honesty to say exactly how sure you are. That is how a critical pump gets kept running without either an unplanned outage or a needless day down: not with a prayer or a strip-down, but with a model built on the machine's own history and a saving Finance can see in rands.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can build a predictive-maintenance pipeline - features, classifier, RUL with uncertainty, and a cost-aware case - now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

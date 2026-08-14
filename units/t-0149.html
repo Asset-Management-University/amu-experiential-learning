@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everyone chasing their own theory</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Everyone chasing their own theory</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and a critical pump has eaten its bearings for the third time this quarter. Your team is investigating - and the investigation is chaos.</p>
+<p>One engineer is certain it is the lubricant, and has spent two days on oil analysis. Another blames the operators. A third quietly suspects misalignment, but checking alignment means stopping the machine and setting up laser gear, so it is awkward, so nobody has done it. Each person is chasing a favourite theory, or the easiest thing to test, and there is no shared list of what could actually be causing this and no agreement on what to look at first.</p>
+<p>You watch them and see the real problem: they are <em>busy</em>, and they are <em>not converging</em>. They are investigating hard, in no particular order, and the way this is going, the "cause" will be whoever's theory is checked last standing - not the thing that is actually breaking the bearings. And the failure will come back a fourth time.</p>
+<blockquote><h2>My team is investigating a failure with energy and no order - each chasing a pet theory or the easy test, with no shared list of possible causes and no agreement on priority. How do I turn this into a structured, prioritised hunt for the real cause?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Third set of bearings. Four capable people, four theories: contaminated oil, a bad batch, vibration coming down the line from the compressor, somebody's fitting. The oil sample went off this morning because it was easy; the bearing batch is being traced because that is a phone call. Checking the alignment properly would mean stopping the machine and getting laser gear on it, so that one has been left for later — <strong>again</strong>. There is no list anywhere of what might be causing this. The way this is going, the &ldquo;cause&rdquo; will be whichever theory is last standing. Write down how you would turn this into an ordered hunt — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what must be kept out of the ranking</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Let everyone finish their checks and compare notes.&rdquo;</strong> The current plan, with a meeting at the end. Whatever the easy tests eliminate will look like progress, and the hard one still will not have been done.</p>
+<p>&bull; <strong>&ldquo;Put the most experienced engineer in charge of deciding.&rdquo;</strong> Replaces four hunches with one, more confidently held. It also buries the disagreement rather than resolving it, so nobody can say afterwards what was ruled out or why.</p>
+<p>&bull; <strong>&ldquo;Do the cheap tests first, then work up.&rdquo;</strong> The most reasonable-sounding answer here, and it is precisely the failure — it is what is already happening, dignified as a strategy. Cheapness has no relationship to likelihood.</p>
+<p>&bull; <strong>&ldquo;Replace everything — bearings, oil, do the alignment, all of it.&rdquo;</strong> Might stop the bleeding, and you will never know which one it was, so you cannot prevent it anywhere else and cannot tell whether it will return.</p>
+<p>&bull; <strong>&ldquo;Fit monitoring and wait for the next one.&rdquo;</strong> Buys data at the cost of a fourth failure, on a critical machine, when you already have three failures' worth of evidence nobody has organised.</p>
+<p>&bull; Two quiet failures are running here. First — and this is the commonest way such an investigation dies — <strong>the real cause may never be written down at all</strong>, and what was never a candidate can never be eliminated. So build the candidate list <strong>before anyone investigates anything</strong>, completely and together, because a list assembled after people are invested in their theories is a negotiation rather than an enumeration. Second, score each candidate on <strong>how likely it is and how much it would contribute</strong>, which turns four competing hunches into a shared basis people can disagree with openly. And now the discipline that decides this case: <strong>record how hard each is to verify, and keep that out of the ranking.</strong> The moment ease enters the priority, convenience takes over again — and the awkward candidate is very often the likely one, precisely because hard-to-check things involve stopping or dismantling something. Your alignment check scores high on both likelihood and contribution. It is also the difficult one. <strong>It goes first.</strong></p>
+</div>
+</details>
+<p>There is a worksheet for exactly this - the FMEA you know, turned around and pointed at a failure that has already happened. Here it is, for the bearings.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the problem-solving FMEA worksheet - every candidate cause, scored and ordered, with the evidence that settles each.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What could have caused THIS failure - all of it? (the candidate causal factors)</div><p class="cb-demo">The critical pump has eaten its bearings for the third time. Before anyone investigates anything, list every candidate causal factor - completely, not one pet theory: MISALIGNMENT of shaft to driver; LUBRICANT CONTAMINATION; UPSTREAM VIBRATION from another machine; a BAD BEARING BATCH; OPERATOR or FITTING error; over-loading. Six factors, not one. The single most common way an RCA fails is that the real cause was never even written down - so the list must be complete before the arguing starts.</p></div><div class="canvas-box"><div class="cb-label">2. How likely, how serious, and how verifiable is each? (the three scores)</div><p class="cb-demo">Score the LIKELIHOOD and CONTRIBUTION of each factor (1-5), and assess its VERIFIABILITY (e.g. easy, hard). This repurposes the FMEA&#039;s occurrence/severity/detection logic for a reactive investigation. Misalignment: likelihood 5, contribution 5, verify HARD (needs the machine stopped and laser alignment). Lubricant contamination: likelihood 3, contribution 4, verify EASY (an oil sample). Upstream vibration: likelihood 3, contribution 3, verify medium. Bad bearing batch: likelihood 2, contribution 4, verify easy. Operator/fitting error: likelihood 2, contribution 3, verify medium. The scores are a shared, explicit basis - not one engineer&#039;s hunch versus another&#039;s.</p></div><div class="canvas-box"><div class="cb-label">3. In what order should I investigate? (prioritise by likelihood x contribution)</div><p class="cb-demo">Priority = likelihood x contribution (how probable AND how much it matters). Misalignment 5x5 = 25; lubricant 3x4 = 12; upstream vibration 3x3 = 9; bad batch 2x4 = 8; operator 2x3 = 6. So the order is MISALIGNMENT FIRST - even though it is the hard one to check. And there is the team&#039;s mistake laid bare: two days were spent on lubricant (priority 12, easy to test) while misalignment (priority 25, awkward) was ignored precisely because it was awkward. Verifiability tells you HOW to check a factor, never whether to - you investigate the likely and serious ones first, hard or not.</p></div><div class="canvas-box"><div class="cb-label">4. What is the worksheet, and what evidence settles each? (the FMEA worksheet)</div><p class="cb-demo">The problem-solving FMEA worksheet, one row per factor: the factor, its likelihood/contribution/verifiability scores, its priority, and - the column that turns it into an investigation - the VERIFICATION ACTION. For misalignment: &#039;stop the pump, take laser-alignment readings; out-of-tolerance confirms, in-tolerance eliminates&#039;. For lubricant: &#039;oil sample and particle count&#039;. Every factor now has a defined piece of evidence that would confirm or kill it, and the team works down the list in priority order instead of in argument order.</p></div><div class="canvas-box"><div class="cb-label">5. What does the evidence actually prove? (investigate, verify, update)</div><p class="cb-demo">The FMEA prioritised the hunt; only EVIDENCE ends it. Investigate misalignment first: the laser readings come back well out of tolerance - confirmed as a major contributor, and now the recurring failure makes sense. Update the worksheet: misalignment confirmed; test the next factors to see whether lubricant contamination was a secondary contributor or a red herring, and eliminate the rest. A high score bought misalignment the first look, not a conviction - the cause is what the evidence proves, not what topped the ranking. That discipline is what separates a structured investigation from a confident guess.</p></div></div>
+
+<p>Look at box 3, because it is where the team's mistake becomes visible. They spent two days on the lubricant - priority 12, easy to test - while misalignment - priority 25, awkward - sat untouched precisely because it was awkward. The worksheet flips that: it says investigate the likely and serious factor first, hard or not. The tool did not solve the failure; it pointed the team at the right lead. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You already know the FMEA as a <em>preventive</em> tool - listing what could fail before it does. A <strong>problem-solving FMEA</strong> takes that same worksheet and turns it <em>reactive</em>: after a failure, it structures the hunt for the cause. Five questions:</p>
+<ul>
+<li><strong>What could have caused this failure - all of it?</strong> List every <strong>candidate causal factor</strong>, completely, before anyone investigates anything. Not one favourite theory - all of them. The most common way an RCA fails is that the real cause was never written down, so it could never be found.</li>
+<li><strong>How likely, how serious, and how verifiable is each?</strong> Score each factor on three axes, borrowing the FMEA's structure: <em>likelihood</em> it is implicated (the occurrence idea), <em>contribution</em> to the failure (severity), and how easily it can be <em>verified</em> (detection). Now the arguing has a shared, explicit basis instead of one engineer's hunch against another's.</li>
+<li><strong>In what order should I investigate?</strong> Rank by <strong>likelihood x contribution</strong> - how probable and how much it matters. And here is the discipline that fixes the ache: <em>verifiability tells you how to check a factor, never whether to</em>. Misalignment scored highest, so it is investigated first even though it is the hard one - you do not skip the most probable cause because it is inconvenient to test.</li>
+<li><strong>What is the worksheet, and what evidence settles each?</strong> The <strong>worksheet</strong> is one row per factor: the scores, the priority, and - the column that makes it an investigation - the <em>verification action</em>, the specific evidence that would confirm or eliminate it. Now the team works down the list in priority order, not in argument order.</li>
+<li><strong>What does the evidence actually prove?</strong> The FMEA guides the hunt; only <strong>evidence</strong> ends it. Verify the top factor, confirm or eliminate it, and <em>update</em> the worksheet as you go. A high score bought a factor the first look - it did not convict it. The cause is what the evidence proves, not what topped the ranking.</li>
+</ul>
+<p>One honest boundary. You are using the FMEA worksheet <em>reactively</em>, to list and prioritise candidate causes for a failure that has already happened. This is the opposite direction to the proactive design FMECA - same tool, pointed at a real failure rather than a possible one. And the worksheet <em>prioritises</em> the investigation; it does not <em>conclude</em> it. The number tells you where to look first; the evidence tells you what is true.</p>
+<p>Does it scale? It is a detective's suspect board: you do not arrest the first face you see or interrogate the whole town - you list the suspects, rank them by motive and opportunity, and investigate the strongest lead first, but you still need evidence to convict.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A control valve on a dosing line keeps sticking - three times in a month. The team is about to investigate.</p>
+<ol>
+<li><strong>List.</strong> Write three or four candidate causal factors for a sticking control valve.</li>
+<li><strong>Score one.</strong> Take one factor and score it on the three axes - likelihood, contribution, verifiability.</li>
+<li><strong>Prioritise.</strong> Say which of your factors you would investigate first, and why - by likelihood and contribution, not by which is easiest to test.</li>
+<li><strong>Verify.</strong> Name the specific evidence that would confirm or eliminate your first factor.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 3, if the factor you chose to investigate first is also the easiest one to check, pause - is it genuinely the most likely and serious, or did "easy" quietly win again? The whole point is to investigate the probable factor first even when it is the awkward one.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-candidates">1. What could have caused THIS failure - all of it? (the candidate causal factors)</label><textarea id="cb-candidates" data-key="t-0149:candidates" placeholder="After the failure, list EVERY plausible causal factor, not just your favourite one. A cause that is never on the list can never be found."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-score">2. How likely, how serious, and how verifiable is each? (the three scores)</label><textarea id="cb-score" data-key="t-0149:score" placeholder="Score each factor on three axes, borrowing the FMEA structure: LIKELIHOOD it is implicated, CONTRIBUTION to the failure, and how easily it can be VERIFIED."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-prioritise">3. In what order should I investigate? (prioritise by likelihood x contribution)</label><textarea id="cb-prioritise" data-key="t-0149:prioritise" placeholder="Rank the investigation by likelihood x contribution - how probable and how serious. Use verifiability to plan HOW to check, never as an excuse to skip a high-priority factor."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-worksheet">4. What is the worksheet, and what evidence settles each? (the FMEA worksheet)</label><textarea id="cb-worksheet" data-key="t-0149:worksheet" placeholder="Assemble the worksheet: each factor, its three scores, its priority, and the VERIFICATION action - the specific evidence that would confirm or eliminate it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-verify">5. What does the evidence actually prove? (investigate, verify, update)</label><textarea id="cb-verify" data-key="t-0149:verify" placeholder="The FMEA guides the hunt; it does not conclude it. Verify the top factor with evidence, confirm or eliminate it, and update the worksheet as the investigation proceeds. A high score is a lead, not a verdict."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now turn a room full of competing theories into one prioritised worksheet and a rational order of investigation.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Structured investigation fails when the structure is skipped, in a few very human ways.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Fixating on the first plausible cause.</strong> Confirmation bias, and the classic RCA failure - seizing "it was the operator" and closing the case. The worksheet exists to force a complete list before anyone commits.</p>
+<p>&bull; <strong>Investigating the easy factors before the likely ones.</strong> Effort spent where it is comfortable, not where the cause probably is. Verifiability plans the method; likelihood and contribution set the order.</p>
+<p>&bull; <strong>An incomplete candidate list.</strong> If the real cause was never on the sheet, no amount of investigation will find it. Completeness first, priority second.</p>
+<p>&bull; <strong>Treating the top score as the proven cause.</strong> A high score is a lead, not a verdict. Nothing is the cause until evidence confirms it, and the highest-scored factor is sometimes eliminated on the first test.</p>
+<p>&bull; <strong>Scoring by gut with no shared basis.</strong> Numbers pulled from the air are just opinion in a table. Agree the basis for the scores, so the priority is defensible rather than personal.</p>
+<p>&bull; <strong>Confusing this with a design FMECA.</strong> The proactive version asks what could fail; this reactive one asks what caused a specific failure. Same worksheet, opposite direction - do not run one when you need the other.</p>
+<p>&bull; <strong>Never updating the worksheet.</strong> An investigation is live: factors get confirmed or killed, and priorities shift. A worksheet frozen at the start becomes a document instead of a tool.</p>
+</div>
+</details>
+<p>Onalenna's team was investigating hard and getting nowhere, each chasing a theory or an easy test, with the most likely cause ignored because it was awkward. Now she can order the hunt: list every candidate cause, score each on likelihood, contribution and verifiability, investigate in priority order regardless of what is easy, and let evidence - not the ranking - name the cause. A problem-solving FMEA turns a chaotic, biased investigation into a structured, prioritised one; and a structured investigation is the one that actually stops the failure coming back. If you are working with an AMU Facilitator, take one recurring failure and build its worksheet before anyone touches a spanner.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can order a failure investigation now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

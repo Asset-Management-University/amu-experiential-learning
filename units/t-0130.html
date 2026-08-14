@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A field of grey</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A field of grey</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works. A repair weld on the high-pressure raw-water main has been radiographed by a contractor, and the main cannot be backfilled and pressurised until somebody signs. That somebody is you.</p>
+<p>The report says: <em>no significant indications - accept.</em> You open the image. It is a field of grey. There is a darker line down near the root, and you have no idea whether that is porosity you could live with, slag, or a lack of penetration you absolutely could not.</p>
+<p>Then you notice something worse. The report never says what the shot was capable of resolving. No demonstrated sensitivity, anywhere on it. So "no significant indications" might mean the weld is sound - or it might mean the image was too blurred to have shown a flaw of the size that would matter, and nobody checked.</p>
+<p>And the main runs under a town.</p>
+<blockquote><h2>I am being asked to stake public safety on a measurement I cannot verify. How do I check whether this image can be believed at all - and then read it well enough to sentence what is in it?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The report says &ldquo;no significant indications&rdquo;, and it is honest — that is genuinely what was seen. What it never says is <strong>what the shot was capable of resolving</strong>. There is no demonstrated sensitivity anywhere on it. So &ldquo;nothing found&rdquo; might mean the weld is sound, or it might mean the image was too blurred to have shown a flaw of the size that would matter, and nobody checked which. The source was a few millimetres across, the part is <strong>25 mm</strong> thick, the source sat about <strong>600 mm</strong> away. And the main runs under a town. Write down how you would decide whether this image can be believed at all — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the question that comes before reading</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Accept it — the contractor is qualified and the report is honest.&rdquo;</strong> Both true, and neither is the point. A truthful account of what was seen tells you nothing about what <em>could</em> have been seen, and it is the second that your decision rests on.</p>
+<p>&bull; <strong>&ldquo;Look at the image myself and judge it.&rdquo;</strong> Reading an image you have not qualified is how a blurred shot gets read confidently. You would be interpreting grey without knowing what size of feature that grey was able to contain.</p>
+<p>&bull; <strong>&ldquo;Have it re-shot by somebody else.&rdquo;</strong> Money spent to obtain a second unqualified image. Unless you specify what it must demonstrate, you will get another honest report with the same silence in it.</p>
+<p>&bull; <strong>&ldquo;Use a different method as well.&rdquo;</strong> Sometimes right, and it is the answer to a question you have not yet asked. Adding methods before you know what this one achieved is buying coverage blind.</p>
+<p>&bull; <strong>&ldquo;It is probably fine — flaws that size are rare.&rdquo;</strong> A probability standing in for a measurement, on a main beneath a town. If that reasoning were acceptable, the inspection was never needed.</p>
+<p>&bull; The discipline starts <strong>before any reading takes place</strong>: prove the image can support a claim, <em>then</em> read it, <em>then</em> sentence it. Proving it means checking the things that set its resolving power against what the job demanded, so the record can state the size of feature it <strong>demonstrably would have shown</strong> — and until that exists, interpretation is decoration. Then read it for what it physically <em>is</em>: not a photograph of the weld but <strong>a map of how much material the beam passed through</strong>, so less material means more radiation through and a darker mark, mechanically rather than visually. From there <strong>the shape is the diagnosis</strong> — rounded, angular, straight, branching, and where it sits — each corresponding to a different physical defect, so identification is a reading rather than an impression. And close it by naming <strong>what this image could never have shown</strong>, because some flaws are invisible to this method by orientation alone, however good the shot. Only then do you sentence anything.</p>
+</div>
+</details>
+<p>There is a sheet for this, and it is only five questions long. Here it is, filled in.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the interpretation and sentencing sheet for that weld, worked all the way to a decision.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Can I believe this image? - unsharpness and demonstrated sensitivity</div><p class="cb-demo">Geometric unsharpness: Ug = F x t / d = 3 mm x 25 mm / 600 mm = 0.125 mm. The procedure limits it to one-hundredth of the 25 mm thickness, so 0.25 mm. PASS. Sensitivity: 2-2T on a 25 mm part means an IQI 0.5 mm thick with its 2T hole - 1.0 mm diameter - visible on the image. It IS visible on this shot. VERDICT: this image has proved it could show a 1.0 mm feature. Now, and only now, I may read it.</p></div><div class="canvas-box"><div class="cb-label">2. What am I actually looking at? - a thickness map, not a photograph</div><p class="cb-demo">Attenuation: I = I0 x exp(-mu x x). Where there is LESS material in the beam path, more radiation gets through, so the region images DARKER. A void, a crack or a gas pore is dark. A denser inclusion is lighter. This is a map of radiographic thickness along the beam path - it is not a photograph of the weld.</p></div><div class="canvas-box"><div class="cb-label">3. What is the indication? - the shape is the diagnosis</div><p class="cb-demo">The indication is a straight, sharp, CONTINUOUS dark line running along the weld root centreline. Rounded dark spots would be porosity; irregular angular dark shapes would be slag; a jagged, branching, irregular line would be a crack; a straight line offset to one side along a fusion face would be lack of fusion. A straight sharp line ON the root centreline is LACK OF PENETRATION.</p></div><div class="canvas-box"><div class="cb-label">4. What could this image never have shown me? - the orientation blind spot</div><p class="cb-demo">Radiography sees a planar flaw only when the beam runs roughly ALONG its plane, so there is a length of missing material to cast a shadow. A tight crack lying across the beam can be invisible. So a clean radiograph does not mean &#039;no cracks&#039; - it means &#039;no cracks lay in a direction this shot could see&#039;. If planar flaws of unknown orientation are the risk, specify ultrasonic testing alongside.</p></div><div class="canvas-box"><div class="cb-label">5. The sentence - against a named standard, by type or by size</div><p class="cb-demo">Acceptance standard: the fabrication code named in the specification (here, the process-piping code). Lack of penetration is a planar, sharp-tipped flaw, and codes reject those BY TYPE - the argument &#039;it is only short&#039; is not available. Rounded porosity would instead be sentenced by size and distribution against stated limits. SENTENCE: REJECT. Cut out, repair, and re-radiograph to the same demonstrated sensitivity. Recorded: standard, clause, indication, decision, and my name.</p></div></div>
+
+<p>Look at the order, because the order is the whole discipline. Nothing is read until box 1 has proved the image was capable of showing what she was hunting for. Then the physics, then the shape, then - before any decision - an honest statement of what this image could never have contained. Only then a sentence, tied to a clause, with her name on it. She walked in unable to say anything and walked out with <strong>REJECT</strong> she could defend to anyone. Let us take it apart.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>What you felt in T1 was not ignorance about welding. It was paralysis in front of an unverified image. The sheet cures it by naming five questions, in order:</p>
+<ul>
+<li><strong>Can I believe this image?</strong> Two numbers answer it. <strong>Geometric unsharpness</strong> is the blur every radiograph has, because the source is not a point: <em>Ug = F x t / d</em>, where F is the focal-spot size, t the distance from the flaw to the detector and d from source to object. Here <em>3 x 25 / 600 = 0.125 mm</em>, inside the 0.25 mm the procedure allows. Notice how it behaves: bring the source in to 300 mm and the blur doubles to 0.25 mm, exactly at the limit; at 200 mm it is 0.375 mm and the shot is invalid. Then the <strong>image quality indicator</strong> - a small stepped plate with holes of 1, 2 and 4 times its own thickness, laid on the part and shot with it. "<strong>2-2T</strong>" means an IQI 2% of the part thickness with its 2T hole visible: on 25 mm steel, a 0.5 mm plate whose 1.0 mm hole you must actually see. The IQI is the radiograph's own exam paper - it has to pass its test, in front of your eyes, before it is allowed to test your weld. Without it, <em>"no indications found"</em> is the emptiest sentence in inspection.</li>
+<li><strong>Why is it dark?</strong> Radiation is absorbed as it passes through material - <em>I = I0 x exp(-mu x x)</em> - so where there is <em>less</em> material in the beam path, more gets through and the image is <strong>darker</strong>. That is all. A void, a pore, a crack: dark. A denser inclusion: lighter. What you are holding is a map of thickness and density along the beam path, not a photograph of a weld.</li>
+<li><strong>What shape is it?</strong> The shape is the diagnosis. <em>Rounded dark spots</em>, single or clustered, are <strong>porosity</strong>. <em>Irregular, angular, often elongated</em> dark shapes are <strong>slag inclusions</strong>. A <em>straight, sharp, continuous</em> dark line on the root centreline is <strong>lack of penetration</strong>. A <em>straight</em> line offset to one side, along a fusion face, is <strong>lack of fusion</strong>. A <em>fine, jagged, irregular, sometimes branching</em> line is a <strong>crack</strong>.</li>
+<li><strong>What could this image never have shown me?</strong> This is the question people skip, and it is the one that kills. Radiography sees a planar flaw only when the beam runs roughly <em>along</em> its plane, so there is a length of missing material to cast a shadow. A crack is like a playing card: face-on to the beam it throws a shadow you cannot miss; edge-on it very nearly vanishes. So a clean radiograph does not mean "there are no cracks" - it means "no crack lay in a direction this shot could see". Where planar flaws of unknown orientation are the risk, ultrasonic testing is specified alongside, and each method guards the other's blind spot.</li>
+<li><strong>What does the standard command?</strong> Characterising is not sentencing. You sentence against a <em>named</em> acceptance standard and a <em>cited</em> clause. The principle underneath the clauses is worth carrying: codes do not tolerate flaws that behave as sharp-tipped crack starters, which is why the planar family - cracks, lack of fusion, lack of penetration - is almost universally rejectable <strong>by type, regardless of length</strong>. Rounded porosity is treated as a stress raiser and sentenced on <strong>size and distribution</strong> against stated limits. Codes differ in their numbers, so always cite the clause you actually applied.</li>
+</ul>
+<p>One honest boundary, so you know exactly what you now hold. This unit teaches you to read and <em>question</em> a radiographic report as a responsible engineer. It does not certify you to perform the interpretation - that is a formally qualified role with its own training and examination. Your job is to make sure the test was valid and the sentence is right against the standard you specified: the intelligent customer and the last guardian of quality, not the operator.</p>
+<p>Does it scale? A radiograph report with no stated sensitivity is like a medical scan reported without saying whether the machine could even resolve something the size of what you were looking for - a reassuring sentence built on an unknown.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A 40 mm thick pressure-vessel weld. Focal spot F = 2 mm, source-to-object d = 800 mm, flaw-to-detector t = 40 mm. The procedure limits unsharpness to one-hundredth of the thickness and requires <strong>2-1T</strong> sensitivity. Work the sheet.</p>
+<ol>
+<li><strong>Can it be believed?</strong> Compute Ug. What is the limit here, and does the technique pass?</li>
+<li><strong>What must be visible?</strong> State the IQI thickness for 2% of 40 mm, and the diameter of the 1T hole that has to be seen.</li>
+<li><strong>Characterise.</strong> The image shows a fine, irregular, jagged dark line that changes direction. Name it - and say whether it is sentenced by <em>type</em> or by <em>size</em>.</li>
+<li><strong>Name the blind spot.</strong> What flaw could this shot have missed entirely, and which method would you add to cover it?</li>
+<li><strong>Sentence it.</strong> Write the one line you would sign, naming what you accepted or rejected and on what basis.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> you did step 1 <em>before</em> step 3. If you characterised the indication first and only then checked whether the image was valid, you read an image you had not yet earned the right to read.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-believe">1. Can I believe this image? - unsharpness and demonstrated sensitivity</label><textarea id="cb-believe" data-key="t-0130:believe" placeholder="Before reading anything: compute the geometric unsharpness and check it against the procedural limit, then confirm the image quality indicator was visible at the required level."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-map">2. What am I actually looking at? - a thickness map, not a photograph</label><textarea id="cb-map" data-key="t-0130:map" placeholder="State the physics: what makes a region dark, and what makes it light."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-characterise">3. What is the indication? - the shape is the diagnosis</label><textarea id="cb-characterise" data-key="t-0130:characterise" placeholder="Describe the indication by its geometry, then name the flaw type it corresponds to."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-blind">4. What could this image never have shown me? - the orientation blind spot</label><textarea id="cb-blind" data-key="t-0130:blind" placeholder="Name what this method cannot see, and what you would add to cover it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-sentence">5. The sentence - against a named standard, by type or by size</label><textarea id="cb-sentence" data-key="t-0130:sentence" placeholder="Cite the acceptance standard and the clause, then state accept or reject and what happens next."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now take a radiographic report you did not commission and say whether it means anything.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Radiographic interpretation goes wrong in a short list of very specific ways, and most of them end with something unsound being accepted.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>The empty sentence.</strong> Accepting "no indications found" from a report with no stated, demonstrated sensitivity. You have been told nothing at all: an image too blurred to show a 3 mm flaw will honestly report no indications. Ask for the IQI level and the unsharpness every single time.</p>
+<p>&bull; <strong>The blind spot.</strong> Reading a clean radiograph as proof there are no cracks. It is proof that no crack was oriented to be seen. If planar flaws matter, the inspection plan needs a second method, not a second radiograph from the same angle.</p>
+<p>&bull; <strong>The sizing fallacy.</strong> Arguing that a lack of penetration or a lack of fusion is "only a short one". Planar flaws are rejected by type because of the sharp tip, not the length - and that argument tends to be made loudest when the repair is expensive.</p>
+<p>&bull; <strong>The digital trap.</strong> Winding the contrast and brightness of a digital image up and down until something appears. Adjust far enough and noise becomes an indication, or a real flaw is flattened into the background. Interpret within the stated display conditions, and record what you used.</p>
+<p>&bull; <strong>The projection error.</strong> Trying to read through-wall <em>depth</em> off a radiograph. It is a two-dimensional projection: it gives you position, length and area honestly, and depth only by inference. If depth governs the decision, that is a different measurement.</p>
+<p>&bull; <strong>Shooting for a pretty picture.</strong> An image with pleasing contrast that was taken outside the required density and geometry is not a compliant image. Compliance is not the same thing as clarity, and only one of them can be defended afterwards.</p>
+</div>
+</details>
+<p>Onalenna was handed an acceptance and could not verify it, on a main that runs under a town. Now you can: prove the image was capable, read the darkness as missing material, let the shape name the flaw, say out loud what the shot could never have contained, and sentence it against a clause you can cite. That is not a formality. It is the difference between signing a document and taking responsibility for one. If you are working with an AMU Facilitator, bring a real inspection report and check it for a stated sensitivity - you may be surprised how often it is missing.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can question an inspection report now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

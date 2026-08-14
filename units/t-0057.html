@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design a maintenance strategy for major turbomachinery</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Design a maintenance strategy for major turbomachinery</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is 02:40 on a Tuesday. You are the reliability engineer at the <strong>Khanyisa Gas Plant</strong>, a gas-processing site near Secunda that takes in raw gas and sends clean, pressurised gas down a pipeline to two customers. You are standing on the steel walkway beside <strong>K-201</strong>, the plant's biggest machine - a <strong>centrifugal compressor</strong> (a machine that spins very fast to squeeze gas and push it down the line). K-201 is the heart of the plant. If it stops, the whole plant stops.</p>
+<p>Right now it has stopped. In your hand is the night-shift logbook, open to the last entry. The operator, <strong>Thandeka</strong>, has written in blue pen: <em>"03:15 - high vibration alarm, K-201 tripped, gas flow zero."</em> Below it she has added, pressing hard enough to dent the page: <em>"3rd trip this month."</em> The walkway under your boots is still warm. There is a faint, sharp smell of hot oil in the cold air. From the control room behind you, the plant manager is on the phone to the customer, and you can hear his voice getting tighter with every sentence.</p>
+<p>You already know the numbers that matter. When K-201 is down, the plant loses about <strong>R600,000 every day</strong> in gas it cannot sell. The last unplanned strip-down of this machine cost <strong>R4.2 million</strong> in parts and took <strong>17 days</strong>. And it is your name on the maintenance plan for this machine - a plan that, clearly, is not working. Three trips in one month is not bad luck. It is a pattern.</p>
+<p>There is a voice in your head saying: <em>just send it for a full overhaul, open it up, fix whatever you find, and put it back.</em> It would feel like doing something. But the last overhaul was only <strong>14 months ago</strong>, and you have no proof that opening it up again will stop the trips - it might even cause new ones.</p>
+<blockquote><h2>You do not need to invent a clever fix tonight. You need something steadier: a reliable, repeatable way to decide what care this machine actually needs - what to inspect, how often, and how to catch the next failure before it trips the plant - instead of reacting to alarms in the dark.</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Three trips in one month, all on high vibration. Every day K-201 is down costs about R600,000 in gas you cannot sell. The last unplanned strip-down was R4.2 million and seventeen days, and the last full overhaul was only fourteen months ago. Your name is on the plan. <strong>Write down what you would do.</strong> Your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five answers, and what each one is really betting on</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Send it for a full overhaul &mdash; open it up and fix what we find.&rdquo;</strong> It would feel like doing something, which is exactly why it is dangerous tonight. The last overhaul was fourteen months ago; <strong>you have no evidence that opening it again stops the trips, and stripping a machine is itself a way of introducing new faults.</strong> Seventeen days and R4.2 million says you get one guess.</p>
+<p>&bull; <strong>&ldquo;Raise the trip setting so it stops shutting the plant down.&rdquo;</strong> Nobody says this out loud and the pull is real at four in the morning, with the plant manager on the phone. It does not make the machine healthier &mdash; <strong>it removes the only thing currently telling you it is not</strong>, and the next event is the one the trip existed to prevent.</p>
+<p>&bull; <strong>&ldquo;Three trips in a month &mdash; it&rsquo;s bad luck, watch it another week.&rdquo;</strong> Three is not luck; it is a pattern. And watching without a defined limit and a defined action is the plan you already have, which is the plan that is not working.</p>
+<p>&bull; <strong>&ldquo;Get the vendor in &mdash; it&rsquo;s their machine.&rdquo;</strong> Worth doing and it is not a strategy. They will ask what the machine was designed to live inside and what it has actually been doing &mdash; and if the answer is that nobody has assembled either, you will be paying somebody else to read your own data.</p>
+<p>&bull; <strong>&ldquo;Look at last night&rsquo;s trip data in detail.&rdquo;</strong> The right instinct pointed at the wrong moment. <strong>A trip is the end of the story, not the story</strong> &mdash; and the thing that will tell you what is failing is not that reading but the eight weeks of readings before it, laid out in a line.</p>
+<p>Notice what you are missing before you can judge any of them: <strong>the numbers this machine was designed to live inside</strong>, and what it has actually been doing week by week. Neither is a clever fix; both are on paper somewhere already.</p>
+</div>
+</details>
+<p>There is a settled way to build exactly that. Here it is, built for real on K-201.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Follow every step. Real numbers throughout. <strong>K-201</strong> is a centrifugal compressor governed by <strong>API 617</strong>; its mechanical seal system is governed by <strong>API 682</strong>. Lost production when down is <strong>R600,000 per day</strong>. The last full overhaul was <strong>14 months ago</strong>, cost <strong>R4.2 million</strong>, and took <strong>17 days</strong>. Trips this month: <strong>3</strong>, all on high vibration.</p>
+<p><strong>Step 1 - Pull the design baseline from the standard.</strong> You open the K-201 datasheet, written against API 617, and write down the limits the machine was designed to live inside.</p>
+<table>
+<tr><th>Baseline limit</th><th>Value</th></tr>
+<tr><td>Normal vibration (up to)</td><td>25 micrometres (a micrometre is one-thousandth of a millimetre)</td></tr>
+<tr><td>Alarm vibration</td><td>50 micrometres</td></tr>
+<tr><td>Trip vibration</td><td>75 micrometres</td></tr>
+<tr><td>Bearing temperature alarm</td><td>90&deg;C</td></tr>
+<tr><td>Seal gas pressure (API 682)</td><td>at least 3.5 bar above the gas pressure inside the machine</td></tr>
+</table>
+<p>These five numbers are the "healthy" definition. Everything else hangs off them.</p>
+<p><strong>Step 2 - Read the trend, not the trip.</strong> You pull the vibration history for the past eight weeks.</p>
+<table>
+<tr><th>Week</th><th>Vibration (micrometres)</th></tr>
+<tr><td>1</td><td>22</td></tr>
+<tr><td>2</td><td>24</td></tr>
+<tr><td>3</td><td>28</td></tr>
+<tr><td>4</td><td>35</td></tr>
+<tr><td>5</td><td>44</td></tr>
+<tr><td>6</td><td>51 (first trip)</td></tr>
+<tr><td>7</td><td>58</td></tr>
+<tr><td>8</td><td>76 (last night's trip)</td></tr>
+</table>
+<p>The story is now obvious. This is not random. Vibration has climbed steadily from a healthy 22 to a tripping 76 over eight weeks. A slow, steady rise like this points to a bearing or seal wearing out - not a sudden break. The machine was warning you for six weeks before last night. The old plan simply was not reading the warning.</p>
+<p><strong>Step 3 - Match the likely cause to the right standard.</strong> Steady rising vibration plus the hot-oil smell points you at the bearing and seal area, so you check the two rulebooks that cover those parts. API 682, for the seal: the seal-gas pressure log has drifted from 4.0 bar above internal pressure down to 3.6 bar - still inside the 3.5 limit, but falling. The seal is starting to struggle. API 617, for the bearing: bearing temperature has risen from 74&deg;C to 88&deg;C over the same eight weeks, just under the 90&deg;C alarm. Two signals, both rising together, both pointing at the same place: <strong>the bearing is wearing, and it is starting to drag on the seal.</strong></p>
+<p><strong>Step 4 - Decide the care, by risk, not by calendar.</strong> Now the actual strategy gets written, matching each task to how often the thing fails and how loudly it warns you.</p>
+<table>
+<tr><th>Frequency</th><th>Task</th></tr>
+<tr><td>Continuous (automatic)</td><td>Vibration, bearing temperature, seal pressure - already monitored; alarm set at 50, trip at 75, matching the API 617 baseline. No change needed except to actually watch the trend.</td></tr>
+<tr><td>Daily (operator, machine running)</td><td>Thandeka records vibration, bearing temperature and seal pressure in the logbook and flags any reading rising three days in a row - the cheap check that catches slow failures early.</td></tr>
+<tr><td>Every 3 months (minor internal)</td><td>Short planned stop to check seal condition and lube-oil cleanliness.</td></tr>
+<tr><td>By condition (not calendar)</td><td>Open the bearing and seal when the trend says so - for example, when the vibration trend crosses 40 and is still rising - not on a fixed 24-month clock.</td></tr>
+</table>
+<p><strong>Step 5 - Make the decision for tonight.</strong> The defensible answer is not "send it for a full overhaul." A full strip-down would cost R4.2 million and 17 days - about R10.2 million in lost gas on top (17 x R600,000). The trend says the problem is local: the bearing and the seal, not the whole machine. The plan: a <strong>targeted bearing-and-seal replacement</strong> - a planned 2-day job, roughly R350,000 in parts. Compared with a full overhaul, that is about <strong>R3.85 million saved in parts</strong> and <strong>15 fewer days down</strong> (about R9 million less lost production). You schedule it, order the kit, and set the new monitoring rule so the next slow rise is caught at week 3, not week 8.</p>
+<p><strong>Step 6 - Write it down as the standing strategy.</strong> This is the part that makes it a <em>strategy</em>, not just tonight's fix: a one-page maintenance strategy for K-201 recording the five baseline limits (Step 1), the four monitored signals with their alarm and trip points, the daily / 3-monthly / by-condition task list, and the trend rule that triggers a bearing-and-seal job. Anyone on any shift can now run this machine to the same plan. That is the difference between a reliable strategy and three trips in the dark.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You have a small number of very expensive, very important machines, and you keep getting surprised by them. The thing you are missing is <strong>a maintenance strategy</strong>: a written plan that says, for each critical machine, what care it gets, why, and how often. Not a guess. A plan you can defend. For <strong>major turbomachinery</strong> - large compressors and turbines that spin at high speed and carry the whole plant on their backs - there is a settled way to build that plan, resting on three pillars: the right design baseline, the right monitoring, and the right inspection rhythm. Each is the answer to a plain question, and each is exactly what you just used on K-201.</p>
+<p><strong>Question 1 - "How was this machine supposed to be built and looked after in the first place?"</strong> Big rotating machines are not designed from scratch by each buyer. The industry agreed on common rulebooks called <strong>API standards</strong> (API stands for the American Petroleum Institute, the body that wrote them). Three matter for turbomachinery: <strong>API 610</strong> - the rulebook for pumps (a pump moves liquid). <strong>API 617</strong> - the rulebook for centrifugal compressors and turbines, the gas-squeezing and gas-driven machines; this was K-201's rulebook. <strong>API 682</strong> - the rulebook for the mechanical seal, the part that stops gas or oil leaking out where the spinning shaft passes through the machine's casing; seals are a top cause of trouble, so they get their own rulebook. You do not memorise these - you use them as the <strong>design baseline</strong>, the "this is how it should be" reference. The standard tells you the safe limits the machine was built to: how much vibration is normal, what the seal system needs, what the bearings (the parts the shaft spins on) can take. This is exactly where the five numbers in T2 Step 1 came from. A maintenance strategy is really just a plan to keep the machine living inside the limits the standard set.</p>
+<p><strong>Question 2 - "How do I catch the next failure before it trips the plant?"</strong> This is <strong>condition monitoring</strong> - watching the machine's health while it runs, the same way a nurse watches a patient's pulse. For turbomachinery, four signals do most of the work: <strong>vibration</strong> (how much the machine shakes - rising vibration is the single best early warning, and it is what tripped K-201), <strong>bearing temperature</strong> (how hot the parts the shaft spins on are getting), <strong>lube-oil condition</strong> (whether the oil protecting the moving parts is clean and doing its job), and <strong>seal system pressure</strong> (whether the seal is holding). The trick is to read these <strong>trends over time</strong>, not single numbers - a machine that has slowly climbed from a steady reading to a high one over three weeks is telling you a clear story. That is exactly what the eight-week vibration table in T2 Step 2 was doing: turning a single trip reading into a trend. This is the difference between <strong>reactive</strong> maintenance (wait for the trip, then scramble) and <strong>predictive</strong> maintenance (read the trend, act before the trip).</p>
+<p><strong>Question 3 - "When do I actually open it up and inspect inside?"</strong> Some checks cannot be done from the outside, so you plan <strong>inspections</strong> at sensible points, of three kinds: <strong>routine external checks</strong> (quick, frequent, machine running - listen, look, read the gauges), <strong>minor internal inspections</strong> (planned short stops to check seals, filters and oil), and <strong>major overhauls</strong> (the big strip-down, done rarely, where you open the casing and renew the wearing parts). The whole skill is <strong>matching the inspection to the risk</strong>: frequent cheap checks on the things that fail often and warn you slowly; rare expensive strip-downs only when monitoring or run-hours say it is time. This is the logic behind the four-row task table in T2 Step 4. Overhauling on a fixed calendar - "every 24 months no matter what" - wastes money and can introduce new faults. That is the trap you felt at 02:40, and it is why K-201's answer in T2 Step 5 was a targeted job, not a full strip-down.</p>
+<p><strong>When this technique fits - and when it does not.</strong> It fits when you have a small number of critical, expensive, well-understood machines - exactly the case with major turbomachinery. The machines are important enough to justify the effort, and the API standards give you a ready-made baseline. It does not fit the same way for cheap, many, simple assets (light bulbs, simple valves, low-cost motors). For those, run-to-failure or simple fixed-interval swaps are often cheaper than building a custom strategy. Spending a week designing a monitoring plan for a R500 part is poor asset management. Reserve this care for the machines that can stop the plant.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Try each task yourself, and write your answer down, before you open the reveal beneath it.</p>
+<p><strong>Task 1 (warm-up) - Read a trend.</strong> A turbine, T-110, shows bearing temperature over six weeks: 72, 73, 74, 81, 86, 92&deg;C. Its alarm limit (per its datasheet) is 90&deg;C. Is this machine healthy, warning, or in trouble? What is the first thing you do?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>It is in trouble - the last reading (92) is above the 90 alarm, and the trend has been climbing steadily for three weeks. The first thing you do is read the trend, not just the latest number, confirm it is a real rise (not a faulty sensor), and treat the steady climb as a wearing part. You do not wait for a trip. A good answer names the trend, not only the single high reading.</p>
+</div>
+</details>
+<p><strong>Task 2 - Match the standard to the part.</strong> You have three jobs this week: (a) the seal on compressor K-201 is leaking; (b) a process pump P-305 is running rough; (c) the compressor rotor on K-201 needs a vibration limit checked. Which API standard do you reach for in each case - 610, 617, or 682?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>(a) seal - API 682; (b) pump - API 610; (c) compressor - API 617. A good answer also explains why in plain words: seals have their own rulebook because they fail often; pumps and compressors are different machines with different rulebooks.</p>
+</div>
+</details>
+<p><strong>Task 3 - Choose the inspection rhythm.</strong> For each item, say whether you would check it continuously, daily, every 3 months, or by condition, and why: (a) vibration on a critical compressor; (b) lube-oil cleanliness; (c) a full casing strip-down; (d) a quick listen-and-look walk-round.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>(a) continuously - vibration is the best early warning, so it is monitored automatically. (b) every 3 months - oil degrades slowly, a planned minor stop suits it. (c) by condition - a strip-down is expensive and risky, so do it when the trend or run-hours say so, never on a blind calendar. (d) daily - cheap, fast, catches obvious changes. A good answer matches cost and warning-speed to frequency: cheap and fast-warning things get done often; expensive and rare things wait for evidence.</p>
+</div>
+</details>
+<p><strong>Task 4 (harder) - Build a mini-strategy and justify the money.</strong> A second compressor, K-202, loses R400,000 per day when down. A full overhaul costs R3.0 million and 12 days. Vibration has risen over five weeks: 20, 26, 33, 41, 49 micrometres (alarm 50, trip 75). Decide: full overhaul now, targeted bearing-and-seal job (est. R300,000, 2 days), or keep running and watch? Show your money reasoning.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>The trend is a steady rise approaching the alarm but not yet tripping, and it points to a local wearing part - so a full overhaul is not justified. The two sensible answers are (i) schedule a targeted bearing-and-seal job now while you can plan it, or (ii) keep running with daily monitoring and a firm trigger (e.g. act when vibration crosses 50 and is still rising). A strong answer compares the money: a full overhaul costs R3.0m in parts plus about R4.8m lost production (12 x R400,000); the targeted job costs R300,000 plus about R800,000 lost (2 x R400,000) - roughly R6.7m cheaper. It also says why not to wait too long: a planned 2-day job is far cheaper than a trip-driven scramble. The key judgement is acting on the trend before the trip, with the cheapest fix the evidence supports.</p>
+</div>
+</details>
+<p><strong>Now build the standing document for one critical machine of your own</strong> - your biggest compressor, turbine, or pump. Work top to bottom; do not skip a box. When every box is filled, you have a defensible standing strategy, not a guess.</p>
+<p><em>The machine, in facts:</em> machine tag/name; what it does (and what stops if it stops); governing API standard (pump &#8594; 610, compressor/turbine &#8594; 617, seal &#8594; 682); lost production per day when down (R/day); last overhaul (when / cost / days down).</p>
+<p><em>Step 1 - Pull the design baseline from the standard.</em> From the datasheet, write the limits the machine was built to live inside: normal vibration (up to), alarm vibration, trip vibration, bearing temperature alarm, seal gas pressure (minimum margin above internal) - and which standard each comes from.</p>
+<p><em>Step 2 - Read the trend, not the trip.</em> Pull the last 6-8 readings for your worst signal. For each: the reading point (week/date), the value, and whether it is rising, steady or falling. Then write the slope, not the last number: what is the trend telling you (a slow rise means a wearing part; a sudden jump means a sensor fault or a break)?</p>
+<p><em>Step 3 - Match the likely cause to the right standard.</em> Which signal is moving, what part does it point to, which standard governs that part, and is it still inside its limit? Do two signals point at the same place - what is the consistent picture?</p>
+<p><em>Step 4 - Decide the care, by risk not calendar.</em> Place each task at the right frequency - continuous (automatic), daily (operator, running), every 3 months (minor stop), by condition (trend trigger) - naming the task, who does it, and why that frequency.</p>
+<p><em>Step 5 - Make the decision, justified by money.</em> Compare the cheapest fix the evidence supports against the full strip-down: for each of full overhaul, targeted (bearing/seal/local) job, and keep running plus monitor, write the parts cost, days down, lost production (days x R/day), and whole cost. Then write your decision and the money reason.</p>
+<p><em>Step 6 - Write the standing trend trigger.</em> The rule any shift can act on without you in the room: "Open/replace ____ when ____ crosses ____ and is still rising," and "investigate any signal drifting toward its limit for ____ readings in a row." If every box above is filled, this one page is your machine's maintenance strategy. Print it, put it by the machine, and run every shift to it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep a maintenance strategy honest.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Overhauling on the calendar, not the condition.</strong> Symptom: "We overhaul every 24 months." Machines are stripped while still healthy; some come back worse than they went in. Fix: move the big strip-down to by-condition (driven by trend and run-hours). Keep the calendar only for cheap, low-risk minor checks. Let evidence, not the date, trigger the expensive work.</p>
+<p>&bull; <strong>Reading single numbers instead of trends.</strong> Symptom: "Vibration was 48 yesterday, under the 50 alarm, so we are fine" - then it trips the next day. Fix: always plot the trend over weeks. A reading climbing steadily toward the alarm is a failure in progress, even while it is "in limit." The slope matters more than the single point.</p>
+<p>&bull; <strong>Reaching for the wrong standard.</strong> Symptom: engineers quote pump limits (API 610) when fixing a compressor, or ignore the seal rulebook (API 682) entirely. Fix: keep the simple map on the wall - pump &#8594; 610, compressor/turbine &#8594; 617, seal &#8594; 682. Check the part, then the rulebook, then the limit. Seals have their own rulebook because they fail often - never skip 682 on a sealing problem.</p>
+<p>&bull; <strong>Treating cheap assets like critical ones (and the reverse).</strong> Symptom: either a full monitoring plan built for a R500 part, or no plan at all for a plant-stopping compressor. Fix: match the care to the consequence. Reserve the full baseline-monitoring-inspection strategy for machines that can stop the plant or hurt someone. For cheap, plentiful, simple assets, a fixed swap or run-to-failure is the correct, cheaper choice.</p>
+<p>&bull; <strong>Ignoring slow drift inside the limits.</strong> Symptom: seal-gas pressure falls from 4.0 to 3.6 bar (limit 3.5) and no one acts because "it is still in spec." Fix: watch drift toward a limit, not only the breach. A signal moving steadily the wrong way is an early warning. Set a trend trigger (e.g. "investigate any signal drifting toward its limit for three readings"), not only a breach alarm.</p>
+<p>&bull; <strong>Building the strategy and never writing it down.</strong> Symptom: the plan lives in one engineer's head; when they are on leave, the night shift reacts to alarms blind. Fix: record the strategy as a one-page standing document per machine - baseline limits, monitored signals with alarm/trip points, task rhythm, and trend triggers. A strategy only counts if every shift can run to it.</p>
+</div>
+</details>
+<p>You came onto the walkway at 02:40 with a machine that had tripped three times and a plan that clearly was not working. You can leave with a defensible standing strategy: the five baseline limits pulled from API 617 and API 682, the eight-week trend that showed exactly where the wear was, the targeted R350,000 fix that saved R3.85 million and fifteen days over a blind overhaul, and a one-page document any shift can run to. <strong>Match the design baseline, the monitoring, and the inspection rhythm to the risk - and let the trend, not the calendar, decide when the expensive work happens.</strong> That is how a plant-stopping machine gets a maintenance plan you can defend, instead of three trips in the dark.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can design a defensible maintenance strategy for major turbomachinery now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

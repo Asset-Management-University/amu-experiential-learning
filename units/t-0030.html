@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The vibration report says this pump motor is healthy - bearings smooth, alignment good - but it keeps tripping on overload in the early hours and nobody can find why. How do I look inside a running motor for a broken rotor, without opening it or shutting it down?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The vibration report says this pump motor is healthy - bearings smooth, alignment good - but it keeps tripping on overload in the early hours and nobody can find why. How do I look inside a running motor for a broken rotor, without opening it or shutting it down?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is 06:40 on a cold Tuesday at the <strong>Ironside Pump Station</strong>, the works that lifts raw river water up to the town's water treatment plant. You are the reliability technician on shift. In front of you sits <strong>Raw-Water Pump 3</strong> - a big motor the size of a beer keg, bolted to its pump, humming under a thin film of dew.</p>
+<p>In your hand is a <strong>vibration report</strong> from last week. Pump 3 looks fine on it: bearings smooth, alignment good, every trace where it should be. On paper, this machine is healthy. But it is <strong>not</strong>. Twice in the last month, Pump 3 tripped on overload in the early hours, restarted on its own, and nobody could find why.</p>
+<p>The plant manager, <strong>Bokamoso</strong>, stands next to you, arms folded. "We have a delivery promise to the town. If Pump 3 drops out during the morning demand peak, the reservoir runs low and we get phone calls from the municipality by 09:00. I need to know what is wrong with this motor. Not a guess. A reason." You crouch and put your hand near the frame - warmer than Pump 1 beside it, which carries the same load, and the faint hot-varnish smell of a motor working hard.</p>
+<p>Here is the trap you can feel pulling at you: the easy move is to call it a bearing problem and swap the bearings, because that is the fault everyone knows how to chase. But the vibration trace already told you the bearings are fine. The problem is <em>inside</em> the motor - somewhere the vibration probe on the frame cannot see: a crack in the rotor buried deep in the middle, or the rotor sitting slightly off-centre. You cannot open the motor on a live shift, and you cannot keep waiting for the next trip.</p>
+<blockquote><h2>How do I look inside a running motor and tell, with evidence, whether the rotor is broken or off-centre - without taking it apart, and without shutting it down?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The motor keeps tripping. The vibration trace says the bearings are fine, so the problem is <em>inside</em> — a cracked rotor bar buried in the middle, or a rotor sitting slightly off-centre. You cannot open it on a live shift and you cannot wait for the next trip. The only thing leaving the motor that you can measure without touching it is the electricity going in. Write down how you would tell which fault it is — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what the frame cannot feel</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Put more vibration sensors on it, in more places.&rdquo;</strong> More of the measurement that has already told you what it can. A crack in the middle of a rotor and an off-centre rotor are both faults the frame barely feels, which is why the trace looks fine.</p>
+<p>&bull; <strong>&ldquo;Wait for the next trip and inspect it then.&rdquo;</strong> That is the plan you already have, and it costs a production stop to buy information you could have had while it ran.</p>
+<p>&bull; <strong>&ldquo;Thermal-image it. A cracked bar will run hot.&rdquo;</strong> It might, eventually, at the surface, through a housing — a slow, blurred version of something happening deep inside.</p>
+<p>&bull; <strong>&ldquo;Measure the current and see whether it is high.&rdquo;</strong> The right place to look, and the wrong question of it. A level tells you the motor is working hard; it cannot tell you which of two faults is making it do so.</p>
+<p>&bull; <strong>&ldquo;Take it out and megger it during the next shutdown.&rdquo;</strong> That tests the insulation, which is not what is being asked, and it tests it when the motor is stopped and unloaded — which is when a rotor fault hides best.</p>
+<p>&bull; The current is not just a level. It is a signal, and the rotor writes on it: a fault inside the rotor disturbs the field in a rhythm tied to how fast the rotor is slipping behind, and that rhythm appears as small peaks arranged <em>around</em> the mains frequency, in a pattern that differs depending on whether the rotor is cracked or off-centre. So the same instrument answers both parts of the question — <strong>which fault, and how far gone</strong>, from how tall those peaks are relative to the main one — on a motor that is running, under load, without anybody opening anything. <strong>Under load matters</strong>: it is the load that makes the rotor work hard enough to speak at all.</p>
+</div>
+</details>
+<p>The motor is already telling you, every second, through its electricity. Here is how to read it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p><strong>Motor Current Signature Analysis (MCSA)</strong> reads the fingerprint a fault leaves in the current a motor draws. Instead of listening to the motor's vibration from the frame, you listen to its electricity - and faults deep inside the rotor, which the frame barely feels, leave small, regular peaks (<em>sidebands</em>) around the big mains-frequency peak. Their position names the fault; their height grades it. Watch it run on Pump 3.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Know why, then set up safely</div><p class="cb-demo">Pump 3&#039;s nameplate: an AC induction motor, 4 poles, 400 V, 50 Hz, rated 48 A, synchronous speed 1500 rpm (the field speed for a 4-pole 50 Hz motor). You clamp a current probe around one phase lead feeding the motor and connect it to a current analyser, with arc-rated PPE on, the permit-to-work in place, and a second person present. You do not open the motor or touch bare conductors.</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Record the current under a steady, real load</div><p class="cb-demo">You let the pump settle at its normal duty and record about 60 seconds of steady running, noting the load holds at 44 A the whole time - close to the rated 48 A, a good real load for MCSA. The current analyser builds the spectrum, with the big 1x peak at 50 Hz dominating it.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Measure the true speed, work out the slip</div><p class="cb-demo">The tachometer reads a running speed of 1480 rpm; the synchronous speed is 1500 rpm. So slip = (1500 - 1480) / 1500 = 20 / 1500 = 0.0133, about 1.33%. That slip is what fixes exactly where a rotor fault&#039;s sidebands will sit.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Predict where the fault shows, then read it</div><p class="cb-demo">Sideband spacing = 2 x slip x line frequency = 2 x 0.0133 x 50 = 1.33 Hz. So a broken bar would put a peak at the lower sideband, 50 - 1.33 = 48.67 Hz (and the upper at 51.33 Hz). You zoom in around the 50 Hz peak and there it is - a small, clear peak at 48.67 Hz, exactly where the maths said. You measure its depth: 38 dB below the 1x peak (the 1x peak set as the 0 dB reference).</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Judge the severity, decide with evidence</div><p class="cb-demo">The guide for the lower-sideband depth: more than 50 dB down = healthy, 45-50 = early stage, 40-45 = likely cracked, less than 40 = severe. Pump 3&#039;s 38 dB is less than 40 - the severe band, a broken rotor bar. You cross-check eccentricity (an off-centre rotor would show sidebands at the running-speed rhythm, about 24.67 Hz either side) and find nothing, so the rotor is centred. The report to Bokamoso: &#039;Pump 3 has a broken rotor bar - a current sideband at 48.67 Hz, exactly the position for this motor&#039;s 1.33% slip, sitting only 38 dB below the line peak, in the severe band; no eccentricity. This explains the early-morning overload trips. Take it out at the next planned window and send the rotor for repair.&#039; A reason, not a guess.</p></div></div>
+
+<p>See what MCSA did. The vibration report said "healthy", and on its own terms it was right - the bearings were fine. But the machine kept tripping, because the fault was somewhere the frame probe simply cannot see, and the easy, familiar move - swap the bearings and hope - would have cost money, a shift, and another 2 a.m. failure, while the real fault sat untouched inside the rotor. <strong>And see the mission in it, because this technique is the refusal of two comfortable answers at once. The first is the false all-clear: a clean report on the wrong sense is not health, it is a blind spot, and the discipline is to go and look where the fault actually lives rather than where the light is good. The second is the blind swap: replacing the part everyone knows how to replace, because doing something feels better than admitting you cannot yet see the cause. MCSA refuses both by doing something quietly rigorous - it predicts, from the motor's own slip, the exact frequency a broken bar would sing at, and then goes to that precise spot on the spectrum to see whether the note is there. Found exactly where the physics said, graded against a guide, with the alternative fault ruled out, it turns "I think it might be the bearings" into "it is a broken rotor bar, here is the evidence, here is how severe, here is what to do" - a reason the manager can defend to the municipality and act on with confidence. And it is done without ever gambling with a life: clamped around the cable, never opened, never improvised alone around live power.</strong> The aim is the town that keeps its water through the morning peak, because someone read the electricity instead of guessing at the steel.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You run the diagnosis in five steps.</p>
+<ul>
+<li><strong>1. Know why, then set up safely.</strong> The frame cannot see the rotor; clamp the current, work live-safe.</li>
+<li><strong>2. Record under a steady, real load.</strong> MCSA needs the motor working, not idling.</li>
+<li><strong>3. Measure the true speed, work out the slip.</strong> The sidebands' position depends on it.</li>
+<li><strong>4. Predict where the fault shows, then read it.</strong> 2 x slip x line frequency; measure the depth in dB.</li>
+<li><strong>5. Judge the severity, decide with evidence.</strong> Grade it, rule out the alternative, give a reason.</li>
+</ul>
+<p>The ideas underneath. A motor turns electrical energy into turning force, and a fault inside leaves a tiny regular fingerprint in the <em>current</em> it draws. Recording that current and asking "what rhythms hide inside it?" gives a <em>current spectrum</em> (the analyser does the maths, an <em>FFT</em>, for you). The mains rhythm - the <em>line frequency</em>, 50 Hz here - shows as one tall <em>1x peak</em>, the motor doing its job. A faulty rotor grows <em>sidebands</em> just left and right of it: their <em>position</em> tells the fault type, their <em>height</em> the severity. Position depends on <em>slip</em> - the small amount an <em>induction motor</em> lags its magnetic field. A <em>broken rotor bar</em> (the rotor is a cage of bars) puts sidebands at a spacing of <em>2 x slip x line frequency</em>; <em>air-gap eccentricity</em> (the rotor off-centre) leaves its own pattern at the running-speed rhythm. You read the depth in <em>decibels (dB)</em> below the 1x peak - deeper is healthier. It fits an AC induction motor you can safely clamp under a steady real load, and it is the electrical <em>complement</em> to vibration analysis; it is the wrong tool for an idling motor (sidebands hide at low load), or for a bearing, balance or alignment fault.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Take an AC induction motor of <em>your</em> own that is misbehaving in a way vibration cannot explain. Read its nameplate; set up live-safe with a clamp-on probe; record a steady, loaded window; tachometer the true speed and work out the slip; predict the broken-bar sideband at 2 x slip x line frequency and measure its depth; then grade it, rule out eccentricity, and write the verdict with a reason.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-setup_safe">Step 1 - Know why, then set up safely</label><textarea id="cb-setup_safe" data-key="t-0030:setup_safe" placeholder="A vibration probe on the frame hears bearings and alignment well, but some faults live deep INSIDE the motor - in the rotor - where the frame barely feels them; the motor tells you through its electricity instead. Then set up safely: this is live electrical work - clamp a current probe AROUND one supply lead (no bare-metal contact), wear arc-rated PPE, follow the permit-to-work, have a second person, and never improvise around live power alone. The analyser records the current and runs the FFT for you."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-record_steady">Step 2 - Record the current under a steady, real load</label><textarea id="cb-record_steady" data-key="t-0030:record_steady" placeholder="MCSA needs the motor working, not idling - rotor-bar sidebands shrink and hide at low load. Record a long enough window of steady running for the analyser to build a clean spectrum (where the line frequency shows up as one tall &#039;1x peak&#039;). A wobbling load smears the result, so steadiness matters."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-speed_slip">Step 3 - Measure the true speed, work out the slip</label><textarea id="cb-speed_slip" data-key="t-0030:speed_slip" placeholder="The sideband positions depend on the slip - the small amount an induction motor lags behind its magnetic field - so you need the real running speed, not the nameplate guess. Point a handheld tachometer at the shaft, then: slip = (synchronous speed - running speed) / synchronous speed."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-predict_read">Step 4 - Predict where the fault shows, then read it</label><textarea id="cb-predict_read" data-key="t-0030:predict_read" placeholder="A broken rotor bar puts small sidebands around the big 1x line-frequency peak at a spacing of 2 x slip x line frequency. Compute the lower sideband (the cleanest sign of a broken bar), zoom in tight on the spectrum at that frequency, and measure how far BELOW the 1x peak the sideband sits, in decibels - the bigger that gap, the healthier the rotor."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-judge_decide">Step 5 - Judge the severity, decide with evidence</label><textarea id="cb-judge_decide" data-key="t-0030:judge_decide" placeholder="Compare the sideband depth to the severity guide, rule out the other fault you can check, and write a verdict with a REASON, not a guess: the predicted sideband, found exactly there, at this depth, in this band. Then plan the fix."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines keep the diagnosis trustworthy. First, <strong>predict the frequency before you look, and read the right load</strong> - MCSA is powerful precisely because the physics tells you exactly where a fault must appear, so you go to that spot and confirm, rather than hunting the spectrum for anything odd and talking yourself into it; and you do it under a real, steady load, because a broken bar goes quiet on an idling motor and you will miss it. Second, <strong>never trade safety for a reading, and never let a clean report on one sense pass for health</strong> - work the permit, the PPE, the clamp-on probe and the second person every time, because no diagnosis is worth a life around live power; and remember that a healthy vibration trace only clears what vibration can see, so a machine that misbehaves with a clean report is telling you to look with a different sense, not to relax.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your diagnosis true.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>A clean report on the wrong sense is a blind spot, not health.</strong> Vibration clears only what the frame can feel. A motor that misbehaves with a clean trace is telling you to look inside, not to relax.</p>
+<p>&bull; <strong>Predict the frequency, then go and look.</strong> The slip tells you exactly where a broken bar must sing. Confirm at that spot - do not hunt the spectrum for anything odd and convince yourself.</p>
+<p>&bull; <strong>Read a real, steady load.</strong> Rotor-bar sidebands shrink and hide on an idling or wobbling motor. No load, no signal - you will miss the fault.</p>
+<p>&bull; <strong>Grade it, and rule out the alternative.</strong> Measure the sideband depth against the guide, and check the eccentricity rhythm too - so your verdict names one fault with evidence, not a hunch.</p>
+<p>&bull; <strong>Never trade safety for a reading.</strong> Permit, arc-rated PPE, clamp-on probe, second person - every time. No diagnosis is worth a life around live power.</p>
+</div>
+</details>
+<p>You came to the pump with a clean vibration report, two unexplained trips, and a manager who needed a reason by the morning peak. You can leave with one: Pump 3 has a broken rotor bar - a current sideband at exactly 48.67 Hz, where this motor's 1.33% slip says a broken bar must sit, 38 dB below the line peak in the severe band, with no eccentricity signature, so take it out at the next planned window and re-bar the rotor. <strong>When the frame probe says healthy but the machine is not, look where the fault lives - read the electricity, predict the fault's fingerprint, find it exactly there, and give a reason, not a guess.</strong> That is what keeps a town's water flowing through the morning peak: not a brave bearing swap, but the quiet rigour of predicting where a fault must show and going to that exact spot to find it - safely, around live power, with the evidence in hand. (Working with an AMU facilitator? Bring one misbehaving induction motor's nameplate and a clamp-on reading, and work the slip and sidebands together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can run Motor Current Signature Analysis to find a broken rotor bar in a running motor now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

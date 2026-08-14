@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The other death</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The other death</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The pump-station control system is in perfect health. It runs faultlessly, it meets every requirement, and by its condition it has a good ten years of life left in it. Nothing is wrong with it at all.</p>
+<p>Then a single-page notice arrives from the manufacturer: a <em>last-order</em> announcement on the control cards the system depends on. After next year, those cards will no longer be made, and no longer supported. The system is not wearing out - it is being <em>stranded</em>. On some ordinary day in the next decade a card will fail, as cards do, and there will be no replacement anywhere in the world, and a perfectly good asset the town relies on will be dead - not from age, but from a decision taken in a factory far away, on the worst possible day, at the worst possible cost.</p>
+<p>And the notice is easy to file and forget, because nothing has failed and nothing hurts today.</p>
+<blockquote><h2>My asset is healthy and its supply chain is dying underneath it - and I will not feel it until the day it is too late. How do I see obsolescence coming, and meet it on my terms instead of in a crisis?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> An email from the supplier, among forty others: the control card in the high-lift pumps goes <strong>end of production</strong> next year, with final orders accepted for twelve months. The pumps are in excellent condition. They have <strong>fifteen years</strong> of required service left. Nothing has failed, nothing hurts today, and there is no cost whatsoever to filing this and moving on — which is precisely what you are about to do. Somewhere in the next decade a card will fail, as cards do, and there will be no replacement anywhere in the world. Write down how you would handle this — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the second way an asset dies</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;File it — nothing has failed.&rdquo;</strong> The default, and it is a decision rather than a deferral: the twelve-month window closes whether or not you engage with it, and after that the option you did not take stops existing.</p>
+<p>&bull; <strong>&ldquo;Deal with it when a card fails.&rdquo;</strong> That is the one moment when every option is at its worst — no time, no stock anywhere, a pump down, and whatever price a broker asks for a card salvaged from a scrapyard.</p>
+<p>&bull; <strong>&ldquo;The maintenance plan covers those pumps.&rdquo;</strong> It covers their <em>condition</em>, immaculately, and condition is not what is threatening them. You could maintain these pumps perfectly and still lose them.</p>
+<p>&bull; <strong>&ldquo;Ask the supplier to keep making it.&rdquo;</strong> Worth an email and rarely available — the decision was taken in a factory far away for reasons that have nothing to do with you, and you are one customer among many.</p>
+<p>&bull; <strong>&ldquo;Replace the pumps early.&rdquo;</strong> One legitimate option among several, and it is the most expensive one, chosen before anybody has looked at the cheaper ones. Reaching for it first is what happens when the question arrives in a crisis.</p>
+<p>&bull; The thing to learn is that <strong>an asset can die two very different deaths.</strong> The familiar one is <strong>wear-out</strong> — it degrades, it fails, its condition ends its life, and the whole discipline of maintenance exists to see that coming. The other is that an asset can be <strong>mechanically perfect, still needed, still running, and functionally dead</strong>, because the technology it depends on, its spares, its support, or the people who understand it have quietly disappeared from under it. Naming the forms tells you where to watch: a technology superseded and unsupported; a requirement or regulation the asset can no longer meet; or the plain vanishing of spares, support contracts, specialist skills or the manufacturer itself. <strong>And the cruel part is the timing.</strong> Wear-out announces itself through symptoms that grow. This gives you <strong>one clear warning, years early, at the moment when acting costs least and feels least necessary</strong> — and then nothing at all until the day it is fatal. So <strong>treat the notice as the event</strong>, because it is the only signal you will get, and choose deliberately between the responses while choices still exist.</p>
+</div>
+</details>
+<p>Here is how you manage the other death.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you keep a needed asset supportable when its technology fades - seeing the other death, monitoring for it, knowing the reactive options, running the proactive cycle, and designing for refresh while justifying the choice.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. The other death - stranded, not worn out</div><p class="cb-demo">START BY LEARNING THAT AN ASSET CAN DIE TWO VERY DIFFERENT DEATHS, BECAUSE MOST ENGINEERS ARE TRAINED TO SEE ONLY ONE. THE FIRST IS WEAR-OUT: the asset degrades, it fails, its physical CONDITION ends its life - and the whole discipline of maintenance exists to see that coming and manage it. THE SECOND IS OBSOLESCENCE, AND IT IS THE ONE PEOPLE FORGET AN ASSET CAN SUFFER: the asset is mechanically perfect, still needed, still running - AND FUNCTIONALLY DEAD, BECAUSE THE TECHNOLOGY IT IS BUILT ON, THE SPARES THAT KEEP IT RUNNING, THE SUPPORT FROM ITS MAKER, OR THE PEOPLE WHO KNOW IT HAVE QUIETLY DISAPPEARED FROM UNDER IT. A pump can be in fine condition and completely unusable because the one control card it depends on is no longer made and no one can repair it. OBSOLESCENCE COMES IN FORMS WORTH NAMING, because naming them tells you where to watch: TECHNOLOGICAL (a newer technology supersedes the old, which still works but is no longer supported); FUNCTIONAL (the asset can no longer meet a new requirement, a new regulation, a new load); and SUPPLY or MANUFACTURING (the spares, the support contract, the specialist skills, or the manufacturer itself simply vanish). AND THE CRUEL FEATURE THEY ALL SHARE: OBSOLESCENCE IS INVISIBLE UNTIL IT BITES. Nothing fails, no gauge moves, no alarm sounds - the supplier simply, quietly discontinues the part, and you discover it the day you reach for the spare and it is gone. This is exactly why a last-order notice is so easy to file and forget: it hurts nothing today, and it is the sound of a clock that only rings once, on the worst possible day. The whole of this unit is learning to hear that clock start.</p></div><div class="canvas-box"><div class="cb-label">2. Monitor - see it coming</div><p class="cb-demo">BECAUSE OBSOLESCENCE GIVES NO FAILURE SIGNAL - NO VIBRATION, NO TEMPERATURE, NO CRACK TO FIND - YOU CANNOT WAIT FOR IT THE WAY YOU WAIT FOR WEAR. YOU HAVE TO WATCH FOR IT, DELIBERATELY, AND FOR THE ASSETS THAT MATTER. Crucially, NOT EVERY ASSET NEEDS THIS: a commodity motor with a dozen interchangeable suppliers will never strand you, and monitoring it would be waste. You focus the watch on the assets that are BOTH CRITICAL AND DEPENDENT ON SOMETHING SCARCE - a control system, a bespoke component, a single-source technology, a proprietary part - because those are the ones that can strand you. FOR THOSE, YOU MONITOR THE SIGNALS: last-order and end-of-support notices from manufacturers; a supplier visibly winding down or being acquired; a technology the whole industry is abandoning; a specialist SKILL that nobody younger is learning, so the knowledge itself is going obsolete. THE SHIFT THIS CREATES IS THE HEART OF THE DISCIPLINE: it turns obsolescence from A SURPRISE YOU SUFFER INTO A RISK YOU TRACK. A risk you can see coming is a risk you can meet cheaply and calmly; a risk you cannot see arrives, by definition, as a crisis. And monitoring buys you the single most valuable thing in the whole obsolescence problem: TIME. Every good option in the boxes that follow - the calm last-time buy, the scheduled refresh, the module redesign - depends entirely on having time, and time is exactly what you have if you were watching and lose entirely if you were not.</p></div><div class="canvas-box"><div class="cb-label">3. Reactive - the expensive path, when you are caught</div><p class="cb-demo">SUPPOSE YOU DID NOT SEE IT COMING - THE MONITORING WAS NOT THERE, OR THE ASSET WAS NOT ON THE WATCH LIST - AND THE PART IS NOW OBSOLETE, THE LINE ALREADY CLOSED. YOU ARE NOT HELPLESS, BUT NOTICE THAT EVERY DOOR LEFT OPEN IS THE DEAR ONE. THE REACTIVE TACTICS, roughly from cheapest to dearest: a LAST-TIME OR LIFETIME BUY if you can still get in before the very last of the stock is gone (buy all the spares you will ever need in one final order); a BRIDGE BUY to cover a gap until a longer solution is ready; an AFTERMARKET SOURCE (a broker or reseller holding old stock, often at a steep markup and with counterfeit risk); a SALVAGE, cannibalising the part from a scrapped or retired unit; an EMULATION, paying a specialist to reverse-engineer and remanufacture the obsolete part; and, WHEN NOTHING ELSE SERVES, AN EMERGENCY REDESIGN of the subsystem to use a currently available part. EVERY ONE OF THESE WORKS - obsolescence is survivable, and it is important that learners know it is not the end of an asset. BUT NOTICE THE COMMON COST OF BEING CAUGHT: you are buying at a PREMIUM, from a SHRINKING supply, under TIME PRESSURE, frequently on an UNPLANNED OUTAGE while the asset is down and needed - and the forced REDESIGN is the most expensive door of all, carrying not just a large price and a long lead time but the re-testing and re-certification of the whole system it touches. Reactive management is real, sometimes genuinely unavoidable, and always the same bargain: you pay the MOST money to have the LEAST choice. Which is exactly why the next box exists.</p></div><div class="canvas-box"><div class="cb-label">4. Proactive - the cheap path, on your terms</div><p class="cb-demo">THIS IS THE POINT OF THE WHOLE UNIT: MEET OBSOLESCENCE BEFORE IT BITES, THROUGH A DELIBERATE, REPEATING CYCLE. MONITOR - watch the technology and supply signals (box 2) so you know what is coming. PLAN - know which of your assets are BOTH CRITICAL AND VULNERABLE, and rank them, so your effort goes where a stranding would actually hurt. MITIGATE - and this is the crux, ACT WHILE YOU STILL HAVE OPTIONS: make the last-time buy CALMLY, a year before the line closes, at list price, in a planned order; arrange a support or spares agreement with the supplier while they still care; or SCHEDULE A TECHNOLOGY REFRESH into an outage YOU choose, at a time that suits the plant. REVIEW - keep the picture current, because technologies and suppliers keep moving and last year assessment goes stale. HERE IS THE INSIGHT THAT MAKES PROACTIVE MANAGEMENT SO POWERFUL: THE VERY SAME TACTICS THAT ARE DESPERATE AND EXPENSIVE WHEN REACTIVE BECOME CHEAP AND CALM WHEN PROACTIVE. A lifetime buy made in a panic, from the last broker holding stock, is a fortune and a gamble; the identical lifetime buy made a year early, in a planned purchase order at list price, is a fraction of the cost and none of the risk. A refresh forced by a failure is an emergency; the same refresh scheduled into a planned outage is routine capital work. THIS IS THE MEANING OF THE LINE: OBSOLESCENCE IS NOT A QUESTION OF IF BUT WHEN, so the real choice is NEVER WHETHER you will deal with it - it is whether you deal with it ON YOUR SCHEDULE AND BUDGET, OR ON THE SUPPLIER SCHEDULE, IN A CRISIS, AT A PREMIUM. Proactive management does not remove the obsolescence; it buys back the choice of how and when to meet it, and that choice is worth an enormous amount of money and risk.</p></div><div class="canvas-box"><div class="cb-label">5. Design for refresh, and justify the choice</div><p class="cb-demo">TWO LAST MOVES COMPLETE THE DISCIPLINE AND TURN IT FROM SPARES-HOARDING INTO ASSET-MANAGEMENT STRATEGY. FIRST, THE DESIGN-TIME LEVER THAT DWARFS EVERY REACTIVE TACTIC: WHEN YOU ACQUIRE OR REFURBISH AN ASSET, BUILD FOR THE OBSOLESCENCE YOU KNOW IS COMING. Using MODULAR, OPEN, STANDARD designs - interfaces that are published rather than proprietary, subsystems that can be replaced independently - means that when one part obsolesces you SWAP A MODULE rather than rebuild the whole system. Obsolescence you designed for is a planned, bounded module change; obsolescence in a sealed, proprietary, all-or-nothing box is a full and costly redesign. The cheapest obsolescence decision is the architecture choice you make years before the obsolescence arrives, so an asset manager influences whole-life supportability most at the moment of acquisition, not at the moment of crisis. SECOND, HOW TO REVIEW AND JUSTIFY AN OBSOLESCENCE DECISION - typically a LIFETIME BUY VERSUS A TECHNOLOGY REFRESH - BECAUSE YOU WILL BE ASKED TO DEFEND THE CHOICE. You do not go on gut or on which crisis is loudest; you WEIGH THE RISK TO AVAILABILITY AGAINST THE WHOLE-LIFE COST, and choose on evidence. A LIFETIME BUY IS JUSTIFIED when the asset has a defined remaining life and the spares to cover it cost far less than replacing the technology - a fraction of the price, and it carries the asset to its planned end. A TECHNOLOGY REFRESH IS JUSTIFIED when it also buys NEW CAPABILITY or a MUCH LONGER SUPPORTED LIFE, when the plant needs the asset well beyond the spares horizon, or when holding a decade of ageing, possibly-degrading spares is itself the bigger risk. EITHER WAY, THE JUSTIFICATION IS THE COMPARISON, WRITTEN DOWN - the risk and the whole-life cost of each path, set side by side - which is exactly the reviewed, justified obsolescence decision an asset manager is asked to produce, and the difference between a defensible strategy and an expensive guess.</p></div></div>
+
+<p>Box 1 is the death people forget an asset can die. Box 4 is the difference between R350,000 on your terms and millions in a crisis. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>Obsolescence is a condition to be managed, not a crisis to be suffered. Obsolescence is not a question of if, but when - the only choice is whether you deal with it on your terms, or on the supplier's.</strong> Five questions:</p>
+<ul>
+<li><strong>What kind of death is this?</strong> <strong>Stranding, not wear-out.</strong> An asset can be healthy and functionally dead because its technology, spares, support or skills have vanished. Invisible until it bites.</li>
+<li><strong>Am I watching for it?</strong> <strong>Monitor the technology and supply signals</strong> - for the assets that matter. Obsolescence is a risk to track, not a surprise to suffer.</li>
+<li><strong>What if I am caught?</strong> <strong>Reactive tactics - last-time buy, bridge buy, emulation, salvage, redesign.</strong> They work, at a premium, under pressure.</li>
+<li><strong>How do I get ahead of it?</strong> <strong>The proactive cycle - monitor, plan, mitigate, review.</strong> The calm last-time buy or the scheduled refresh, on your timetable.</li>
+<li><strong>How do I choose, and defend it?</strong> <strong>Design for refresh, and justify on risk and whole-life cost.</strong> Modular, open designs make a refresh a module swap; the decision is evidence, not panic.</li>
+</ul>
+<p><strong>The other death - assets get stranded, not just worn out.</strong> Start by learning that an asset can die two very different deaths. One is <em>wear-out</em>: it degrades, it fails, its condition ends its life, and the whole discipline of maintenance exists to manage that. The other is <em>obsolescence</em>, and it is the one people forget: the asset is mechanically perfect, still needed, still running - and <strong>functionally dead, because the technology it is built on, the spares that keep it running, the support from its maker, or the people who know it have quietly disappeared from under it</strong>. A pump can be in fine condition and unusable because the control card it depends on is no longer made. Obsolescence comes in forms worth naming: <em>technological</em> (a newer technology supersedes it), <em>functional</em> (it can no longer meet a new requirement or regulation), and <em>supply</em> or manufacturing (the spares, the support, the skills, the manufacturer itself vanish). And the cruel feature they share: <strong>obsolescence is invisible until it bites</strong>. Nothing fails, no gauge moves, no alarm sounds - the supplier simply, quietly, discontinues the part, and you find out the day you reach for the spare and it is gone. That is why the last-order notice is so easy to file and forget, and so dangerous to.</p>
+<p><strong>Monitor - see it coming.</strong> Because obsolescence gives no failure signal, you cannot wait for it - you have to <em>watch</em> for it, deliberately, for the assets that matter. Not every asset needs this: a commodity motor with a dozen suppliers will never strand you. But for the assets that are <em>both critical and dependent on something scarce</em> - a control system, a bespoke component, a technology with a single source - you monitor the signals: last-order and end-of-support notices, a supplier winding down, a technology the industry is abandoning, a skill nobody younger is learning. Turning obsolescence from a surprise you suffer into a <em>risk you track</em> is the whole shift, because a risk you can see coming is a risk you can meet cheaply; a risk you cannot see arrives as a crisis. Monitoring buys you the one thing that makes every good option possible: <em>time</em>.</p>
+<p><strong>Reactive - the expensive path, when you are caught.</strong> Suppose you did not see it coming, and the part is now obsolete. You are not helpless, but every door left is the dear one. The <em>reactive</em> tactics: a <strong>last-time or lifetime buy</strong> if you can still get in before the line closes (buy all the spares you will ever need); a <strong>bridge buy</strong> to cover a gap; an <strong>aftermarket source</strong> or a <strong>salvage</strong> from a scrapped unit; an <strong>emulation</strong> of the old part by someone who can remake it; and, when nothing else serves, an emergency <strong>redesign</strong>. These all work - obsolescence is survivable - but notice the cost of being caught: you are buying at a premium, from a shrinking supply, under time pressure, often on an unplanned outage, and a forced redesign is the most expensive of all (large cost, long lead time, and the re-testing and re-certification of a whole system). Reactive management is real and sometimes unavoidable, but it is always the path of paying the most to have the least choice.</p>
+<p><strong>Proactive - the cheap path, on your terms.</strong> The alternative, and the point of the whole unit, is to meet obsolescence <em>before</em> it bites, through a deliberate cycle: <strong>monitor</strong> (watch the signals, box 2), <strong>plan</strong> (know which of your assets are both critical and vulnerable, and rank them), <strong>mitigate</strong> (act while you still have options - make the last-time buy <em>calmly</em>, arrange a support agreement, or schedule a technology refresh into an outage <em>you</em> choose), and <strong>review</strong> (keep the picture current as technologies and suppliers move). The very same tactics that are desperate when reactive become cheap and calm when proactive: a lifetime buy made a year <em>before</em> the line closes, at list price, in a planned order, is a fraction of the cost and none of the risk of the same buy attempted in a panic. This is the meaning of the line: <strong>obsolescence is not a question of if but when</strong>, so the real choice is never whether you will deal with it - it is whether you deal with it on <em>your</em> schedule and budget, or on the supplier's, in a crisis, at a premium.</p>
+<p>One honest boundary. <strong>Obsolescence is a reality of technology and supply chains, not a failure of the person maintaining the asset. The skill is not in preventing a supplier from discontinuing a part; it is in anticipating that moment and choosing, on evidence, how to meet it.</strong> No maintainer can stop a factory closing a production line, and a team caught by an unmonitored obsolescence was failed by the absence of a process, not by a personal lapse - so this is never a stick to beat someone with. And it is the opposite of fatalism: precisely because you cannot stop the part being discontinued, the agency is entirely in <em>how and when</em> you meet it, and that is a real, powerful choice you own.</p>
+<p><strong>Design for refresh, and justify the choice.</strong> Two last moves complete the discipline. First, the design-time lever that dwarfs every reactive tactic: when you acquire or refurbish an asset, <strong>build for the obsolescence you know is coming</strong>, using <em>modular, open, standard</em> designs, so that when one subsystem obsolesces you <em>swap a module</em> rather than rebuild the whole system - obsolescence you designed for is a planned module change; obsolescence in a sealed, proprietary box is a full redesign. Second, to <em>review and justify</em> an obsolescence decision - a lifetime buy versus a technology refresh - you do not go on gut: you weigh the <em>risk to availability</em> against the <em>whole-life cost</em>, and choose on evidence. A lifetime buy is justified when the asset genuinely has a defined remaining life and the spares will cover it more cheaply than a refresh. A technology refresh is justified when it also buys new capability or a much longer supported life, or when holding a decade of spares is riskier than replacing the technology outright. Either way, the justification is the comparison, written down - which is exactly what an asset manager is asked to produce.</p>
+<p>Does it scale? Anyone who has owned a phone or a laptop knows the other death: the device works perfectly and stops getting security updates, or the charger it needs is discontinued, and a healthy machine becomes unusable not from breakage but from abandonment. The person who saw it coming bought the spare charger and planned the upgrade on a good month; the person who did not is stranded on a bad one. An organisation and a household both learn that a thing can be fine and finished at the same time - and that the difference is whether you watched.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is the control-card decision, with the numbers. Write the justification memo.</p>
+<table>
+<tr><th>Fact</th><th>Value</th></tr>
+<tr><td>Remaining useful life of the pump-station control system</td><td>~10 years</td></tr>
+<tr><td>Control cards consumed (historic failure rate)</td><td>about 1 card per year</td></tr>
+<tr><td>Cost per card (last-time buy, at list)</td><td>R25,000</td></tr>
+<tr><td>Planned technology refresh to a modern modular controller</td><td>R1.5 million (buys new capability + 15 years supported life)</td></tr>
+<tr><td>Emergency redesign if a card fails with none in stock</td><td>~R5 million + a 6-month lead time + an unplanned outage + re-certification</td></tr>
+</table>
+<ol>
+<li><strong>Name the death.</strong> Which form of obsolescence is this, and why has nothing failed?</li>
+<li><strong>Reactive vs proactive.</strong> In a line each, contrast what happens if the utility waits, versus acts now.</li>
+<li><strong>Size the lifetime buy.</strong> How many cards should the lifetime buy hold, and what does it cost? (Justify the quantity.)</li>
+<li><strong>Review and justify.</strong> Recommend the lifetime buy <em>or</em> the technology refresh, and justify it on whole-life cost and risk.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the death: this is <strong>supply (manufacturing) obsolescence</strong> - the maker is discontinuing the cards. Nothing has failed because obsolescence is not a condition of the asset; the system is healthy, and it is the <em>supply chain</em> that is ending, invisibly, ahead of any failure.</p>
+<p>Second, the contrast: <em>if the utility waits</em>, a card eventually fails with none in stock, forcing a R5 million emergency redesign on an unplanned outage months long. <em>If it acts now</em>, it has cheap, calm options while the cards can still be bought - the crisis is converted into a planned purchase or a scheduled refresh.</p>
+<p>Third, the lifetime buy: at about 1 card a year for 10 years, the expected need is 10 cards - but a lifetime buy must cover the <em>worst plausible</em> run, not the average, so add a safety margin (say 4 cards) against a bad year or two, giving roughly <strong>14 cards at R25,000 = R350,000</strong>. The mark of a real answer is sizing to the remaining life <em>plus</em> a margin for variability, not to the bare average - because a lifetime buy you under-size leaves you back in the crisis you were trying to avoid.</p>
+<p>Fourth, the justification. Both options beat the R5 million redesign by far, so the real choice is <strong>lifetime buy (R350,000) vs refresh (R1.5 million)</strong>. If the plant needs the system for only its ~10 remaining years and gains nothing from new capability, the <strong>lifetime buy is justified</strong> - it is a fraction of the refresh cost and covers the whole remaining life. If the plant is expanding, or the new controller's capability and its 15-year supported life genuinely pay back, or holding a decade of ageing cards is itself risky, the <strong>refresh is justified</strong>. A real answer states the comparison and picks on the evidence - it does not just name the cheapest number.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-the_other_death">1. The other death - stranded, not worn out</label><textarea id="cb-the_other_death" data-key="t-0221:the_other_death" placeholder="An asset can die two deaths. Wear-out: its condition fails. Obsolescence: it is healthy and functionally dead because its technology, spares, support or skills have vanished from under it. Obsolescence comes in forms - technological (superseded), functional (cannot meet a new requirement), supply/manufacturing (the maker or spares vanish) - and is invisible until it bites: nothing fails, the part is just quietly discontinued."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-monitor">2. Monitor - see it coming</label><textarea id="cb-monitor" data-key="t-0221:monitor" placeholder="Because obsolescence gives no failure signal, you cannot wait for it - you watch for it, for the assets that matter. Not every asset (a commodity motor with many suppliers will never strand you), but the ones both critical and dependent on something scarce: watch last-order and end-of-support notices, a supplier winding down, a technology the industry is abandoning, a skill nobody is learning. Turning obsolescence from a surprise into a tracked risk buys you the one thing that makes every good option possible: time."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-reactive">3. Reactive - the expensive path, when you are caught</label><textarea id="cb-reactive" data-key="t-0221:reactive" placeholder="Caught, with the part now obsolete, you are not helpless but every door is the dear one: a last-time or lifetime buy (if you can still get in), a bridge buy, an aftermarket source, a salvage, an emulation - and when nothing else serves, an emergency redesign. All work; all mean buying at a premium, from a shrinking supply, under time pressure, often on an unplanned outage. A forced redesign is the most expensive of all (large cost, long lead, full re-certification)."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-proactive">4. Proactive - the cheap path, on your terms</label><textarea id="cb-proactive" data-key="t-0221:proactive" placeholder="Meet obsolescence before it bites, through a deliberate cycle: monitor (watch the signals), plan (know which assets are both critical and vulnerable, and rank them), mitigate (act while you have options - the calm last-time buy, a support agreement, a refresh scheduled into an outage you choose), review (keep it current). The same tactics that are desperate when reactive are cheap and calm when proactive. Obsolescence is not if but when: deal with it on your terms, or the supplier&#039;s."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-design_and_justify">5. Design for refresh, and justify the choice</label><textarea id="cb-design_and_justify" data-key="t-0221:design_and_justify" placeholder="Two last moves. At acquisition, design for the obsolescence you know is coming: modular, open, standard designs so a subsystem obsolescence is a module swap, not a whole-system rebuild. And to review and justify a decision (lifetime buy vs technology refresh), weigh the risk to availability against the whole-life cost and choose on evidence: a lifetime buy when the remaining life is defined and cheaper to cover; a refresh when it buys new capability or a much longer supported life."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When the obsolescence is seen, sized and justified, <strong>download or save it</strong> - it is yours. You can now meet the other death on your own terms.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>An asset can be in perfect condition and functionally dead at the same time. The question is never only "is it working?" - it is "can I still support it, and for how long?"</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Treating obsolescence as only wear-out.</strong> A healthy asset can be stranded by a dying supply chain. Watch its supportability, not only its condition.</p>
+<p>&bull; <strong>Waiting for the part to fail.</strong> Obsolescence gives no failure signal; by the time a card dies, the cheap options are gone. Act on the notice, not on the failure.</p>
+<p>&bull; <strong>No monitoring, so you are always reactive.</strong> Without watching the supply and technology signals for critical assets, every obsolescence arrives as a crisis. Monitor buys you time.</p>
+<p>&bull; <strong>A panic redesign that could have been a planned refresh.</strong> Forced redesign is the most expensive door there is. Seen early, the same change is a scheduled refresh at a fraction of the cost.</p>
+<p>&bull; <strong>A lifetime buy sized by guess.</strong> Size it to the remaining life plus a margin for a bad run, not to the bare average - an under-sized buy drops you back into the crisis.</p>
+<p>&bull; <strong>Ignoring modular, open design at acquisition.</strong> A sealed proprietary box makes future obsolescence a full redesign; a modular open design makes it a module swap. Design for the refresh you know is coming.</p>
+<p>&bull; <strong>Blaming the maintainer.</strong> A supplier discontinuing a part is outside anyone's control. The failure, if any, is an absent process - not a person who missed a notice they were never asked to watch for.</p>
+<p>&bull; <strong>Fatalism.</strong> You cannot stop the part being discontinued, but you own entirely how and when you meet it. That is agency, not helplessness.</p>
+</div>
+</details>
+<p>The control system was in perfect health and being stranded underneath, its cards quietly discontinued, so that unless someone acted it would die not from wear but from a supplier's decision, on the worst day, at the worst cost. So learn to manage the other death: see that assets are stranded as well as worn out, and that obsolescence - technological, functional or supply - is invisible until it bites; monitor the technology and supply signals for the assets that matter, turning a surprise into a tracked risk; know the reactive tactics for when you are caught, and that they all cost a premium; run the proactive cycle of monitor, plan, mitigate and review so you act while the cheap options are still open; and design for refresh with modular, open architectures, justifying a lifetime buy against a technology refresh on the risk to availability and the whole-life cost. <strong>Obsolescence is not a question of if but when, so meet it on your terms and not the supplier's - and never carry it as a personal failure, because the discontinuation is not your choice, but how and when you answer it is entirely yours.</strong> The next time a last-order notice lands on a healthy asset, do not file it - that quiet page is the sound of a clock starting, and the whole art is to act while it is still ticking.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can meet the other death on your terms now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

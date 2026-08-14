@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The records say what, not why</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The records say what, not why</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Adaeze, and the seasonal question is answered. The wet season really does destroy more rollers, and carry-back really is associated with it.</p>
+<p>Which produced a second finding you were not looking for. You pulled the belt-cleaner adjustment records to check something else, and found this:</p>
+<p>Wet season: <strong>49 of 120</strong> scheduled adjustments completed - <strong>41 per cent</strong>. The rest of the year: <strong>150 of 168</strong> - <strong>89 per cent</strong>.</p>
+<p>The same people. The same procedure. The same plant.</p>
+<p>You can think of four reasons immediately. They are busier in the wet season. The access platform is genuinely dangerous when it is wet. Nobody has ever explained why the adjustment matters. Or the procedure as written does not work in wet material.</p>
+<p>All four fit the number exactly. All four call for a completely different response - one is a resourcing decision, one is a safety redesign, one is a training gap, and one means the procedure is wrong.</p>
+<p>And you notice, uncomfortably, that there is a fifth explanation available to you, which is that the crews cannot be bothered. You do not believe it. But you have no evidence against it either, and neither will anybody who reads your chapter.</p>
+<blockquote><h2>I know exactly what is happening and I have no idea why. How do I answer a question that no amount of further counting will touch?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The number is solid and finished: belt-cleaner adjustments are completed at <strong>41 per cent</strong> in the wet season against <strong>89 per cent</strong> the rest of the year. Four explanations fit it exactly. The crews are genuinely busier then. The access platform is slippery and frightening in the wet. Nobody has ever explained why the adjustment matters. Or the procedure as written cannot actually be done in those conditions. <strong>One is a resourcing decision, one a safety redesign, one a training gap, and one means the procedure is wrong</strong> — four different responses, and the number cannot choose between them. And there is a fifth explanation available: that the crews cannot be bothered. You do not believe it. You have no evidence against it either, and neither will anyone who reads your chapter. Write down how you would answer this — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what counting cannot reach</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Cut the data more finely — by crew, by shift, by site.&rdquo;</strong> More counting against a question counting cannot answer. You would produce a more detailed description of the same pattern and still not know why.</p>
+<p>&bull; <strong>&ldquo;Correlate it with weather and workload data.&rdquo;</strong> Genuinely useful and it can only distinguish the explanations that leave a numerical trace. &ldquo;Nobody explained why it matters&rdquo; leaves none, and neither does a procedure that cannot be followed as written.</p>
+<p>&bull; <strong>&ldquo;Report the finding and let others interpret it.&rdquo;</strong> Hands over a number with five explanations attached, and in the absence of evidence about people's reasoning, <strong>the least generous one fills the vacuum.</strong> You would be publishing the fifth explanation without ever endorsing it.</p>
+<p>&bull; <strong>&ldquo;Observe the crews without telling them.&rdquo;</strong> Might reveal what happens and not what they were weighing — and it treats people as subjects to be caught out rather than as those who hold the answer.</p>
+<p>&bull; <strong>&ldquo;Send a questionnaire with the options on it.&rdquo;</strong> Offers your four explanations back and forecloses the fifth possibility that matters most: a reason you have not thought of.</p>
+<p>&bull; Notice what your question has done. <strong>Questions ask for different kinds of answer.</strong> Some want a <strong>quantity</strong> — how much, how often. Some want a <strong>mechanism</strong> — what physically produces this. And some want a <strong>meaning</strong> — how the people doing the work understand what they are doing, and what they are actually weighing. Your first question wanted a quantity and you answered it: that 41 against 89 is solid and it is <em>finished</em>. <strong>Your second question wants a meaning, and continuing to count is not rigour but avoidance.</strong> So choose the instrument that fits, <strong>against named alternatives, with your reasons recorded</strong> — because it will be challenged by people who regard counting as the only real evidence. And take on what the counting did not require: the people who explain their reasoning are <strong>giving you something</strong>, often about decisions they have been criticised for, and what you owe them — consent, confidentiality, care in how their words are represented — is part of the method rather than an appendix to it.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the justification - what the question is asking for, the approach chosen against named alternatives, who is selected and why those people, how you get from what was said to what you claim, and what you owe the people who told you.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Ask what your question actually wants - a quantity, a mechanism, or a meaning</div><p class="cb-demo">&lt;strong&gt;Before choosing any method, work out what kind of answer your question is asking for, because that decides everything after it.&lt;/strong&gt; Some questions want a &lt;strong&gt;quantity&lt;/strong&gt; - how much, how often, how much more than. Some want a &lt;strong&gt;mechanism&lt;/strong&gt; - what physically produces this. And some want a &lt;strong&gt;meaning&lt;/strong&gt; - how do the people doing this understand what they are doing, and what considerations are they weighing. &lt;strong&gt;Mine has moved.&lt;/strong&gt; My first question wanted a quantity and I answered it: belt-cleaner adjustments are completed at &lt;strong&gt;41 per cent&lt;/strong&gt; in the wet season against &lt;strong&gt;89 per cent&lt;/strong&gt; the rest of the year. That number is solid and it is finished. &lt;strong&gt;My second question is &#039;why&#039;, and no amount of further counting will touch it.&lt;/strong&gt; I can think of four explanations immediately - the crews are busier in the wet season, the access platform is genuinely dangerous when wet, nobody has explained why the adjustment matters, or the adjustment as written does not work in wet material. &lt;strong&gt;All four are plausible. All four fit the same number. And they call for four completely different responses from the organisation&lt;/strong&gt; - one is a resourcing decision, one is a safety redesign, one is a training gap, and one means the procedure itself is wrong. &lt;strong&gt;A question that cannot be settled by collecting more of the same data is not a data problem. It is a different question, and it needs a different instrument.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">2. Choose one approach - and justify it against the ones you rejected, by what each would have given you</div><p class="cb-demo">&lt;strong&gt;Choose one, and earn it by writing down what the others would have given you.&lt;/strong&gt; I am using &lt;strong&gt;semi-structured interviews with thematic analysis&lt;/strong&gt;: a small number of conversations, guided by a few open questions, read afterwards for the patterns that recur across them. &lt;strong&gt;Now the rejections, each with a reason that is about the question rather than about convenience.&lt;/strong&gt; A &lt;strong&gt;survey&lt;/strong&gt; would give me how many people endorse each of my four explanations - but I wrote those four, so a survey can only rank my own guesses and cannot surface the fifth reason I have not thought of, which is the entire point. &lt;strong&gt;Direct observation&lt;/strong&gt; would show me what happens on the platform, which is genuinely valuable and cannot tell me what somebody was weighing when they decided to leave it. A &lt;strong&gt;single deep case study&lt;/strong&gt; of one crew would give rich detail about one crew, and I need to know whether this is one crew or the whole operation. &lt;strong&gt;Notice the shape of that reasoning.&lt;/strong&gt; I am not arguing that interviews are better. I am arguing that this question asks for the considerations people weigh, that only asking them reaches those, and that the other three instruments answer questions I am not asking. &lt;strong&gt;An examiner does not need you to have chosen the best method. They need to see that you knew what you were choosing between.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. Say who you will talk to and why those people - the logic is coverage, not headcount</div><p class="cb-demo">&lt;strong&gt;In this kind of work the sample is not chosen for size and cannot be justified by one. It is chosen for coverage of the situations you need to understand.&lt;/strong&gt; Fourteen people do this task. I am not sampling them at random, because random sampling of fourteen would probably give me five people from the same crew. &lt;strong&gt;I select for range:&lt;/strong&gt; both shifts, because access in the dark may be a different problem; people with long service and short, because a person who has done it for eleven years may have stopped noticing what they work around; and at least two people who complete the adjustment reliably in the wet season, &lt;strong&gt;because the ones who manage it know something and nobody has ever asked them.&lt;/strong&gt; That is roughly nine conversations. &lt;strong&gt;Now the stopping rule, which replaces a sample-size calculation and must be stated in advance.&lt;/strong&gt; I keep going until new interviews stop producing new explanations - and I plan two beyond the point where that seems to have happened, because &#039;nothing new&#039; is easy to conclude when you are tired. &lt;strong&gt;If the ninth conversation produces something I have not heard, I have not finished and I say so.&lt;/strong&gt; &lt;strong&gt;Write down in the proposal that the number may change and why.&lt;/strong&gt; A fixed number promised in advance is a number you will meet whether or not you have understood anything.</p></div><div class="canvas-box"><div class="cb-label">4. Say how you get from what people said to what you claim it means - and how somebody else could check</div><p class="cb-demo">&lt;strong&gt;This is the step that decides whether the work is research or an impression, and it is the step most engineering proposals leave as a single word.&lt;/strong&gt; Write it as something somebody could repeat. &lt;strong&gt;Record and transcribe&lt;/strong&gt;, so the analysis works from what was said rather than from what I remember being said. &lt;strong&gt;Code line by line&lt;/strong&gt; - short labels for what each passage is about - working through everything before deciding what the categories are, rather than sorting statements into my four guesses. &lt;strong&gt;Group the codes into themes,&lt;/strong&gt; and here is the discipline: &lt;strong&gt;a theme has to be a pattern I could show somebody in the transcripts, not a summary of my impression.&lt;/strong&gt; &lt;strong&gt;Have a second reader code two transcripts independently&lt;/strong&gt; and discuss where you differ - the disagreements are the useful part, because they show where a code is doing unclear work. &lt;strong&gt;Then, when you write, carry the evidence with the claim.&lt;/strong&gt; Every theme is reported with the passages that produced it and with how many participants it appeared across, so the reader can judge whether it is a pattern or a striking sentence from one person. &lt;strong&gt;And report what did not fit.&lt;/strong&gt; If seven people describe a time constraint and one describes something else entirely, that eighth account goes in the write-up. &lt;strong&gt;The account that does not fit is either the boundary of your theme or the beginning of your next study, and burying it costs you both.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">5. Say what would make you wrong - and what you owe the people who talked to you</div><p class="cb-demo">&lt;strong&gt;Two things close this out, and the second is not paperwork.&lt;/strong&gt; &lt;strong&gt;First, what would make me wrong.&lt;/strong&gt; These are nine accounts from one terminal; they explain what these people weigh, and they do not establish that other terminals are the same. Interviews report what people are willing and able to say, which is not always what they do - so where an account can be checked against a record or an observation, I check it, and where it cannot, I say so. &lt;strong&gt;And I state my own position, because it is doing work in this study:&lt;/strong&gt; I am an engineer at this site, which means people may tell me what they believe an engineer wants to hear, and it means I already had four explanations in my head before I asked anybody. &lt;strong&gt;Writing that down is not a confession. It is the reader&#039;s only way to weigh what I am reporting.&lt;/strong&gt; &lt;strong&gt;Second, what I owe the nine.&lt;/strong&gt; They can decline, and can stop, and can withdraw afterwards, and none of that reaches their supervisor. What they say is not attributable - and in a group of fourteen that takes real care, because &#039;a long-serving night-shift operator said&#039; identifies somebody. &lt;strong&gt;And they hear the findings before anybody senior does&lt;/strong&gt;, with the chance to say that I have misunderstood them. &lt;strong&gt;The people who explained this to me are the only ones who can tell me I got it wrong, and they should not read it first in a report about them.&lt;/strong&gt;</p></div></div>
+
+<p>Box 2 is what an examiner is actually reading for, and box 4 is where this becomes research rather than an impression. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Justifying a qualitative method is <strong>not the act of defending a softer option. It is the act of showing that your question asks for something a count cannot deliver, and that you know what you chose between.</strong> Five moves:</p>
+<ul>
+<li><strong>Ask what the question wants.</strong> <strong>Quantity, mechanism, or meaning.</strong> "How much" is finished at 41 against 89. "Why" is a different question and needs a different instrument.</li>
+<li><strong>Choose one, and justify by rejection.</strong> <strong>What each alternative would have produced.</strong> A survey can only rank the guesses you wrote; observation shows what happened, not what was weighed.</li>
+<li><strong>Select for coverage, not headcount.</strong> <strong>Range, and a stated stopping rule.</strong> Both shifts, long and short service, and the people who <em>do</em> manage it in the wet - because they know something nobody has asked them.</li>
+<li><strong>Make the analysis repeatable.</strong> <strong>Transcribe, code, group, second reader, evidence beside every claim.</strong> A theme is a pattern you can show in the transcripts.</li>
+<li><strong>State what would make you wrong, and what you owe them.</strong> <strong>Your own position, and their consent, anonymity and first sight of the findings.</strong></li>
+</ul>
+<p><strong>The number that starts it, and why it is a dead end.</strong> <strong>49 of 120</strong> in the wet season and <strong>150 of 168</strong> the rest of the year - 41 per cent against 89. That figure is solid, and it is the last thing counting can tell you here. Four explanations fit it identically. You could collect three more years of the same records and the four would still fit identically, because <em>the records were never capable of distinguishing them.</em> Recognising that a dataset has been exhausted is a research skill, and it usually arrives disguised as an urge to collect more data.</p>
+<p><strong>Why the fifth explanation matters so much.</strong> The unspoken one - that the crews cannot be bothered - is available to every reader of your chapter, and it is the explanation that requires no work and blames people who are not in the room to answer. <em>The strongest reason to do this study properly is that if you do not, that explanation wins by default.</em> Nine conversations is not a soft alternative to hard data. It is the only instrument that can hold the fifth explanation to account.</p>
+<p><strong>The stopping rule, and why it must be written down first.</strong> You keep going until new conversations stop producing new explanations, and you plan two beyond the point where that seems to have happened. Written in advance, that is a discipline. Decided afterwards, it becomes "I stopped when I had enough", which is indistinguishable from stopping when you were tired or when the answers had started agreeing with you.</p>
+<p><strong>An honest boundary.</strong> This teaches you to build the argument for <em>one</em> approach. It is not a survey of qualitative methods, and there are several this does not cover. It does not make you a qualitative researcher in an afternoon - it makes you an engineer who can defend a method choice to a committee and execute it without doing harm. And it does not replace the reading you will need to do on whichever approach you choose.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Kwena is two months from his methodology chapter. He has just decided to go qualitative.</p>
+<table>
+<tr><th>Item</th><th>Detail</th></tr>
+<tr><td>His question</td><td>"What is the relationship between planned-maintenance compliance and unplanned downtime across the plant's asset classes?"</td></tr>
+<tr><td>His original plan</td><td>Statistical analysis of five years of CMMS data</td></tr>
+<tr><td>What went wrong</td><td>The compliance field is populated for only 31 per cent of work orders, downtime is recorded in three incompatible ways across the period, and asset class was re-coded in year three</td></tr>
+<tr><td>His new plan</td><td>Interview maintenance planners and supervisors about compliance and downtime instead</td></tr>
+<tr><td>His justification</td><td>"A qualitative approach allows for richer insight into the factors affecting compliance"</td></tr>
+<tr><td>Sample</td><td>"Approximately 12 participants"</td></tr>
+<tr><td>Analysis</td><td>"Thematic analysis"</td></tr>
+<tr><td>Time left</td><td>Two months to the chapter, eight months total</td></tr>
+</table>
+<ol>
+<li><strong>Name what has actually happened here.</strong> One sentence, and be precise - it is not that qualitative work is inferior.</li>
+<li><strong>Test his question</strong> against box 1. Is it asking for a quantity, a mechanism, or a meaning? What follows from your answer?</li>
+<li><strong>His justification sentence.</strong> Say specifically what is wrong with "allows for richer insight" as a justification.</li>
+<li><strong>"Approximately 12" and "thematic analysis".</strong> What is missing from each?</li>
+<li><strong>Salvage it.</strong> There is a genuinely good qualitative study available to Kwena here, and it is not the one he proposed. Write its question.</li>
+<li><strong>What does he do about the original question?</strong> It was a reasonable question. Say honestly what becomes of it.</li>
+</ol>
+<p>Work it before you turn over. The point of this one is that choosing a method because your data failed is not the same as choosing it because your question asked for it.</p>
+<details><summary>Compare your thinking - one way through</summary>
+<div class="reveal-content">
+<p><strong>1. What has happened.</strong> <em>He has kept the question and changed the instrument, when the question was the thing that needed to change.</em> His question asks for a relationship between two measured quantities across asset classes - that is a quantitative question, and interviews cannot answer it. He has not chosen a method; he has retreated to one.</p>
+<p><strong>2. The question tested.</strong> It asks for a <strong>quantity</strong> - the relationship between compliance and downtime. Nine planners telling him they believe compliance reduces downtime is not evidence about that relationship; it is evidence about what planners believe. Both are legitimate objects of study. They are not the same object, and his chapter would be claiming one while holding the other.</p>
+<p><strong>3. "Allows for richer insight".</strong> It could be written about any qualitative study of any topic - which means it is not a justification, it is a genre. A justification names <em>this</em> question, says what kind of answer it needs, and says what the rejected alternatives would have produced instead. Nothing in his sentence would change if the topic changed completely, and that is the test it fails.</p>
+<p><strong>4. The two placeholders.</strong> "Approximately 12" has no selection logic - twelve <em>who</em>, chosen how, covering what range, and stopping when? "Thematic analysis" names a family of methods without saying how he gets from a transcript to a theme, whether anybody else reads the data, or what evidence will appear beside each claim. Both are the correct words with the work still to be done behind them.</p>
+<p><strong>5. The study that is actually there.</strong> Look again at his data problem, because it <em>is</em> his finding: the compliance field is populated 31 per cent of the time. Somebody decides, work order by work order, whether to fill it in. So: <strong>"How do maintenance planners and supervisors decide what to record on a work order, and what shapes those decisions?"</strong> That is a genuine question about meaning, it is answerable by interview, nobody has asked it, and it explains a data-quality problem that every plant has and almost nobody investigates. He has been standing on his study for two months while trying to get around it.</p>
+<p><strong>6. The original question.</strong> It stays alive, and it becomes future work - honestly stated: it cannot be answered from this dataset because compliance is recorded for 31 per cent of work orders and downtime definitions changed twice. <em>That sentence is a contribution.</em> The next person who proposes this study at this plant will read it and know, in year zero, what he found out in year one.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Watch for the traps &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The method is sound. A few traps catch almost everyone applying it for the first time. Glance through these before you trust your own draft.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Choosing a qualitative method because the quantitative data failed, not because the question asked for it.</strong> Retreating to an instrument is not the same as choosing one - test the question against quantity, mechanism, or meaning first.</p>
+<p>&bull; <strong>Justifying the choice with a genre phrase.</strong> &quot;Allows for richer insight&quot; would fit any topic. A real justification names this question and what the rejected alternatives would have produced instead.</p>
+<p>&bull; <strong>Leaving the sample and the analysis as placeholders.</strong> &quot;Approximately 12&quot; and &quot;thematic analysis&quot; are the right words with the work still to be done behind them - say who, chosen how, and how a transcript becomes a theme.</p>
+<p>&bull; <strong>Deciding the stopping rule after the interviews are already under way.</strong> Decided in advance it is a discipline. Decided afterwards it is indistinguishable from stopping when you were tired, or when the answers had started agreeing with you.</p>
+</div>
+</details>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Tell a question that wants a quantity from one that wants a meaning. Justify one approach by naming what the rejected ones would have produced. Select participants for coverage and state a stopping rule in advance. Describe an analysis somebody else could follow. And name what you owe the people who agreed to talk to you.</p>
+<p>Adaeze's 41 per cent was never going to become a reason, however many years of records she added to it.</p>
+<p><strong>The records tell you what happened. They were never asked to know why, and they will not tell you that they cannot.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

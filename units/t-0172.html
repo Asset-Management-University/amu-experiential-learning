@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The proof of concept worked. Fourteen months ago.</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The proof of concept worked. Fourteen months ago.</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The proof of concept worked.</p>
+<p>You are Onalenna, and it genuinely did. The model predicted the pump failures, the data team demonstrated it, the room was impressed, and somebody used the word <em>transformative</em>.</p>
+<p>That was fourteen months ago, and it has not moved since. It is a notebook on somebody's laptop, run by hand when anyone asks - which is now nobody.</p>
+<p>So you go looking for the villain, and there isn't one. Nothing failed. Nobody dropped anything. What you find instead is a series of absences: there was never a definition of what the model had to achieve to justify the next step, so "it worked" meant whatever anyone wanted it to mean. Nobody was ever named as its owner. The data it needs was assembled by hand for the demonstration and nobody ever built the pipeline that would feed it in production. And nobody can tell you who would be accountable if it were wrong about a pump.</p>
+<p>It is not a failed project. It is a project that was never actually <em>started</em> - and when you open the drawer, there are three more exactly like it.</p>
+<blockquote><h2>My proof of concept succeeded and then died quietly, and I cannot even say what went wrong. How do I take one AI application from proof of concept through pilot to production - and govern it once it is live?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The proof of concept worked. Everybody was pleased. That was <strong>fourteen months ago</strong> and nothing has happened since. Looking into it now: the data it ran on was assembled by hand for the demonstration and nobody ever built anything that would supply it continuously; no one owns it; and nobody can tell you who would be accountable if it were wrong about a pump. The technology was never the problem — it worked. And when you open the drawer, there are <strong>three more exactly like it</strong>. Write down how you would take something like this from demonstration to a working capability — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what the gates are actually testing</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Get funding to productionise it.&rdquo;</strong> Money aimed at a project nobody owns, feeding on data nobody supplies, for a decision nobody has said it changes. You would build the thing and it would join the other three.</p>
+<p>&bull; <strong>&ldquo;Improve the model — get the accuracy higher first.&rdquo;</strong> The model was never what stopped it. This is the most comfortable answer because it is the part your team knows how to do.</p>
+<p>&bull; <strong>&ldquo;Find out who killed it.&rdquo;</strong> Nobody did. There is no decision anywhere to point at — which is the actual finding, and it is worse than a rejection, because a rejection at least happened.</p>
+<p>&bull; <strong>&ldquo;Run another proof of concept, better this time.&rdquo;</strong> Would produce a fifth item for the drawer. You already have four demonstrations that something is possible, and zero of anything else.</p>
+<p>&bull; <strong>&ldquo;Buy a supported product instead of building.&rdquo;</strong> Legitimate, and it changes nothing about the gap: a bought product still needs somebody to own it, a supply of data, and a named person accountable when it is wrong.</p>
+<p>&bull; The reframe: <strong>this is not a failed project, it is a project that was never actually started.</strong> A demonstration and a working capability are different objects, and only the first was built. So make the gates test <strong>the organisation rather than the technology</strong>. Each stage answers a genuinely different question — whether the thing is <strong>possible</strong>, on real data rather than a sample somebody prepared; whether it is <strong>useful</strong> to real people in real conditions, meaning they actually change what they do; and whether it can be <strong>sustained</strong>, which is a question about ownership, data supply and accountability, not about performance. Two disciplines make that real. <strong>Name the decision it must change first</strong> — who makes it today, on what basis, what they would do differently — because something that changes no decision cannot succeed however good it is. And <strong>write each stage's success criteria before anything is built</strong>: criteria written afterwards are always the criteria the thing happens to meet, which is precisely how four proofs of concept came to be declared successful and go nowhere.</p>
+</div>
+</details>
+<p>You build the machine around it, not just the model. Here it is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the AI product roadmap - three stages, the gates between them, and the governance that keeps it alive.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Name the decision, and write the success criteria BEFORE anything is built</div><p class="cb-demo">Start with the DECISION, not the model. Which decision does this application change, who makes it today, on what information, and what would they do differently? An application that changes no decision cannot succeed, however good the model. Then write the SUCCESS CRITERIA FOR EVERY STAGE BEFORE ANYTHING IS BUILT - because the single MOST FREQUENT cause of industrial AI failure is UNCLEAR SUCCESS CRITERIA DEFINED AT PoC START, ahead of data quality problems, stakeholder misalignment and governance gaps. Criteria written afterwards are always the criteria the model happens to meet, which is why so many proofs of concept are declared successful and go nowhere. Here: the decision is which pumps to intervene on this week; it is currently made from a calendar and a maintenance planner&#039;s judgement; and the criteria for leaving the PoC stage are written now, in advance, and agreed by the person who makes that decision today.</p></div><div class="canvas-box"><div class="cb-label">2. Three stages, three different questions - and gates on ORGANISATIONAL readiness</div><p class="cb-demo">Each stage answers a DIFFERENT question. The PROOF OF CONCEPT proves the thing is POSSIBLE on real data - not on a clean sample somebody prepared. The PILOT proves it is USEFUL to real users in real conditions - do the people who make the decision actually change what they do, and does the outcome improve? PRODUCTION proves it is SUSTAINABLE - it runs without heroics, on a pipeline that exists, watched by somebody whose job it is. AND HERE IS THE MOVE THAT MATTERS: THE GATES TEST ORGANISATIONAL READINESS, NOT MODEL ACCURACY. Is there a production data pipeline or was the data assembled by hand? Is there a named owner? Is there a monitoring plan? Is there an approved retraining route? Accuracy gates never kill anything, because accuracy is almost never why these applications die - the failures are coordination breakdowns, ownership ambiguity and inadequate monitoring, which are invisible at PoC scale and fatal at production scale.</p></div><div class="canvas-box"><div class="cb-label">3. Why gating early is worth real money</div><p class="cb-demo">Put money on it. A proof of concept costs about R150,000, a pilot R600,000, and a production deployment R2.4m. The industry ratio is stark: ONLY 4 OUT OF 33 PROTOTYPES REACH PRODUCTION. So carry every PoC into pilot and you spend 33 x R150k + 33 x R600k + 4 x R2.4m = R34.35m. Put a READINESS GATE after the PoC so that only 10 of the 33 proceed, and you spend 33 x R150k + 10 x R600k + 4 x R2.4m = R20.55m. THE SAVING IS R13.80m, AND THE SAME FOUR REACH PRODUCTION. Read that carefully, because it is the whole economic argument: THE GATE DOES NOT CREATE WINNERS. It stops you paying pilot money for losers. And since the most frequent cause of failure is a criteria failure at the very start, the gate that saves the money is one you have to write before you build anything at all.</p></div><div class="canvas-box"><div class="cb-label">4. Governance, part one - who owns it, and who is accountable</div><p class="cb-demo">Ownership ambiguity is one of the named killers, so split it explicitly. BUSINESS UNITS OWN AI PRODUCTION PERFORMANCE; IT OWNS THE INFRASTRUCTURE it runs on. And one NAMED BUSINESS OWNER is accountable for: defining the acceptable performance thresholds, reviewing the monthly KPI report, APPROVING MODEL RETRAINING DECISIONS, and escalating governance concerns. A name, not a department. Then the question most roadmaps avoid entirely. ACCOUNTABILITY IS NOT AUTOMATABLE. AN AI MODEL IN A CRITICAL SYSTEM PROVIDES ANALYSIS AND RECOMMENDATIONS; IT DOES NOT MAKE DECISIONS. A NAMED HUMAN, THE DESIGNATED BUSINESS OWNER, REMAINS 100 PER CENT ACCOUNTABLE FOR ANY OPERATIONAL DECISION INFLUENCED BY THE MODEL&#039;S OUTPUT. THE PHRASE &#039;THE MODEL SAID SO&#039; IS NEVER AN ACCEPTABLE JUSTIFICATION FOR AN OUTCOME. THE GOVERNANCE PLAN MUST EXPLICITLY DOCUMENT THE HUMAN-IN-THE-LOOP WORKFLOW AND THE FINAL HUMAN DECISION AUTHORITY.</p></div><div class="canvas-box"><div class="cb-label">5. Governance, part two - life after launch</div><p class="cb-demo">A model is not a deliverable, it is an asset with a life, and it decays. DRIFT MONITORING is not optional: without proper practice, 40 PER CENT OF MODELS EXPERIENCE DRIFT WITHIN MONTHS as the plant, the duty or the data changes underneath them. So state what is monitored, how often, and the threshold that triggers action. State the RETRAINING TRIGGER and WHO APPROVES IT - the business owner, not whoever notices. State that the PRODUCTION DATA PIPELINE must exist and be owned, because a pilot that ran on data assembled by hand has proved nothing about whether this can run on a Tuesday when its author is on leave. And write the RETIREMENT CRITERION, which almost nobody does: the condition under which this application is switched OFF deliberately, because a model that no longer earns its keep should be retired by decision rather than left running unwatched, quietly influencing decisions nobody is checking.</p></div></div>
+
+<p>Box 2 holds the idea that changes everything: the gates test whether the <em>organisation</em> is ready, not whether the model is accurate. Every one of the absences in that drawer would have been caught by a gate. None of them would have been caught by a better model. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>An industrial AI application does not fail because the model is not accurate enough. It fails because nobody defined what <em>good enough</em> meant before it was built, nobody owns it once it is live, and nothing watches it decay. Five questions:</p>
+<ul>
+<li><strong>What decision does this change?</strong> Name it, name who makes it today, and write the <strong>success criteria for every stage before anything is built</strong> - because the most frequent cause of failure is unclear success criteria set at proof-of-concept start, and criteria written afterwards are the ones the model happens to meet.</li>
+<li><strong>What does each stage prove?</strong> <strong>Proof of concept</strong>: it is possible on real data. <strong>Pilot</strong>: it is useful to real users in real conditions. <strong>Production</strong>: it is sustainable. And the <strong>gates test organisational readiness</strong> - pipeline, owner, monitoring, retraining route - not model accuracy, which is almost never why these die.</li>
+<li><strong>Why gate early?</strong> Because the same few reach production either way, and everything else is pilot money spent on applications that were never going to survive.</li>
+<li><strong>Who owns it?</strong> Business units own production performance, IT owns the infrastructure, and one <strong>named business owner</strong> is accountable for thresholds, the monthly report, retraining approval and escalation.</li>
+<li><strong>What happens after launch?</strong> <strong>Drift monitoring</strong> - 40 per cent of models drift within months without proper practice - a retraining trigger with a named approver, a production data pipeline that actually exists, and a <strong>retirement criterion</strong>.</li>
+</ul>
+<p><strong>The principle this unit will not soften.</strong> Accountability is not automatable. An AI model in a critical system provides analysis and recommendations; it does not make decisions. A named human, the designated Business Owner, remains 100 per cent accountable for any operational decision influenced by the model's output. The phrase "the model said so" is never an acceptable justification for an outcome. The governance plan must explicitly document the human-in-the-loop workflow and the final human decision authority.</p>
+<p>One honest boundary. You are designing the roadmap and governance for <em>one</em> application. You are not building the model, not evaluating its monetary value in detail, and not sequencing the enterprise portfolio of which it is one candidate. That portfolio question - which initiatives, in what order - is a different technique, and an organisation with dozens of stalled pilots is usually missing both: no portfolio view, and no disciplined lifecycle for the individual applications inside it.</p>
+<p>Does it scale? A new medicine that works in the laboratory is not a treatment. Between the result and the patient sit trials that prove it works in real bodies, a manufacturing process that can make it reliably, a named prescriber who remains responsible for the decision, and surveillance that keeps watching after approval - and the laboratory result is the cheapest and least significant part of that chain. Your notebook is the laboratory result.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A water utility has completed a proof of concept for an AI application that reads CCTV footage of sewer inspections and flags defects for an engineer to review. The PoC classified defects on 400 archived videos with reasonable agreement against an expert's assessment. The data team is asking for funding to take it further.</p>
+<p>Today, every inspection video is watched end to end by a qualified inspector, who records defects and assigns a severity grade that drives repair prioritisation.</p>
+<ol>
+<li><strong>The decision.</strong> Name the decision this application changes, who makes it today, and what they would do differently. Then say what would have to be true for this to be worth doing at all.</li>
+<li><strong>Gate criteria.</strong> Write two gate criteria for leaving the PoC stage and two for leaving the pilot stage. At most one of your four may be about model performance.</li>
+<li><strong>Ownership.</strong> Assign ownership across business and IT, and name what the business owner is accountable for.</li>
+<li><strong>Life after launch.</strong> State what you would monitor for drift on this particular application, and what would trigger retraining.</li>
+<li><strong>Accountability.</strong> An inspector accepts the model's grading and a defect is missed. Say who is accountable and how your governance plan makes that clear in advance.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three ways to go wrong.</p>
+<p>First, in step 2, notice the constraint and take it seriously. If you found it hard to write three non-performance gate criteria, that difficulty <em>is</em> the lesson - it is exactly why organisations build accuracy gates that never stop anything and then wonder why their pilots stall. Ask instead: is there a pipeline that can receive video automatically? Who reviews the flags? What happens on the day it is unavailable?</p>
+<p>Second, in step 4, think about what would make this specific model drift. New camera equipment. A different crawler. Contractors filming in a different style. A new pipe material appearing in the network. Drift is rarely the model changing; it is the world arriving in a form the model never saw.</p>
+<p>Third, step 5 is the one that decides whether this application can be deployed at all. If your answer is that the model was wrong, you have not answered. The inspector accepted it, the business owner set the thresholds and the workflow, and the organisation chose to put a recommendation in front of a human. Say plainly where accountability rests - ultimately with the business owner who owns the system, not just the operator who used it - and what the governance plan told everybody in advance - because working that out after a missed defect is far too late, and "the model said so" will not survive a single question.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-decision_and_criteria">1. Name the decision, and write the success criteria BEFORE anything is built</label><textarea id="cb-decision_and_criteria" data-key="t-0172:decision_and_criteria" placeholder="State which decision this application changes, who makes it today, and what must be true at each stage for it to proceed - written before a model exists."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-three_stages_gates">2. Three stages, three different questions - and gates on ORGANISATIONAL readiness</label><textarea id="cb-three_stages_gates" data-key="t-0172:three_stages_gates" placeholder="PoC proves it is possible, pilot proves it is useful, production proves it is sustainable - and each gate tests whether the organisation is ready, not whether the model is accurate."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-gating_arithmetic">3. Why gating early is worth real money</label><textarea id="cb-gating_arithmetic" data-key="t-0172:gating_arithmetic" placeholder="Cost the stages and compare gating after the proof of concept against carrying everything into pilot."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-governance_ownership">4. Governance, part one - who owns it, and who is accountable</label><textarea id="cb-governance_ownership" data-key="t-0172:governance_ownership" placeholder="Split ownership explicitly, name the accountable business owner, and state who is accountable for a decision the model influences."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-governance_life_after_launch">5. Governance, part two - life after launch</label><textarea id="cb-governance_life_after_launch" data-key="t-0172:governance_life_after_launch" placeholder="Plan for drift, retraining approval, the production data pipeline, and the criterion for switching it off."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now get an application out of the drawer and keep it alive.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Industrial AI fails in a small number of well-documented ways, and almost none of them are about the model.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>No success criteria before building.</strong> The single most frequent cause. "It worked" then means whatever the room wants it to mean.</p>
+<p>&bull; <strong>Criteria written after the proof of concept.</strong> They will be the criteria the model met. That is not a gate, it is a certificate.</p>
+<p>&bull; <strong>Gates that test accuracy.</strong> They never stop anything, because accuracy is not what kills these applications.</p>
+<p>&bull; <strong>A pilot running on hand-assembled data.</strong> It proves the model and nothing about whether this can run on a Tuesday when its author is on leave.</p>
+<p>&bull; <strong>Nobody named as owner.</strong> Ownership ambiguity is one of the documented killers, and a department is not an owner.</p>
+<p>&bull; <strong>No drift monitoring.</strong> Around 40 per cent of models drift within months. An unwatched model does not stop being wrong; it stops being noticed.</p>
+<p>&bull; <strong>Retraining with no named approver.</strong> Either it never happens, or it happens quietly and nobody knows the model changed.</p>
+<p>&bull; <strong>No answer to who is accountable when it is wrong.</strong> Then the application cannot responsibly be deployed, and finding that out after an incident is the worst possible moment.</p>
+<p>&bull; <strong>No retirement criterion.</strong> Models outlive their usefulness and keep influencing decisions nobody is checking.</p>
+<p>&bull; <strong>Carrying every proof of concept into pilot.</strong> This is where the money actually goes, and the gate that prevents it costs nothing but honesty at the start.</p>
+</div>
+</details>
+<p>Onalenna's proof of concept worked and then sat in a drawer for fourteen months, with three more beside it. Name the decision the application changes and write the success criteria before anything is built, because the commonest failure happens before a model exists; understand what each stage proves and gate on organisational readiness rather than accuracy; gate early, because the same few reach production either way and everything else is pilot money spent on applications that were never going to survive; split ownership and name one accountable business owner; and plan for life after launch - drift, retraining approval, a real pipeline, and the criterion for switching it off. A model is not a deliverable; it is an asset with a life. And accountability is not automatable: the model recommends, a named human decides, and "the model said so" is never an answer. If you are working with an AMU Facilitator, find a stalled pilot in your own organisation and ask just two questions of it - what were its success criteria, and who owns it?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can get it out of the drawer now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where are your results?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Where are your results?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Adaeze. The study is done. The chapter is 12,000 words and it took you eleven weeks.</p>
+<p>Your supervisor has returned it with one comment, on page 1.</p>
+<blockquote><p>Where are your results?</p></blockquote>
+<p>They are <em>in</em> it. Section 4.3, pages 41 to 58, twenty-one figures, every number you spent a year collecting.</p>
+<p>You read it again, slowly, and about halfway down page 44 you stop, because you can see it. The methods run into the results, which run into what you think it all means. A figure appears on page 46 answering a question you have not asked yet. On page 50 there is a sentence reading "wear was 49 mm, which shows the interaction is significant" - and you cannot tell any more which half of that you measured and which half you concluded.</p>
+<p>The work is sound. Every number in it is right. And a reader cannot get at any of it.</p>
+<blockquote><h2>Everything I found is in this chapter and my supervisor could not find it. How do I structure a piece of research writing so that a reader can tell what I did from what I found from what I think it means?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Your supervisor has written in the margin: <em>where are your results?</em> They are in there. Method runs into finding runs into what you think it all means; a figure appears on <strong>page 46</strong> answering a question you have not asked yet; and on page 50 there is a sentence reading <em>&ldquo;wear was 49 mm, which shows the interaction is significant&rdquo;</em> — and rereading it now, <strong>you cannot tell which half you measured and which half you concluded.</strong> The work is sound. Every number in it is right. And a reader cannot get at any of it. Write down how you would structure this — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what the structure is actually protecting</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Add headings and signposting.&rdquo;</strong> Labels over an unchanged flow. If a paragraph contains method and interpretation together, putting a heading above it tells the reader which one to expect and delivers both.</p>
+<p>&bull; <strong>&ldquo;Write a summary at the front so they can find the findings.&rdquo;</strong> Helps this one reader once and leaves the body unnavigable — and your supervisor's question will simply move to the summary.</p>
+<p>&bull; <strong>&ldquo;Rewrite it from scratch, properly this time.&rdquo;</strong> Weeks of work, and without knowing what you have actually written you will reproduce the same fusion in better prose.</p>
+<p>&bull; <strong>&ldquo;Move the figures to an appendix.&rdquo;</strong> Removes the evidence from where it is needed and answers a question about placement rather than about which claims rest on what.</p>
+<p>&bull; <strong>&ldquo;It is all there — they should read it more carefully.&rdquo;</strong> They read it and could not find it. And note the sharper problem: <strong>you have just reread your own sentence and could not separate the measurement from the conclusion.</strong></p>
+<p>&bull; Do not rewrite yet. <strong>Find out what you have actually written</strong>, because it is almost never what you think. Take it paragraph by paragraph and put each into exactly one of four bins: why it matters and what is being asked; what was done; what was found; what it means. <strong>Then count the words in each</strong>, and the counts will tell you something the reading did not — it is usual to find the part carrying your actual contribution is the smallest thing in the document, dwarfed by context and procedure that exist only to make it possible. But <strong>the more useful half of the exercise is listing the paragraphs that will not go into any single bin</strong>, because that is exactly where the fusing happened. Your page-50 sentence is one: it measures and concludes in the same breath, and no amount of better prose fixes it — only separating the two claims. And here is what the structure is really protecting: <strong>your reader's ability to disagree with you.</strong> Kept apart, somebody can accept what you did, accept what you found, and reject what you say it means. <strong>Fused, they must take or leave the whole thing — and a wrong conclusion drags sound data down with it.</strong></p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the restructure - sorting what you already wrote, the introduction that narrows, methods somebody could repeat, results without interpretation, and a discussion given the room to carry the contribution.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Sort every sentence you have written into one of four bins - and look hard at the ones that will not go</div><p class="cb-demo">&lt;strong&gt;Before rewriting anything, find out what you have actually written, because it is almost never what you think.&lt;/strong&gt; Take the draft paragraph by paragraph and put each one in exactly one of four bins. &lt;strong&gt;Introduction&lt;/strong&gt; - why this matters and what question is being asked. &lt;strong&gt;Methods&lt;/strong&gt; - what was done. &lt;strong&gt;Results&lt;/strong&gt; - what was found. &lt;strong&gt;Discussion&lt;/strong&gt; - what it means. &lt;strong&gt;Then count the words, because the counts will tell you something the reading did not.&lt;/strong&gt; Mine, in a 12,000-word chapter: &lt;strong&gt;introduction 4,200; methods 1,100; results 5,900; discussion 800.&lt;/strong&gt; &lt;strong&gt;Look at that last figure. The discussion is 800 words - under 7 per cent of the chapter - and it is the only part that contains my actual contribution.&lt;/strong&gt; Everything else is context, procedure and data, all of which exist to make the discussion possible. &lt;strong&gt;Now the more useful half of this exercise: list the paragraphs that would not go in any single bin.&lt;/strong&gt; I had eleven. Every one of them was a result with an interpretation attached in the same sentence - &#039;wear was 49 mm, which shows the interaction is significant&#039;. &lt;strong&gt;That sentence is two sentences pretending to be one, and it is the single commonest structural fault in engineering writing.&lt;/strong&gt; The reader cannot separate what the instrument measured from what the author concluded, so they must either take both or refuse both.</p></div><div class="canvas-box"><div class="cb-label">2. Introduction: narrow from the field to your one question - and cite as you narrow</div><p class="cb-demo">&lt;strong&gt;An introduction has one shape and it is a funnel. It starts wide enough that a reader outside your speciality can enter, and it ends on your question - and nothing else.&lt;/strong&gt; Four movements, each shorter than the one before. &lt;strong&gt;The field:&lt;/strong&gt; why conveyor availability matters at a bulk terminal, in a paragraph. &lt;strong&gt;What is established:&lt;/strong&gt; seasonal effects on roller life have been observed, and here the citations do real work. &lt;strong&gt;Where the established knowledge stops:&lt;/strong&gt; carry-back has been proposed as the mechanism but has not been measured alongside failure rate at the same site. &lt;strong&gt;The question, stated once, plainly, as the last thing before the methods.&lt;/strong&gt; &lt;strong&gt;Now citation, and there are only three rules worth memorising.&lt;/strong&gt; &lt;strong&gt;Every claim about what is known carries a source&lt;/strong&gt; - if a sentence says something is the case in the world and has no citation, either you are claiming to have established it or you are hoping nobody asks. &lt;strong&gt;Cite what you read&lt;/strong&gt;, not what you found cited in something else; if you cannot get the original, say so in the citation rather than pretending. &lt;strong&gt;And one style, applied identically everywhere, linking every in-text citation to a full entry in your reference list.&lt;/strong&gt; Which style you use matters less than this: a reader must be able to go from any claim to its source without effort. &lt;strong&gt;Every one of those rules protects the same thing: the reader&#039;s ability to check you.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. Methods: written so somebody else could do it - past tense, and no results in it</div><p class="cb-demo">&lt;strong&gt;The test for a methods section is not whether it is clear. It is whether a competent stranger could repeat the study from it and get comparable data.&lt;/strong&gt; That is a higher bar and it is the one an examiner applies. &lt;strong&gt;Write it in the past tense and in the order it happened:&lt;/strong&gt; what was sampled and over what period, what was measured and with what instrument, how the data was prepared, what was excluded and why, what analysis was applied. &lt;strong&gt;My exclusions belong here, not hidden in a footnote&lt;/strong&gt; - the work orders that could not be classified, and how many. &lt;strong&gt;Then run the one check that matters.&lt;/strong&gt; Read the section looking only for findings, and remove every one. It is remarkably easy to write &#039;three years of records were extracted, showing a clear seasonal pattern&#039; - and that second clause is a result, in the methods, where the reader is not yet equipped to judge it. &lt;strong&gt;Methods say what you did. They do not say what happened, and they never say whether it worked.&lt;/strong&gt; &lt;strong&gt;And a methods section that is too short is usually a study that cannot be checked.&lt;/strong&gt; Mine at 1,100 words was not concise. It was missing the exclusion criteria, the instrument, and the definition of a failure - which are exactly the three things a reader would need in order to disagree with me.</p></div><div class="canvas-box"><div class="cb-label">4. Results: what you found, with nothing added - and every figure earning its place</div><p class="cb-demo">&lt;strong&gt;Results are what the study produced, reported without interpretation, in the order your question needs rather than the order you obtained them.&lt;/strong&gt; This is harder than it sounds, because the interpretation is what you find interesting and it will keep arriving. &lt;strong&gt;Report the finding and stop:&lt;/strong&gt; &#039;Wear depth was 49 mm at the combined setting against a predicted 37 mm.&#039; Not &#039;only 49 mm&#039;, not &#039;disappointingly&#039;. &lt;strong&gt;The adverbs are the discussion leaking backwards.&lt;/strong&gt; &lt;strong&gt;Now the figures, and this is where a results section is usually rescued.&lt;/strong&gt; I had &lt;strong&gt;21&lt;/strong&gt;. I applied one rule: &lt;strong&gt;each figure must answer a question that the introduction actually asked.&lt;/strong&gt; &lt;strong&gt;Eight did. Thirteen were &#039;here is some data I collected&#039;&lt;/strong&gt; - true, honest, hard-won, and answering nothing the reader has been prepared to care about. &lt;strong&gt;Those thirteen went to an appendix, where they remain available to anybody who wants them and stop obstructing the eight that carry the argument.&lt;/strong&gt; &lt;strong&gt;Cutting them was the most uncomfortable hour of the chapter and it improved the chapter more than any other hour in it.&lt;/strong&gt; A figure that is not answering a stated question is asking the reader to do your work.</p></div><div class="canvas-box"><div class="cb-label">5. Discussion: what it means, what it does not, and what the next person should know - and give it the room</div><p class="cb-demo">&lt;strong&gt;Fix the budget first, because the structure follows the space you allow.&lt;/strong&gt; From &lt;strong&gt;4,200 / 1,100 / 5,900 / 800&lt;/strong&gt; to &lt;strong&gt;2,400 / 2,400 / 3,600 / 3,600&lt;/strong&gt; - the same 12,000 words, with the introduction cut almost in half, the methods more than doubled so the study can be checked, and &lt;strong&gt;the discussion given four and a half times the space it had.&lt;/strong&gt; &lt;strong&gt;Now four things go in it, in this order.&lt;/strong&gt; &lt;strong&gt;The answer to your question, in the first paragraph&lt;/strong&gt; - a reader should not have to hunt for it, and putting it last is a habit borrowed from detective fiction. &lt;strong&gt;How it sits with what was known:&lt;/strong&gt; the seasonal effect is consistent with the humid-tropical studies, and the carry-back association is new because nobody had measured the two together. &lt;strong&gt;What limits it, written by you:&lt;/strong&gt; one terminal, association rather than cause, and temperature not separable from moisture. &lt;strong&gt;And what the next person should do&lt;/strong&gt; - which is the paragraph that most repays the effort, because it is where a chapter stops being an account of your year and becomes something somebody else can build on. &lt;strong&gt;Write it as though the reader is a person about to spend a year of their life on this.&lt;/strong&gt; They are.</p></div></div>
+
+<p>Box 1 is where the diagnosis happens, and box 5 is where the word budget makes the structure possible. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>The four-part structure is <strong>not a formatting convention. It is a promise to the reader that they can tell what you did from what you found from what you concluded - and it is enforced by keeping the three apart.</strong> Five moves:</p>
+<ul>
+<li><strong>Sort what you already have.</strong> <strong>Four bins, and a word count.</strong> The paragraphs that refuse to be sorted are almost always a result with an interpretation welded to it.</li>
+<li><strong>The introduction narrows.</strong> <strong>Field, established, where it stops, your question</strong> - ending on the question and nothing after it. Citations do their work here.</li>
+<li><strong>Methods are repeatable.</strong> <strong>Past tense, no findings.</strong> The test is whether a competent stranger could repeat the study and get comparable data.</li>
+<li><strong>Results carry no interpretation.</strong> <strong>And every figure answers a question the introduction asked.</strong></li>
+<li><strong>The discussion needs room.</strong> <strong>Rebalance the budget, then: the answer first, how it sits, what limits it, what next.</strong></li>
+</ul>
+<p><strong>The arithmetic that makes the argument.</strong> The draft was <strong>4,200 / 1,100 / 5,900 / 800</strong>. That is 35 per cent introduction, 9 per cent methods, 49 per cent results, and <strong>under 7 per cent discussion</strong> - and the discussion is the only section containing the contribution. The rebalance, in the same 12,000 words: <strong>2,400 / 2,400 / 3,600 / 3,600</strong>. The introduction halves, the methods more than double so the study can be checked, and <strong>the discussion gets four and a half times the space it had</strong>. Nothing was added. The chapter was re-proportioned to match what each section is for.</p>
+<p><strong>The sentence that is two sentences.</strong> "Wear was 49 mm, which shows the interaction is significant." The first clause is a measurement and the second is a conclusion, and joining them with a comma asks the reader to accept both or reject both. Split them, put them in different sections, and the reader can do what a reader is entitled to do: accept your measurement and argue with your conclusion. <em>Most disagreements in engineering are about the second half. Writing that lets somebody reach it is not a weakness in your case - it is the reason your case can be trusted.</em></p>
+<p><strong>The thirteen figures.</strong> One rule cut them: each figure must answer a question the introduction actually asked. Eight did. Thirteen were data, honestly collected and answering nothing the reader had been prepared to care about, and they went to an appendix where they remain available. This was the most uncomfortable hour in the chapter. <em>A figure that is not answering a stated question is asking the reader to do your work for you.</em></p>
+<p><strong>An honest boundary.</strong> This gives you a structure and the citation discipline that goes with it. It does not make the underlying work good - a well-structured account of a weak study is a well-structured account of a weak study. It does not cover every publication format; some journals and some disciplines want something different, and where they do, they say so and you follow them. And it is not a substitute for reading papers in your own field and noticing how they are built.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Zanele's chapter has the opposite problem. Her structure is immaculate.</p>
+<table>
+<tr><th>Section</th><th>Words</th><th>What is in it</th></tr>
+<tr><td>Introduction</td><td>2,600</td><td>Funnels correctly. Ends on a clearly stated question. Well cited</td></tr>
+<tr><td>Methods</td><td>2,900</td><td>Thorough. A stranger could repeat it. No findings anywhere in it</td></tr>
+<tr><td>Results</td><td>3,900</td><td>Clean. No interpretation. Nine figures, each answering a stated question</td></tr>
+<tr><td>Discussion</td><td>2,600</td><td>See below</td></tr>
+</table>
+<p>Her discussion, in order: a summary of what she did (600 words); a restatement of the results (700 words); a paragraph noting that the findings "are in line with the literature", citing four papers (200 words); a limitations section (500 words); and a closing paragraph saying more research is needed (600 words).</p>
+<p><strong>Her supervisor's comment: "What did you find out?"</strong></p>
+<ol>
+<li><strong>Her budget is correct.</strong> 22 / 24 / 32 / 22 per cent. So why is the comment the same one Adaeze got?</li>
+<li><strong>Diagnose the 600 and the 700.</strong> What are those 1,300 words doing, and what should be in their place?</li>
+<li><strong>"In line with the literature", 200 words, four citations.</strong> Say what is wrong with this - it is the most important defect in the chapter.</li>
+<li><strong>The 500-word limitations section</strong> is genuinely good work. Say why it is not enough on its own.</li>
+<li><strong>"More research is needed", 600 words.</strong> Rewrite the brief for that paragraph - what should it actually contain?</li>
+<li><strong>Rebudget her 2,600-word discussion</strong> across the four things a discussion must do.</li>
+</ol>
+<p>Work it before you turn over. The point of this one is that correct structure is necessary and it is not sufficient - you can put everything in the right room and still not say anything.</p>
+<details><summary>Compare your thinking - one way through</summary>
+<div class="reveal-content">
+<p><strong>1. Why the same comment.</strong> Adaeze's contribution was <em>unfindable</em> because the sections were braided. Zanele's is <em>absent</em> - her discussion section contains no discussion. She has built four correctly labelled rooms and left the most important one empty. <em>Structure is the container. It does not generate the contents.</em></p>
+<p><strong>2. The 1,300 words.</strong> They are a summary of the methods and a restatement of the results - both of which the reader has just finished reading, in the sections designed for them. They are doing nothing, and they are doing it in the most valuable space in the chapter. In their place belongs <strong>the answer to her question, in the first paragraph, in plain words</strong>, followed by what it means for somebody operating a plant.</p>
+<p><strong>3. "In line with the literature".</strong> This is the most important defect because it is where her contribution should be and it is the place she has hurried past. The sentence claims agreement without doing any of the work: <em>in line in what respect, with which of the four papers, and where does she differ?</em> If she genuinely agrees with all four in every respect, she has confirmed what was known and should say so plainly, which is a modest but honest result. And if she does not - if her magnitude is different, or her conditions differ, or one of the four disagrees with the other three - <em>that difference is her finding, and it is currently compressed into four words.</em></p>
+<p><strong>4. The limitations section.</strong> It is good work and it is only half of the pair. Limitations say what your result cannot bear. They do not say what it <em>can</em>. A chapter that carefully bounds a claim it never actually made reads as apologetic - and examiners notice, because it is the signature of a writer more focused on being unassailable than on being understood. State the claim, then bound it. In that order.</p>
+<p><strong>5. "More research is needed."</strong> The brief for that paragraph: <em>name the next study.</em> Its question, why it is the right next one given what you now know, what it would need in access and data, and what you found out this year that would save the person doing it three months. Six hundred words of that is a gift to a stranger. Six hundred words of "more research is needed" is a sentence that could end any chapter ever written on any subject.</p>
+<p><strong>6. A rebudget of the 2,600.</strong> The answer and what it means: <strong>900</strong>. How it sits with the literature, engaged specifically, agreements and differences named: <strong>800</strong>. Limitations, largely as she has them: <strong>400</strong>. The next study, specified: <strong>500</strong>. That is 2,600 - the same words, none added, with 1,300 of them moved from restating what the reader knows to saying what only she knows.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Watch for the traps &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The method is sound. A few traps catch almost everyone applying it for the first time. Glance through these before you trust your own draft.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Welding an interpretation onto a result in the same sentence.</strong> If a paragraph will not sort cleanly into one of the four bins, it is almost always a result wearing a discussion's clothes.</p>
+<p>&bull; <strong>Letting the introduction run long because it feels like scene-setting.</strong> It should narrow to one stated question and stop, not survey the whole field on the way there.</p>
+<p>&bull; <strong>Writing a methods section too short to be repeated.</strong> If a competent stranger could not follow it and get comparable data, it is not finished - and a methods section that short is usually a study that cannot be checked.</p>
+<p>&bull; <strong>Leaving the discussion under-resourced because the word budget was never rebalanced.</strong> The discussion carries the contribution. A starved discussion starves the argument, however good the results are.</p>
+</div>
+</details>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Sort a draft into four bins and find the sentences that refuse. Narrow an introduction to a single question and cite every claim about what is known. Write methods a stranger could repeat, with no findings in them. Report results without adverbs, and make every figure answer a stated question. And give the discussion the room its job requires.</p>
+<p>Adaeze's chapter was sound. Every number in it was right, and it took her eleven weeks. The restructure took four days and added nothing that was not already there.</p>
+<p><strong>A year of work that a reader cannot get at has not yet been communicated - and until it is, it is not yet knowledge, however true it is.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

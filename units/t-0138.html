@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A system running on one person&#039;s conscience</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A system running on one person&#039;s conscience</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and by every ordinary measure you have done this job right. There is a policy. There is a SAMP you built and the board celebrated. There are costed plans, and the work gets done. You are good at this.</p>
+<p>Two years later, a pump station is overwhelmed - the region has outgrown its capacity, badly and suddenly. A board member asks the obvious question: how did we not see this coming? And the answer, when you trace it, is brutal. The region grew faster than the SAMP assumed. But the SAMP was approved once and never looked at again. Decisions quietly drifted away from it, month by month, and <em>nobody caught the drift</em> - because there was no review, no oversight, and no one at board level actually tasked with watching the asset-management system as a system.</p>
+<p>It all rested on you paying attention. And the one thing you could never do, however conscientious you were, was oversee your own work. Good management. Zero governance. And the gap was invisible right up until the moment it wasn't.</p>
+<blockquote><h2>Everything I built works only as long as I personally keep watch - and I cannot check my own work. How do I design the structure that directs this system, oversees it independently, and holds someone to account, so it does not depend on one person's conscience?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The system is good. You built it, it works, and nobody can fault the management of it. You were away for two weeks and something consequential went through unchecked — nothing dramatic, nothing anybody was careless about; it simply passed, because the person who would have caught it was you. You write the plans, you do the work, and you are the only one who checks any of it. Someone senior said last month that the assets are in good hands, and took the fact that it all runs smoothly as evidence that it is being overseen. Write down what is actually missing — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the one thing you can never do</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Be more thorough — build better checks into my routine.&rdquo;</strong> More of the thing that already works, added to the same pair of hands. Every check you design is a check you are also performing, so the dependency is untouched and the exposure is identical.</p>
+<p>&bull; <strong>&ldquo;Document everything so somebody could pick it up.&rdquo;</strong> Genuinely worth doing, and it addresses continuity rather than oversight. Perfect documentation of a system nobody independent is looking at is a well-described blind spot.</p>
+<p>&bull; <strong>&ldquo;Hire an assistant to help carry the load.&rdquo;</strong> More capacity in the same function. Somebody who reports to you and works to your judgement is not in a position to find your errors, however capable.</p>
+<p>&bull; <strong>&ldquo;Bring in an external audit each year.&rdquo;</strong> Closer, and as a stand-alone it is a snapshot from outside with no standing between visits, no authority to decide anything, and nobody accountable for acting on what it finds.</p>
+<p>&bull; <strong>&ldquo;Nothing is wrong — the system works.&rdquo;</strong> It does, and that is precisely why this is invisible. A well-run system looks exactly like a well-governed one from the inside, which is what your senior colleague was reading when he said the assets were in good hands.</p>
+<p>&bull; The flaw is <strong>structural rather than personal</strong>, and it has one sharp form: however conscientious anybody is, <strong>nobody can oversee their own work.</strong> One pair of hands doing the work and checking it gives you excellent management and <strong>zero governance</strong>, and the two get confused because they look identical from within. So separate <strong>running</strong> the system from <strong>directing and overseeing</strong> it, and put them in different hands — the second is a different job, not a more senior version of the first: it sets the direction, approves the plan, and holds the running of it to account. Three things make that real rather than nominal. <strong>Decision rights must be explicit</strong> — who recommends, who approves, who is accountable — because unstated authority collapses straight back onto whoever is most conscientious, which is how you got here. <strong>One named person must be accountable</strong> for the system working, since a responsibility shared by a committee is held by nobody. And <strong>review happens on fixed dates, not when something goes wrong</strong> — a review triggered by trouble is not oversight, it is a reaction, and it arrives after the thing it was supposed to prevent.</p>
+</div>
+</details>
+<p>That structure has a name - governance - and it fits on one page. Here it is, for the water board.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the governance framework and cycle Onalenna should have designed the day the SAMP was approved.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Governance or management? (draw the line, and keep the hats separate)</div><p class="cb-demo">Two different jobs, and they must not be the same hands. MANAGEMENT runs the asset-management system day to day - Onalenna and her team writing plans, doing the work, keeping the plant reliable. GOVERNANCE sits above it: the board sets the direction (the policy), approves the SAMP, and holds management to account for delivering the organisational objectives. The failure at the root of the ache was that these were fused - the person doing the work was the only one watching it. You cannot oversee your own work; nobody can. Separate the hats first, or nothing below matters.</p></div><div class="canvas-box"><div class="cb-label">2. Who is accountable, and who decides what? (roles, decision rights, the AM Council charter)</div><p class="cb-demo">THE GOVERNING BODY (the regional water board): sets policy, approves the SAMP, holds management to account. THE AM COUNCIL: a cross-functional steering group - operations, finance, engineering - that coordinates asset direction; its CHARTER, one line: &#039;purpose - align asset decisions to the SAMP; members - heads of ops/finance/engineering; authority - recommends the SAMP and prioritises the capital programme; meets quarterly.&#039; THE AM SYSTEM OWNER: one named senior person accountable for the system working. DECISION RIGHTS made explicit: the Council RECOMMENDS the SAMP; the board APPROVES it; the system owner is CONSULTED; the plant is INFORMED. No one should have to guess who decides.</p></div><div class="canvas-box"><div class="cb-label">3. How does the board KNOW it is working - independently? (the three lines)</div><p class="cb-demo">The three lines model. FIRST LINE: management runs the assets and owns the risks (Onalenna&#039;s team). SECOND LINE: oversight functions - risk, compliance, safety - that monitor and advise. THIRD LINE: an INDEPENDENT internal audit that reports straight to the board, not through management. The point of the third line is brutal and necessary: if every assurance the board receives comes through the people being assured about, the board is blind. Independent audit is how a mistake at the wheel gets caught by someone who is not steering.</p></div><div class="canvas-box"><div class="cb-label">4. On what schedule is it reviewed? (the governance cycle - with dates, not good intentions)</div><p class="cb-demo">The rhythm that would have prevented the ache. QUARTERLY: a performance report to the board against the SAMP objectives. ANNUALLY: a formal management review of the whole asset-management system - is it delivering, what has changed, what must adjust. EVERY ~5 YEARS: a strategic refresh of the SAMP itself, because a 20-year plan cannot be a set-and-forget document. These are SCHEDULED DATES in the calendar, not &#039;when someone remembers&#039;. A governance cycle with no dates is not a cycle - it is a hope, and the SAMP went stale on exactly that hope.</p></div><div class="canvas-box"><div class="cb-label">5. When it misses, who acts - and does it close? (the accountability loop)</div><p class="cb-demo">A finding with no owner is a finding that recurs. When the quarterly report shows an objective slipping, or the third line raises a gap, it becomes a corrective action with a NAMED owner, a defined action, and a DEADLINE - logged, tracked, and reported back to the board as closed or not. The stale SAMP would have been flagged at the first annual review, given an owner, and refreshed - the loop would have caught it a year before the pump station was overwhelmed. Governance is not the paperwork; it is the guarantee that a known problem cannot quietly stay open.</p></div></div>
+
+<p>Notice that Onalenna's name barely appears - and that is the whole point. Every box builds a structure that works whether or not any one person is paying attention: someone other than the doer checks the work, someone independent tells the board the truth, the reviews happen on fixed dates, and a known problem cannot quietly stay open. This is a system given a conscience of its own.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Everything here rests on one distinction, and if you get it wrong nothing else works. <strong>Management</strong> runs the system - does the work, keeps the plant reliable. <strong>Governance</strong> directs and controls it - sets the direction, provides oversight, and holds management to account for delivering the organisation's objectives. Governance is the mind; management is the hands; and the failure in the ache was that they were the same person. Five questions build it:</p>
+<ul>
+<li><strong>Who directs and oversees this, versus who runs it?</strong> Draw the line between <strong>governance and management</strong> and keep the hats separate. The people who do the work cannot be the only ones who check it - not because they are dishonest, but because no one can see their own blind spot. This separation is the foundation; the other four boxes are built on it.</li>
+<li><strong>Who is accountable, and who decides what?</strong> Name the <strong>governing body</strong> (the board - approves the policy and the SAMP, holds management to account), the <strong>AM Council</strong> (a cross-functional steering group that coordinates asset direction) with a <strong>charter</strong> that states its purpose, members, authority and cadence, and a single named <strong>system owner</strong>. Then make the <strong>decision rights</strong> explicit - who <em>recommends</em> the SAMP, who <em>approves</em> it, who is <em>consulted</em>, who is <em>informed</em> - so no one ever has to guess who decides.</li>
+<li><strong>How does the board KNOW it is working - independently?</strong> Use the <strong>three lines model</strong>. The <em>first line</em> runs the assets and owns the risk (management). The <em>second line</em> is oversight - risk, compliance, safety - monitoring and advising. The <em>third line</em> is an <strong>independent audit</strong> that reports straight to the board, <em>not through management</em>. That independence is the crux: if every assurance the board hears comes through the very people it is being assured about, the board is blind. The third line is how a mistake at the wheel gets caught by someone who is not steering.</li>
+<li><strong>On what schedule is it reviewed?</strong> The <strong>governance cycle</strong> is a rhythm with real dates: routine performance <em>reporting</em>, an annual <em>management review</em> of the whole system, and a periodic (commonly around five-yearly) strategic <em>refresh</em> of the SAMP - because a multi-decade plan cannot be set-and-forget. A cycle with no dates in the calendar is not a cycle; it is the exact hope on which the SAMP went stale.</li>
+<li><strong>When it misses, who acts, and does it close?</strong> The <strong>accountability loop</strong>: every performance miss or audit finding becomes a corrective action with a named <em>owner</em>, a defined action, and a <em>deadline</em>, tracked to closure and reported back up. A finding with no owner recurs. This loop is the guarantee that a known problem cannot quietly stay open - which is the one guarantee the ache was missing.</li>
+</ul>
+<p>One honest boundary. You are the architect, not the king. Your job is to design the council chamber and the rules of court - the <em>structure</em> by which the board governs - not to sit on the throne yourself. You do not govern (that is the board), you are not re-writing the SAMP or the policy, and governance is not management. Governance directs and checks; management does; and they cannot be the same hands.</p>
+<p>Does it scale? A ship's navigator sets the course and the captain oversees the voyage while the helmsman steers - three roles on purpose, so that an error at the wheel is caught by someone whose job is to be watching, not steering.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A different organisation: a hospital that runs its own estate - buildings, backup power, medical-gas systems, water. It has good facilities managers and no asset-management governance. Design it.</p>
+<ol>
+<li><strong>The AM Council charter, in one line.</strong> Purpose, who sits on it, what authority it has, how often it meets.</li>
+<li><strong>The three lines.</strong> Assign each line to a real role in a hospital estate - who is first line, who second, who is the independent third line reporting to the board?</li>
+<li><strong>The cycle.</strong> Set the governance-cycle dates: what is reported, how often, and when is the SAMP refreshed?</li>
+<li><strong>One decision right.</strong> State clearly who <em>approves</em> the estate's SAMP versus who <em>recommends</em> it - and why those must be different.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> look at your third line. If the person auditing the estate reports to the person running the estate, you have not built a third line - you have built management checking itself. The independence is the whole point; if it is not there, redraw it.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-gov_or_mgmt">1. Governance or management? (draw the line, and keep the hats separate)</label><textarea id="cb-gov_or_mgmt" data-key="t-0138:gov_or_mgmt" placeholder="Separate what the organisation DIRECTS and OVERSEES from what it RUNS. The people who do the work cannot be the only ones who check it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-roles">2. Who is accountable, and who decides what? (roles, decision rights, the AM Council charter)</label><textarea id="cb-roles" data-key="t-0138:roles" placeholder="Name the governing body, the AM Council (with a one-line charter), and the named system owner - then make the key decision rights explicit."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-assurance">3. How does the board KNOW it is working - independently? (the three lines)</label><textarea id="cb-assurance" data-key="t-0138:assurance" placeholder="Set up assurance so the board hears more than management&#039;s own report: first line runs and owns risk, second line oversees, third line audits independently to the board."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-cycle">4. On what schedule is it reviewed? (the governance cycle - with dates, not good intentions)</label><textarea id="cb-cycle" data-key="t-0138:cycle" placeholder="Set the oversight rhythm as a scheduled cycle: routine performance reporting, an annual management review, and a periodic strategic SAMP refresh."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-loop">5. When it misses, who acts - and does it close? (the accountability loop)</label><textarea id="cb-loop" data-key="t-0138:loop" placeholder="Every performance miss or audit finding gets an owner, a corrective action and a deadline, tracked to closure and reported back up. The loop must close."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You have designed a system that keeps its own watch, so it no longer depends on any one person never looking away.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Governance goes wrong in a handful of ways, and most of them are governance in name only.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Management with a grander name.</strong> If the people who do the work are also the only ones who review it, you have not added governance - you have relabelled management. The separation of hats is the non-negotiable.</p>
+<p>&bull; <strong>No independent third line.</strong> Assurance that flows entirely through the people being assured about tells the board nothing. Independent audit reporting to the board is what makes the assurance worth having.</p>
+<p>&bull; <strong>An AM Council with no charter.</strong> Without a stated purpose, membership and authority, a council has no teeth and drifts into a monthly talking shop. The charter is what gives it the right to decide.</p>
+<p>&bull; <strong>A cycle with no dates.</strong> "We review it regularly" is not a cycle. Fixed dates - this quarter's report, this year's management review, this decade's SAMP refresh - are what make oversight happen instead of intending to.</p>
+<p>&bull; <strong>Approving the SAMP once and never refreshing it.</strong> The exact failure that started the ache. A strategy is a living document; a governance cycle that never revisits it guarantees it goes stale where nobody is looking.</p>
+<p>&bull; <strong>A corrective-action loop that never closes.</strong> Logging findings and never resolving them is worse than not logging them, because it looks like control while being none. Every finding needs an owner and a deadline, tracked to closed.</p>
+<p>&bull; <strong>Mistaking governance for bureaucracy.</strong> Governance is oversight proportionate to consequence, not paperwork for its own sake. If a control does not change a decision or catch a risk, it is not governance - it is friction, and it should go.</p>
+</div>
+</details>
+<p>Onalenna built a system that worked beautifully and depended entirely on her never looking away - and one year of not looking was enough to overwhelm a pump station. Now you can build the other thing: a structure that directs the system, oversees it with eyes that are not management's own, reviews it on fixed dates, and closes every gap it finds. That is governance - and it is the difference between a system that has one person's conscience and a system that has a conscience of its own. If you are working with an AMU Facilitator, take an organisation you know and ask the hardest question first: who, independently, checks that the assets are being managed well?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can give a system a conscience of its own now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

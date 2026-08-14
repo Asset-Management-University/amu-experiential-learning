@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One shared password and a hope</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>One shared password and a hope</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and you have been handed an instruction that makes your stomach drop: "make the CMMS secure."</p>
+<p>The CMMS holds everything that matters - the asset register, the entire maintenance history, the safety-critical records for the plant. And right now it is protected by a password the whole maintenance team shares, and a general hope that nothing bad happens. You know that is not secure. But when you try to think about what "secure" actually <em>means</em>, you freeze. Your only instinct is "ask IT to put antivirus on it", and something tells you that is nowhere near enough - you just cannot say what is missing.</p>
+<p>What is missing is this. There is no backup, so a single ransomware attack would erase the plant's whole maintenance memory in an afternoon. The shared password means anyone - or anyone who guesses it - can silently alter a safety-critical record, and nobody would ever know who. You have a system full of irreplaceable, safety-relevant data, protected by almost nothing, and no framework at all for what protecting it should even involve.</p>
+<blockquote><h2>I have been told to secure a system that holds our safety records and our whole maintenance memory, and my only idea is "antivirus" - which I know is not enough. What does securing an asset-information system actually require, and which controls does this one need?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The maintenance system holds the asset register, every work order ever raised, and the safety-critical records. It is the plant's entire memory, and none of it exists anywhere else. Everybody logs in with <strong>the same shared password</strong> — it is written on a card by the office printer — the backups have never been tested, and protection consists of whatever the supplier installed. Anyone could alter a safety record and <strong>nobody could ever say who</strong>. You have been told to secure it, and your only idea is antivirus, which you know is not enough. Write down what securing this actually requires — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and which property matters most here</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Buy a proper security product.&rdquo;</strong> A purchase standing in for a decision. Without knowing what you are protecting and from what, you cannot tell whether the product addresses your actual exposure — and the biggest one here is not technical at all.</p>
+<p>&bull; <strong>&ldquo;Lock it down — restrict access to as few people as possible.&rdquo;</strong> Secrecy as the goal, which is the instinct worth examining. Restricting access to a system people need in order to do maintenance can cost you more than a leak would, and it still leaves the shared credential doing its damage.</p>
+<p>&bull; <strong>&ldquo;Follow a recognised standard and implement it fully.&rdquo;</strong> Closer, and taken literally it is unaffordable — the published catalogues offer far more than any one system needs, and a programme that cannot be funded is a programme that does not happen.</p>
+<p>&bull; <strong>&ldquo;It is only maintenance data — nobody wants to steal it.&rdquo;</strong> Probably true and the wrong axis entirely, as the next paragraph shows. Nobody has to want it for you to lose it.</p>
+<p>&bull; <strong>&ldquo;Make sure there are backups.&rdquo;</strong> Essential, and note what you actually have: backups nobody has ever restored, which is a belief rather than a backup. An untested backup and no backup differ only in how you find out.</p>
+<p>&bull; The frame starts by asking <strong>what actually matters for this system</strong>, and here the answer inverts the instinct. Security is usually imagined as keeping things secret — but for operational records, <strong>that they are correct and that they are there when needed both outrank secrecy</strong>. A leaked asset list is embarrassing; a <em>silently altered</em> safety record can hurt somebody, and a destroyed history erases everything this plant knows about its own equipment. Get that ordering right and it tells you what is worth paying for. Then <strong>select controls against the real threats rather than adopting a catalogue wholesale</strong> — proportionality is what makes security affordable and therefore real. And start where the damage actually is: <strong>a credential shared among many people destroys the ability to attribute any action to anybody</strong>, so a record can be changed and nobody can ever say by whom. No technical control repairs that. Named accounts are unglamorous, cost almost nothing, and are the single most important thing on your list.</p>
+</div>
+</details>
+<p>There is a standard for exactly this, and a way to build a proportionate defence on one page. Here it is, for the CMMS.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the Cybersecurity Resilience Annex for the CMMS - a proportionate, justified set of controls, not a wall of jargon.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What are we protecting, and from what? (assets, threats, and the CIA priority)</div><p class="cb-demo">The CMMS holds the asset register, the maintenance history, and safety-critical records - the plant&#039;s whole maintenance memory. The threats: RANSOMWARE (encrypts it), UNAUTHORISED CHANGE (someone alters a record), DATA LOSS (no backup), INSIDER error or misuse. Now the priority, using the CIA triad: for asset information, INTEGRITY (the data is correct and un-tampered) and AVAILABILITY (it is there when needed) matter more than CONFIDENTIALITY. A leaked asset list is embarrassing; a silently altered safety record can hurt someone, and a ransomwared register can erase the plant&#039;s memory. Protect integrity and availability first.</p></div><div class="canvas-box"><div class="cb-label">2. Which proportionate controls, across all four themes? (select on risk, not all 93)</div><p class="cb-demo">ISO/IEC 27001:2022 offers 93 controls in four themes; you SELECT the proportionate ones for these threats, not all 93. ORGANISATIONAL: an access policy, and security terms in the CMMS vendor&#039;s contract. PEOPLE: unique NAMED accounts (retire the shared password), and basic awareness training. PHYSICAL: controlled access to the server room. TECHNOLOGICAL: multi-factor authentication, TESTED backups, timely patching, a logging/audit trail, and encryption of sensitive fields. Note that the single most important fix - killing the shared password - is a PEOPLE control, not antivirus. Security is a mix across all four themes, chosen for the risk.</p></div><div class="canvas-box"><div class="cb-label">3. Which part of CIA does each threat attack - and which control answers it? (the mapping)</div><p class="cb-demo">The mapping that proves the selection. RANSOMWARE attacks AVAILABILITY -&gt; answered by TESTED BACKUPS (a copy it cannot reach, proven by restoring it). UNAUTHORISED CHANGE attacks INTEGRITY -&gt; answered by NAMED ACCOUNTS + an AUDIT LOG (now every change has a who and a when, and the shared password that made tampering anonymous is gone). A LEAKED EXPORT attacks CONFIDENTIALITY -&gt; answered by ACCESS CONTROL + ENCRYPTION. Each control earns its place by answering a specific threat to a specific part of CIA - and if a control answers no threat, it does not belong in this annex.</p></div><div class="canvas-box"><div class="cb-label">4. What is on the record? (the resilience annex / Statement of Applicability)</div><p class="cb-demo">The Cybersecurity Resilience Annex, in the form of a Statement of Applicability: the threats identified; each selected control with its justification (WHY it is here - which threat, which CIA element); and, importantly, what is EXCLUDED and why (a control for a threat this system does not face is honestly left out, not silently ignored). This puts the security decisions on the record so they can be reviewed and challenged - &#039;we chose these, deliberately, for these reasons&#039; is a defensible position; a pile of controls with no rationale is not.</p></div><div class="canvas-box"><div class="cb-label">5. How does it recover when prevention fails? (resilience, not just prevention)</div><p class="cb-demo">Prevention fails eventually, so the annex is judged on RESILIENCE, not just resistance. The load-bearing measure is RECOVERY: a backup that has actually been restored in a rehearsed test - because an untested backup fails exactly when you finally need it. If ransomware encrypts the CMMS tomorrow, a tested restore turns a catastrophe into a bad afternoon. And when a control is breached, the incident-response plan takes over - detect, contain, recover. Prevention buys you fewer incidents; recovery is what lets you survive the ones that get through.</p></div></div>
+
+<p>Notice the single most important fix in box 2: it is not antivirus. It is retiring the shared password for named accounts - a <em>people</em> control. And notice box 1 sets the priority before any control is chosen: for this system, keeping the data <em>correct</em> and <em>available</em> matters more than keeping it secret. Security here is a proportionate mix, aimed at the threats that actually matter. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Securing a CMMS is not "install antivirus" - it is a risk-based selection of proportionate controls. Five questions build it:</p>
+<ul>
+<li><strong>What are we protecting, and from what?</strong> Name the assets (register, history, safety records), the threats (ransomware, unauthorised change, data loss, insider), and then use the <strong>CIA triad</strong> - Confidentiality, Integrity, Availability - to set the priority. For asset information the crucial insight is that <em>integrity</em> (the data is correct and un-tampered) and <em>availability</em> (it is there when you need it) usually matter <em>more</em> than confidentiality. A leaked asset list is embarrassing; an altered safety record can hurt someone, and a ransomwared register can erase the plant's memory.</li>
+<li><strong>Which proportionate controls, across all four themes?</strong> <strong>ISO/IEC 27001:2022</strong> offers 93 controls in four themes - <em>organisational</em>, <em>people</em>, <em>physical</em>, <em>technological</em> - and you <em>select</em> the ones the risk needs, not all 93. Crucially, security is not just the technological theme: the biggest single fix here, replacing the shared password with named accounts, is a <em>people</em> control. A defence built only of technology, with people and process ignored, has a hole straight through the middle.</li>
+<li><strong>Which part of CIA does each threat attack, and which control answers it?</strong> Map them: ransomware attacks <em>availability</em>, answered by tested backups; unauthorised change attacks <em>integrity</em>, answered by named accounts and an audit log; a leaked export attacks <em>confidentiality</em>, answered by access control and encryption. Every control earns its place by answering a specific threat to a specific part of CIA - and a control that answers no threat does not belong.</li>
+<li><strong>What is on the record?</strong> Assemble the <strong>Statement of Applicability</strong>: the threats, the controls selected <em>with their justification</em>, and what is deliberately <em>excluded</em> and why. Security decisions belong on the record - "we chose these, for these reasons, and left those out on purpose" is defensible; an undocumented pile of controls is not.</li>
+<li><strong>How does it recover when prevention fails?</strong> No control set stops everything, so the annex is judged on <strong>resilience</strong>, not just resistance. The load-bearing measure is <em>recovery</em>: a backup that has actually been <em>restored in a test</em>, because an untested backup fails exactly when you need it. If ransomware hits tomorrow, a tested restore turns a catastrophe into a bad afternoon.</li>
+</ul>
+<p>One honest boundary. Your job is to <em>select and specify</em> the controls - risk-based, proportionate, across all four themes. You are not implementing them (that is the IT security team's craft), nor are you running the incident response when a control is breached (that is a separate plan for detect-contain-recover). Your role is to decide, on the record, what this system needs and why.</p>
+<p>Does it scale? Securing a building is the same discipline: you do not fit a bank vault to every door - you assess what is valuable and what the threats are, choose a proportionate mix of locks, alarms and staff procedures, and make sure you can recover if someone gets in anyway.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A condition-monitoring database stores the vibration and temperature histories the reliability team uses to decide when to intervene on rotating machines. The main worry: an insider could quietly alter records to hide a developing fault, and a ransomware attack could lock the team out during a critical period.</p>
+<ol>
+<li><strong>CIA priority.</strong> Which element of the CIA triad is most at risk for this system, given those two worries - and why?</li>
+<li><strong>Select controls.</strong> Choose one control from each of two different ISO 27001 themes that would answer these threats, and say which threat each control addresses.</li>
+<li><strong>Recovery.</strong> State one recovery measure that would let the team survive a ransomware incident on this database.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 2, if both your controls are technological, reach into the people or organisational theme instead - the insider threat is answered as much by named accounts and an audit trail (people, organisational) as by any technology. A defence drawn from only one theme has the classic hole.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-protect_from">1. What are we protecting, and from what? (assets, threats, and the CIA priority)</label><textarea id="cb-protect_from" data-key="t-0147:protect_from" placeholder="Name what the CMMS holds, the threats it faces, and which part of the CIA triad matters most for THIS system. For asset information, integrity and availability usually lead."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-select_controls">2. Which proportionate controls, across all four themes? (select on risk, not all 93)</label><textarea id="cb-select_controls" data-key="t-0147:select_controls" placeholder="From ISO 27001&#039;s 93 controls, select the ones these threats need - across all four themes, not just the technological one. Security is people and process, not only technology."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-cia_lens">3. Which part of CIA does each threat attack - and which control answers it? (the mapping)</label><textarea id="cb-cia_lens" data-key="t-0147:cia_lens" placeholder="Map each threat to the CIA element it attacks and the control that protects it. This is what proves the controls are aimed at the real risks."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-annex_soa">4. What is on the record? (the resilience annex / Statement of Applicability)</label><textarea id="cb-annex_soa" data-key="t-0147:annex_soa" placeholder="Assemble the annex: the threats, the controls selected WITH their justification, and what is deliberately excluded and why. Security decisions belong on the record."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-resilience">5. How does it recover when prevention fails? (resilience, not just prevention)</label><textarea id="cb-resilience" data-key="t-0147:resilience" placeholder="No control set stops everything, so build in recovery - backups that have actually been restored in a test - so the CMMS survives an incident, not merely resists it. Link to the incident-response plan."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now turn "make it secure" into a proportionate, justified, recoverable set of controls aimed at the threats that actually matter.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>CMMS security fails in a few very consistent ways, almost all of them a failure to think past technology and past prevention.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Security equals antivirus.</strong> A single technological control while people, process and recovery are ignored. The shared password and the missing backup are the real exposures, and neither is an antivirus problem.</p>
+<p>&bull; <strong>Applying all 93 controls as a checklist.</strong> The standard is a menu to select from on risk, not a list to tick end to end. Over-engineering wastes effort and buries the controls that matter.</p>
+<p>&bull; <strong>Protecting confidentiality while ignoring integrity and availability.</strong> For a CMMS, a tampered safety record and a locked-out register are worse than a leaked asset list. Set the CIA priority for the system you actually have.</p>
+<p>&bull; <strong>Tolerating the shared password.</strong> It is the people control that quietly undoes every technological one - it makes every change anonymous and every account guessable. Named accounts are often the highest-value single fix.</p>
+<p>&bull; <strong>Prevention with no recovery.</strong> Without a tested backup, the first ransomware attack is fatal. Resilience, not resistance, is the goal - build in the way back.</p>
+<p>&bull; <strong>A backup nobody has ever restored.</strong> An untested backup is a hope, not a control. It fails precisely on the day you stake everything on it. Restore it in a rehearsal, on a schedule.</p>
+<p>&bull; <strong>No Statement of Applicability.</strong> Controls chosen with no recorded rationale cannot be reviewed, defended or improved. Put the decisions - and the deliberate exclusions - on the record.</p>
+</div>
+</details>
+<p>Onalenna was told to secure a system holding the plant's safety records and had only "antivirus" to offer. Now she can do the real thing: name what she is protecting and from what, set the CIA priority for asset data, select proportionate controls across all four themes, put the decisions on the record, and build in a tested way to recover when prevention fails. Securing a CMMS is not a product you buy; it is a set of proportionate choices you can defend - and a backup you have actually restored. If you are working with an AMU Facilitator, take one real asset-information system and find its single most valuable control - it is rarely the one people reach for first.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can specify a proportionate defence now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

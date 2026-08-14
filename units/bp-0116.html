@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preventive maintenance keeps slipping  -  service dates pass and the routine work never gets called</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Preventive maintenance keeps slipping  -  service dates pass and the routine work never gets called</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Simulation</h2>
+<p>It is 06:40 on a Tuesday and you are standing at the planning desk in the maintenance office at Mthatha Bottling, a soft-drink plant that fills 18,000 bottles an hour on a good day. The office smells of instant coffee and warm dust off the printer. Through the window you can see Line 3 - the big filler - already running, the conveyor clattering, three operators in blue overalls feeding empties.</p>
+<p>In your hand is a printed sheet, still warm from the printer. It is the maintenance schedule for this week, pulled from the system. Twelve jobs are listed. Beside each one is a "due" date. Your eyes go down the column and your stomach tightens. Six of the twelve were due <strong>last week</strong>. One - the filler valve service on Line 3, the machine running right now in front of you - was due <strong>eleven days ago</strong>.</p>
+<p>You know how this happened, because it happens every week. The schedule lives in the system. It tells you <em>what</em> care each machine needs and <em>when</em>. But a due date on a sheet is not a job anybody can do. Before a fitter can touch that filler, someone has to: book a slot when Line 3 is stopped, check that two fitters are actually free that day, make sure the replacement valve seals are in the store-room (they cost R3,200 a set and the last set went to Line 1), and arrange for the line to be locked out safely so nobody loses a finger. None of that happens by itself. It is <em>your</em> job to turn the due date into a real job - and last week production ran flat out every shift, so you never got to it. The dates just slid past.</p>
+<p>Your supervisor, Nomalanga, walks in holding her own mug. She does not shout. She just looks at the sheet in your hand and then at you, and says quietly, "The filler on 3 is overdue again. If it drops a valve mid-shift we lose the whole line for a day. That is about R90,000 of product we do not fill." She is not angry. She is tired, and that is worse. You are the one who is meant to keep this from happening, and you both know the same thing keeps happening.</p>
+<p>You look back at the sheet. Twelve jobs. Six overdue. The filler eleven days late and running right now. And it is not that anyone forgot, or that the schedule is wrong. The schedule is <em>fine</em>. The jobs simply never get turned into work that capacity, parts and a safe slot are actually lined up for - so the routine care quietly lapses, week after week, until something breaks and everyone scrambles.</p>
+<p>Part of you wants to do the obvious thing: grab a fitter, walk to Line 3, and just <em>do</em> the filler service now, today, get it off the list. Get one win. But Line 3 is running full product, the seals may not even be in the store, and stopping it unplanned mid-shift is its own R90,000 problem.</p>
+<p>You put the warm sheet down on the desk. Twelve due dates that are not jobs. A schedule that is right but never gets <em>called</em>. Nomalanga waiting.</p>
+<p>Where do you start? What is the thing that actually keeps failing here - and what would you have to fix so the routine work gets called <em>before</em> the date passes, not after?</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>Before you read how the Mthatha team fixed this, work it yourself. Sit with the sheet in your hand for a minute and think it through.</p>
+<p>These prompts will not hand you the answer - but each one you can <em>check for yourself</em> from the facts already in front of you, before any solution is shown. Do the checking; do not just guess and wait.</p>
+<ol><li><strong>Draw the chain - then find the first broken link.</strong> Draw the chain of steps from "due date on the sheet" to "fitter completes the job" - for example: raise the work order, book a slot, assign the people, gather the parts, do the work. Now self-test: take a real overdue job (the Line 3 filler, eleven days late) and walk it <em>backwards</em>, marking the FIRST step that was never actually done. The earliest broken link you find is your diagnosis - you can verify it yourself by checking which step has no record for that job. No solution needed; the chain shows you.</li><li><strong>Cross-tabulate the slips against the load.</strong> For each week, note two things: was production flat-out or normal, and how many PM jobs slipped? Lay them side by side. Self-test: if the slips cluster in the flat-out weeks, the data in front of you shows this is a <em>capacity-and-readiness</em> problem, not a <em>remembering</em> problem - you can read that pattern straight off your own little table. If slips were scattered randomly across busy and quiet weeks alike, it would point to memory. The pattern answers it for you, without waiting for the worked solution.</li><li><strong>Change one routine step - then simulate next week on paper.</strong> Describe one change to the regular weekly steps - for example, a fixed booking step that <em>reserves</em> capacity for PM work before production claims it. Self-test it against the twelve-into-six pile-up: simulate next week on paper. With your change in place, do the PM jobs now get a reserved slot regardless of whether you "got to it"? If your change still leaves the jobs un-booked the moment you are busy, it has failed its own simulation - and you will know that before reading on.</li><li><strong>Name an owner and a day for each readiness item - then check it was done.</strong> Write the three readiness items - slot, people, parts. For next week, assign each one an owner and a day. Built-in check: by Friday, was each item confirmed <em>before</em> its job's due date? If you can name the person and the day, and verify it was actually done, the check is real. If any cell stays blank, you have found exactly where readiness breaks - and you found it yourself, no answer key required.</li></ol>
+<p><strong>Now set your own yardstick.</strong> Before you read on, write two short lines about <em>your own</em> version of this problem - a recurring plan that slips on you:</p>
+<details><summary>Show me &#9656;</summary>
+<div class="reveal-content">
+<ul><li><em>My idea is fitting if I see ___ .</em></li><li><em>I would change my mind if ___ .</em></li></ul>
+<p>Keep those two lines. When you read the worked solution, you are comparing it to <em>your</em> pre-stated line - not waiting for us to tell you the verdict.</p>
+<p>Make your best attempt. Then read on.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>Here is what the Mthatha team actually did - and the name for the thing that was broken.</p>
+<p><strong>They stopped treating the schedule as the work.</strong> Nomalanga and the planner (you, in the story) sat down and drew the gap on a whiteboard. On the left: the schedule - twelve due dates the system produces. On the right: twelve real jobs a fitter can pick up, each with a slot, people and parts secured. The arrow between them had no owner and no fixed time. <em>That arrow was the problem.</em> The missing piece was the routine that turns a planned care item into a ready-to-execute job. In asset-management language, this step is called <strong>work planning and scheduling</strong> - and specifically the act of <strong>converting the maintenance plan into executable work orders</strong>: taking each due item and, ahead of time, checking capacity, securing resources, and booking a safe slot so the job is <em>ready to be released</em> before its date passes.</p>
+<p>Naming it mattered, because it told them the fix was not "try harder to remember" or "do jobs faster". It was: <strong>build the conversion step into the week as a fixed, owned routine, and protect the time for it.</strong></p>
+<p><strong>But before they spent anyone's protected time, they tested the diagnosis.</strong> Nomalanga was honest: "I <em>think</em> the conversion step is the problem. But I have been wrong before - let me not redesign the whole week on a hunch." So she set a success line in advance: <em>"If the conversion step is really what is broken, then when I walk each overdue job backwards, the first missing thing should be a booking, a person or a part - not a forgotten date. And the slips should sit in our flat-out weeks, not be scattered."</em> That was the cheapest honest instrument she had - no money, no new system, just the records already in the office.</p>
+<p>She built it in an afternoon. She took the last eight weeks' schedules and, for each of the slipped jobs, walked it backwards and marked the first step with no record. Then she put the slip-count next to each week's production load.</p>
+<p><strong>The first reading confirmed her hunch - and then one column surprised her.</strong> As expected, the slips clustered hard in the flat-out weeks: capacity-and-readiness, not memory. Good. But when she sorted the <em>first broken link</em> for every slipped job, the breakdown was not what she had assumed. She had been sure the binding gate was <strong>slot</strong> - getting a line stopped. It was not. The single most common first-missing thing was <strong>parts</strong>: again and again, the seal set or the bearing had simply not been on the shelf when the slot finally came. The slot was usually findable on a Sunday; it was the five-day parts lead-time, started too late, that actually killed the job. Her instinct would have had her fighting production for mid-week slots - solving the wrong gate.</p>
+<p>That surprise changed the design. The horizon - how far ahead they convert - moved from "a few days" to a firm <strong>two weeks</strong>, governed by the <em>parts</em> lead-time, not the slot. The whiteboard diagnosis held, but reality re-pointed <em>where</em> the routine had to bite. She decided to hold the overall fix and change the one thing the evidence demanded.</p>
+<p>Here is what they put in place.</p>
+<p><strong>1. A fixed weekly planning window - the conversion gets its own protected slot.</strong> Every Thursday, 13:00 to 15:00, the planner does nothing but turn next week's due items into work orders. Not "when there's time" - Thursday, locked in the diary, production manager agreed. Two hours, because they counted: twelve jobs, roughly eight minutes each to plan properly, is about 90 minutes. The window is the single most important change. The slipping happened <em>because the conversion had no time of its own</em> - it was always the thing that lost to "production is flat out".</p>
+<p><strong>2. A readiness check for every job - the three gates.</strong> No due item becomes a released work order until three things are confirmed and written on it:</p>
+<ul><li><strong>Slot</strong> - a window when the machine can be safely stopped and locked out. For the Line 3 filler, that meant booking it into the planned Sunday 06:00-10:00 maintenance shift, not mid-week production.</li><li><strong>People</strong> - named fitters confirmed free for that slot. The filler valve service needs two fitters for three hours; the planner checks the labour board and writes their names on the order.</li><li><strong>Parts</strong> - the materials physically in the store, reserved to this job. The R3,200 valve seal set is checked on the shelf and tagged "Line 3 filler - Sunday" so it cannot wander off to Line 1 again.</li></ul>
+<p>A job missing any one gate is <strong>not released</strong> - it is flagged, and the missing gate becomes a task with an owner (order the seals; free up a second fitter). This is the honest core: a work order is only real when slot, people and parts are all secured. Before, jobs "existed" with none of the three lined up, which is why doing them was always a scramble.</p>
+<p><strong>3. A short release horizon, so nothing waits to the last day.</strong> They now convert items <strong>two weeks ahead</strong> of the due date, not on the date. That gives time to order parts (the seal set has a five-day lead time from the supplier) and to negotiate a Sunday slot. The due date is a deadline for the <em>work</em>; the conversion happens well before it. This is the horizon the surprise forced - set by the parts lead-time, the gate that was actually biting hardest.</p>
+<p><strong>What it cost, honestly.</strong> The fix is not free and not magic.</p>
+<ul><li>It costs <strong>two protected hours a week</strong> of planner time, taken off other work - the production manager had to agree to ring-fence it, and in a genuinely crazy week it is tempting to raid that slot. They wrote a rule: the Thursday window is the last thing cut, not the first.</li><li>It needs a <strong>small parts buffer</strong>. Keeping a reserved valve seal set on the shelf ties up R3,200 that is not earning. They decided overdue-filler risk (R90,000 a day) more than justifies one reserved set.</li><li>It does <strong>not</strong> create capacity out of nothing. Some weeks there genuinely are not two free fitters for every due job. The routine does not hide that - it <em>surfaces</em> it early, as a flagged job with a named gap, so Nomalanga can decide what gives (pull a fitter off Line 1, pay overtime on Sunday, or consciously defer a lower-risk job <em>with a recorded reason</em>). The point is a deliberate, visible decision two weeks out - not a silent slip discovered eleven days late.</li></ul>
+<p><strong>The result, six weeks on.</strong> The overdue count went from six-of-twelve to one-of-twelve, and that one was a deliberate, recorded deferral, not a slip. The Line 3 filler valve service now lands on a planned Sunday slot with seals on the shelf and two fitters named. The filler has not dropped a valve mid-shift since. And because the diagnosis was <em>tested</em> - not just declared - they knew the two-week horizon was aimed at the real binding gate, parts, rather than the one they had assumed.</p>
+<p>The lesson: <strong>the maintenance plan slipping is almost never a plan problem - it is a conversion problem.</strong> The schedule said what to do. What was missing was the owned, time-protected routine that turns each planned item into a work order with capacity, parts and a safe slot secured <em>before the date passes</em>. Build that conversion step in as a fixed part of the week, gate every job on slot-people-parts, and work a horizon ahead - and routine care stops quietly lapsing. But notice the deeper move: they did not just <em>believe</em> the conversion step was broken; they built a cheap instrument from records they already had, set a success line first, and let it tell them <em>which gate</em> was really biting - and it was not the one they expected.</p>
+<blockquote><p><strong>Method & Finding</strong></p>
+<ul><li><strong>The Method</strong> (the lesson - reusable): Before redesigning the week, test the diagnosis cheaply - walk each slipped item backwards to its first missing step, and tabulate the first-broken-link against the workload, <em>with a success line set in advance</em>.</li><li><strong>The Finding</strong> (in this story only): The slips were indeed a capacity problem, but the binding gate was <strong>parts</strong> (a five-day lead-time started too late), not the <strong>slot</strong> Nomalanga had assumed - so the horizon, not the mid-week slot, was the real lever.</li><li><strong>Your Check</strong> (how you will know in your world): For your own last five slipped items, count how many had each gate as the <em>first</em> missing thing. The gate with the highest count is where to aim first - and it may not be the one you would have guessed.</li></ul>
+<p><strong>Do this yourself.</strong> Steal the Mthatha planner's tool, not just their story. The recipe is four moves: (1) set up an owned, time-protected conversion window; (2) for each due item, run it through the three gates <em>before</em> you release it; (3) work a horizon ahead so nothing waits to the last day; (4) when a gate fails, make it a visible task with an owner, not a silent slip.</p>
+<p>First, set the routine up once. Fill this in for your own plan:</p>
+<table><thead><tr><th>Set-up question</th><th>Your answer</th></tr></thead><tbody><tr><td>What recurring plan keeps slipping?</td><td></td></tr><tr><td>Who owns the conversion step? (one name)</td><td></td></tr><tr><td>When is the protected window? (fixed day + time)</td><td></td></tr><tr><td>How far ahead do you convert? (your longest gate lead-time)</td><td></td></tr><tr><td>What is the one rule that protects the window?</td><td></td></tr></tbody></table>
+<p>Then, run every due item through this grid in that window. A row is only <em>released</em> when all three gates say "yes":</p>
+<table><thead><tr><th>Due item</th><th>Gate 1 - Slot (an approved/safe window booked?)</th><th>Gate 2 - People (a free, capable person named?)</th><th>Gate 3 - Parts (tools / materials / access / approvals on hand?)</th><th>Released? (all three yes)</th><th>If a gate fails: missing thing + owner + by-when</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>
+<p>The headers are the thinking. If you cannot fill a gate cell, you have found exactly why that item keeps slipping - and turning the blank cell into the last column (a named task with an owner and a date) is the whole fix.</p></blockquote>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>You have seen the clean version on a factory floor. Now let us take one guided rep on the <em>same deep problem</em> - but wearing a different disguise, so it is harder to spot. We will work it together: I will give you a hint, you pause and think, then we reveal.</p>
+<p>Meet <strong>Thandeka</strong>. She runs the books for a small panel-beating business - eight staff, one workshop. There is no factory, no fitters, no spare parts on a shelf. Her recurring plan is a wall calendar of <strong>filing dates</strong>: VAT every two months, PAYE monthly, an annual return, a couple of municipal permits. The dates are right and clear. Yet almost every filing goes in <em>on the deadline day</em> in a panic, and twice this year one went in <strong>late</strong> - a R2,000 penalty each time. From the outside it looks nothing like a bottling plant.</p>
+<p><strong>Hint 1 - listen to how Thandeka explains it.</strong> She says: "It is not my fault the filings slip. The director, Mr Khumalo, has to sign off the numbers before I can submit, and he is never around. I literally cannot file until he signs." On the surface this sounds like a <em>sign-off problem</em> - a missing person with authority. <em>Pause. Do you believe that is the real cause? What would you ask her next?</em></p>
+<details><summary>Reveal &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal 1.</strong> It is tempting to accept her story and go fix Mr Khumalo's diary. But ask the bottling-plant question: <em>when</em> does she go to him for sign-off? The answer: on the due day, every time. So "he is never around" is not really about him - it is about <em>when</em> she starts. The sign-off is just one of her gates, and she is hitting it at the last possible second. The misleading surface ("an authority problem") is hiding the same thing we saw at Mthatha.</p>
+</div>
+</details>
+<p><strong>Hint 2 - draw Thandeka's arrow.</strong> Between "a filing is due on the calendar" and "Thandeka clicks submit", several things must line up first: the figures pulled and reconciled, Mr Khumalo's sign-off, and the login/portal access ready. <em>Pause. Which of those steps has no owner and no fixed time? And does that remind you of anything?</em></p>
+<details><summary>Reveal &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal 2.</strong> Every one of those steps happens in a scramble on the due day, owned by nobody until the deadline forces it. That is the <em>exact arrow</em> from the whiteboard - the unowned, time-starved conversion step between a known due date and a ready-to-submit job. Thandeka's three gates are simply the office version of slot-people-parts: <strong>data ready</strong> (the figures reconciled), <strong>people</strong> (Mr Khumalo's sign-off), and <strong>access</strong> (the portal login and any supporting documents). Same three-gate shape, different words.</p>
+</div>
+</details>
+<p><strong>Hint 3 - fix it the same way.</strong> <em>Pause. If you handed Thandeka the Mthatha recipe, what are the four moves she would make?</em></p>
+<details><summary>Reveal &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal 3.</strong> The same four. (1) <strong>An owned, protected window:</strong> Thandeka blocks the first Monday morning of each month - her conversion slot, nothing else allowed in. (2) <strong>The three gates, checked ahead:</strong> in that window she reconciles the figures, books a 15-minute sign-off with Mr Khumalo for <em>that week</em>, and confirms the portal access works - before the deadline, not on it. (3) <strong>A horizon:</strong> her longest lead-time is getting Mr Khumalo to sit down, so she starts a full two weeks out. (4) <strong>Surface, don't hide:</strong> if his diary truly has no slot, that is now a visible task with a name and a date two weeks early - not a R2,000 penalty discovered on the day.</p>
+</div>
+</details>
+<p><strong>The deep-structure lesson.</strong> A maintenance plan and a filing calendar look like completely different worlds - machines and seals versus numbers and signatures. They are the <em>same problem-type</em>. Both are correct plans that lapse because the owned, time-protected step that converts a due item into ready, gate-checked work is missing. And notice the trap: the disguise tempts you to blame the most visible gate ("the parts never arrive", "the director is never around") instead of seeing that <em>no one owns the conversion and it has no protected time</em>. Find the unowned arrow first. The gates and the fix are the same everywhere.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>The same trap lives anywhere a <em>plan</em> exists but the routine that turns it into <em>ready-to-do work</em> is missing or has no protected time. Find it where you are.</p>
+<ol><li><strong>Name a "schedule that's right but slips" in your world.</strong> Where do you have a clear plan of recurring care or tasks - software updates due, inspections, vehicle services, regulatory filings, supplier reviews, even watering a community garden on a roster - where the <em>dates are known</em> but the work still lapses? Write down the plan and how often items actually slip past their date.</li><li><strong>Draw the arrow.</strong> Between "an item is due on the plan" and "a person can actually pick up and do it", list every thing that must happen first. Which of those steps has <strong>no owner and no fixed time</strong>? That gap is your conversion problem.</li><li><strong>Find your three gates.</strong> For your tasks, what is the equivalent of <em>slot, people, parts</em>? It might be: an approved time window, a free and skilled person, and the tools/materials/access on hand. Pick one recurring item that recently slipped and check honestly - which gate was not secured when the date arrived?</li><li><strong>Protect a conversion window.</strong> Could you ring-fence a fixed, regular slot - 30 minutes a week, a named day - whose <em>only</em> job is to turn upcoming due items into ready, gated work? What would you have to say no to, to protect it? Who needs to agree?</li><li><strong>Set a horizon.</strong> How far ahead would you need to start preparing each item so parts/approvals/people are ready <em>before</em> the date - not on it? What is the longest lead time among your gates?</li><li><strong>Be honest about capacity.</strong> When the routine surfaces a job with no free person or no budget, that is not a failure of the routine - it is the routine doing its job, early. What deliberate choice would you make, recorded and visible, instead of a silent slip?</li></ol>
+<p><strong>The transfer, stated plainly:</strong> this is the <em>same problem-type</em> - a correct plan that lapses because the owned, time-protected step that converts planned items into ready, resource-checked work is missing. Your industry, scale and "gates" differ. The trap, and the fix, do not. Take one slipping plan of your own into the AI facilitator and work it through.</p>
+<p><strong>Close the loop - run the smallest test this week.</strong> Pick one slipping plan and do just the cheap diagnosis the Mthatha team did: walk your last five slipped items backwards, count which gate was the <em>first</em> missing thing each time, and set your success line first - <em>"if it is really a conversion problem, the first miss will be a slot, a person or a part, not a forgotten date."</em> Then see what the count actually says. You may find, like Nomalanga, that the gate you would have blamed is not the one biting hardest. Afterwards, close the cycle in yourself: <em>"I predicted ___, reality did ___, so I now think ___ ."</em> Reality, not us, returns the verdict.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You&#039;ve worked through the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

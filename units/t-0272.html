@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A foreigner in your own house</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A foreigner in your own house</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You have twenty minutes at the end of the meeting and you know you are going to lose.</p>
+<p>Not because you are wrong. The case for renewing the east bank over the next four years is sound - you have the condition data, the failure trend, the consequence if it goes. You have been right about this for two years.</p>
+<p>But the room speaks a language, and it is not yours. The conversation moves in cost per megalitre and capital envelope and this financial year, and every time you say <em>resilience</em> you can feel the word land as a preference rather than as a fact. Somebody nods kindly. The item is noted.</p>
+<p>And the thing that stays with you afterwards is not losing. It is the suspicion that your professional judgement - the thing you were trained for, the thing you are paid to hold - is simply untranslatable here, and therefore counts for nothing.</p>
+<blockquote><h2>I am right about this and I cannot make it count, because the room does not have a way to hear what I am saying. How do I build a shared language for value instead of losing in somebody else's?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Twenty minutes at the end of the meeting, and you already know how it goes. You have the condition data, the failure trend and the consequence. You have been right about this for two years. And every time you say <em>resilience</em> you can feel it land as a preference rather than as a fact &mdash; somebody nods kindly, the item is noted, and the conversation returns to cost per megalitre. Write down what you would do differently before the next meeting &mdash; your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five answers, and the one thing none of them changes</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Convert it into their units &mdash; put a rand figure on the risk.&rdquo;</strong> The strongest of the five and worth doing, and notice what you have conceded by doing only this: you have agreed that <strong>money is the language in which value is settled</strong>, and everything of yours that does not convert cleanly now reads as though it does not exist. You will win some arguments this way and lose the ones that matter most.</p>
+<p>&bull; <strong>&ldquo;Explain it better &mdash; they do not understand the engineering.&rdquo;</strong> They understood it. Nobody in that room disputed a single technical claim you made; the item was <em>noted</em>, which is what happens to a fact that has nowhere to go. <strong>More explanation of a thing nobody disagreed with buys nothing</strong>, and repeated, it starts to cost you.</p>
+<p>&bull; <strong>&ldquo;Get agreement on what value means, once and for all.&rdquo;</strong> The instinct behind this is right and the destination is wrong. Those four definitions in the room are <strong>each legitimate and genuinely in conflict</strong> &mdash; availability, cost per unit, continuity of supply, the asset base &mdash; and an organisation that agrees a single definition has either silenced three people or written the sentence about serving all stakeholders sustainably, <strong>which is what organisations write instead of doing this.</strong></p>
+<p>&bull; <strong>&ldquo;Score the options against the criteria and let the numbers decide.&rdquo;</strong> Almost, and it hides the decision rather than exposing it. Score genuinely different options with every criterion weighted equally and they can come out level &mdash; and equal weighting is not neutrality, it is <strong>the strong claim that this organisation values all four exactly the same</strong>, which nobody believes and nobody has said aloud. <strong>The default that looks like fairness is a value judgement that smuggled itself in.</strong></p>
+<p>&bull; <strong>&ldquo;Go around them &mdash; find a sponsor, raise it as a safety matter.&rdquo;</strong> Sometimes available, and it wins this one item at the price of the next ten: you have shown that your case travels by influence rather than by argument, and <strong>the room still has no way to hear you</strong> the following quarter.</p>
+<p>What none of them changes is the thing you actually named: <strong>the room does not have a way to hear what you are saying.</strong> Every answer above is you arguing better inside somebody else&rsquo;s language. Hold on to your own diagnosis &mdash; it is more accurate than any of them.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the framework - collecting every definition without ranking them, naming what each costs, scoring the real options, making the weights explicit, and publishing it so the trade-off stays debatable.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Write down every definition of value in the room, and whose it is - without ranking any of them</div><p class="cb-demo">&lt;strong&gt;Start by collecting, in their own words, and resist every instinct to tidy.&lt;/strong&gt; &lt;strong&gt;Four in my room.&lt;/strong&gt; &lt;strong&gt;The plant manager: availability.&lt;/strong&gt; Value is the works running when it is meant to. &lt;strong&gt;Finance: cost per unit produced.&lt;/strong&gt; Value is the same output for less, or more output for the same. &lt;strong&gt;The regulator, represented by the compliance lead: continuity of service to the customer.&lt;/strong&gt; Value is nobody&#039;s supply interrupted. &lt;strong&gt;The board, represented by the CEO: the asset base on the balance sheet.&lt;/strong&gt; Value is what the organisation is worth and what it can borrow against. &lt;strong&gt;Write each with the name attached and in the words they used.&lt;/strong&gt; &lt;strong&gt;Do not merge them into a single sentence about serving stakeholders sustainably - that sentence is what an organisation writes instead of doing this.&lt;/strong&gt; &lt;strong&gt;And do not rank them, which is the strong instinct and the one to resist hardest, because the moment a ranking appears the person at the bottom stops participating and starts defending.&lt;/strong&gt; &lt;strong&gt;Every one of these four is defensible.&lt;/strong&gt; Not politically defensible - actually correct, from where that person sits, about a real obligation they carry. &lt;strong&gt;An organisation cannot decide well between four true things it has never written down side by side.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">2. For each definition, name what it optimises, what it sacrifices, and when it is the right one</div><p class="cb-demo">&lt;strong&gt;Now make each one legible, which means naming its cost as well as its benefit - and doing that for ALL of them, including the one you personally hold.&lt;/strong&gt; &lt;strong&gt;Availability&lt;/strong&gt; optimises output and sacrifices maintenance windows and eventually the assets themselves; &lt;strong&gt;it should win when a customer commitment is at stake this week.&lt;/strong&gt; &lt;strong&gt;Cost per unit&lt;/strong&gt; optimises efficiency and sacrifices resilience and long-horizon condition; &lt;strong&gt;it should win when the organisation&#039;s survival depends on a margin.&lt;/strong&gt; &lt;strong&gt;Continuity of service&lt;/strong&gt; optimises the customer&#039;s experience and sacrifices flexibility and often money; &lt;strong&gt;it should win when the consequence of interruption falls on people who did not choose it.&lt;/strong&gt; &lt;strong&gt;Balance-sheet value&lt;/strong&gt; optimises borrowing capacity and sacrifices operating spend, sometimes the spend that protects the asset; &lt;strong&gt;it should win when the organisation needs to raise capital to do anything at all.&lt;/strong&gt; &lt;strong&gt;That third column is the one that changes the room.&lt;/strong&gt; &lt;strong&gt;The moment each person sees a situation written down in which THEIR definition should lose, and another in which it should win, the argument stops being about whose value is right.&lt;/strong&gt; &lt;strong&gt;It becomes about which situation this is - and that is a question people can actually answer together.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. Score the real options against every definition - and look hard at what equal weighting hides</div><p class="cb-demo">&lt;strong&gt;Take a decision that is actually in front of the organisation, not a worked example, and score every option against every definition on a simple scale.&lt;/strong&gt; &lt;strong&gt;Three options, four definitions, scored one to five.&lt;/strong&gt; &lt;strong&gt;Option A: 5, 2, 4, 3. Option B: 3, 5, 2, 4. Option C: 4, 3, 5, 2.&lt;/strong&gt; &lt;strong&gt;Total them with equal weights and something remarkable happens: A scores 14, B scores 14, C scores 14.&lt;/strong&gt; &lt;strong&gt;A dead tie, three ways.&lt;/strong&gt; &lt;strong&gt;Read what that means, because it is the most important moment in the method.&lt;/strong&gt; &lt;strong&gt;It does not mean the options are equivalent - they are wildly different, and each is clearly best on one measure and clearly worst on another.&lt;/strong&gt; &lt;strong&gt;It means the entire decision lives in the weights, and equal weighting has hidden all of it.&lt;/strong&gt; &lt;strong&gt;And equal weighting is not neutral.&lt;/strong&gt; &lt;strong&gt;It is a strong claim - that this organisation values availability, cost, service continuity and balance-sheet strength exactly equally - which nobody in the room believes and nobody has ever said out loud.&lt;/strong&gt; &lt;strong&gt;The default that looks like fairness is a value judgement that has smuggled itself in unexamined&lt;/strong&gt;, and surfacing that is worth more than the scoring.</p></div><div class="canvas-box"><div class="cb-label">4. Make the weights explicit and owned - and show the ranking flipping</div><p class="cb-demo">&lt;strong&gt;Now apply weightings that real people would actually defend, and show what each does.&lt;/strong&gt; &lt;strong&gt;Availability-led, at 40 / 20 / 20 / 20: A scores 3.8, B scores 3.4, C scores 3.6. Option A wins.&lt;/strong&gt; &lt;strong&gt;Cost-led, at 20 / 40 / 20 / 20: A scores 3.2, B scores 3.8, C scores 3.4. Option B wins.&lt;/strong&gt; &lt;strong&gt;The same three options, the same scores, and a different answer - and the only thing that changed was a set of numbers nobody had previously written down.&lt;/strong&gt; &lt;strong&gt;Put both on one page in front of the room.&lt;/strong&gt; &lt;strong&gt;What that page does is move the argument from which option is best to which weighting this organisation actually holds&lt;/strong&gt; - and the second question is answerable, because it is a question about the organisation rather than about the engineering. &lt;strong&gt;Then make somebody own the weighting.&lt;/strong&gt; &lt;strong&gt;A weighting with a name against it and a date is a decision that can be revisited when circumstances change; a weighting that emerged from a discussion belongs to nobody and cannot be challenged.&lt;/strong&gt; &lt;strong&gt;And record the dissent.&lt;/strong&gt; If the compliance lead thinks service continuity deserves more than twenty per cent, write that down beside the chosen weighting rather than resolving it away - &lt;strong&gt;because the next time an interruption is proposed, that recorded dissent is the fastest route back to a decision the room already half made.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">5. Publish the framework so the trade-off is debatable - not so the argument is over</div><p class="cb-demo">&lt;strong&gt;Publish it, and be clear about what it is for - because a value framework presented as the end of the argument becomes a tool for whoever holds the pen.&lt;/strong&gt; &lt;strong&gt;The framework contains: the four definitions in their own words with names attached; what each optimises and sacrifices; the situation in which each should win; the current weighting, its owner and its date; and the recorded dissent.&lt;/strong&gt; &lt;strong&gt;Then state plainly what it does not do.&lt;/strong&gt; &lt;strong&gt;It does not decide anything on its own.&lt;/strong&gt; A framework that produces answers without a person taking a decision has replaced judgement with arithmetic, and the arithmetic will be wrong in exactly the situations that matter most. &lt;strong&gt;It does not eliminate the trade-off - it makes the trade-off visible, which is the entire point.&lt;/strong&gt; &lt;strong&gt;And it does not make the junior engineer&#039;s concern about long-horizon resilience win.&lt;/strong&gt; &lt;strong&gt;It makes it LEGIBLE - expressed in the same currency, on the same page, weighted explicitly rather than dismissed for being spoken in the wrong language.&lt;/strong&gt; &lt;strong&gt;That is the whole of what a value framework is for.&lt;/strong&gt; &lt;strong&gt;You are not building a machine that produces the right answer. You are building the room in which the right argument can be had, by people who each hold a piece of the truth and have until now had no shared way to put the pieces beside each other.&lt;/strong&gt;</p></div></div>
+
+<p>Box 3 is where the method earns itself, and box 2 is where the room changes. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A value framework is <strong>not an agreed definition of value. It is a structure that can hold several conflicting legitimate definitions in tension, so that the trade-off between them becomes explicit and debatable rather than settled by volume.</strong> Five moves:</p>
+<ul>
+<li><strong>Collect every definition, in its own words, with a name.</strong> <strong>Do not merge and do not rank.</strong> The single sentence about serving stakeholders sustainably is what organisations write <em>instead of</em> doing this.</li>
+<li><strong>Name what each optimises, sacrifices, and when it should win.</strong> <strong>That third column changes the room.</strong></li>
+<li><strong>Score the real options - and read the tie.</strong></li>
+<li><strong>Make the weights explicit, owned, and dated. Record the dissent.</strong></li>
+<li><strong>Publish so the trade-off is visible, not so the argument is over.</strong></li>
+</ul>
+<p><strong>The arithmetic, and the moment it turns.</strong> Three options, four definitions, scored one to five. <strong>A: 5, 2, 4, 3. B: 3, 5, 2, 4. C: 4, 3, 5, 2.</strong> Total with equal weights: <strong>A = 14. B = 14. C = 14.</strong> A dead tie, three ways.</p>
+<p><em>That does not mean the options are equivalent.</em> They are wildly different - each is clearly best on one measure and clearly worst on another. <strong>It means the entire decision lives in the weights, and equal weighting has concealed all of it.</strong></p>
+<p>And equal weighting is <em>not neutral</em>. It is a strong claim - that this organisation values availability, cost, service continuity and balance-sheet strength exactly equally - which nobody in the room believes and nobody has said aloud. <strong>The default that looks like fairness is a value judgement that smuggled itself in.</strong></p>
+<p><strong>Then apply weightings people would actually defend.</strong> Availability-led at 40/20/20/20: <strong>A 3.8, B 3.4, C 3.6 - A wins.</strong> Cost-led at 20/40/20/20: <strong>A 3.2, B 3.8, C 3.4 - B wins.</strong> Same options, same scores, different answer. <em>The only thing that changed was four numbers nobody had written down.</em></p>
+<p><strong>What that page does.</strong> It moves the argument from <em>which option is best</em> - unanswerable, because each person is answering a different question - to <em>which weighting does this organisation actually hold</em>. And the second question is answerable, because it is about the organisation rather than about the engineering.</p>
+<p><strong>Why the third column changes the room.</strong> Writing, for each definition, the situation in which it should <em>lose</em> as well as the one in which it should <em>win</em> - including your own - is what stops this being advocacy. The moment each person sees a case where their definition should give way, the argument stops being about whose value is right and becomes about which situation this is. <em>That is a question people can answer together.</em></p>
+<p><strong>An honest boundary, and it matters more here than usual.</strong> This does not decide anything on its own - a framework that produces answers without a person taking a decision has replaced judgement with arithmetic, and the arithmetic will be wrong precisely in the situations that matter most. It does not make your argument win. <strong>It makes it legible</strong> - expressed in the same currency, on the same page, weighted explicitly rather than dismissed for being spoken in the wrong language. And in an organisation where one person's definition is simply imposed, this will not save you; it will only document what happened, which is sometimes worth having and is not the same thing.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A municipal fleet. Four hundred vehicles. The decision is what to do about an ageing refuse fleet, and there are three options on the table.</p>
+<table>
+<tr><th>Whose definition</th><th>What they mean by value</th></tr>
+<tr><td>Fleet manager</td><td>Vehicles available on the morning of the round</td></tr>
+<tr><td>Finance</td><td>Cost per household serviced</td></tr>
+<tr><td>Ward councillors</td><td>Collections happening on the advertised day, in every ward equally</td></tr>
+<tr><td>Environmental officer</td><td>Emissions and noise in residential streets</td></tr>
+</table>
+<table>
+<tr><th>Option</th><th>Fleet mgr</th><th>Finance</th><th>Councillors</th><th>Environment</th></tr>
+<tr><td><strong>A</strong> Replace a third now, rest over six years</td><td>5</td><td>2</td><td>4</td><td>3</td></tr>
+<tr><td><strong>B</strong> Extend life with a major refurbishment programme</td><td>3</td><td>5</td><td>2</td><td>4</td></tr>
+<tr><td><strong>C</strong> Lease a managed fleet</td><td>4</td><td>3</td><td>5</td><td>2</td></tr>
+</table>
+<ol>
+<li><strong>Total the three with equal weights.</strong> What do you get, and what does it tell you?</li>
+<li><strong>Write the "when should this one lose" line</strong> for each of the four definitions. Be specific - this is the exercise.</li>
+<li><strong>The environmental officer scores option B at 4</strong>, which is higher than the two options involving newer vehicles. Explain how that can be legitimate rather than an error.</li>
+<li><strong>Apply a councillor-led weighting</strong> (40 per cent on equal service across wards, 20 each elsewhere). Who wins?</li>
+<li><strong>Who should own the weighting here</strong>, and what makes this case different from a private company?</li>
+<li><strong>The fleet manager will lose under most weightings.</strong> Write what the framework owes them.</li>
+</ol>
+<p>Work it before you turn over.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me one way &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: One Way Through</h2>
+<p><strong>1. Equal weights.</strong> A = 5+2+4+3 = <strong>14</strong>. B = 3+5+2+4 = <strong>14</strong>. C = 4+3+5+2 = <strong>14</strong>. <em>Another three-way tie</em> - and the lesson is the same one: the options are not equivalent, the decision is entirely in the weights, and equal weighting is a claim that this municipality values morning availability, cost per household, ward equity and residential emissions exactly the same. <strong>No councillor would sign that sentence, and it is what the default arithmetic just asserted on their behalf.</strong></p>
+<p><strong>2. When each should lose.</strong> <em>Fleet availability</em> should lose when the money required would come from something the community needs more - availability is a means, not an end. <em>Cost per household</em> should lose when the cheapest option produces a service that fails the people least able to complain about it. <em>Ward equity</em> should lose when insisting on identical service everywhere is more expensive than serving everyone adequately by different means. <em>Emissions and noise</em> should lose when the alternative is collections not happening, because uncollected refuse in a dense residential area is itself an environmental and health outcome.</p>
+<p><em>Notice what writing all four does.</em> Each person has now stated a case against their own position, which is the only thing that makes the next hour a discussion.</p>
+<p><strong>3. The environmental officer's 4 on refurbishment.</strong> Entirely legitimate, and the reason is that the environmental account does not start at the tailpipe. Manufacturing four hundred new vehicles carries a large embodied impact; refurbishment avoids most of it. A newer fleet is better on local emissions and worse on whole-life impact, and <em>which of those an environmental officer weights depends on whether their mandate is air quality in residential streets or the municipality's total footprint.</em> <strong>The score is not an error; it is a different and defensible reading of the same word, which is the whole subject of this unit.</strong></p>
+<p><strong>4. Councillor-led weighting (0.2 / 0.2 / 0.4 / 0.2).</strong> A = 1.0+0.4+1.6+0.6 = <strong>3.6</strong>. B = 0.6+1.0+0.8+0.8 = <strong>3.2</strong>. C = 0.8+0.6+2.0+0.4 = <strong>3.8</strong>. <strong>Option C, the managed lease, wins.</strong> And it wins for a reason worth saying out loud: a managed fleet delivers consistent service across wards more reliably than an ageing owned fleet, whatever else is true about it.</p>
+<p><strong>5. Who owns the weighting.</strong> Here it must be the <strong>elected representatives</strong>, not the officers - and that is the difference from a private company. In a company the weighting is a management decision. In a municipality the weighting <em>is the political question</em>, and it is the one thing the officers must not settle among themselves. <em>The officers' job is to produce the page that makes the weighting visible and its consequences clear; choosing it belongs to the people who answer to the residents.</em> An officer who selects the weighting has quietly taken a decision that was not theirs, however technically sound their choice.</p>
+<p><strong>6. What the framework owes the fleet manager.</strong> Three things. That their definition appears <em>in their own words</em>, not translated into somebody else's terms. That the weighting which caused them to lose is <strong>written down, owned and dated</strong>, so it can be challenged and revisited rather than absorbed. And that their dissent is recorded beside it - <em>"the fleet manager considers that morning availability is under-weighted and that option C transfers operational risk to a third party"</em> - so that when a round is missed in eighteen months, that sentence is already on the page and the conversation starts from it.</p>
+<p><em>The framework does not owe them the win. It owes them that losing is a decision somebody took and signed, rather than something that happened to them because they spoke the wrong language.</em></p>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Collect every definition of value without ranking it. Name what each optimises, sacrifices, and when it should lose - including your own. Score the real options and read what a tie is telling you. Make the weights explicit, owned and dated, with the dissent recorded. And publish it so the trade-off stays arguable.</p>
+<p>You were right about the east bank. You are probably still right. What was missing was never the evidence.</p>
+<p><strong>The framework will not make your argument win. It will make it audible - and an argument that can be heard, and is then lost to a weighting somebody signed, is a different experience from one that was never in the language of the room at all.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

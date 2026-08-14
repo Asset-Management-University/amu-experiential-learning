@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A finding somebody can act on</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A finding somebody can act on</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Ntsika, and this time the audit found things.</p>
+<p>Eleven findings. Good ones - sampled properly, traced to source, evidenced. You wrote them up, graded them, and issued the report.</p>
+<p>That was seven months ago.</p>
+<p>You have the closure log in front of you. <strong>Nine of the eleven are marked closed.</strong> Six were closed by correcting the individual record you cited. Two were closed by a briefing to the maintenance team. One was closed with the note <em>"discussed at toolbox talk"</em>.</p>
+<p>You went back last week and pulled fifteen fresh work orders.</p>
+<p><strong>Five of them have a blank criticality field.</strong></p>
+<p>Nothing has changed. Every finding was true, every finding was accepted, nobody argued with you, and the plant is exactly where it was.</p>
+<blockquote><h2>Eleven true findings, nine closed, and nothing is different. How do I write findings that change something instead of findings that get closed?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Eleven findings. All true, all accepted, nobody argued with a single one. Nine are closed: six by correcting the individual record you cited, two by a briefing to the maintenance team, one with the note <em>&ldquo;discussed at toolbox talk&rdquo;</em>. Last week you pulled <strong>fifteen fresh work orders</strong>. <strong>Five have a blank criticality field</strong> — the same rate as before. Looking at your list again, three of the six minor findings all involve something that traces back to a criticality register last updated three years ago, though you wrote them up as three separate items. Nothing has changed. Write down how you would write findings that change something — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the level you wrote at</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Raise them again and grade them higher.&rdquo;</strong> A harder grade on a finding that can still be closed by correcting one record gets that record corrected more urgently. <strong>Severity is not the axis you are wrong on.</strong></p>
+<p>&bull; <strong>&ldquo;Follow up more rigorously on closures.&rdquo;</strong> The closures were legitimate responses to what you wrote. Rejecting them means arguing that people did not do what your own finding asked, which you will lose and should.</p>
+<p>&bull; <strong>&ldquo;Sample more work orders next time.&rdquo;</strong> More evidence of the same thing. You already have five in fifteen; the difficulty is not that the problem is unproven.</p>
+<p>&bull; <strong>&ldquo;Escalate to management — they are not taking it seriously.&rdquo;</strong> They accepted every finding without argument and closed nine. By any reasonable reading they took it seriously.</p>
+<p>&bull; <strong>&ldquo;Add a recommendation to each finding.&rdquo;</strong> Helps, and a recommendation attached to a finding about one blank field will recommend filling in that field. <strong>The level is set by the finding, not by the advice bolted onto it.</strong></p>
+<p>&bull; Before grading anything, <strong>group the findings by cause</strong> — because grading a list in the order you found it is exactly how a systemic problem gets recorded as a handful of small ones. Your three minors are not three small problems; they are <strong>three visible places where one problem surfaced</strong>, and there will be others nobody sampled. Regrouped, eleven becomes nine, and a systemic failure moves out of three easily-closed minors and into one major. <strong>Nothing was added and nothing was excused</strong> — the same evidence, read for cause rather than for instance. Then write the finding <strong>onto the system rather than onto a record or a person</strong>: a finding naming one blank field can be closed by filling it, while the same evidence written as a statement about the arrangement that allows it to be blank cannot. <strong>The difference is level, not severity.</strong> Then apply the test at your desk before issuing: <strong>could this be closed without anything about the organisation being different?</strong> If yes, rewrite it. And read it as the person who must accept it — because a finding they cannot act on <strong>will be closed in the way that is available</strong>, which is precisely what happened, and that is a property of your writing rather than a failure of their good faith.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the analysis and the report - grouping by cause before grading, a stated test rather than a feeling, findings written onto the system rather than onto people, the actionability check, and reading it as the person who has to accept it.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Group the findings by cause before grading any of them - several small ones with one cause are not several small ones</div><p class="cb-demo">&lt;strong&gt;Do this before grading anything, because grading a list in the order you found it is how a systemic problem gets recorded as a handful of small ones.&lt;/strong&gt; &lt;strong&gt;The assessor&#039;s raw list was eleven: two major, six minor, three opportunities for improvement.&lt;/strong&gt; &lt;strong&gt;Now read the six minors together rather than one at a time.&lt;/strong&gt; Three of them - a blank criticality field, an unrecorded condition check, a missing job-plan review - &lt;strong&gt;have the same cause: a criticality register last updated three years ago.&lt;/strong&gt; &lt;strong&gt;They are not three small problems. They are three visible places where one problem surfaced&lt;/strong&gt;, and there will be others nobody sampled. &lt;strong&gt;Grouped, the count becomes nine: three major, three minor, three opportunities.&lt;/strong&gt; &lt;strong&gt;Look at what that regrouping did.&lt;/strong&gt; Nothing was added and nothing was excused. The same evidence, read for cause rather than for instance, moved a systemic failure from three easily-closed minors into one major that requires a real fix. &lt;strong&gt;And notice which way the error usually runs.&lt;/strong&gt; Ungrouped findings are almost always graded too low, because each instance in isolation looks small - &lt;strong&gt;and each can be closed by correcting the one record, after which the register is still three years out of date and the audit has achieved nothing.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">2. Grade each finding against a stated test - not against how bad it feels</div><p class="cb-demo">&lt;strong&gt;Write the test down in the report, so the reader is judging your reasoning rather than your temperament.&lt;/strong&gt; &lt;strong&gt;Mine, in three questions.&lt;/strong&gt; &lt;strong&gt;Does the system fail to do something the standard requires?&lt;/strong&gt; If no requirement is breached, it is an opportunity for improvement, however much you would prefer things otherwise - &lt;strong&gt;and an auditor who grades preferences as nonconformities loses the authority to grade anything.&lt;/strong&gt; &lt;strong&gt;Is it systemic or isolated?&lt;/strong&gt; One work order with a blank field is isolated. A register nobody can update is systemic. &lt;strong&gt;Does it defeat the system&#039;s ability to achieve its intended outcome?&lt;/strong&gt; This is the one that separates major from minor. &lt;strong&gt;Worked.&lt;/strong&gt; The criticality register, three years stale, affecting every job plan: &lt;strong&gt;a requirement is breached, it is systemic, and it defeats the organisation&#039;s ability to prioritise maintenance by consequence - which is the whole point of clause 8.1. Major.&lt;/strong&gt; A single work order with an unpopulated field, in a system that otherwise works: &lt;strong&gt;requirement breached, isolated, does not defeat the outcome. Minor.&lt;/strong&gt; Handover notes that are legible but inconsistent in format: &lt;strong&gt;no requirement breached. Opportunity.&lt;/strong&gt; &lt;strong&gt;Record the reasoning for each, in one sentence, in the report.&lt;/strong&gt; &lt;strong&gt;A grade with its reasoning attached can be argued with; a grade on its own can only be resented or obeyed.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">3. Write each finding as situation, behaviour and impact - where the behaviour is the SYSTEM&#039;s, never a person&#039;s</div><p class="cb-demo">&lt;strong&gt;Three parts, and one rule that decides everything: the behaviour is what the SYSTEM does or fails to do. Never a person.&lt;/strong&gt; &lt;strong&gt;Situation&lt;/strong&gt; - where and when, factually. &lt;strong&gt;Behaviour&lt;/strong&gt; - what the system does. &lt;strong&gt;Impact&lt;/strong&gt; - the consequence for the organisation. &lt;strong&gt;Worked, the wrong way first, because it is the version that writes itself:&lt;/strong&gt; &#039;Planners are not completing the criticality field. This means jobs are not being prioritised correctly.&#039; &lt;strong&gt;Every word of that is true and it is unusable.&lt;/strong&gt; It names a group of people as the behaviour, it will be read by them as an accusation, and the only action it suggests is telling them to try harder - which is what four previous audits suggested. &lt;strong&gt;Now the same evidence, correctly:&lt;/strong&gt; &lt;strong&gt;Situation&lt;/strong&gt; - &#039;In 6 of 15 work orders sampled from the twelve months to date, the criticality field was not populated.&#039; &lt;strong&gt;Behaviour&lt;/strong&gt; - &#039;The asset criticality register was last updated in August 2021 and does not contain assets commissioned since, so the required value cannot be looked up for those assets.&#039; &lt;strong&gt;Impact&lt;/strong&gt; - &#039;Job prioritisation for those assets is made without criticality, which is the basis clause 8.1 requires, and the organisation cannot demonstrate that maintenance is directed by consequence.&#039; &lt;strong&gt;Same evidence. Same grade. And the second one names something that can actually be repaired&lt;/strong&gt;, while the first names people who were already doing the more honest of the two things available to them.</p></div><div class="canvas-box"><div class="cb-label">4. Test every finding for whether somebody could act on it - and rewrite the ones they could not</div><p class="cb-demo">&lt;strong&gt;Run every finding through three questions before it goes in the report, and rewrite any that cannot answer all three.&lt;/strong&gt; &lt;strong&gt;Who would own this?&lt;/strong&gt; If the answer is &#039;everybody&#039; or &#039;the site&#039;, the finding is too diffuse to act on. &lt;strong&gt;What would they do first?&lt;/strong&gt; If the only available first action is &#039;remind people&#039;, the finding has named a symptom rather than a cause. &lt;strong&gt;And would doing it change the evidence you found?&lt;/strong&gt; - &lt;strong&gt;which is the sharpest of the three.&lt;/strong&gt; &lt;strong&gt;Test the bad version:&lt;/strong&gt; planners are not completing the field. Owner - unclear, the planning team collectively. First action - a reminder. Would it change the evidence? &lt;strong&gt;No, because the register is still three years out of date and the value still cannot be looked up.&lt;/strong&gt; &lt;strong&gt;Test the good version:&lt;/strong&gt; the register was last updated in 2021 and lacks assets commissioned since. Owner - whoever maintains the asset register, one named role. First action - populate criticality for the assets added since 2021, of which there are 41. Would it change the evidence? &lt;strong&gt;Yes. Directly and checkably.&lt;/strong&gt; &lt;strong&gt;A finding that survives those three questions is worth writing.&lt;/strong&gt; &lt;strong&gt;One that does not is going to be closed by an email, and closing it will not have changed the plant.&lt;/strong&gt;</p></div><div class="canvas-box"><div class="cb-label">5. Read it as the person receiving it will - and make sure it is possible to accept</div><p class="cb-demo">&lt;strong&gt;Before the report leaves, read it once as the person whose area it describes - because they have to accept it, and a finding that can only be accepted as an admission of failure will be argued with instead.&lt;/strong&gt; &lt;strong&gt;Three checks.&lt;/strong&gt; &lt;strong&gt;Is there a sentence that a reasonable person would experience as an accusation?&lt;/strong&gt; Anything with a role as the subject of a failure verb. Rewrite it onto the system. &lt;strong&gt;Is there anything they could not have known?&lt;/strong&gt; If the finding rests on a requirement nobody communicated to them, the finding is real and it belongs one level up - &lt;strong&gt;and saying so in the report is not softening it, it is aiming it correctly.&lt;/strong&gt; &lt;strong&gt;And is there anything working that you have not said?&lt;/strong&gt; &lt;strong&gt;An audit report that records only gaps is not neutral - it is inaccurate&lt;/strong&gt;, because the organisation is doing a great many things adequately and your silence implies otherwise. Where it is genuinely true, say it: &#039;the work-order close-out discipline was consistently strong across the sample&#039;. &lt;strong&gt;Not to soften the report and not as a courtesy - because it is a finding too, and because a report that can distinguish what works from what does not is the only kind anybody trusts on the second reading.&lt;/strong&gt; &lt;strong&gt;You are not there to establish that something is wrong. You are there so that it becomes right, and that requires somebody in the room to act.&lt;/strong&gt;</p></div></div>
+
+<p>Box 1 is where nine findings become three, and box 3 is the rule the whole unit rests on. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>An audit finding is <strong>not a record that something is wrong. It is an instrument for getting something changed - and it fails if it can be closed without the plant being different afterwards.</strong> Five moves:</p>
+<ul>
+<li><strong>Group by cause before grading.</strong> <strong>Several small ones sharing a cause are not several small ones.</strong> Eleven becomes nine, and a systemic failure stops being three easily-closed minors.</li>
+<li><strong>Grade against a stated test.</strong> <strong>Requirement breached? Systemic or isolated? Does it defeat the outcome?</strong> Written in the report, so the reader judges your reasoning rather than your temperament.</li>
+<li><strong>Situation, behaviour, impact - and the behaviour is the system's.</strong> <strong>Never a person as the subject of a failure verb.</strong></li>
+<li><strong>Test whether somebody could act.</strong> <strong>Who owns it, what would they do first, and would doing it change the evidence?</strong></li>
+<li><strong>Read it as the person receiving it.</strong> <strong>Make it possible to accept</strong> - and say what is working, where it is true.</li>
+</ul>
+<p><strong>The regrouping, and what it does.</strong> Eleven raw findings: two major, six minor, three opportunities. Three of the six minors share one cause - a criticality register last updated three years ago. Grouped: <strong>nine findings, three major, three minor, three opportunities.</strong> <em>Nothing was added and nothing was excused.</em> The same evidence, read for cause instead of for instance. And notice which way the error runs: ungrouped findings are almost always graded <em>too low</em>, because each instance in isolation looks small - <em>and each can be closed by correcting one record, after which the register is still three years out of date.</em> That is exactly what the closure log shows: six closed by correcting the record you cited.</p>
+<p><strong>The rule that carries the unit.</strong> In situation-behaviour-impact, <strong>the behaviour is what the system does or fails to do.</strong> Compare the two versions of the same evidence:</p>
+<ul>
+<li><em>"Planners are not completing the criticality field."</em> True. Names people as the behaviour. Suggests one action - tell them to try harder.</li>
+<li><em>"The asset criticality register was last updated in August 2021 and does not contain assets commissioned since, so the required value cannot be looked up for those assets."</em> Same evidence. Same grade. <em>Names something that can be repaired.</em></li>
+</ul>
+<p>And there is a second reason beyond dignity, which matters if the first ever feels like softness: <em>the planners leaving the field blank were choosing the more honest of the two options available to them.</em> Entering an unsupported value would have been worse. The first version does not merely offend them - <strong>it is a less accurate account of what happened.</strong></p>
+<p><strong>The question that kills a bad finding.</strong> <em>Would acting on this change the evidence you found?</em> Reminder to planners - no, the register is still stale. Populate criticality for the 41 assets added since 2021 - yes, directly and checkably. <em>A finding that cannot answer that question will be closed by an email, and closing it will not have changed the plant.</em></p>
+<p><strong>An honest boundary.</strong> This produces findings that can be acted on. It does not make them acted on - that needs an owner with time and authority, and neither is yours to grant. It does not cover the formal corrective-action process, which has its own procedure. And a report cannot rescue an audit that did not look in the right places; that was the previous unit's work.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Four raw findings from an audit of clause 10.1, nonconformity and corrective action. Grade them, and rewrite them.</p>
+<table>
+<tr><th>#</th><th>Raw finding as the auditor first wrote it</th><th>Evidence</th></tr>
+<tr><td>1</td><td>"Operators are not raising nonconformity reports for minor equipment defects."</td><td>Interviews: three operators said they stopped raising them. The system requires a supervisor sign-off within 24 h; the log shows a median of 31 days to sign-off, and 40 per cent never signed</td></tr>
+<tr><td>2</td><td>"Corrective actions are closed without verification of effectiveness."</td><td>12 of 12 closed actions sampled had no effectiveness check recorded. The form has no field for one</td></tr>
+<tr><td>3</td><td>"The maintenance manager has not attended nonconformity training."</td><td>Training record confirms it. The procedure requires it within 3 months of appointment; they were appointed 14 months ago</td></tr>
+<tr><td>4</td><td>"Nonconformity reports are handwritten and sometimes difficult to read."</td><td>Seven of thirty reviewed were hard to read. No requirement in the standard or the procedure specifies legibility or format</td></tr>
+</table>
+<ol>
+<li><strong>Group.</strong> Do any of these share a cause? Say which and why.</li>
+<li><strong>Grade all four</strong> against the three-question test, with your reasoning for each.</li>
+<li><strong>Finding 1</strong> is the important one. Rewrite it in situation-behaviour-impact. Then say what the original version would have caused to happen.</li>
+<li><strong>Finding 3</strong> is uncomfortable - it names one identifiable person. Say how you handle it without either omitting it or making it about them.</li>
+<li><strong>Finding 4.</strong> Apply the test honestly. What is it, and what do you do with it?</li>
+<li><strong>The actionability check.</strong> Apply the three questions to your rewritten finding 1.</li>
+</ol>
+<p>Work it before you turn over.</p>
+<details><summary>Compare your thinking - one way through</summary>
+<div class="reveal-content">
+<p><strong>1. Grouping.</strong> Findings 1 and 2 share a cause worth naming: <em>the nonconformity process does not close its own loop.</em> Reports go in and nothing visibly comes back - unsigned for a month or never, and closed without any check that the fix worked. They can stay as two findings, because they need two different fixes, but the report should say they share a cause. Finding 3 is separate. Finding 4 is not a finding at all - see below.</p>
+<p><strong>2. Grades.</strong> <em>Finding 1:</em> requirement breached (24-hour sign-off), systemic (40 per cent never signed, median 31 days), and it defeats the outcome - if defects are not reported the system cannot act on them. <strong>Major.</strong> <em>Finding 2:</em> requirement breached (10.1 requires reviewing effectiveness), systemic (12 of 12, and the form has no field), defeats the outcome - corrective action that is never verified is indistinguishable from none. <strong>Major.</strong> <em>Finding 3:</em> requirement breached (the procedure's own three months), isolated to one role, does not by itself defeat the outcome. <strong>Minor.</strong> <em>Finding 4:</em> <strong>no requirement breached. Opportunity for improvement.</strong></p>
+<p><strong>3. Finding 1 rewritten.</strong> <em>Situation:</em> "Of the nonconformity reports raised in the twelve months to date, 40 per cent have no supervisor sign-off, and the median time to sign-off for those signed is 31 days against a required 24 hours." <em>Behaviour:</em> "The nonconformity process provides no escalation when a report is not signed within the required period, and no feedback to the person who raised it at any point." <em>Impact:</em> "Reports are raised into a process that does not visibly respond, and the organisation loses its earliest and cheapest source of defect information." <strong>What the original would have caused:</strong> "operators are not raising reports" would have produced a briefing to operators about the importance of raising reports - <em>addressed to the only people in the story who were doing their part, and leaving untouched the thirty-one days that taught them not to bother.</em></p>
+<p><strong>4. Finding 3, the identifiable person.</strong> Do not omit it - it is a real breach of the organisation's own procedure and everybody can see the training record. Do not write it as a personal failing either. <em>Situation:</em> a role requiring training within three months of appointment has been held for fourteen months without it. <em>Behaviour:</em> "There is no mechanism that identifies when a role-holder's mandatory training is overdue; compliance depends on the individual recalling the requirement." <em>Impact:</em> the organisation cannot demonstrate competence for the role. <strong>The finding is now about the absence of a tracking mechanism</strong>, which is true, is fixable, and is also the reason it happened - <em>nobody told this person, and nothing was watching.</em></p>
+<p><strong>5. Finding 4.</strong> No requirement in the standard or the procedure specifies legibility. So it is not a nonconformity, however much you would prefer typed reports - <em>and an auditor who grades preferences as nonconformities loses the authority to grade anything.</em> Record it as an opportunity for improvement, in one line, and move on. <em>If you genuinely think legibility should be required, that is a proposal to change the procedure, not a finding against it.</em></p>
+<p><strong>6. Actionability.</strong> <em>Who owns it?</em> Whoever owns the nonconformity process - one named role. <em>What would they do first?</em> Add an escalation when a report is unsigned at 48 hours, and a notification back to the raiser at sign-off. <em>Would it change the evidence?</em> Yes - the 40 per cent unsigned and the 31-day median are both directly measurable again in three months, which also gives the effectiveness check that finding 2 says is missing.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Watch for the traps &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The method is sound. A few traps catch almost everyone applying it for the first time. Glance through these before you trust your own draft.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Grading each instance separately when several share one cause.</strong> Ungrouped findings are graded too low - group by cause first, because a shared cause turns several easily-closed minors into one systemic finding.</p>
+<p>&bull; <strong>Naming the person as the subject of the failure verb instead of the system.</strong> &quot;The planner left the field blank&quot; is less accurate, not more - the system gave them no better option, and that is the true cause.</p>
+<p>&bull; <strong>Writing a finding nobody can act on.</strong> If ownership, first action, and evidence of change are not all named, closing the finding will not change anything on the plant.</p>
+<p>&bull; <strong>Recording only the gaps and none of what is working.</strong> A report of gaps alone is not neutral. Say what is working, where it is true - an accurate report earns the trust the recommendations need.</p>
+</div>
+</details>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Group findings by cause before you grade them. Apply a stated test and publish the reasoning. Write the system as the subject rather than a person. Check that somebody could act and that acting would change the evidence. And read the report as the person who has to accept it.</p>
+<p>Your eleven findings were all true. Nine were closed. Six of them were closed by correcting the exact record you cited - <em>which is the correct response to a finding written as an instance</em>, and it is what you asked for without meaning to.</p>
+<p><strong>A finding that names an instance gets the instance corrected. A finding that names a cause gets the cause repaired. Both are true, and only one of them is worth the audit.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

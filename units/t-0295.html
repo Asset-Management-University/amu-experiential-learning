@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two brackets, same steel, same load, same stress - one cracks in fourteen months and the other never does. What is my calculation missing?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Two brackets, same steel, same load, same stress - one cracks in fourteen months and the other never does. What is my calculation missing?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are the design engineer at <strong>Setshaba Trailers</strong>, a tipper-trailer builder outside Middelburg, and there is a photograph on your screen that should not exist.</p>
+<p>It shows a crack, about 30 mm long, running along the weld where a suspension-hanger bracket joins the chassis rail of a trailer your shop built <strong>fourteen months ago</strong>. The customer runs eight identical trailers on the same coal route. Two have cracked at this bracket. Six have not.</p>
+<p>What makes it worse is the drawing open next to it. There are two brackets on that rail carrying almost the same load - the suspension hanger, and the body-pivot bracket a metre behind it. Your calculation sheet from last year is right there: both details were checked, both come out at about <strong>90 MPa</strong> of stress range under the customer's duty, both were signed off against the same allowable. Same steel, same load, same stress.</p>
+<p><strong>The pivot bracket has not cracked on a single trailer.</strong> The hanger has cracked on two.</p>
+<p>You go back through the calculation looking for the mistake and there is no mistake. The stresses are right. The loads are right. The steel is the steel you specified. And yet the two things your calculation says are equivalent are visibly not, out on the N4, under real coal.</p>
+<p>Your production manager wants to know whether to keep building the other twelve trailers on the order. Your customer wants to know whether the six uncracked ones are safe. And the only honest thing you can say this morning is that your design method cannot tell the difference between two details it has already told you are the same.</p>
+<blockquote><h2>Two brackets, same steel, same load, same stress - one cracks in fourteen months and one does not. What is my calculation missing?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Two details at 90 MPa, one cracking and one not, twelve more trailers on the line and a customer waiting. Write down what you think the difference is and how you would prove it - your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the five answers, and what each one does with the two brackets</summary>
+<div class="reveal-content">
+<p>&bull; <strong>"The weld quality on those two trailers was poor - find the welder."</strong> The first place everybody looks, and it is worth checking, and it does not explain why the failures are on the same detail rather than the same trailer. Two different trailers cracked at the same bracket; a bad welder would scatter.</p>
+<p>&bull; <strong>"The stress calculation must be wrong somewhere."</strong> The most disciplined instinct, and you have already been through it twice. This is the moment worth noticing: when a correct calculation predicts something that is visibly untrue, the error may be in what the calculation is <em>about</em> rather than in its arithmetic.</p>
+<p>&bull; <strong>"Those two trailers were overloaded."</strong> Possible and easy to check, and eight trailers run the same route with the same operator. It would have to be an overload that found the hanger and spared the pivot, on two trailers out of eight.</p>
+<p>&bull; <strong>"Use a thicker plate on the bracket."</strong> The reflex fix, and it may even work - by accident, and at a cost, on all twelve remaining trailers, without anybody knowing which part of it helped or whether the pivot bracket needed it too.</p>
+<p>&bull; <strong>"Increase the safety factor across the board."</strong> Safe-sounding and it makes every trailer heavier and dearer to fix one detail. It also cannot tell you whether the six uncracked trailers are safe, which is the question the customer actually asked.</p>
+<p>&bull; What the first five share is the assumption that <strong>stress is the property that decides fatigue life</strong>. It is not, at a weld. Two joints at the same nominal stress can differ in life by a factor of five or more, and the thing that separates them is the <em>shape of the joint</em> - how sharply the load turns as it passes through the weld, and where the toe of that weld sits relative to the flow of stress. Fatigue at a weld is decided by the detail, and the detail is something you choose on a drawing, usually without noticing you are choosing anything.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Here is the assessment, run on both brackets side by side.</p>
+<p><strong>Step 1 - Stop using the nominal stress, and find the stress the weld toe actually sees.</strong> The 90 MPa on your calculation sheet is the stress in the rail - the <em>nominal</em> stress, computed as if the section were smooth. It is not what the toe of the weld feels. Where the bracket meets the rail, the load has to turn a corner, and the structural stress rises locally before it ever reaches the weld itself. The team fits strain gauges either side of each toe, on a running trailer, and extrapolates the readings in to the toe line. The hanger bracket comes back at <strong>1.6 times</strong> the nominal - <strong>144 MPa</strong> at the toe. The pivot bracket, whose gusset carries the load round the corner more gently, comes back at <strong>1.15</strong> - <strong>104 MPa</strong>. Same nominal stress; the toes are 40 per cent apart.</p>
+<p><strong>Step 2 - Classify each joint, honestly, by what it looks like rather than what you intended.</strong> Weld fatigue curves are published by joint <em>class</em>: a family of curves, each one measured from tests on a particular kind of detail. Better classes are for details where the stress flows smoothly and the weld toe is not sitting across the load path; poorer ones are for attachments welded onto a loaded member with a fillet weld running transverse to the stress. The two brackets classify differently, and once you look at them as a fatigue detail rather than as a bracket it is not close: the hanger is a load-carrying transverse fillet-welded attachment, and the pivot is a longitudinally gusseted attachment with a ground toe. <strong>The published curve for the hanger's class sits well below the pivot's.</strong></p>
+<p><strong>Step 3 - Read each one off its own curve, at its own stress.</strong> Two curves, two stresses, two lookups. <em>The cycle figures below are the ones this worked example runs on; for your own joint you must read the curve for the class you matched it to, and your numbers will be different.</em> Suppose the lookups give about <strong>250,000 cycles</strong> for the hanger detail and about <strong>1,200,000</strong> for the pivot. The customer's route puts about <strong>40,000</strong> damaging cycles a year on the chassis.</p>
+<table>
+<tr><th>Detail</th><th>Nominal stress</th><th>Stress at the toe</th><th>Class</th><th>Cycles to failure</th><th>Life</th></tr>
+<tr><td><strong>Suspension hanger</strong></td><td>90 MPa</td><td><strong>144 MPa</strong> (x1.6)</td><td>poorer</td><td>about 250,000 (worked example)</td><td><strong>about 6 years</strong></td></tr>
+<tr><td>Body pivot</td><td>90 MPa</td><td>104 MPa (x1.15)</td><td>better</td><td>about 1,200,000 (worked example)</td><td>about 30 years</td></tr>
+</table>
+<p><strong>There it is - a factor of five, from two details your calculation sheet called identical.</strong> And notice that the factor does not rest on those particular lookup figures: the hanger's toe sees more stress <em>and</em> sits on a lower curve, so whatever the two curves give, they separate in the same direction. And the two causes stack: the hanger's toe sees 40 per cent more stress <em>and</em> it sits on a lower curve. Because life falls with roughly the cube of stress, the 1.6-versus-1.15 concentration alone accounts for about a 2.7-fold difference, and the class does the rest.</p>
+<p><strong>Step 4 - Answer the question that was actually asked.</strong> Six years of predicted life against fourteen months of cracking is not a match, so the assessment is not finished - it says the hanger is the weak detail, not that the number is right. The team looks again and finds the missing piece: the customer's coal route includes a stretch of badly corrugated haul road that the design duty never contemplated, and the strain trace over that stretch is far heavier than the rest. Recalculated on the real duty, the hanger's life comes out at <strong>about fifteen months</strong>, and the pivot's at nearly six years. Two cracks at fourteen months, on the detail the assessment says fails first, at about the time it says. <strong>The method now explains what actually happened</strong>, which is the only test that matters.</p>
+<p><strong>Step 5 - Fix the detail, not the plate.</strong> The remaining twelve trailers get the hanger redesigned as a gusseted attachment with the toe ground and dressed - the same change that makes the pivot bracket what it is - which moves it onto the better curve and drops its toe concentration. No thicker plate, no heavier trailer, no change to the steel: about R900 a trailer in extra fabrication. The six uncracked trailers in service are put on a three-monthly inspection at that bracket until they can be retrofitted, and the customer is told plainly which detail is the one to watch and why.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Four moves, and the first two are the ones a stress calculation skips.</p>
+<ul>
+<li><strong>1. Find the stress at the weld toe</strong>, not the nominal stress in the member - by strain gauges extrapolated in, or by a model fine enough to show the local rise.</li>
+<li><strong>2. Classify the joint</strong> by what it is, using the published catalogue of details.</li>
+<li><strong>3. Read the life off that class's curve, at that stress</strong>, and convert to years using the real duty.</li>
+<li><strong>4. If the answer does not match what the asset is doing, keep going</strong> - the method has told you which detail, and something in the duty or the classification is still wrong.</li>
+</ul>
+<p>Two ideas are doing the work. The first is <strong>hot-spot stress</strong>: the structural stress at the weld toe, obtained by reading the stress either side of the toe and extrapolating in - deliberately avoiding the very sharp, very local peak in the weld metal itself, which is real but is already accounted for inside the test data behind the curves. The second is the <strong>weld detail class</strong>: fatigue curves for welded joints are published as a family, each curve measured from tests on one kind of detail, and choosing which curve applies to your joint is an act of classification, not calculation. Standards such as BS 7608 and the IIW recommendations publish these catalogues with pictures, and the pictures are the point - <em>you match your joint to the picture</em>.</p>
+<p>Which gives the sentence worth carrying out of here: <strong>at a weld, the detail decides the life, and the detail is chosen on a drawing.</strong> A designer who changes a bracket from a gusseted attachment to a plain welded-on plate has changed the fatigue life by a factor of several, without changing a single number on the calculation sheet - and the calculation sheet will go on saying the two are equivalent, correctly, because it is answering a different question.</p>
+<p>Where it fits: welded structures under repeated loading - trailers, cranes, bridges, conveyor structures, pressure equipment, ship and rail. Three limits worth being straight about. <strong>The classification is a judgement</strong>, and two competent engineers can classify the same joint differently and get lives a factor of two apart; agree it, write down which detail in the catalogue you matched to and why, and be conservative where the match is not clean. <strong>The curves assume a weld of the quality the tests used</strong> - undercut, a poor profile or a lack of penetration puts your joint below its own class, so the classification presumes a workshop that produces what the drawing says. And <strong>the whole answer scales with the duty</strong>, which is where this case's first pass went wrong: a perfectly executed assessment on the wrong load history produces a confidently wrong life, and the tell is exactly what happened here - the numbers do not explain what the asset is actually doing.</p>
+<p>Two neighbouring questions have their own units. Turning a messy, variable load history into the table of stress ranges and counts this method needs - and adding up the damage they do - is <strong>t-0019</strong>. And what to do once an inspection has actually found a crack, when these curves no longer apply at all, is <strong>t-0296</strong>.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Work each one before opening its answer.</p>
+<p><strong>Task 1 - The junior's report.</strong> A junior engineer computes the nominal stress range at a bracket weld as 110 MPa, reads it straight off the weld curve, and reports a long life. The toe concentration at that detail is 1.5. What did they get wrong, and roughly how far out is their answer?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>They read the curve at the nominal stress, where the toe actually sees the structural stress magnified by the detail. The range to read at is 110 x 1.5 = <strong>165 MPa</strong>. Because life falls with roughly the cube of stress range, the true life is about (165/110)³ = <strong>3.4 times shorter</strong> than they reported. Good answers name the direction - the error is always optimistic, so it never gets caught by a component surviving longer than expected.</p>
+</div>
+</details>
+<p><strong>Task 2 - Same stress, different detail.</strong> Two attachments on the same beam both see a nominal 100 MPa. Detail A is a small gusset with a ground, tapered toe; Detail B is a plate welded transversely across the flange with a fillet weld. Without any curve in front of you, say which has the shorter life, why, and what you would tell a designer who says "they are both at 100 MPa so they are both fine".</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p><strong>B is far worse</strong>, and for two reasons that stack. Its toe sits transverse to the flow of stress with an abrupt change of section, so the hot-spot stress is higher; and that detail classifies onto a lower curve, because the test data for that shape gives shorter lives at every stress. What to tell the designer: the nominal stress is the same and the fatigue lives are not, because at a weld the life is set by the detail as much as by the stress - and the detail is a drawing decision, so it is theirs to make and cheap to change now.</p>
+</div>
+</details>
+<p><strong>Task 3 - The assessment that does not match reality.</strong> Your assessment says a bracket should last twelve years. It has cracked in two. Give three candidate explanations, and say which you would check first and why.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Three candidates: <strong>the duty is heavier than assumed</strong> (the load history is wrong, or a route or process changed); <strong>the joint is classified too optimistically</strong> (it is not the detail you matched it to, or the weld quality is below what the class assumes - undercut, poor profile, lack of penetration); or <strong>the hot-spot stress is understated</strong> (the concentration was taken from a handbook rather than measured, or there is a secondary load - vibration, misalignment, a restrained thermal movement - that nobody put in). Check the <strong>duty first</strong>: it is the cheapest to measure with a strain survey, it is the input most often wrong by a large factor, and until it is right neither of the other two can be judged. Good answers also say what a factor of six means: something is wrong by a lot, not by a little, so look for a whole missing load case rather than a refinement.</p>
+</div>
+</details>
+<p><strong>Now take a welded detail of your own</strong> that carries repeated load, and work the four moves.</p>
+<p><strong>1.</strong> What is the nominal stress range in the member? Then: what does the toe actually see - measured, modelled, or taken from a published concentration for that shape? Write which of the three it is.</p>
+<p><strong>2.</strong> Find your joint in a published catalogue of details and write down the one you matched it to, with a note on why. If two matches look plausible, take the poorer one and say so.</p>
+<p><strong>3.</strong> Read the life off that curve at that stress. Convert to years using cycles from the real duty, not the design duty.</p>
+<p><strong>4.</strong> Compare the answer with what the asset is actually doing. If they disagree by a lot, do not adjust the number - go and find the load case, the misclassification or the weld-quality problem that explains it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep the weld assessment honest.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>The nominal stress read straight off a weld curve.</strong> The commonest error and always optimistic, so nothing in service will ever correct it for you. Extrapolate to the toe before you read anything.</p>
+<p>&bull; <strong>The joint classified by what it was meant to be.</strong> Classify what is actually there - the shape on the drawing, and the shape in the workshop if they differ. A gusset that was value-engineered into a plain plate is a different detail on a different curve.</p>
+<p>&bull; <strong>Two engineers, two classes, one joint.</strong> Classification is a judgement and a factor of two hides in it. Agree it, write down which catalogue detail you matched and why, and take the poorer of two plausible matches.</p>
+<p>&bull; <strong>A weld curve applied to a weld the workshop did not make.</strong> The curves assume the quality of the joints that were tested. Undercut, a sharp toe or lack of penetration puts your joint below its own class - so a fatigue-critical detail needs its inspection requirement on the drawing, not just its size.</p>
+<p>&bull; <strong>The design duty used where a real duty exists.</strong> A perfect assessment on the wrong load history is confidently wrong. If you can measure the duty, measure it; if you cannot, say which duty you used and how you would know it was wrong.</p>
+<p>&bull; <strong>An answer that does not match reality, adjusted until it does.</strong> When the assessment says twelve years and the thing cracks in two, the gap is information. Something is wrong by a factor, not by a percentage - go and find it rather than tuning a coefficient.</p>
+<p>&bull; <strong>Thicker plate reached for first.</strong> More steel often does very little for fatigue at a bad detail, because the stress concentration and the class are unchanged. Changing the detail is usually cheaper and works better.</p>
+<p>&bull; <strong>These curves used on a component with a known crack.</strong> They assume a sound weld. Once a crack has been found, this whole method stops applying to that component.</p>
+</div>
+</details>
+<p>You had a photograph of a crack, two brackets your own calculation called identical, and a customer waiting on an answer you could not give. You can give it now: the hanger's toe sees 1.6 times the nominal stress against the pivot's 1.15, it classifies onto a lower curve, and the two together make a factor of five in life - which, once the real haul-road duty is measured, comes out at about fifteen months against the fourteen the trailers actually managed. <strong>At a weld, the stress is only half the question: the detail decides the life, and the detail is chosen on a drawing by somebody who usually does not know they are choosing.</strong> The fix was R900 a trailer of better fabrication, not thicker steel. (Working with an AMU facilitator? Bring a drawing with a welded attachment on it and classify its details together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can tell why two welds at the same stress have different lives, and design the difference deliberately.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

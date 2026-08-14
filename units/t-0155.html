@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ninety-two percent accurate, and nobody knew if it paid</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Ninety-two percent accurate, and nobody knew if it paid</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and the data team is proud. They have built a predictive-maintenance model for the critical pumps, and it is <strong>92% accurate</strong>. They want to deploy it - switch it on, let it call which pumps to intervene on before they fail. The number is impressive, and everyone in the room is nodding.</p>
+<p>So you ask the question nobody has asked, and the room goes quiet. <em>Does this model actually help us keep the town's water flowing - and can we show, in rand, that it earns its keep doing it rather than costing more than it saves?</em></p>
+<p>Because "92% accurate" does not answer that, and you can feel that it does not. It does not tell you whether the model's false alarms - each one an unnecessary pump strip-down that costs real money - add up to more than the failures the model prevents. It does not tell you whether the failures it still misses are catastrophic. A model can be 92% accurate and be a money pit, if it cries wolf constantly, or a bargain, if the few failures it catches were about to be disasters. The accuracy number is silent on all of it. You have a good-sounding model and no idea whether it is worth switching on.</p>
+<blockquote><h2>My data team has a 92%-accurate model and wants to deploy it, and accuracy does not tell me whether it pays. How do I evaluate a predictive-maintenance model by the money it makes or loses, and set it to the point that pays best?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The data team's model is <strong>92% accurate</strong> and they would like to switch it on. They are good, and they are not overselling it. Sitting in the background, unremarked by anybody: an unplanned pump failure costs about <strong>R200,000</strong>, and pulling a pump for a planned intervention costs about <strong>R20,000</strong> — whether or not anything was wrong with it. Somebody wants a decision this week. You can feel that 92% does not answer the question you were actually asked, and you cannot say why. Write down how you would judge whether this model is worth running — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what a percentage cannot see</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;92% is good — deploy it.&rdquo;</strong> The figure is real and it is silent on value. It counts every kind of mistake as one mistake, and your two kinds of mistake differ by an order of magnitude in what they cost.</p>
+<p>&bull; <strong>&ldquo;Not good enough — ask for 98% before we deploy.&rdquo;</strong> A higher number on the same blind measure, bought with months of work. A 98%-accurate model that is wrong in the expensive direction can still lose money.</p>
+<p>&bull; <strong>&ldquo;Run it in parallel for a year and see.&rdquo;</strong> Prudent, expensive, and it will end with the same argument unless somebody decides in advance what would count as success — which is the thing you have not got.</p>
+<p>&bull; <strong>&ldquo;Trust the data team — this is their expertise.&rdquo;</strong> Their expertise is the model. Whether it pays is a question about your costs, which they do not hold, and nobody in the room has put the two together.</p>
+<p>&bull; <strong>&ldquo;Compare it against how we do it now.&rdquo;</strong> Exactly the right comparison and not yet expressible, because you have no common unit — you cannot set a percentage against current practice and get an answer.</p>
+<p>&bull; The common unit is money. A model like this makes <strong>four different kinds of call</strong>, and the two ways of being wrong are not remotely equivalent: an alarm when nothing was coming costs you an intervention, while silence when something <em>was</em> coming costs the whole failure. Accuracy treats those as equal, which is why a very accurate model can be a money pit if it cries wolf constantly, and a modest one a bargain if the few things it catches were about to be disasters. So <strong>price each outcome</strong>. A correct warning is worth the avoided failure less the cost of acting — R200,000 less R20,000, so <strong>R180,000 saved</strong>. A false alarm costs <strong>R20,000</strong>. A miss costs the full <strong>R200,000</strong>. Correct silence costs nothing. Now the model's performance is a net figure you can set against doing nothing. And this reveals what the percentage hid entirely: <strong>the model's sensitivity is adjustable</strong>, and moving it trades one kind of error for the other — so because they cost different amounts, there is a setting that <strong>pays best</strong>, and it is generally not the setting that scores best.</p>
+</div>
+</details>
+<p>There is a way to turn a model's performance into rand, on one page. Here it is, for the pump model.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the cost-aware evaluation - the model's accuracy translated into money, and the threshold chosen to pay best.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Why does accuracy hide the value? (accuracy is not value)</div><p class="cb-demo">A predictive-maintenance model makes one of four calls: a TRUE POSITIVE (predicted a failure, one was coming - a good catch), a FALSE POSITIVE (predicted a failure, none coming - a false alarm, an unnecessary strip-down), a FALSE NEGATIVE (predicted nothing, a failure happened - a costly miss), or a TRUE NEGATIVE (correctly quiet). ACCURACY - the fraction it gets right - treats all four the same. But a false alarm and a missed failure cost wildly different amounts, so accuracy is blind to the one thing that matters: money. A 92%-accurate model tells you nothing about whether it pays.</p></div><div class="canvas-box"><div class="cb-label">2. What does each outcome cost or save? (cost the confusion matrix)</div><p class="cb-demo">Cost each outcome from the real numbers. An unplanned pump failure costs R200,000; a planned intervention (and an unnecessary one) costs R20,000. So: a TRUE POSITIVE lets you intervene before the failure, worth the R200,000 avoided minus the R20,000 intervention = R180,000 SAVED. A FALSE POSITIVE is an unnecessary strip-down = R20,000 COST. A FALSE NEGATIVE is the full unplanned failure = R200,000 COST. A TRUE NEGATIVE costs nothing. Now every prediction the model makes has a price - and the picture is no longer a percentage but a set of rands.</p></div><div class="canvas-box"><div class="cb-label">3. What is the model&#039;s net benefit in money? (compute it)</div><p class="cb-demo">Net benefit = sum over the matrix of (count x value). Over a season at the current threshold, the model scored 8 true positives, 15 false positives, 2 false negatives. So: 8 x R180,000 saved - 15 x R20,000 - 2 x R200,000 = R1,440,000 - R300,000 - R400,000 = R740,000 net benefit. THAT is the model&#039;s value - a number in rand the board can act on, not a percentage nobody could translate. And note it already shows the misses (2 x R200,000 = R400,000) are a big part of the cost - which is exactly what the next box works on.</p></div><div class="canvas-box"><div class="cb-label">4. Which threshold maximises it? (choose by net benefit, not recall)</div><p class="cb-demo">The model gives a probability; you pick a THRESHOLD to act above. Lower it (more sensitive) and you catch more failures but raise more false alarms. So try a more sensitive threshold B: 9 true positives, 40 false positives, 1 false negative -&gt; 9 x R180,000 - 40 x R20,000 - 1 x R200,000 = R1,620,000 - R800,000 - R200,000 = R620,000. WORSE than the R740,000 at threshold A - even though B catches an extra failure, because its forty false alarms cost more than the one miss they prevent. The threshold is set by the COST ASYMMETRY (a R200,000 miss vs a R20,000 false alarm), not by chasing recall or accuracy.</p></div><div class="canvas-box"><div class="cb-label">5. The cost-aware evaluation report (and its honest limits)</div><p class="cb-demo">The report the decision rests on: the model&#039;s net benefit (R740,000 at the chosen threshold A), the threshold and WHY it beats the alternatives, and the honest limits. The costs are ESTIMATES - if a failure actually costs R400,000, not R200,000, the asymmetry doubles and the best threshold moves more sensitive, so recompute when the numbers change. And the decisive test: if a model is net-NEGATIVE at its best threshold, it should not be switched on at all, however accurate - accuracy was never the point, net benefit was. That report answers Onalenna&#039;s question: yes, it pays - R740,000 a season, at this threshold, while these cost estimates hold.</p></div></div>
+
+<p>Watch box 4 overturn an instinct everyone has: the more sensitive threshold, which catches an extra failure, is <em>worse</em> - because its false alarms cost more than the miss it prevents. "Catch every failure" sounds responsible and loses money. Accuracy would never have shown you that; only the rands did. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A model's accuracy is not its value. Five questions turn performance into money:</p>
+<ul>
+<li><strong>Why does accuracy hide the value?</strong> A prediction has four outcomes - a <em>true positive</em> (good catch), a <em>false positive</em> (false alarm), a <em>false negative</em> (a costly miss), a <em>true negative</em> (correctly quiet) - and they cost wildly different amounts. <strong>Accuracy</strong>, the fraction correct, treats all four the same, so it is blind to the one thing that matters for maintenance: money.</li>
+<li><strong>What does each outcome cost or save?</strong> Put a rand value on each, from the real costs. A true positive lets you intervene before the failure, so it saves the failure avoided minus the intervention. A false positive costs an unnecessary intervention. A false negative costs the full unplanned failure. A true negative costs nothing. Now every prediction has a price.</li>
+<li><strong>What is the model's net benefit in money?</strong> <strong>Net benefit</strong> = the sum across the confusion matrix of (count x value) - the <em>expected value</em> of the model's decisions, in rand. A percentage becomes a number the board can act on.</li>
+<li><strong>Which threshold maximises it?</strong> The model outputs a probability, and you choose a <strong>threshold</strong> to act above. A lower one catches more failures but raises more false alarms; a higher one does the reverse. The right threshold is the one that maximises net benefit - and where it sits is set by the <strong>cost asymmetry</strong> between a missed failure and a false alarm, not by accuracy or recall. Chasing "catch every failure" can destroy value when false alarms are cheap misses' worth of nuisance.</li>
+<li><strong>What goes in the report, and what are its limits?</strong> The <strong>cost-aware evaluation report</strong>: the monetised metrics, the chosen threshold and why, and the honest limits. The costs are estimates - recompute the threshold when they change - and a model that is net-negative at its best threshold should not be deployed, however accurate.</li>
+</ul>
+<p>One honest boundary. You <em>evaluate the model's value in money</em> and set its operating threshold by net benefit. You are not building the model, and you are not interpreting why it made a given prediction - those are separate units. You are answering the question the data team could not: is it worth switching on, and at what threshold? And the answer runs on one principle - accuracy is not value; net benefit is.</p>
+<p>Does it scale? It is choosing a smoke alarm's sensitivity: you do not want the most sensitive setting or the least, you want the point where the nuisance of its false alarms is worth the fires it catches - and that point depends on how bad a missed fire would be, not on the number printed on the box.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A predictive model watches a critical transformer. An unplanned transformer failure costs <strong>R500,000</strong>; an inspection (planned, or an unnecessary one on a false alarm) costs <strong>R10,000</strong>. Over a year the model scores, at two thresholds:</p>
+<ul>
+<li><strong>Threshold X:</strong> 3 true positives, 4 false positives, 1 false negative.</li>
+<li><strong>Threshold Y (more sensitive):</strong> 4 true positives, 20 false positives, 0 false negatives.</li>
+</ul>
+<ol>
+<li><strong>Value a true positive.</strong> What does one true positive save?</li>
+<li><strong>Net benefit.</strong> Compute the net benefit at each threshold.</li>
+<li><strong>Choose.</strong> Which threshold is better, and why - given that Y catches every failure?</li>
+<li><strong>One limit.</strong> State one honest limitation of this analysis.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> Before you do the arithmetic, your instinct might be that Y is obviously better because it catches every failure. Or, you might remember from the demonstration that a more sensitive model can be worse. Do not trust instinct either way. The whole point of this technique is to let the net-benefit numbers decide. Calculate the value of each threshold and choose the one that pays more; the cost asymmetry is the only thing that determines the right answer.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-accuracy_not_value">1. Why does accuracy hide the value? (accuracy is not value)</label><textarea id="cb-accuracy_not_value" data-key="t-0155:accuracy_not_value" placeholder="Recognise that a prediction has four possible outcomes with wildly different costs, so a single accuracy figure hides everything that decides whether the model is worth deploying."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-cost_each">2. What does each outcome cost or save? (cost the confusion matrix)</label><textarea id="cb-cost_each" data-key="t-0155:cost_each" placeholder="Put a money value on each of the four outcomes, from the real maintenance costs."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-net_benefit">3. What is the model&#039;s net benefit in money? (compute it)</label><textarea id="cb-net_benefit" data-key="t-0155:net_benefit" placeholder="Sum the value across the confusion matrix at the current threshold: the model&#039;s expected value in money, not a statistic."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-threshold">4. Which threshold maximises it? (choose by net benefit, not recall)</label><textarea id="cb-threshold" data-key="t-0155:threshold" placeholder="The model outputs a probability; you choose a threshold to act above. Compare thresholds by net benefit - a more sensitive one catches more failures but raises more false alarms. The cost asymmetry decides."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-report">5. The cost-aware evaluation report (and its honest limits)</label><textarea id="cb-report" data-key="t-0155:report" placeholder="Assemble the report: the monetised metrics, the chosen threshold and why, and the honest limits - the costs are estimates, recompute when they change, and a model net-negative at every threshold should not be deployed."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now tell a data team not just how accurate their model is, but whether - and at what setting - it actually pays.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Model evaluation goes wrong when the money is left out, in a few predictable ways.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Judging by accuracy or recall alone.</strong> The numbers that hide the money. A model can win on accuracy and lose on net benefit; only the rands decide.</p>
+<p>&bull; <strong>Treating a false alarm and a miss as equally bad.</strong> They almost never are. Cost each of the four outcomes separately, or the whole evaluation is meaningless.</p>
+<p>&bull; <strong>Chasing recall - "catch every failure".</strong> It sounds responsible and can be net-negative, because catching the last few failures may cost a flood of false alarms. Net benefit, not recall, sets the threshold.</p>
+<p>&bull; <strong>Setting the threshold by a statistics rule.</strong> The threshold is an economic decision, driven by the ratio of a miss's cost to a false alarm's cost - not by a default like 0.5.</p>
+<p>&bull; <strong>Treating estimated costs as certain.</strong> The failure and false-alarm costs are estimates; when they change, the best threshold moves. Recompute rather than trusting a one-off number.</p>
+<p>&bull; <strong>Deploying a net-negative model because it is "accurate".</strong> If the best threshold still loses money, the model should not be switched on. Accuracy is not a reason to deploy; net benefit is.</p>
+<p>&bull; <strong>Confusing evaluating value with building or explaining the model.</strong> Building the model and interpreting its predictions are separate jobs; this one answers whether it pays and at what setting.</p>
+</div>
+</details>
+<p>Onalenna's data team had a 92%-accurate model and no idea whether it paid, because accuracy cannot see money. Now she can answer it: cost each of the four outcomes, sum them into a net benefit in rand, choose the threshold that maximises it - driven by the asymmetry between a missed failure and a false alarm - and report it honestly, limits and all. A model earns its keep by what it protects - measured honestly in the money it saves, not the percentage it scores - and a model that loses money at its best setting should stay switched off however accurate it is. If you are working with an AMU Facilitator, take one real model's confusion matrix and turn it into rand - then find the threshold that pays.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can tell whether a model actually pays now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

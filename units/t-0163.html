@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nothing to be failing</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Nothing to be failing</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and you lose two arguments in one week for exactly the same reason.</p>
+<p>On Tuesday a resident tells you the water pressure is terrible. You want to answer her properly and you find you cannot. <em>Terrible</em> is an opinion. <em>Adequate</em>, which is what you would like to say, is also an opinion. There is nothing either of you can check, so the conversation becomes about who is more insistent, and she leaves believing the works does not care - which is not true, and you could not prove it.</p>
+<p>On Thursday you ask for money to renew the mains, and somebody asks the reasonable question: what happens if you do not get it? And everything you can say sounds like special pleading. The assets will deteriorate. The risk will rise. Eventually there will be consequences. You can hear how it lands - as an engineer asking for money because engineers always ask for money.</p>
+<p>You did not lose either argument because you were wrong, or because you argued badly.</p>
+<p>You lost both because <strong>nobody has ever written down what this works owes this town</strong>. There is no agreed standard. And with no agreed standard there is no gap, no evidence and no case - because there is <em>nothing to be failing</em>.</p>
+<blockquote><h2>Every complaint is an opinion against my opinion, and every budget request sounds like special pleading. How do I establish what we actually owe - so that performance and funding can both be argued from evidence?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Two arguments in one month, both lost, and you were right on the substance in both. A resident complained about interruptions; you said the works performs reasonably; she said it does not; there was no way to settle it, so it stayed her word against yours. Then you asked for money to reduce those interruptions, and it read as special pleading — because you could not show a shortfall against anything. You keep good technical measures, and both of them shrugged at those. And when somebody asked what this works is actually supposed to deliver, <strong>you had no answer to give.</strong> Write down how you would establish what you owe — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and why there was nothing to argue from</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Report our technical measures more clearly.&rdquo;</strong> They saw them and shrugged, because those measure <strong>the assets, not the service</strong>. Nobody outside your works cares about a mean time between failures; they care whether the water is on.</p>
+<p>&bull; <strong>&ldquo;Benchmark against other works and show we compare well.&rdquo;</strong> Answers &ldquo;are we typical&rdquo; when the question is &ldquo;are we adequate&rdquo;. It also invites the reply that the comparators may all be poor.</p>
+<p>&bull; <strong>&ldquo;Survey residents on satisfaction.&rdquo;</strong> Produces a better-evidenced opinion, and an opinion is what you already had. Satisfaction moves with the weather and the news, and you cannot build a capital case on it.</p>
+<p>&bull; <strong>&ldquo;Make the funding case on risk — what happens if we do nothing.&rdquo;</strong> Genuinely useful and still incomplete: risk against what threshold? Without a stated standard, &ldquo;this could get worse&rdquo; has nothing to be worse <em>than</em>.</p>
+<p>&bull; <strong>&ldquo;Argue it better next time.&rdquo;</strong> You did not lose because you argued badly. You lost because there was nothing to argue from, and rhetoric will not fill that gap twice.</p>
+<p>&bull; Both were lost for one reason: <strong>nobody has ever written down what this works owes this town.</strong> With no agreed standard there is no gap, so a complaint is one opinion against another and a funding request is pleading — <strong>there is nothing to be failing.</strong> So write the promise down, publicly, with a number against it, and build it in this order. Start <strong>where the service is felt rather than where the assets sit</strong>, in words a resident would use: the water is safe; there is enough of it; it does not stop; when it stops it comes back quickly; when I call, somebody answers. A framework that opens with technical measures is not a promise, it is <strong>an engineer's dashboard</strong>. Then <strong>translate each statement into something you can measure and control, with a target</strong> — that bridge is what makes the promise manageable instead of rhetorical. Check the set against the recognised dimensions of service, so you have a balanced promise rather than the four things that came to mind. And note what this buys you on the second argument: once what is owed is stated, <strong>funding becomes arithmetic</strong> — a target is affordable or it is not, and that is a decision somebody must make in the open rather than one settled through complaints.</p>
+</div>
+</details>
+<p>You write the promise down, in public, with a number against it. Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the level of service framework - what the works owes, in language the town recognises and the engineers can manage.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. What do customers actually value? (in their words, not yours)</div><p class="cb-demo">Start where the service is felt, not where the asset sits. Write CUSTOMER LEVEL OF SERVICE statements in language a resident would use: the water is safe to drink; there is enough of it, at usable pressure; it does not stop; when it does stop it comes back quickly; and when I call, somebody answers and tells me the truth. If your framework is a list of technical KPIs it is not a level of service framework, it is an engineer&#039;s dashboard - it measures the ASSETS, not the SERVICE. Then check the set against the recognised service dimensions - QUALITY, QUANTITY, RELIABILITY, RESPONSIVENESS, ENVIRONMENTAL, ACCEPTABILITY AND COST - so that what you have is balanced, rather than the four things that happened to come to mind.</p></div><div class="canvas-box"><div class="cb-label">2. What measure delivers it? (translate promise into something you control)</div><p class="cb-demo">Now the bridge, and the heart of the technique: every customer statement gets a TECHNICAL LEVEL OF SERVICE measure and a TARGET, so the promise becomes something you can actually manage. &#039;Safe to drink&#039; becomes ZERO E. coli detections per 100 samples. &#039;It does not stop&#039; becomes UNPLANNED INTERRUPTIONS PER CONNECTION PER YEAR. &#039;It comes back quickly&#039; becomes PERCENTAGE RESTORED WITHIN SIX HOURS. &#039;Somebody answers&#039; becomes calls answered within a stated time. Both halves are load-bearing: a framework of only customer statements cannot be MANAGED, and a framework of only technical indicators cannot be READ by the people it serves - condition ratings and distress measurements are not commonly understood outside the agency, and a promise nobody outside can understand is not a promise.</p></div><div class="canvas-box"><div class="cb-label">3. What may you never go below? (the statutory floor is not a target)</div><p class="cb-demo">Three kinds of level, and confusing them is how utilities publish failure. STATUTORY is what you MUST - the regulatory minimum, drinking-water standards, reporting obligations. AGREED CUSTOMER LoS is what you PROMISE, settled with the community and funded. ASPIRATIONAL is what you WANT and have not yet paid for. The statutory level is a FLOOR, NOT A TARGET: aiming at it makes the legal minimum into the ceiling, and leaves nothing between normal operation and non-compliance. And the floor exists for a reason worth stating plainly - it is the minimum owed to every customer regardless of income, which is why the trade-off conversation in the next box decides levels ABOVE the floor and never negotiates the floor itself.</p></div><div class="canvas-box"><div class="cb-label">4. What does each level cost? (turn the argument into arithmetic)</div><p class="cb-demo">Price the options and hand over a genuine choice, because the asset manager&#039;s duty is to present the trade-off between LEVEL OF SERVICE, RISK AND COST - not to bring one option for signature. Corathyl has 25,000 connections and 3.0 unplanned interruptions per connection per year. OPTION A, hold at 3.0: no additional cost. OPTION B, reduce to 2.0: a mains renewal programme at R6.0m a year = R240 per connection a year = R20 A MONTH. OPTION C, reduce to 1.0: R18.0m a year = R720 per connection = R60 A MONTH. Note the shape of it: the first increment costs R6.0m and the second costs R12.0m, TWICE as much - each increment of service costs more than the last. Now the town can answer a question it could not answer before. AND THE HARD RULE: DO NOT PUBLISH A LEVEL YOU CANNOT FUND, because an unfunded promise converts an underfunded utility into a permanently and documentably failing one.</p></div><div class="canvas-box"><div class="cb-label">5. The performance monitoring plan (and what happens when you miss)</div><p class="cb-demo">The framework is only a promise until it is monitored, so finish the job. For EVERY measure record: the DATA SOURCE (where the number genuinely comes from, not where you wish it came from), the FREQUENCY, the OWNER by name, the REPORTING ROUTE and audience, and - the part that is always missing - WHAT HAPPENS WHEN A TARGET IS MISSED. A monitoring plan with no consequence is a spreadsheet. Name the trigger: a breach of the statutory floor is reported immediately and escalated; a missed agreed target is investigated and answered publicly; a target missed three periods running forces a decision - either the service is restored or the promise is renegotiated honestly. Publishing the result is what makes it a promise rather than an intention, and it is what finally gives Onalenna something to point at in both of those meetings.</p></div></div>
+
+<p>Box 4 is what ends Thursday's meeting. Onalenna no longer arrives asking for money; she arrives with three costed options and a question the town is entitled to answer. Notice she does not decide it. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A level of service is a <strong>promise, not a measurement</strong>. It converts an unwinnable argument into a public commitment - making delivery accountable and budget decisions defensible. Five questions:</p>
+<ul>
+<li><strong>What do customers actually value?</strong> <strong>Customer levels of service</strong>, written in plain language, checked against the recognised service dimensions - quality, quantity, reliability, responsiveness, environmental, acceptability and cost - so the set is balanced rather than accidental. Start here, always: the technical measures exist to serve this promise, not the other way round.</li>
+<li><strong>What measure delivers it?</strong> Each statement gets a <strong>technical level of service</strong> measure and target. Both halves are load-bearing - customer statements alone cannot be managed, and technical indicators alone cannot be <em>read</em> by the people they are promised to.</li>
+<li><strong>What may you never go below?</strong> The <strong>statutory floor</strong> - a floor, not a target. Keep the three levels distinct: statutory is what you <em>must</em>, agreed customer LoS is what you <em>promise</em>, aspirational is what you <em>want</em>.</li>
+<li><strong>What does each level cost?</strong> Present the <strong>level-of-service, risk and cost trade-off</strong>, with the community's expectations and its willingness to pay in view, so the agreed level is a decision rather than a wish. Expect <strong>diminishing returns</strong>: each increment costs more than the last.</li>
+<li><strong>How is it monitored?</strong> The <strong>performance monitoring plan</strong> - source, frequency, owner, reporting route, and the consequence when a target is missed.</li>
+</ul>
+<p><strong>The ethical floor, which this unit will not soften.</strong> The principle of <em>willingness to pay</em> must be balanced by <em>ability to pay</em> and the fundamental right to essential services. The statutory floor exists for this reason: it is the minimum standard of service owed to every citizen, regardless of their income. A level of service framework for a public utility uses the trade-off conversation to decide on service levels <em>above</em> this floor, not to negotiate the floor itself. Promising only what the most affluent are willing to fund, while leaving others below a minimum standard, is a failure of public duty.</p>
+<p>One honest boundary. You are architecting the <em>promise</em> - what is owed, and how it will be monitored. You are not setting the budget, not running a customer satisfaction survey, and not building the internal scorecard that steers the organisation against its own goals. That scorecard answers "how are we performing?"; this framework defines what it is you are supposed to be performing <em>at</em>, which is why it comes first.</p>
+<p>Does it scale? An ambulance service that says it "responds quickly" has promised nothing, and can be neither praised nor held to account. One that says it will reach ninety per cent of life-threatening calls within eight minutes has made a promise a community can plan around, argue with, fund properly - or knowingly decide it cannot afford, which is a legitimate answer and an entirely different thing from never having said.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A district municipality maintains a <strong>road network serving 18,000 households</strong>. Complaints are constant and unstructured: potholes, dust on gravel roads, unlit intersections, and roads that flood and become impassable. There is a legal duty to make a reported hazard safe within a defined period. Budget discussions have run the same way for years.</p>
+<ol>
+<li><strong>Customer statements.</strong> Write three customer levels of service in a resident's language, drawn from different service dimensions - not three versions of the same one.</li>
+<li><strong>Translate.</strong> Give each a technical measure and a target you could actually collect.</li>
+<li><strong>The floor.</strong> Identify which of your measures has a statutory floor, and say how you would treat that floor differently from a target.</li>
+<li><strong>Price one increment.</strong> Pothole repair currently averages 21 days from report. Reducing it to 7 days requires a second repair crew at <strong>R4.32m a year</strong>. Express that per household per month, and present it as a choice rather than a request.</li>
+<li><strong>Monitor.</strong> Draft three lines of the monitoring plan - measure, source, frequency, owner, and what happens on a miss.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three ways to go wrong, all of which look professional on the page.</p>
+<p>First, writing a technical indicator as if it were a customer statement. "Achieve a pavement condition index of 75" is a perfectly good technical measure and a meaningless promise - no resident experiences an index, and nobody can consent to one. If your customer statements contain jargon, you have written box 2 twice and skipped box 1.</p>
+<p>Second, treating the statutory floor as the target. If the law says a reported hazard must be made safe within 48 hours and you adopt 48 hours as your service level, you have made the legal minimum your aim, and left yourself no distance at all between an ordinary bad week and a breach.</p>
+<p>Third, and most tempting: proposing the level you think the district <em>ought</em> to have. If it cannot be funded, publishing it does not create ambition - it creates a documented, permanent, provable failure, and it will be quoted back to you by everyone who was ever let down by it.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-customer_words">1. What do customers actually value? (in their words, not yours)</label><textarea id="cb-customer_words" data-key="t-0163:customer_words" placeholder="Write the service promises in plain customer language, checked against the full set of service dimensions so the picture is balanced rather than whatever came to mind."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-translate_technical">2. What measure delivers it? (translate promise into something you control)</label><textarea id="cb-translate_technical" data-key="t-0163:translate_technical" placeholder="Give every customer statement a technical measure and a target - the bridge between what people experience and what engineers manage."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-statutory_floor">3. What may you never go below? (the statutory floor is not a target)</label><textarea id="cb-statutory_floor" data-key="t-0163:statutory_floor" placeholder="Separate the three kinds of level cleanly - what you must, what you promise, what you want - and treat the regulatory minimum as a floor rather than an aim."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-price_tradeoff">4. What does each level cost? (turn the argument into arithmetic)</label><textarea id="cb-price_tradeoff" data-key="t-0163:price_tradeoff" placeholder="Cost the options and express them per household, so the level of service becomes a decision the community can weigh rather than a wish."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-monitoring_plan">5. The performance monitoring plan (and what happens when you miss)</label><textarea id="cb-monitoring_plan" data-key="t-0163:monitoring_plan" placeholder="For each measure: the data source, the frequency, the owner, the reporting route - and the consequence when a target is missed."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now say what your organisation owes, and show whether it is delivering.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Level of service frameworks fail in ways that are easy to spot once you know them.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>All technical measures, no customer language.</strong> An engineer's dashboard wearing the wrong title. If those it is promised to cannot read it, it is not a promise.</p>
+<p>&bull; <strong>All customer language, no technical measure.</strong> Warm, unmanageable and unfalsifiable. "We will provide an excellent service" commits nobody to anything.</p>
+<p>&bull; <strong>Measuring only what is easy.</strong> Whole service dimensions end up blank - usually acceptability and responsiveness, because they are harder to count than volumes and pressures.</p>
+<p>&bull; <strong>Treating the statutory floor as the target.</strong> It makes the legal minimum the ceiling and removes every margin between a bad week and non-compliance.</p>
+<p>&bull; <strong>Publishing a level you cannot fund.</strong> Not ambition. A documented promise to fail, quoted back to you by everyone it disappoints.</p>
+<p>&bull; <strong>Bringing one option instead of a costed trade-off.</strong> That asks the decision-maker to rubber-stamp rather than decide, and it is how asset managers lose the right to be believed.</p>
+<p>&bull; <strong>Assuming service improvements scale linearly.</strong> Each increment costs more than the last, and a plan that assumes otherwise promises a level it will not reach.</p>
+<p>&bull; <strong>A monitoring plan with no owner, frequency or consequence.</strong> Then it is a spreadsheet, and the promise quietly reverts to an intention.</p>
+<p>&bull; <strong>Setting levels without asking the community.</strong> A technically excellent framework can promise entirely the wrong things, expensively and for years.</p>
+<p>&bull; <strong>Letting willingness to pay override ability to pay.</strong> For a monopoly supplier of an essential service, the market analogy breaks down. The floor is owed to everyone; only what sits above it is up for negotiation.</p>
+</div>
+</details>
+<p>Onalenna lost both arguments because there was nothing to be failing. Write what customers value in their own words; translate each promise into a technical measure and target you control; separate what you must do, what you promise and what you merely want, and treat the statutory level as a floor owed to everyone; price the options and present the trade-off so the community can choose rather than be told; then monitor with a source, an owner, a frequency and a consequence. A level of service is a promise, not a measurement - and a promise you cannot fund should never be published. If you are working with an AMU Facilitator, take one complaint your organisation receives often and write the customer statement, the technical measure and the target that would have settled it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can say what you owe, and prove it, now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

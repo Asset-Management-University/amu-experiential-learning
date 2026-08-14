@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The answer that flips</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The answer that flips</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The capital paper is on your desk, and it is confident. A lifecycle-cost model, neatly laid out, recommends <strong>replacing</strong> the big pump set rather than refurbishing it, and the headline is in bold: <em>saves R3.5 million over twenty years</em>. Everyone in tomorrow's meeting will see that number. It is precise. It looks like a fact.</p>
+<p>And you have a quiet unease you cannot quite justify. The arithmetic is surely right - these things always add up. But R3.5 million over twenty years is a big claim to sign, and you find yourself wondering what is <em>behind</em> the number. That twenty-year life the new pump is assumed to have - was that measured from real failure data, or did someone just type in a hopeful round number? Because if it was a guess, the whole recommendation might be resting on sand, and the output gives you no way to tell.</p>
+<p>The number looks exactly as confident either way. That is the problem.</p>
+<blockquote><h2>The model is precise and the arithmetic is sound - so why don't I trust it enough to sign? How do I tell an answer that is genuinely solid from one that just looks solid because it has a decimal point?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The model says replace, and it says so precisely. You have checked the arithmetic twice and it is correct — every formula, every link. Then you look at the inputs and find the new pump is assumed to have a <strong>twenty-year life</strong>. Nobody can tell you where that came from. It might be from real failure data. It might be a hopeful round number somebody typed on a Friday. The output looks <strong>exactly as confident either way</strong>, and there is a large sum of money waiting on your signature. Write down how you would tell a genuinely solid answer from one that just looks solid — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and where trustworthiness actually lives</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Check the calculation again.&rdquo;</strong> You have, and it is right — which is exactly what makes a bad model dangerous. It is not clumsily, visibly wrong; it is <strong>confidently, precisely wrong</strong>, and the sum verifies nothing whatever about the conclusion.</p>
+<p>&bull; <strong>&ldquo;Ask the analyst if they are confident.&rdquo;</strong> They will say yes, sincerely, because their arithmetic is sound. Confidence in the method is not evidence about the inputs, and the person closest to a model is rarely the person most sceptical about it.</p>
+<p>&bull; <strong>&ldquo;Get a second model built independently.&rdquo;</strong> Expensive, slow, and it will very likely use the same twenty-year figure, because it is the number everybody has. Two models resting on one guess agree with each other and prove nothing.</p>
+<p>&bull; <strong>&ldquo;Add a safety margin to the answer.&rdquo;</strong> Applies an unquantified pad to an unquantified doubt. If the twenty years is wrong by half, no margin you choose by feel will be the right size.</p>
+<p>&bull; <strong>&ldquo;It is the best analysis we have — sign it.&rdquo;</strong> Might be right and cannot be defended. If it fails you will be asked what the recommendation rested on, and &ldquo;the arithmetic was correct&rdquo; is not an answer.</p>
+<p>&bull; The problem is that <strong>the output hides its own foundation.</strong> A result looks equally authoritative whether the assumptions beneath it were measured from hard data or invented on a Friday afternoon — the decimal point is applied equally to the solid and the flimsy, and the format carries no information about what is underneath. So <strong>stop looking at the polished output and look under it</strong>, at the inputs and assumptions, because that is the only place the trustworthiness of the answer lives. Practically: <strong>separate what was measured from what was guessed</strong>, and then test whether the guesses matter by asking <strong>how far each would have to move before the recommendation changes.</strong> That question sorts them into two very different kinds. Some can be badly wrong and change nothing — and no further work on them is warranted, which is itself worth knowing. Others are <strong>load-bearing</strong>: a modest change flips the answer, and the entire decision turns out to rest on a number somebody typed in. Find a flip and your unease becomes a finding you can put in writing — <em>this recommendation stands or falls on this one figure, and here is how confident we actually are about it.</em></p>
+</div>
+</details>
+<p>Here is how you evaluate it instead of just believing it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you decide whether to trust an analysis before you act on it - looking past the output, separating data from guesses, running the sensitivity, checking the fit and the claim, and reporting it as a service.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Look past the output - it hides its own foundation</div><p class="cb-demo">START WITH WHY THE UNEASE IS JUSTIFIED, BECAUSE IT NAMES THE WHOLE PROBLEM. A MODEL OUTPUT - &#039;SAVES 3.5 MILLION&#039;, &#039;RELIABILITY 98.5 PER CENT&#039;, &#039;REPLACE&#039; - LOOKS EXACTLY AS CONFIDENT WHETHER THE ASSUMPTIONS BENEATH IT WERE MEASURED FROM HARD DATA OR INVENTED ON A FRIDAY AFTERNOON. The decimal point is applied equally to the solid and the flimsy; the format carries no information about the foundation. THIS IS WHY EVALUATING AN ANALYSIS IS NOT RE-CHECKING THE ARITHMETIC. The arithmetic is almost always correct - and that is precisely what makes a bad model DANGEROUS: it is not clumsily, visibly wrong, it is CONFIDENTLY, PRECISELY WRONG, and it carries no warning label. A learner&#039;s instinct is to verify the sum; the sum verifies nothing about whether to trust the conclusion. SO THE ENTIRE ACT OF EVALUATION IS TO STOP LOOKING AT THE POLISHED OUTPUT AND LOOK UNDERNEATH IT - at the inputs and the assumptions the output was built from - because that is the only place the trustworthiness of the answer actually lives. The output is a mirror; it reflects back the confidence you bring to it. The foundation is where the truth is. THE SINGLE HARDEST TRUTH OF THE UNIT: A PRECISE ANSWER FROM A MODEL IS NOT THE SAME AS A TRUSTWORTHY ONE. Trust does not come from the polish of the number; it comes from testing the assumptions the precision rests on. Do not re-check the arithmetic - check the assumptions the arithmetic stands on.</p></div><div class="canvas-box"><div class="cb-label">2. Separate the data from the guesses</div><p class="cb-demo">UNDERNEATH EVERY MODEL IS A MIX OF TWO VERY DIFFERENT KINDS OF INPUT, AND THE FIRST REAL MOVE OF EVALUATION IS SIMPLY TO TELL THEM APART. SOME INPUTS ARE DATA: measured, quoted, evidenced - the purchase price from a real supplier quote, the energy rate from the meter, the failure count from the maintenance record. SOME INPUTS ARE GUESSES: estimates standing in for numbers nobody actually has yet - the assumed twenty-year life, the assumed future energy escalation, the assumed failure rate of an option that has not been built. GO THROUGH THE MODEL AND MARK EVERY SINGLE INPUT AS ONE OR THE OTHER, DATA OR GUESS. It is astonishing how rarely this is done, and how much it reveals. NOW THE DIGNITY OF IT, WHICH MATTERS: THIS IS NOT ABOUT SHAMING THE GUESSES. A SOFT ASSUMPTION IS NOT A MISTAKE. IT IS AN HONEST MARKER OF THE EDGE OF OUR KNOWLEDGE, AND NAMING IT MAKES THE UNCERTAINTY VISIBLE SO THE GROUP CAN DECIDE WITH ITS EYES OPEN. Every hard question has places where the data runs out and a professional has to estimate; that is honest and unavoidable. THE DANGER IS NEVER AN ASSUMPTION THAT IS LABELLED AS ONE. THE DANGER IS A GUESS THAT HAS QUIETLY PUT ON THE COSTUME OF A FACT - a hopeful round number sitting in the same neat column as the real quote, indistinguishable in the output - so that a decision ends up leaning its full weight on a number that was never more than someone&#039;s best estimate. Marking data from guess strips the costume off, and lets you see exactly where the model is standing on rock and where it is standing on sand.</p></div><div class="canvas-box"><div class="cb-label">3. Run the sensitivity - the real test of trust</div><p class="cb-demo">NOW THE SHARPEST MOVE IN THE UNIT, THE ONE THAT ACTUALLY SEPARATES A TRUSTWORTHY CONCLUSION FROM A LUCKY-LOOKING ONE. ONCE YOU KNOW WHICH INPUTS ARE GUESSES, ASK THE SINGLE DECISIVE QUESTION: HOW MUCH DOES THE ANSWER MOVE IF A GUESS IS WRONG WITHIN ITS HONEST RANGE? This is sensitivity analysis, and you do it on the assumptions that actually DRIVE the result - usually only a few of the many inputs. Take each driver and vary it across the range it could reasonably take, and watch what the conclusion does. A CONCLUSION THAT HOLDS STEADY ACROSS THE PLAUSIBLE RANGE OF ITS GUESSES IS ROBUST - YOU CAN ACT ON IT WITH CONFIDENCE, because whatever the true value turns out to be, the decision is the same. A CONCLUSION THAT FLIPS - FROM &#039;REPLACE&#039; TO &#039;REFURBISH&#039;, FROM &#039;YES&#039; TO &#039;NO&#039; - WHEN A SINGLE ASSUMED NUMBER CHANGES WITHIN THE RANGE IT COULD HONESTLY TAKE IS NOT A CONCLUSION AT ALL. IT IS A COIN TOSS WITH A DECIMAL POINT, AND THE DECISION IS REALLY BEING MADE BY WHOEVER CHOSE THE ASSUMPTION - not by the evidence. This is the whole reason a single assumed life can matter more than everything else in the model: if the recommendation is the same at a fifteen-year and a twenty-five-year life, the guess was harmless and you can move on; but if it FLIPS at a twelve-year life the asset might honestly have, then the recommendation was never really about the asset - it was about that one unexamined number. Find the drivers, move them across their honest range, and let the conclusion show you whether it is standing on rock or balancing on a guess. Sensitivity is how a precise answer earns, or fails to earn, your trust.</p></div><div class="canvas-box"><div class="cb-label">4. Check the fit and the claim</div><p class="cb-demo">TWO CHECKS FINISH THE APPRAISAL, AND BOTH CATCH ERRORS THAT SENSITIVITY ALONE WILL MISS. FIRST, FITNESS FOR PURPOSE: WAS THIS THE RIGHT TYPE OF MODEL FOR THE QUESTION BEING ASKED? An analytical framework is a tool built for a particular job, and a tool pointed at the wrong job gives a confident, invalid answer while looking perfectly competent. A cost model built to compare a LIKE-FOR-LIKE replacement is the wrong instrument for judging a re-rated, larger, different-duty new unit - it will still produce a tidy number, and the number will be meaningless. So part of evaluating an analysis is judging whether the chosen framework actually SUITS the question, and part of building one is selecting and JUSTIFYING the right framework in the first place - a production-capacity model, a degradation model, a utilisation analysis each answer different questions, and using the wrong one is a silent, upstream error no amount of careful arithmetic can rescue. SECOND, DOES THE OUTPUT ACTUALLY SUPPORT THE CONCLUSION DRAWN FROM IT? Read the recommendation carefully against what the model genuinely computed, because there is very often a gap. THE OUTPUT SAYS X; THE CONCLUSION CLAIMS Y; AND THE SPACE BETWEEN THEM IS WHERE THE REAL ERROR USUALLY HIDES. The model compared COST - but the recommendation calls the cheaper option &#039;BETTER&#039;, which quietly implies reliability, safety, or performance that a cost model never assessed at all. A model that computes one thing cannot license a conclusion about another, however confidently the summary line is written. Check that the claim is no bigger than the computation that is supposed to support it.</p></div><div class="canvas-box"><div class="cb-label">5. Report it as a service, not a score</div><p class="cb-demo">END ON POSTURE, BECAUSE AT NQF 8 THE POSTURE IS THE METHOD, AND THE SAME SKILL DONE WITH THE WRONG POSTURE BUILDS ARROGANCE INSTEAD OF DECISIONS. FIRST, THE AIM: THE GOAL IS NOT TO DISTRUST ALL MODELS. THAT IS AS USELESS AS TRUSTING THEM BLINDLY. THE GOAL IS TO KNOW WHICH PARTS OF A MODEL TO TRUST, AND TO BUILD COLLECTIVE CONFIDENCE IN A DECISION. A person who reflexively rejects every analysis has not become rigorous; they have become useless in a different way. SECOND, THE ROLE: THE EVALUATOR&#039;S JOB IS NOT TO FIND FAULT. IT IS TO FIND THE ASSUMPTIONS THAT CARRY THE MOST WEIGHT, AND TO TEST WHETHER THE CONCLUSION IS STRONG ENOUGH TO BEAR THAT WEIGHT. THIS IS A SERVICE, NOT A CRITICISM. The analyst who made an estimate is not a person to be exposed - they are a colleague doing their best at the edge of the available data, and the soft assumption you found is the honest state of a hard question, not their failing. THIRD, HOW TO SPEAK: FRAME YOUR FINDING AS A CONTRIBUTION. NOT &#039;YOUR FORECAST IS WRONG&#039;, BUT &#039;THE WHOLE CONCLUSION SEEMS TO REST ON THE TWENTY-YEAR LIFE; BEFORE WE COMMIT, I WOULD WANT US TO TEST HOW THE ANSWER CHANGES IF THAT LIFE IS FIFTEEN YEARS, OR TWENTY-FIVE.&#039; That sentence makes the decision better, invites the group to look together, and takes nothing from the person who did the work. The most useful critique is never the one that tears something down to look clever; it is the one that builds a stronger, more robust shared understanding - and that is the practitioner this unit exists to make.</p></div></div>
+
+<p>Box 3 is the test that tells trustworthy from merely precise. Box 5 is what keeps this a contribution, not an attack. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A precise answer from a model is not the same as a trustworthy one. Trust comes from testing the assumptions the precision rests on. Do not re-check the arithmetic - check the assumptions the arithmetic stands on.</strong> Five questions:</p>
+<ul>
+<li><strong>Am I judging the output or the foundation?</strong> <strong>Look past the output.</strong> The number looks equally confident whether its assumptions were measured or guessed, so re-checking the sum tells you nothing about whether to trust it.</li>
+<li><strong>Which inputs are data, which are guesses?</strong> <strong>Mark every one.</strong> Every model mixes measured facts and estimates; the danger is the guess dressed as a fact.</li>
+<li><strong>Does the conclusion hold if the guesses are wrong?</strong> <strong>Run the sensitivity.</strong> Vary the driving assumptions across their honest range; a conclusion that flips is a coin toss, not a conclusion.</li>
+<li><strong>Is it the right tool, and does it prove the claim?</strong> <strong>Check fitness and the claim.</strong> Wrong model type for the question gives a confident wrong answer; and the output often measures less than the recommendation claims.</li>
+<li><strong>How do I say what I found?</strong> <strong>As a service, not a score.</strong> Surface the uncertainty so the group decides with its eyes open - name the assumption to test, do not attack the analyst.</li>
+</ul>
+<p><strong>Look past the output - the number hides its own foundation.</strong> Start with why the unease is justified. A model's output - "saves R3.5 million", "reliability 98.5 per cent", "replace" - <em>looks exactly as confident whether the assumptions beneath it were measured from hard data or invented on a Friday afternoon</em>. The decimal point is applied equally to the solid and the flimsy. This is why evaluating an analysis is <em>not</em> re-checking the arithmetic: the arithmetic is almost always correct, and that is precisely what makes a bad model dangerous - it is not clumsily wrong, it is <em>confidently, precisely wrong</em>, and it carries no warning. So the whole act of evaluation is to stop looking at the polished output and look <em>underneath</em> it, at the inputs and assumptions the output was built from - because that is the only place the trustworthiness actually lives.</p>
+<p><strong>Separate the data from the guesses.</strong> Underneath every model is a mix of two very different things, and the first real move is to tell them apart. Some inputs are <em>data</em> - measured, quoted, evidenced (the purchase price from a real quote, the energy rate from the meter). Some are <em>guesses</em> - estimates standing in for numbers nobody has yet (the twenty-year life, the assumed future energy escalation, the failure rate of an option not yet built). Go through the model and <strong>mark every input as one or the other</strong>. This is not to shame the guesses - <em>a soft assumption is not a mistake; it is an honest marker of the edge of our knowledge, and naming it makes the uncertainty visible so the group can decide with its eyes open.</em> The danger is never an assumption that is <em>labelled</em> as one. The danger is a guess that has quietly put on the costume of a fact, so that a decision leans its full weight on a number that was never more than someone's best estimate.</p>
+<p><strong>Run the sensitivity - the real test of trust.</strong> Now the sharpest move in the unit. Once you know which inputs are guesses, ask the one question that separates a trustworthy conclusion from a lucky-looking one: <strong>how much does the answer move if a guess is wrong within its honest range?</strong> Take the assumptions that actually <em>drive</em> the result - usually only a few - and vary each across the range it could reasonably take, and watch the conclusion. <em>A conclusion that holds steady across the plausible range of its guesses is robust; you can act on it.</em> <em>A conclusion that flips - from "replace" to "refurbish", from "yes" to "no" - when a single assumed number changes within the range it could honestly take is not a conclusion at all. It is a coin toss with a decimal point, and the decision is really being made by whoever chose the assumption.</em> This is the whole reason the twenty-year life matters: if the answer is the same at a fifteen- or twenty-five-year life, the guess was harmless; if the answer flips at a twelve-year life the pump might honestly have, then the recommendation was never about the pump at all - it was about that one number, and nobody stress-tested it.</p>
+<p><strong>Check fitness and the claim.</strong> Two checks finish the appraisal. First, <em>fitness for purpose</em>: was this the right <em>type</em> of model for the question being asked? A tool built for one job and pointed at another gives a confident, invalid answer - a cost model built to compare a like-for-like replacement is the wrong instrument for judging a re-rated, different-sized new unit, and it will still produce a tidy number. Choosing and justifying the right analytical framework for the question is itself part of the evaluation. Second, <em>does the output actually support the conclusion drawn from it?</em> Read the recommendation against what the model genuinely computed. Very often there is a gap: the model compared <em>cost</em>, but the recommendation claims the replacement is <em>better</em> - which quietly implies reliability, safety or performance the cost model never assessed at all. <strong>The output says X; the conclusion claims Y; the space between them is where the real error usually hides.</strong></p>
+<p>One honest boundary. <em>The goal is not to distrust all models. That is as useless as trusting them blindly. The goal is to know which parts of a model to trust, and to build collective confidence in a decision.</em> And the posture is everything: <strong>the evaluator's job is not to find fault. It is to find the assumptions that carry the most weight, and to test whether the conclusion is strong enough to bear that weight. This is a service, not a criticism.</strong> So when you have found the soft spot, <strong>frame your finding as a contribution - not "your forecast is wrong", but "the whole conclusion seems to rest on the twenty-year life; before we commit, I would want us to test how the answer changes if that life is fifteen years, or twenty-five."</strong> That sentence makes the decision better and takes nothing from the person who did the work.</p>
+<p>Does it scale? A student reads that a degree "adds R2 million to lifetime earnings" and treats it as a fact - but that number rests on assumed graduate salaries, an assumed job market twenty years out, and an assumed zero cost of the years spent studying, any of which could flip it. Evaluating a claim - a headline, a business case, a forecast - is the same everywhere: find the assumptions under the number, and ask which one, if wrong, changes the answer. The pump and the life choice are judged the same way.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is the very model from your desk. It compares <strong>refurbishing</strong> the pump set against <strong>replacing</strong> it, over twenty years, and recommends <strong>replace</strong>.</p>
+<table>
+<tr><th>Input</th><th>Value used</th></tr>
+<tr><td>Extra capital to replace rather than refurbish</td><td>R6.5 million (from a real supplier quote)</td></tr>
+<tr><td>Annual saving of the new pump (energy + maintenance)</td><td>R0.5 million per year (from meter readings and the maintenance record)</td></tr>
+<tr><td>Assumed life of the new pump</td><td>20 years (a round figure; no failure data for this duty)</td></tr>
+<tr><td>Headline result</td><td>Saving over 20 years = (R0.5m x 20) - R6.5m = <strong>+R3.5 million: REPLACE</strong></td></tr>
+</table>
+<ol>
+<li><strong>Tag the inputs.</strong> Mark each of the three inputs as <em>data</em> or <em>guess</em>.</li>
+<li><strong>Find the driver and test it.</strong> Name the one assumption most likely to flip the conclusion. Recompute the saving at a <strong>12-year</strong> life (well within honest uncertainty here). Does the decision hold or flip?</li>
+<li><strong>Claim versus computation.</strong> The paper recommends replace as the "better" option. Name one thing "better" implies that this cost model did <em>not</em> actually assess.</li>
+<li><strong>The meeting sentence.</strong> Write the one sentence you would say tomorrow - a contribution that surfaces the uncertainty without attacking whoever built the model.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the tags. The extra capital (R6.5m, from a quote) is <strong>data</strong>. The annual saving (R0.5m, from meter and maintenance records) is <strong>data</strong>. The twenty-year life is a <strong>guess</strong> - explicitly "a round figure; no failure data" - and it is the only guess in the model.</p>
+<p>Second, the driver and the flip. The twenty-year life is the driver, because it is the one guess and it multiplies the saving. Recompute at a 12-year life: saving = (R0.5m x 12) - R6.5m = R6.0m - R6.5m = <strong>-R0.5 million</strong>. The saving has become a <em>loss</em>: the decision <strong>flips from replace to refurbish</strong>. So the headline was never really "replace saves R3.5m" - it was "replace saves R3.5m <em>if the pump lasts twenty years</em>", and nobody tested whether it would. The recommendation was resting entirely on the single most uncertain number in the model.</p>
+<p>Third, claim versus computation. "Better" implies things the model never touched - it compared <em>cost only</em>. It did not assess reliability, safety, the risk of the refurbishment failing early, downtime, or how the two options differ in performance. Calling the cheaper option "better" claims more than a cost model can prove.</p>
+<p>Fourth, the sentence. Something like: <em>"The model is clear and the arithmetic holds - my one question is that the whole R3.5 million rests on the assumed twenty-year life, which we have no failure data for; before we commit R6.5 million, could we see what the answer does at, say, a twelve- and a fifteen-year life?"</em> Notice it thanks the work, names the single load-bearing assumption, proposes a concrete test, and blames no one. That sentence is the whole unit.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-look_past_the_output">1. Look past the output - it hides its own foundation</label><textarea id="cb-look_past_the_output" data-key="t-0212:look_past_the_output" placeholder="A model&#039;s output looks equally confident whether its assumptions were measured or guessed - the decimal point is applied to solid and flimsy alike. Evaluating an analysis is not re-checking the arithmetic (which is almost always right); it is looking underneath the polished number at the inputs and assumptions it was built from, because that is where trustworthiness actually lives."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-separate_data_from_guesses">2. Separate the data from the guesses</label><textarea id="cb-separate_data_from_guesses" data-key="t-0212:separate_data_from_guesses" placeholder="Every model mixes two very different things: measured, evidenced data (a real quote, a meter reading) and guesses standing in for numbers nobody has yet (an assumed life, a future escalation rate). Mark every input as one or the other. A soft assumption is not a failing - the danger is only a guess wearing the costume of a fact, so a decision leans its full weight on it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-run_the_sensitivity">3. Run the sensitivity - the real test of trust</label><textarea id="cb-run_the_sensitivity" data-key="t-0212:run_the_sensitivity" placeholder="Take the few assumptions that actually drive the result and vary each across its honest range. A conclusion that holds steady across the plausible range of its guesses is robust - act on it. A conclusion that flips (replace to refurbish, yes to no) when one assumed number changes within the range it could honestly take is not a conclusion; it is a coin toss with a decimal point, and the decision is really being made by whoever chose the assumption."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-check_fitness_and_the_claim">4. Check the fit and the claim</label><textarea id="cb-check_fitness_and_the_claim" data-key="t-0212:check_fitness_and_the_claim" placeholder="Two checks finish the appraisal. Fitness for purpose: is this the right TYPE of model for the question? A tool built for one job, pointed at another, gives a confident invalid answer. And does the output actually support the conclusion? Read the recommendation against what the model truly computed - the output says X, the conclusion often claims Y, and the gap is where the error hides."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-report_it_as_a_service">5. Report it as a service, not a score</label><textarea id="cb-report_it_as_a_service" data-key="t-0212:report_it_as_a_service" placeholder="The goal is not to distrust all models (as useless as trusting them blindly) but to know which parts to trust and build collective confidence. The evaluator&#039;s job is not to find fault; it is to find the assumptions that carry the most weight and test whether the conclusion can bear them. Frame the finding as a contribution - name the load-bearing assumption and propose a test - not as an attack on the analyst."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you have found the load-bearing assumption and tested whether the answer survives it, <strong>download or save it</strong> - it is yours. You can now tell a trustworthy answer from a merely precise one.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A precise answer is not a trustworthy one. Trust is not in the polish of the output; it is in whether the conclusion survives its own assumptions being wrong.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Re-checking the arithmetic instead of the assumptions.</strong> The sum is almost always right - that is what makes a bad model dangerous. Check the inputs the arithmetic stands on, not the arithmetic.</p>
+<p>&bull; <strong>Trusting a precise-looking output.</strong> A decimal point is applied equally to solid data and pure guesswork. Precision is not evidence; it is formatting.</p>
+<p>&bull; <strong>Treating a guess as data.</strong> The danger is never a labelled assumption - it is a guess wearing the costume of a fact. Mark every input as measured or estimated.</p>
+<p>&bull; <strong>Missing the one driving assumption.</strong> Usually only a few inputs move the answer. Find them; the rest can be roughly wrong without harm.</p>
+<p>&bull; <strong>Not testing sensitivity.</strong> A conclusion that flips when one honest assumption changes is a coin toss with a decimal point. Vary the drivers across their range before you act.</p>
+<p>&bull; <strong>Wrong model type for the question.</strong> A tool built for one job gives a confident, invalid answer when pointed at another. Check the framework fits the question first.</p>
+<p>&bull; <strong>A conclusion that claims more than the model measured.</strong> "Cheaper" is not "better". Read the recommendation against what was actually computed, and name the gap.</p>
+<p>&bull; <strong>Using critique to look clever.</strong> Tearing something down to score points builds arrogance, not decisions. The useful critique builds a stronger shared understanding.</p>
+<p>&bull; <strong>Distrusting every model.</strong> Refusing to trust any analysis is as useless as trusting all of them. The skill is knowing which parts to trust, and why.</p>
+</div>
+</details>
+<p>The capital paper said replace, saves R3.5 million, in confident black and white - and the whole of it rested on a twenty-year life that someone had simply guessed. Do not re-check the arithmetic; check the assumptions it stands on: look past the confident output, because it looks the same whether its foundation is rock or sand; separate the data from the guesses and mark each one; run the sensitivity on the few assumptions that drive the answer and see whether the conclusion holds or flips when they move within their honest range; and check that the model is the right type for the question and that its output actually supports the claim being made. <strong>A precise answer is not a trustworthy one - trust comes from testing the assumptions the precision rests on - and when you find the soft spot, name it as a service to the decision, not a strike against the person who did the work.</strong> The next time a confident number lands on your desk asking for a signature, do not ask "is the sum right?" - ask "what is this resting on, and does the answer survive if that one thing is wrong?"</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can tell a trustworthy answer from a precise one now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

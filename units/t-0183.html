@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The same cycles in a different order</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The same cycles in a different order</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>The port at Meeubaai has found a crack. It is at a weld toe on the ship-loader boom, it was picked up at the last inspection, and they want to know how long they have.</p>
+<p>You are Onalenna, and you have done this before. Crack growth is one of the cleaner calculations in engineering: take the crack you have, take the crack you cannot tolerate, and integrate the growth law between them.</p>
+<p>Except that method wants <em>one stress range</em>, and this boom does not have one. It lifts a different parcel every time, it luffs, and it stands in the wind. You pull a year of strain data and there is no single number anywhere in it.</p>
+<p>So you read further into how the growth law behaves under real load histories, and you find something that stops you.</p>
+<p><strong>The same cycles, applied in a different order, give a different life.</strong></p>
+<p>Not a different estimate. A different life. The method you trust assumes a simplicity the structure does not have.</p>
+<blockquote><h2>There is a crack in a structure that works over people and vessels, and the calculation I know assumes something untrue. How do I produce a remaining life I can actually defend?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> There is a crack at a weld toe on the boom, measured and sized. That boom swings over people and over vessels. You reach for the growth calculation you know and it needs <strong>one repeated stress range</strong> — and you pull a year of strain data and there is no single number anywhere in it: light lifts, heavy lifts, slewing, wind, the occasional snatch. Then you read further into how the growth law behaves under real histories and find the thing that stops you: <strong>the same cycles, applied in a different order, give a different life.</strong> Not a different estimate. A different life. Write down how you would produce a life you can defend — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the input that governs the answer</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Use the worst cycle in the record and treat everything as that.&rdquo;</strong> Conservative, arbitrary, and unquantifiably so — you would produce a number nobody can calibrate, and if it says twelve years you cannot tell whether the truth is fifteen or ninety.</p>
+<p>&bull; <strong>&ldquo;Use the average stress range.&rdquo;</strong> The dangerous mirror of the above. Averaging a spectrum understates the large cycles that do most of the damage, and it does so invisibly.</p>
+<p>&bull; <strong>&ldquo;Inspect it more often and stop calculating.&rdquo;</strong> Reasonable interim management, and it begs the question the calculation exists to answer — <em>how often</em> is set by how fast the crack grows, which is what you cannot yet say.</p>
+<p>&bull; <strong>&ldquo;Get a specialist to run a full analysis.&rdquo;</strong> Legitimate, and you still have to state the starting flaw and decide the sequence question yourself, because those are engineering judgements about your structure and your inspection, not arithmetic somebody else can supply.</p>
+<p>&bull; <strong>&ldquo;Repair the crack and the problem goes away.&rdquo;</strong> Sometimes right, often unaffordable, and it leaves the general question standing for every other weld toe on a boom with hundreds of them.</p>
+<p>&bull; Two disciplines, and the first is about honesty rather than physics. Every remaining-life prediction begins with <strong>an assumed starting flaw, and that assumption moves the answer more than the physics does</strong> — the same structure, spectrum and material can give a life several times longer or shorter depending on where you start. You measured this one, so use it; where nothing has been measured the honest value is <strong>the smallest flaw the inspection could reliably find</strong>, because anything smaller could be there right now and you would not know. Note where that number comes from: <strong>the inspection department, not the stress analysis</strong>. Never report a life without the flaw size it rests on — a life quoted bare has withheld the thing that governs it. Second, <strong>build the spectrum from what actually happens</strong>, then look at where the damage really accumulates, which is often not where intuition puts it. And decide the sequence question <strong>explicitly, with a stated basis</strong>: pretending the ordering does not matter is itself a decision, taken silently.</p>
+</div>
+</details>
+<p>Here is the analysis.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the crack growth analysis - the starting flaw, the spectrum, the model, the interaction decision, and the interval that comes out of it.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. State the starting crack - and say where that number came from</div><p class="cb-demo">EVERY REMAINING-LIFE PREDICTION BEGINS WITH A CRACK YOU HAVE ASSUMED, AND THAT ASSUMPTION WILL MOVE THE ANSWER MORE THAN THE PHYSICS DOES. Sometimes you have measured the crack - here a weld-toe indication was found and sized on the ship-loader boom. Often you have not, and then a_i IS THE SMALLEST FLAW THE INSPECTION CAN RELIABLY FIND, because anything smaller could be present right now and you would not know. SO THE NUMBER COMES FROM THE INSPECTION DEPARTMENT, NOT FROM THE STRESS ANALYSIS, and it is the single most sensitive input in the calculation. Run it three ways and look at what happens, on the SAME structure with the SAME spectrum and the SAME material: a_i = 2 MM gives 54.1 YEARS; a_i = 6 MM gives 22.2 YEARS; a_i = 10 MM gives 12.4 YEARS. A FACTOR OF FOUR, DECIDED BY WHAT YOUR INSPECTION CAN SEE. Write a_i at the top of the analysis, write where it came from beside it, and never report a life without reporting the flaw size it rests on. An engineer who quotes 54 years without saying &#039;from an assumed 2 mm flaw&#039; has reported a number and withheld the thing that governs it.</p></div><div class="canvas-box"><div class="cb-label">2. Build the spectrum - and find out where the damage actually is</div><p class="cb-demo">A CONSTANT-AMPLITUDE ANALYSIS NEEDS ONE STRESS RANGE. THIS BOOM DOES NOT HAVE ONE. It lifts different parcels, it luffs, and it stands in the wind, so a year of strain data reduces to blocks: 40 MPA RANGE x 180,000 CYCLES, 80 MPA x 22,000, AND 140 MPA x 900 - 202,900 cycles a year in total. NOW SEE WHERE THE DAMAGE SITS, because it is not where the cycles are. On a cube law the 40 MPa block is 88.71 PER CENT OF THE CYCLES AND ONLY 45.62 PER CENT OF THE DAMAGE; the 80 MPa block is 10.84 per cent of the cycles and 44.60 PER CENT OF THE DAMAGE; and the 900 heavy lifts, 0.44 PER CENT OF THE CYCLES, carry 9.78 per cent. THE BLOCK YOU WOULD HAVE SPENT YOUR TIME ON DOES LESS THAN HALF THE WORK. AND NOW THE DISTINCTION THIS WHOLE UNIT TURNS ON. What you have just built is a HISTOGRAM - it says WHAT cycles occurred and HOW MANY. A SPECTRUM says what occurred AND WHEN. RAINFLOW COUNTING, the standard way of pulling cycles out of a messy history, DOES NOT PRESERVE THE ORDER IN WHICH THEY OCCURRED. For stress-life fatigue with a linear damage rule that loss does not matter. FOR CRACK GROWTH IT MAY MATTER A GREAT DEAL, and box 4 is where you decide.</p></div><div class="canvas-box"><div class="cb-label">3. Define the model - growth law, geometry and the size at which it is over</div><p class="cb-demo">THREE CHOICES, EACH OF WHICH YOU MUST BE ABLE TO DEFEND. THE GROWTH LAW: da/dN = C x (delta K)^m, with C = 3.0e-12 (metres per cycle, MPa root-metre) and m = 3, which are typical for welded structural steel in the Paris regime - and note that this law describes only the STABLE middle region, not threshold behaviour at the bottom or fast fracture at the top. THE GEOMETRY FACTOR: delta K = Y x delta-sigma x root(pi a), with Y = 1.12. BE HONEST ABOUT THIS ONE - 1.12 is the classical edge-crack solution and it is A SIMPLIFICATION FOR A TEACHING CASE. A real weld toe sits in a stress concentration, in a residual stress field, at a changing aspect ratio, and it needs a specific solution from a handbook or from finite element analysis. Using a Y outside its geometry is one of the quietest ways to be badly wrong. THE CRITICAL SIZE: the plate is 25 mm, so the crack is taken as critical when it becomes THROUGH-THICKNESS AT a_c = 25 MM. That is a defensible endpoint for a plate structure, and you should say which criterion you used and why. FOR m = 3 AND CONSTANT Y THE INTEGRATION CLOSES IN FORM: N = 2 / (C Y^3 delta-sigma^3 pi^1.5) x (1/root(a_i) - 1/root(a_c)). You do not need a code to see the shape of the answer, and seeing it by hand is what lets you tell when a code is lying to you.</p></div><div class="canvas-box"><div class="cb-label">4. Decide whether to model load interaction - and DECLARE the decision</div><p class="cb-demo">METHOD A, THE BASELINE. Treat every cycle as doing its damage independently and reduce the spectrum to an EQUIVALENT CONSTANT-AMPLITUDE RANGE - on the cube law, 49.93 MPA. Integrate, and with a_i = 2 mm you get 1.098e7 cycles, 54.1 YEARS. THIS IS NOT THE ANSWER. IT IS THE BASELINE, AND IT IS THE ANSWER YOU GET IF YOU CHOOSE TO IGNORE LOAD INTERACTION. Say what that choice assumes out loud: it assumes you could tip the whole year of cycles into a bucket, shake it, and apply them in any order at all for the same result. BUT A REAL STRUCTURE REMEMBERS THE LAST BIG LOAD. METHOD B, INTERACTION. An OVERLOAD creates a large plastic zone at the crack tip, and the RESIDUAL COMPRESSIVE STRESSES left in it reduce the tensile stress the following cycles actually see - so growth is RETARDED, and the retardation persists as long as the crack and its own plastic zone remain inside the plastic zone the peak load created. There is a second mechanism working with it: tensile plastic deformation left in the WAKE of the crack causes PLASTICITY-INDUCED CLOSURE, the faces touching for part of each cycle. The classical models are WHEELER and WILLENBORG, the second accounting for the slow-down as a REDUCTION IN STRESS INTENSITY FACTOR. TREAT RETARDATION AS A REAL PHYSICAL EFFECT AND ITS MODELS AS CALIBRATED APPROXIMATIONS, because that is what they are. AND KNOW WHAT UNDOES IT: A COMPRESSIVE UNDERLOAD FOLLOWING AN OVERLOAD REDUCES THE EFFECTIVE OVERLOAD PLASTIC ZONE AND ERASES PART OF THE RETARDATION - which is why &#039;ignoring retardation is conservative&#039; is USUALLY true and NOT ALWAYS true, and why you must look at your spectrum before saying it. THE DIAGNOSTIC, AND IT COSTS YOU ONE RUN: SHUFFLE THE SPECTRUM AND RE-RUN. IF THE PREDICTED LIFE DOES NOT CHANGE, YOU HAVE NOT MODELLED INTERACTION. That may be a perfectly defensible choice. IT MUST BE A DECLARED CHOICE AND NOT AN ACCIDENT OF THE DEFAULT SETTINGS. Cycle-by-cycle integration that preserves the order is what specialist crack growth codes do; knowing WHAT the code is doing is the engineering, and knowing which buttons it has is not.</p></div><div class="canvas-box"><div class="cb-label">5. Turn the life into a decision - an inspection interval, with its sensitivity shown</div><p class="cb-demo">A REMAINING LIFE PREDICTION IS NOT A GUARANTEE. IT IS AN ENGINEERING ESTIMATE FOUNDED ON MULTIPLE ASSUMPTIONS - MATERIAL PROPERTIES, INITIAL FLAW SIZE, FUTURE LOADING, GEOMETRIC SIMPLIFICATIONS. THEREFORE THE RAW LIFE PREDICTION IS NEVER THE FINAL DELIVERABLE. IT IS CONVERTED INTO A PRACTICAL, CONSERVATIVE INSPECTION INTERVAL, TYPICALLY BY APPLYING A FACTOR OF SAFETY SUCH AS HALF-LIFE OR LESS, TO MANAGE THE PROFOUND UNCERTAINTY IN THE CALCULATION AND ENSURE STRUCTURAL INTEGRITY. The logic is simple and it is the whole of damage tolerance: if the crack takes this long to grow from what you can DETECT to what you cannot TOLERATE, then inspect at least twice in that window, so that a crack which appears just after one inspection is still found before it becomes critical. HERE: 54.1 years from a 2 mm flaw gives a 27.1-YEAR interval; 22.2 years from 6 mm gives 11.1; 12.4 years from 10 mm gives 6.2. REPORT THE TABLE, NOT THE NUMBER. The sensitivity to a_i is not a caveat buried in an appendix - it is the most useful finding in the analysis, because it tells the port exactly what improving their inspection capability is worth, in years. AND NOTICE WHAT HAS JUST HAPPENED: the inspection determined the flaw size, the flaw size determined the life, and the life determined the inspection interval. The loop closes, and an engineer who does not see it will keep treating inspection capability as somebody else&#039;s department.</p></div></div>
+
+<p>Box 4 is where the unit lives, and box 5 is where the analysis becomes something a port can act on. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>The order in which loads are applied changes the remaining life of a cracked component</strong>, because a large load leaves behind a memory - a field of residual stress at the crack tip - that retards the growth which follows it. Five questions:</p>
+<ul>
+<li><strong>What crack am I starting from, and who decided that?</strong> <strong>Initial flaw size.</strong> Usually the smallest flaw the inspection can reliably find. It swings the answer by a factor of four here, and it is not set by the stress analyst.</li>
+<li><strong>What does the load history actually look like, and where is the damage?</strong> <strong>Spectrum against histogram.</strong> The 40 MPa block is 88.71 per cent of the cycles and 45.62 per cent of the damage. And rainflow counting, which produced the blocks, <em>does not preserve the order</em>.</li>
+<li><strong>What law, what geometry, what endpoint?</strong> <strong>The growth model.</strong> Paris in the stable middle region; Y = 1.12 as a teaching simplification a real weld toe would not accept; through-thickness at 25 mm as the criterion.</li>
+<li><strong>Am I modelling interaction, or not?</strong> <strong>Retardation, acceleration, and the declared choice.</strong> Overload plasticity retards; a compressive underload after an overload erases part of that retardation. Either model it or say you did not.</li>
+<li><strong>What do I actually hand over?</strong> <strong>Life into interval.</strong> Not a life - an inspection interval, factored, with the sensitivity table attached.</li>
+</ul>
+<p><strong>The arithmetic, and the honest thing to say about it.</strong> The baseline reduces the spectrum to an equivalent constant-amplitude range of 49.93 MPa and integrates to 1.098 x 10<sup>7</sup> cycles - <strong>54.1 years</strong> from a 2 mm flaw. That number is arrived at by treating the cycles as though you could tip them into a bucket, shake it, and apply them in any order. <em>Which is exactly the assumption this unit exists to question.</em> That is not a contradiction if you name it: <strong>the baseline is the answer you get when you choose to ignore load interaction</strong>, it is a legitimate and common choice, and it is the thing an interaction-aware analysis is compared against. What is not legitimate is arriving at it by accident.</p>
+<p><strong>The one-run test.</strong> <strong>Shuffle the spectrum and re-run it.</strong> If the predicted life does not change, you have not modelled interaction. That may be entirely defensible - retardation models are calibrated approximations of a real effect, they add their own uncertainty, and ignoring retardation is <em>usually</em> conservative when the spectrum is dominated by occasional overloads. It is <em>not</em> conservative when compressive underloads follow those overloads and strip the retardation away. So look at your spectrum before you claim conservatism, and either way <strong>write the decision into the report</strong>. A modelling choice that lives in a settings dialogue is not a decision, it is a default.</p>
+<p><strong>And what the tool is for.</strong> Specialist crack growth codes do this cycle by cycle, preserving order, with a retardation model you select and calibrate. Every serious organisation uses one, and you should. But the code will return a number whatever you feed it, and the engineering is in knowing what it is doing - which growth law in which regime, which geometry factor from which handbook, which flaw size, which interaction model - so that you can tell a result from an output. <strong>Knowing what the code is doing is the profession. Knowing which buttons it has is not.</strong></p>
+<p>One honest boundary. You produce the analysis and the prediction, and you quantify every assumption that governs it. You do not design the repair, you do not decide to derate the crane, and you do not certify the structure for continued service. Somebody senior does those things, and they can only do them well if your assumptions are on the page.</p>
+<p>Does it scale? A doctor reading a scan does not report "eight months". They report what is there, what it is likely doing, how fast, what would change the estimate, and when to look again - and the follow-up appointment is the actual output. Your inspection interval is that appointment.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A regional aviation maintenance organisation asks you to look at a <strong>main landing gear strut</strong> in a 7000-series aluminium alloy. A crack has been assumed at the smallest size their eddy current inspection reliably detects.</p>
+<table>
+<tr><th>Item</th><th>Figure</th></tr>
+<tr><td>Growth law</td><td>C = 2.0 x 10<sup>-11</sup> (m/cycle, MPa root-m), m = 3, Y = 1.12</td></tr>
+<tr><td>Initial flaw / critical size</td><td>a<sub>i</sub> = 1.5 mm; a<sub>c</sub> = 12 mm</td></tr>
+<tr><td>Flight block</td><td>1 landing cycle at 180 MPa range, plus 10 taxi cycles at 35 MPa range</td></tr>
+<tr><td>Note on the landing cycle</td><td>It carries a compressive component on the ground-air-ground transition</td></tr>
+<tr><td>Ordering 1 (as flown)</td><td>[landing, taxi x 10], repeated flight after flight</td></tr>
+<tr><td>Ordering 2 (grouped)</td><td>All landing cycles first, then all taxi cycles</td></tr>
+</table>
+<ol>
+<li><strong>Damage distribution.</strong> Compute what share of the cycles and what share of the damage each part of the flight block carries. Compare the pattern with the ship-loader.</li>
+<li><strong>Baseline life.</strong> Compute the equivalent range and the life in flights, ignoring interaction.</li>
+<li><strong>The shuffle.</strong> Compute the baseline life for Ordering 2. Then say what the result proves about your model.</li>
+<li><strong>The real structure.</strong> Which ordering would the actual strut survive longer, and why? Be specific about the mechanism.</li>
+<li><strong>The deliverable.</strong> State the inspection interval and what you would tell the organisation about its confidence.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> three things.</p>
+<p>First, your step 1 should invert the ship-loader's pattern: the single landing cycle is <strong>9.09 per cent of the cycles and 93.15 per cent of the damage</strong>, while the ten taxi cycles are 90.91 per cent of the cycles and 6.85 per cent of the damage. Step 2 gives an equivalent range of <strong>82.87 MPa</strong>, 3.749 x 10<sup>5</sup> cycles, <strong>34,079 flights</strong>, and an interval of about <strong>17,000 flights</strong>.</p>
+<p>Second, step 3 is the whole exercise and the answer is meant to feel wrong. The baseline life for Ordering 2 is <strong>34,079 flights - identical, to the last digit</strong>. Two load histories that any engineer can see are physically different produce exactly the same prediction, because the model was never told that order exists. <em>That identity is the diagnostic.</em> It is not a bug in the arithmetic; it is the arithmetic telling you what it does and does not contain.</p>
+<p>Third, step 4 has a genuine wrinkle and you should not skate over it. In Ordering 1 each landing overload retards the ten small cycles that immediately follow it, over and over, for the whole life - so the real strut should last longer than the baseline says. In Ordering 2 the landings run consecutively, so each overload's retardation is overridden by the next equal one and the benefit largely disappears. <em>But</em> the landing cycle carries a compressive component, and a compressive underload after an overload reduces the effective overload plastic zone and strips retardation away. So the honest answer is Ordering 1, with a stated reservation about how much benefit survives the compression - which is precisely why a retardation model must be calibrated against a spectrum like the one it will be used on, and not simply switched on.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-initial_flaw">1. State the starting crack - and say where that number came from</label><textarea id="cb-initial_flaw" data-key="t-0183:initial_flaw" placeholder="The initial flaw size is an assumption, it usually comes from what the inspection can reliably detect, and it moves the answer more than anything else you will do."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-build_the_spectrum">2. Build the spectrum - and find out where the damage actually is</label><textarea id="cb-build_the_spectrum" data-key="t-0183:build_the_spectrum" placeholder="Reduce the load history to blocks or cycles, then check which of them carries the damage - it is usually not the block with the most cycles."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_model">3. Define the model - growth law, geometry and the size at which it is over</label><textarea id="cb-the_model" data-key="t-0183:the_model" placeholder="State the growth law and its constants, the geometry factor and its limits, and the critical crack size - each is an assumption with a cost."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-interaction_declared">4. Decide whether to model load interaction - and DECLARE the decision</label><textarea id="cb-interaction_declared" data-key="t-0183:interaction_declared" placeholder="Run the baseline that ignores sequence, then say plainly whether you are modelling retardation, and test your model by shuffling the spectrum."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-life_to_interval">5. Turn the life into a decision - an inspection interval, with its sensitivity shown</label><textarea id="cb-life_to_interval" data-key="t-0183:life_to_interval" placeholder="The deliverable is not a life. It is an interval, factored for the uncertainty, reported with the assumption that governs it."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now predict a life under real loading and defend every number in it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Crack growth predictions go wrong in ways that make the report look more precise and less true.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Reporting three significant figures from a one-figure assumption.</strong> "54.1 years" rests on an assumed 2 mm flaw. Quote the flaw with the life or do not quote the life.</p>
+<p>&bull; <strong>Treating a rainflow histogram as a spectrum.</strong> It tells you what cycles occurred and how many. It does not tell you when, and for crack growth the when can matter.</p>
+<p>&bull; <strong>Ignoring interaction silently.</strong> A defensible choice becomes an indefensible one the moment it is made by a default setting rather than by an engineer.</p>
+<p>&bull; <strong>Assuming that ignoring retardation is always conservative.</strong> Usually, when occasional overloads dominate. Not when compressive underloads follow them and strip the retardation away.</p>
+<p>&bull; <strong>Switching a retardation model on and trusting it.</strong> These are calibrated semi-empirical models of a real effect. Uncalibrated, they can buy you life you do not have.</p>
+<p>&bull; <strong>Using a geometry factor outside its geometry.</strong> Y = 1.12 is an edge-crack solution. A weld toe in a residual stress field with a changing aspect ratio is not that, and this error is silent.</p>
+<p>&bull; <strong>Applying the Paris law outside its regime.</strong> It describes the stable middle. Near threshold it over-predicts growth; approaching fast fracture it under-predicts it.</p>
+<p>&bull; <strong>Spending the effort on the biggest block by count.</strong> On the boom it carried less than half the damage. Rank the blocks by damage, not by cycles.</p>
+<p>&bull; <strong>Delivering a remaining life instead of an inspection interval.</strong> A life is an estimate. An interval is a decision, and it is what the asset owner can actually act on.</p>
+<p>&bull; <strong>Hiding the sensitivity to the initial flaw size.</strong> It is the most useful finding in the analysis - it prices what better inspection is worth, in years.</p>
+<p>&bull; <strong>Forgetting that the loop closes.</strong> Inspection sets the flaw size, the flaw size sets the life, the life sets the inspection interval. Treat inspection capability as somebody else's department and you have cut your own analysis loose from reality.</p>
+</div>
+</details>
+<p><strong>The principle that governs the deliverable.</strong> A remaining life prediction is not a guarantee. It is an engineering estimate founded on multiple assumptions - material properties, initial flaw size, future loading, geometric simplifications. Therefore the raw life prediction is never the final deliverable. It is converted into a practical, conservative inspection interval, typically by applying a factor of safety such as half-life or less, to manage the profound uncertainty in the calculation and ensure structural integrity.</p>
+<p>Onalenna could not use the method she trusted, because it assumed a structure that lifts the same load every time. State the crack you are starting from and where that number came from, since it will move the answer further than the physics will; build the spectrum and find where the damage actually sits, which is rarely where the cycles are; declare the growth law, the geometry factor and the critical size, and be honest about which of them is a simplification; decide whether you are modelling load interaction and write that decision down, testing it by shuffling the spectrum and seeing whether anything moves; and hand over an inspection interval rather than a life, with the sensitivity to the assumed flaw size shown rather than buried. A remaining life prediction is not a guarantee. It is an argument, and your sharpest tool is not the number at the end of it but the declared list of assumptions that produced it. If you are working with an AMU Facilitator, take a life prediction your organisation relies on and find the initial flaw size it assumed.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can predict a life under real loading now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

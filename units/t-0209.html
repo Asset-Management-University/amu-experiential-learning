@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A date is not a plan</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>A date is not a plan</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is six o'clock in the morning. The crew is on site, boots on, ready for the pump-three overhaul that has been on the schedule for a week. And nothing happens.</p>
+<p>The seal drawn from the store is the wrong size. No isolation permit was raised, so the pump cannot legally be opened. The special puller needed to withdraw the rotating element is out on another job across the plant. And the work order, when someone finally reads it properly, says four words: "overhaul pump 3."</p>
+<p>You are the planner, and you did put this job on the schedule. You gave it a date, a crew, a slot. You believed that was planning it. But a date told the crew <em>when</em> to arrive; it did not make the job ready for them when they got there - and now eight skilled people stand in the yard, on the clock, waiting for a plan that was never actually made.</p>
+<blockquote><h2>I scheduled the job, so why is the crew standing idle? What is the difference between a job that has a date and a job that is actually ready to be done - and whose job is it to make it ready?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Six o'clock. <strong>Eight fitters</strong> in the yard, on the clock, for a pump overhaul you scheduled — a date, a named crew, a slot. The work order says four words: <em>&ldquo;overhaul pump 3.&rdquo;</em> The seal kit was never drawn from stores. There is no permit. The line has not been isolated. Nobody has the drawings and the access platform is still on the other job. You are the planner and you put this job on the schedule, and you believed that was planning it. Write down what would have made this job actually ready — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the three acts hiding in one word</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Send someone for the parts now and start late.&rdquo;</strong> Today's rescue, and it means eight people paid to wait while one drives to stores. It also guarantees the same morning next month, because nothing about how the job was prepared has changed.</p>
+<p>&bull; <strong>&ldquo;The supervisor should have checked the night before.&rdquo;</strong> Pushes readiness onto somebody with no time and no authority to draw parts or raise permits, and it will work occasionally, which is worse — it hides the gap without closing it.</p>
+<p>&bull; <strong>&ldquo;Give the crew more notice.&rdquo;</strong> More warning of an unready job. They would arrive earlier at a site with no permit and no isolation.</p>
+<p>&bull; <strong>&ldquo;Write longer work orders.&rdquo;</strong> Closer, and a fuller description of the work still does not draw the parts, raise the permit or book the platform. The document is a symptom; the missing thing is the preparation it should describe.</p>
+<p>&bull; <strong>&ldquo;I did plan it — it was on the schedule with a crew.&rdquo;</strong> This is the belief that put them in the yard, and it is worth stating plainly: <strong>a date is the scheduler's product.</strong> It tells the crew when to arrive and does nothing to make the job ready for them.</p>
+<p>&bull; Three different acts hide inside the one word. <strong>Planning</strong> answers what needs to be done and how — tasks, parts, tools, skills, permits, isolation, drawings, access. It is technical thinking and it looks at <strong>one job in depth</strong>. <strong>Scheduling</strong> answers when it happens and by whom — fitting <em>ready</em> jobs into time and people. It is logistical thinking and it looks <strong>across many jobs in time</strong>. <strong>Executing</strong> is doing it. These are genuinely different kinds of work with competing horizons, which is why in a larger team they become different people. And the part most often misread is what the planner does <em>during</em> execution: <strong>not picking up a spanner</strong>, but having made this job ready beforehand and now working ahead on the jobs that follow — because a planner pulled into today's execution stops producing tomorrow's ready work, and the yard fills again next week. Your deliverable was never the date. It was <strong>a job that can be started the moment the crew arrives.</strong></p>
+</div>
+</details>
+<p>Here is what planning really is.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is what a maintenance planner actually produces - separating planning from scheduling, making the job ready, setting the two scopes, working the process, and sequencing the activity list.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Plan, schedule, execute - three different acts</div><p class="cb-demo">START BY SEPARATING THREE THINGS THAT HIDE INSIDE THE ONE WORD &#039;PLANNING&#039;, BECAUSE BLURRING THEM IS EXACTLY WHAT PUT THE CREW IN THE YARD AT SIX O&#039;CLOCK. PLAN WORK ANSWERS WHAT NEEDS TO BE DONE AND HOW - the technical content of the job: the tasks, the parts, the tools, the skills, the permits, the isolation, the drawings, the access. It is technical thinking, and it looks at one job in DEPTH. SCHEDULE WORK ANSWERS WHEN IT HAPPENS AND BY WHOM - the logistics: fitting ready jobs into time and people. It is logistical thinking, and it looks ACROSS many jobs in time. EXECUTE WORK is doing it. These are genuinely different kinds of work, which is why, as a team grows, the planner and the scheduler become different people - the skills and the time horizons compete when combined. THE MISTAKE THAT CAUSED THE DISASTER WAS TREATING &#039;IT IS ON THE SCHEDULE&#039; AS &#039;IT IS PLANNED&#039;. A date is the scheduler&#039;s product. It tells the crew when to arrive; it does nothing to make the job ready for them when they get there. AND THE PLANNER&#039;S ROLE DURING EXECUTION IS THE ONE PEOPLE MOST MISREAD: IT IS NOT TO PICK UP A SPANNER. It is to have made the job ready beforehand, and then, while the crew works, to keep it ready (clear a blocker, confirm a part) and to CAPTURE WHAT ACTUALLY HAPPENED - the real hours, the surprise found under the cover, the extra part nobody expected - so the NEXT plan is better. A planner pulled onto the tools is a planner not planning the next job. Planning is the opposite of the reactive scramble: it looks forward and prepares, so the work can be calm.</p></div><div class="canvas-box"><div class="cb-label">2. The planner produces a READY JOB, not a date</div><p class="cb-demo">IF A SCHEDULER PRODUCES A DATE AND A TECHNICIAN PRODUCES A REPAIR, ASK THE SHARP QUESTION: WHAT DOES THE PLANNER PRODUCE? THE ANSWER IS A READY JOB. Concretely, it is a WORK PACKAGE, and it has a definite content: the breakdown of the tasks and how long each should take; the procedure for how to do each task correctly; the safety and risk requirements; ALL the parts, equipment, services and materials; and the technical information - the drawings, the specifications, the acceptance limits. THE TEST OF A READY JOB IS BRUTAL AND SIMPLE: WHEN THE CREW ARRIVES, IS EVERYTHING THERE TO DO THE JOB RIGHT THE FIRST TIME - the correct parts in hand, the right tools available, the permit already raised, the line ready to isolate, and clear steps to follow? If yes, it was planned. If the crew has to stop and hunt for a seal, wait for a permit, or walk to another job to borrow a puller, it was not planned - it was merely named and dated. THIS IS WHY A JOB IS NOT &#039;PLANNED&#039; THE MOMENT IT HAS A DATE; IT IS PLANNED ONLY WHEN IT IS READY TO BE SCHEDULED - complete, with nothing missing that would stop the crew starting. Mark it ready-to-schedule only when it truly is, because a job marked ready that is not ready is a promise the plant cannot keep. AND HERE IS THE DIGNITY OF IT: THE SIX-O&#039;CLOCK FAILURE WAS NOT THE CREW BEING CARELESS OR THE PLANNER BEING LAZY. IT WAS A JOB GIVEN A DATE BEFORE IT WAS MADE READY - A SYSTEM CONDITION, NOT A PERSONAL FAILING - and the fix is a better planning practice, not a harder-working person.</p></div><div class="canvas-box"><div class="cb-label">3. Scope of work vs job scoping - two different magnitudes</div><p class="cb-demo">THIS IS THE DISTINCTION THAT QUIETLY DECIDES WHETHER A PLAN HOLDS, AND MOST PLANNERS NEVER NAME IT - SO NAME IT. SCOPE OF WORK IS THE BOUNDARY OF THE WHOLE BODY OF WORK - everything a shutdown or project does and does not include. IT IS WIDE: these forty jobs are in, those are out; the pump and its motor are in, the downstream pipework is a separate job. It answers &#039;what are we doing overall, and what is explicitly NOT ours?&#039; JOB SCOPING IS THE DEPTH OF ONE JOB - exactly what a single task needs. IT IS NARROW: this pump, these six steps in order, this seal kit, this torque figure, this permit, ninety minutes. It answers &#039;how, precisely, is this ONE thing done?&#039; THEY ARE DIFFERENT MAGNITUDES OF THE SAME DISCIPLINE - ONE IS THE CAMPAIGN, THE OTHER IS THE TASK - and the mistake is to do one and think you have done the other. YOU NEED BOTH, AND EACH FAILS IN ITS OWN WAY WHEN SKIPPED. Skip the SCOPE OF WORK and the job grows without limit, because nobody drew the boundary, so once the covers come off the work swallows the budget and the schedule - that is scope creep, and it is a scope-of-work failure. Skip the JOB SCOPING and the crew arrives to missing parts, because nobody detailed the work, so the day is lost to the store and the tool crib - that is the six-o&#039;clock disaster, and it is a job-scoping failure. A useful picture: the scope of work is the guest list and menu for the whole feast - who is coming, what dishes are on and off; the job scope is the recipe for a single dish - the exact ingredients, steps and timing. You cannot cook the feast with only a guest list, and you cannot cater it with only one recipe. NAME WHICH MAGNITUDE YOU ARE WORKING AT, AND DO BOTH.</p></div><div class="canvas-box"><div class="cb-label">4. Work the planning process in order</div><p class="cb-demo">PLANNING IS NOT ONE ACT BUT A SHORT SEQUENCE, AND DOING IT IN ORDER IS WHAT ACTUALLY MAKES THE JOB READY. IDENTIFY the work - the request, the inspection finding, the routine that has come due. SCOPE it - and here you WALK THE JOB DOWN, you physically go and look, because the drawing does not show the seized valve, the access that is not there, or the scaffold that must go up before anyone can start; the best estimate comes from someone who has stood in front of the actual asset. DETAIL the tasks, the parts, the tools, the skills, the permits and the access. ESTIMATE the durations and resources honestly, built from the steps rather than guessed. PACKAGE it into a complete work order and MARK IT READY TO SCHEDULE - but only when it truly is, with nothing missing. Then HAND IT TO SCHEDULING for a date and a crew (that is their act, not yours). SUPPORT the execution without doing it. And CLOSE OUT AND FEED BACK - update the asset&#039;s history and record what was really found, so the next plan starts from the truth rather than from the same hopeful assumptions. THAT LAST STEP IS WHERE PLANNING COMPOUNDS OVER TIME, and it carries a rule that keeps it humane and useful: CAPTURE WHAT WAS FOUND, NOT WHO WAS AT FAULT. The scored shaft discovered under the cover is data to improve the next plan - a fact to anticipate next time - never a reason to blame the person who found it or the person who missed it. A planning process that hunts for fault stops getting honest feedback, and a planning process with no honest feedback stops improving.</p></div><div class="canvas-box"><div class="cb-label">5. Compile the activity list in execution sequence</div><p class="cb-demo">THE THING THAT TURNS A SCOPED JOB INTO AN ACTUAL PLAN IS THE ACTIVITY DESCRIPTION LIST - AND THE ONE RULE THAT MAKES IT WORK IS THIS: COMPILE IT IN THE SEQUENCE THE WORK PHYSICALLY HAPPENS, NOT IN ANY OTHER ORDER. Walk the job in execution order: raise the permit and isolate, then lock out and prove dead, then drain, then dismantle, then inspect and measure, then repair or replace, then reassemble, then align, then test, then return to service and sign off. WHY THE ORDER MATTERS SO MUCH: THE SEQUENCE IS WHAT REVEALS WHAT YOU NEED AND WHEN. You cannot know which parts to order until you have walked to the &#039;inspect and measure&#039; step and seen what wears; you cannot know the permit is needed until you have put &#039;isolate&#039; first; you cannot estimate the time until the steps are laid out in order. A LIST COMPILED OUT OF EXECUTION ORDER - grouped by trade, or by whatever came to mind first - HIDES THE VERY DEPENDENCIES THAT MAKE THE JOB PLANNABLE, and you end up ordering the wrong parts, missing a permit, or discovering at the machine that step four had to come before step two. The sequenced activity list is the engine of readiness: from it fall the parts, the tools, the permits, the skills and the honest time estimate, in the order the crew will actually need them. Get the sequence right and the work package almost writes itself; get it wrong and you have planned a different job from the one that will actually be done. LIST THE WORK IN THE ORDER IT HAPPENS, AND LET THE SEQUENCE TELL YOU WHAT THE JOB NEEDS.</p></div></div>
+
+<p>Box 1 is the confusion that caused the six-o'clock disaster. Box 3 is the distinction most planners never name. Let us walk through the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>The planner's job is not to put a date on the work; it is to make the work ready for a date. A scheduled job is not a ready job.</strong> Five questions:</p>
+<ul>
+<li><strong>Plan, schedule, or execute?</strong> <strong>Three different acts.</strong> Plan = what and how. Schedule = when and who. Execute = do it. Putting a job on the schedule is not planning it.</li>
+<li><strong>Is the job ready?</strong> <strong>The planner produces a ready job</strong> - a work package so complete the crew arrives to every part, tool, permit and step already there. Ready-to-schedule only when complete.</li>
+<li><strong>Scope of work, or job scope?</strong> <strong>Two magnitudes.</strong> Scope of work is the boundary of the whole body of work; job scoping is the depth of one task. You need both.</li>
+<li><strong>What is the process?</strong> <strong>Identify, scope, detail, estimate, package, then hand to scheduling, support, and feed back.</strong> Planning looks forward and prepares.</li>
+<li><strong>In what order do I list the activities?</strong> <strong>The sequence the work actually happens.</strong> Isolate before dismantle, inspect before you order, test before you hand back - the sequence reveals what you need.</li>
+</ul>
+<p><strong>Planning is not scheduling, and neither is execution.</strong> Three different things hide inside the one word "planning," and blurring them is what put the crew in the yard. <em>Plan work</em> answers <strong>what needs to be done and how</strong> - the technical content of the job: the tasks, the parts, the tools, the skills, the permits, the isolation, the drawings, the access. <em>Schedule work</em> answers <strong>when it happens and by whom</strong> - the logistics of fitting ready jobs into time and people. <em>Execute work</em> is doing it. These are genuinely different kinds of thinking: planning is technical and looks at one job in depth; scheduling is logistical and looks across many jobs in time. And the planner's role during <em>execution</em> is the one people most misread - it is <strong>not</strong> to pick up a spanner. It is to have made the job ready beforehand, and then to capture what actually happened - the real hours, the surprise found under the cover, the extra part nobody expected - so the next plan is better. Planning is the opposite of the reactive scramble: it looks forward and prepares, so the work can be calm.</p>
+<p><strong>The planner's product is a ready job.</strong> If a scheduler produces a date and a technician produces a repair, what does the planner produce? <em>A ready job.</em> Concretely, a <strong>work package</strong>: the breakdown of tasks and how long each should take, the procedure for how to do each one, the safety and risk requirements, all the parts and equipment and materials, and the technical information - drawings, specifications, acceptance limits. The test of it is brutal and simple: <strong>when the crew arrives, is everything there to do the job right the first time - the correct parts, the right tools, the permit already raised, the line ready to isolate, and clear steps to follow?</strong> A job is not "planned" the moment it has a date; it is planned only when it is <em>ready to be scheduled</em> - complete, with nothing missing that would stop the crew. The six-o'clock failure was not a scheduling mistake and it was not the crew being careless. <em>It was a job that was given a date before it was made ready</em> - a system condition, not a personal failing, and the fix is a better planning practice, not a harder-working person.</p>
+<p><strong>Scope of work and job scoping - two different magnitudes.</strong> This is the distinction that quietly decides whether a plan holds, and most people never name it. <strong>Scope of work is the boundary of the whole body of work</strong> - everything a shutdown or project does and does not include. It is <em>wide</em>: these forty jobs are in, those are out; the pump and its motor are in, the downstream pipework is a separate job. It answers "what are we doing overall, and what is explicitly not ours?" <strong>Job scoping is the depth of one job</strong> - exactly what a single task needs. It is <em>narrow</em>: this pump, these six steps in order, this seal kit, this torque figure, this permit, ninety minutes. It answers "how, precisely, is this one thing done?" One is the campaign, the other is the task, and they are different <em>magnitudes</em> of the same discipline. You need both, and each fails in its own way when skipped: <strong>skip the scope of work and the job grows without limit</strong>, because no one drew the boundary, so once the covers come off it swallows the budget and the schedule (scope creep); <strong>skip the job scoping and the crew arrives to missing parts</strong>, because no one detailed the work, so the day is lost to the store and the tool crib. The six-o'clock disaster was a job-scoping failure; the shutdown that doubles in size is a scope-of-work failure. Name which magnitude you are working at, and do both.</p>
+<p><strong>The planning process, in order.</strong> Planning is not one act but a short sequence, and doing it in order is what makes the job ready. <em>Identify</em> the work (the request, the inspection finding, the routine that has come due). <em>Scope</em> it - and here you walk the job down, go and look, because the drawing does not show the seized valve, the access that is not there, or the scaffold that must go up first. <em>Detail</em> the tasks, parts, tools, skills, permits and access. <em>Estimate</em> the durations and resources honestly. <em>Package</em> it into a complete work order and mark it ready to schedule <em>only when it truly is</em>. Then <em>hand it to scheduling</em> for a date and a crew, <em>support</em> the execution, and <em>close out and feed back</em> - update the asset's history and record what was really found, so the next plan starts from truth. That last step is where planning compounds: <strong>capture what was found, not who was at fault</strong> - the surprise under the cover is data to improve the next plan, never a reason to blame.</p>
+<p>One honest boundary. Readiness is a <em>product</em>, and a product takes time to make. A planner cannot turn a one-line request into a ready job with no hours in the day to plan it - <strong>if the system does not give the planner time to plan, it will not get ready jobs, and that is a resourcing decision, not the planner's failing.</strong> The role only pays back - and it pays back several times over - when it is given the time to do the work of readiness before the crew arrives, not squeezed in between emergencies.</p>
+<p>Does it scale? A student who writes "revise for exam" on Monday has scheduled nothing and planned nothing. Planning it is scoping the work (which topics are in, which are already known and out), scoping each session (this chapter, these three problem sets, ninety minutes), and sequencing it (the foundational topic before the one built on it). A date in a diary is not a plan; a ready, scoped, sequenced set of sessions is - and the exam and the pump overhaul succeed on exactly the same distinction.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is a real one. A work order lands on your desk. In full, it reads: <strong>"Overhaul gearbox on Conveyor 04."</strong> That is the whole plan. It already has a date - Thursday - and a crew. Make it ready.</p>
+<ol>
+<li><strong>Name the three acts.</strong> For this job, say in one line each what <em>plan work</em>, <em>schedule work</em> and <em>execute work</em> mean - and which one has actually been done so far.</li>
+<li><strong>Draw the boundary (scope of work).</strong> State what is <em>in</em> this job and name at least two things that are explicitly <em>out</em> (and are therefore separate jobs, not free additions once the covers are off).</li>
+<li><strong>Scope the job (job scoping).</strong> Compile the activity description list for the gearbox overhaul in the correct <em>execution</em> sequence - the order the work physically happens.</li>
+<li><strong>List what falls out.</strong> From that sequenced list, name the parts, the tools, the permit, and the time estimate the job needs. (Notice you could not know these until you had the sequence.)</li>
+<li><strong>Close the loop.</strong> Describe the planner's role while the crew is executing on Thursday, and name one thing they must capture to make the next gearbox plan better.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> five things.</p>
+<p>First, the three acts. <em>Plan work</em> = decide what the gearbox overhaul needs and how it is done (tasks, parts, tools, permit, steps). <em>Schedule work</em> = decide when (Thursday) and who (the crew). <em>Execute work</em> = the crew doing it on the day. <strong>Only the scheduling has been done</strong> - the job has a date and a crew but no plan, which is the whole trap: a scheduled job masquerading as a ready one.</p>
+<p>Second, the boundary. <em>In:</em> the gearbox on Conveyor 04 - isolate, remove, strip, inspect, replace worn internals, refit, test. <em>Out</em> (separate jobs, not to be swept in when the covers come off): the conveyor belt itself, the drive motor's alignment and internals, the structural rollers, the electrical supply beyond isolation. Naming these out is what stops the Thursday job quietly turning into a three-day rebuild - the scope-of-work boundary is the defence against scope creep.</p>
+<p>Third, the sequence - listed in the order the work truly happens, for example: raise permit and isolate (electrical and mechanical) -> lock out and prove dead -> drain the oil -> disconnect couplings and guards -> remove the gearbox to the workshop (or strip in place) -> open and inspect gears and bearings -> measure and record wear -> replace worn gears, bearings and seals -> reassemble to spec -> refill with the correct oil -> refit and re-couple -> align -> test run and check for noise, heat and leaks -> return to service and sign off. A list in <em>any other order</em> plans the job wrong.</p>
+<p>Fourth, what falls out of that sequence: the <strong>parts</strong> (gear set, bearing kit, seals, the correct grade and quantity of oil, gaskets), the <strong>tools</strong> (lifting gear for the gearbox, pullers, alignment equipment, torque wrench), the <strong>permit</strong> (electrical and mechanical isolation, lock-out), and an honest <strong>time estimate</strong> built from the steps, not guessed. The point to see: <em>you could not list the parts and tools until you had walked the sequence</em> - the sequenced activity list is the engine that produces the readiness.</p>
+<p>Fifth, the loop. On Thursday the planner does <strong>not</strong> pick up a spanner - they made the job ready, and now they keep it ready (clear a blocker, confirm the part) and then <strong>capture what was actually found</strong>: the real hours the job took, and the surprise under the cover - say the input shaft was scored, not just the bearings. That goes into the asset history and the next plan, recorded as <em>what was found, not who was at fault</em>, so next time the scored shaft is anticipated, not rediscovered at six in the morning.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-plan_schedule_execute">1. Plan, schedule, execute - three different acts</label><textarea id="cb-plan_schedule_execute" data-key="t-0209:plan_schedule_execute" placeholder="Plan work = what needs doing and how (technical content). Schedule work = when and by whom (logistics). Execute work = doing it. Putting a job on the schedule is not planning it. The planner&#039;s role during execution is to have made it ready and to capture what happened - not to pick up a spanner."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_ready_job">2. The planner produces a READY JOB, not a date</label><textarea id="cb-the_ready_job" data-key="t-0209:the_ready_job" placeholder="The planner&#039;s product is a work package so complete that when the crew arrives, every part, tool, permit, drawing and step is already there and it can be done right the first time. A job is &#039;planned&#039; only when it is ready to be scheduled - complete, nothing missing. A scheduled job is not a ready job."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-scope_of_work_vs_job_scoping">3. Scope of work vs job scoping - two different magnitudes</label><textarea id="cb-scope_of_work_vs_job_scoping" data-key="t-0209:scope_of_work_vs_job_scoping" placeholder="Scope of work is the boundary of the WHOLE body of work - what is in and out of the shutdown or project (wide). Job scoping is the DEPTH of one task - the exact steps, parts, tools, permit and time for a single job (narrow). You need both: skip the scope of work and jobs grow without limit (scope creep); skip the job scoping and the crew arrives to missing parts."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_planning_process">4. Work the planning process in order</label><textarea id="cb-the_planning_process" data-key="t-0209:the_planning_process" placeholder="Identify the work, then SCOPE it (walk it down - the drawing hides the seized valve), detail the tasks/parts/tools/permits/access, estimate honestly, package it and mark ready-to-schedule only when it truly is. Then hand to scheduling, support execution, and close out by feeding back what was found. Planning looks forward and prepares."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-sequence_the_activity_list">5. Compile the activity list in execution sequence</label><textarea id="cb-sequence_the_activity_list" data-key="t-0209:sequence_the_activity_list" placeholder="List the activities in the order the work physically happens: isolate before dismantle, inspect before you order the final parts, test before you hand back. That execution sequence is what reveals the parts, tools, permits and timing the job needs - a list compiled in any other order plans the job wrong."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When your one-line work order has become a ready, scoped, sequenced job, <strong>download or save it</strong> - it is yours. You can now tell a job that has a date from a job that is actually planned.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A job on the schedule is not a job that is ready. The date tells the crew when to come; only the plan lets them start.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Believing a scheduled job is a planned job.</strong> A date is the scheduler's product; a ready job is the planner's. Putting work on the calendar without making it ready is the six-o'clock disaster in the making.</p>
+<p>&bull; <strong>The one-line work order.</strong> "Overhaul pump 3" is a wish, not a plan. If the crew cannot start from what is written, it was never planned - only named.</p>
+<p>&bull; <strong>Confusing scope of work with job scoping.</strong> One is the boundary of the whole body of work; the other is the depth of a single task. Skip the first and the job grows without limit; skip the second and the crew arrives to missing parts.</p>
+<p>&bull; <strong>Compiling the activity list out of order.</strong> The list must follow the sequence the work actually happens - isolate before dismantle, inspect before you order. Any other order plans the job wrong and hides what you need.</p>
+<p>&bull; <strong>The planner doing the work.</strong> The planner's job during execution is to have made it ready and to capture what happened - not to pick up a spanner. A planner pulled onto the tools is a planner not planning the next job.</p>
+<p>&bull; <strong>Skipping the walkdown.</strong> The drawing does not show the seized valve or the missing access. Scope the job by going and looking, or you will scope it wrong from a desk.</p>
+<p>&bull; <strong>Capturing no feedback.</strong> If nobody records what was really found, the next plan repeats today's miss. Capture what was found, not who was at fault - it is data for the next plan, not blame.</p>
+<p>&bull; <strong>Blaming the crew for a readiness failure.</strong> An idle crew at six is a process that failed to ready the job - a system condition, not a personal failing. Fix the practice, not the person.</p>
+</div>
+</details>
+<p>The crew stood idle at six o'clock because the job had a date but was never made ready, and the planner had mistaken scheduling for planning. Plan is not schedule and neither is execute - the planner's product is a ready job, a work package so complete the crew arrives to every part, tool, permit and step already there; set the two scopes, the wide boundary of the whole body of work and the deep detail of the single task, and do both; work the process in order - identify, scope by walking it down, detail, estimate, package to ready, hand off, support, and feed back what was found; and compile the activity list in the sequence the work actually happens, because that sequence is what reveals the parts, the tools and the time. <strong>The planner's job is not to put a date on the work; it is to make the work ready for a date - and where the plan honestly needs more preparation time, that is the plan doing its job, not the planner failing at theirs.</strong> Next time a one-line work order lands on your desk, do not schedule it - ready it: scope it, sequence it, and make it so complete that the crew who arrives has nothing to do but the work.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can make a job ready now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

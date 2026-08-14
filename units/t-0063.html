@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perform an advanced Fitness-for-Service assessment (FAD, J-integral, CTOD)</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Perform an advanced Fitness-for-Service assessment (FAD, J-integral, CTOD)</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are standing on a steel walkway beside a pressure vessel at the <strong>Witklip processing plant</strong>, in the cold hour after dawn. In your hand is an inspection report from last night's shutdown. A scanner found a flaw in a weld near the bottom of the shell: <strong>a sharp, planar root crack, 4 mm tall, running 30 mm along the weld.</strong> The shell is <strong>25 mm thick carbon steel</strong>. The vessel runs at <strong>18 bar</strong> and the metal can drop to <strong>5&deg;C</strong> on a winter start-up. People work on the deck below it.</p>
+<p>The plant manager is already on the walkway, holding a coffee that has gone cold, looking at you. <em>"So do we keep running, or do I shut the whole line down today? Every day this is off costs us R180 000."</em> You can hear the vessel ticking as it warms, and you can smell the faint sourness of the process gas on the wind.</p>
+<p>It would be easy to reach for the rule you already know - the simple flaw table from the fabrication code that said anything taller than 1 mm is rejectable. By that rule, 4 mm is a clear reject: shut it down, cut it out. But that table was written for a brand-new weld coming off the bench. This is a vessel that has run for years, with a real crack, at real pressure, in cold steel. A flaw being <em>bigger than the new-build table allows</em> does not, on its own, tell you whether this vessel will hold today - or burst.</p>
+<p>The honest question is sharper than pass or fail.</p>
+<blockquote><h2>Will this crack stay put under load, or will it run? A new-build table cannot answer that. You need a way to take this real crack, this real steel, this real pressure and temperature, and work out - with a margin you can defend - whether the vessel is safe to keep running, and if so, for how long.</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> A 4 mm crack in a vessel that has run for years. The fabrication code&rsquo;s flaw table rejects anything over about 1 mm. Shutting the line costs R180,000 a day, and the plant manager is holding a cold coffee waiting for your answer. <strong>Write down what you would tell him.</strong> Your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare &mdash; the five answers, and what each one is actually asking</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;The table says reject at 1 mm. Shut it down and cut it out.&rdquo;</strong> Defensible, immediate, and it applies a rule to something it was not written about. <strong>That table judges a brand-new weld coming off the bench</strong> &mdash; it decides what a fabricator may hand over, not whether a vessel that has run for years will hold this afternoon. Those are different questions with different answers.</p>
+<p>&bull; <strong>&ldquo;It has run for years with a crack in it &mdash; it will keep running.&rdquo;</strong> The opposite error and the one that kills people. Nothing about surviving until today says the crack will stay put under the next load, and <strong>this is the reasoning that is only ever wrong once.</strong></p>
+<p>&bull; <strong>&ldquo;Drop the pressure and keep going.&rdquo;</strong> Sometimes exactly right, and right now it is a guess in a safer-sounding direction. <strong>Drop it to what?</strong> Without knowing what the crack can take, you have chosen a number that feels careful, and told the plant manager it is a decision.</p>
+<p>&bull; <strong>&ldquo;Grind it out and weld it up today.&rdquo;</strong> A repair to a pressure boundary, made in a hurry, on a vessel nobody has yet assessed &mdash; and welding puts heat and residual stress into cold steel next to the thing you are worried about.</p>
+<p>&bull; <strong>&ldquo;Get a specialist in &mdash; I&rsquo;m not qualified to say.&rdquo;</strong> Often the correct call, and notice what the specialist will need when they arrive: <strong>the real wall thickness, the real pressure, the real steel&rsquo;s toughness at the real temperature.</strong> If nobody has assembled those, the wait buys nothing.</p>
+<p>The honest question is sharper than pass or fail, and it is not the one the table answers: <strong>will this crack stay put under load, or will it run?</strong></p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>The cracked vessel at Witklip was built years ago by <strong>Bergview Pressure Fabrication</strong>, the small Mpumalanga shop. Their senior engineer, <strong>Thandeka</strong>, a competent person for Fitness-for-Service (FFS), is called out to do a <strong>Level-3 FFS assessment to API 579-1 / ASME FFS-1, Part 9</strong>. On her laptop is the inspection report; in her bag is the original material certificate and a CTOD test result on the same steel grade. Every number below is consistent and carried through, start to finish.</p>
+<p><strong>The known facts (the inputs):</strong> Shell 25 mm thick carbon steel, inside radius 750 mm. Operating pressure 18 bar = 1.8 MPa. Minimum metal temperature on start-up 5&deg;C. Flaw: a surface-breaking root crack, height a = 4 mm, length 2c = 30 mm, on the inside surface. Material yield strength sigma<sub>y</sub> = 350 MPa; tensile strength sigma<sub>u</sub> = 490 MPa. Measured toughness from the CTOD test at 5&deg;C: CTOD delta = 0.15 mm.</p>
+<p><strong>Step 1 - confirm this is the right tool, and gather the inputs.</strong> Thandeka first checks the simple route. The new-build flaw table rejects anything over about 1 mm; the crack is 4 mm, so the simple screen fails. A flat reject would mean shutting the line - R180 000 a day. The vessel is in service with a fully characterised flaw and she has real toughness data, so a Level-3 FFS is exactly the right next step. She writes the inputs above onto the assessment sheet first - the assessment is only as good as these numbers.</p>
+<p><strong>Step 2 - work out the stress driving the crack (the primary stress).</strong> The crack is driven mainly by the hoop stress in the shell wall - the stress that tries to split the cylinder along its length under internal pressure. Hoop stress sigma = (pressure x radius) / thickness = (1.8 MPa x 750 mm) / 25 mm = <strong>54 MPa</strong>. This is the primary stress (it comes from the pressure load and must be carried). Thandeka notes there is little secondary stress here (no big thermal gradient on a slow start-up), which keeps the case clean.</p>
+<p><strong>Step 3 - work out the crack-tip driving force, and turn it into K<sub>r</sub>.</strong> The crack-tip driving force is captured by the stress intensity factor K, which for a surface crack is K = sigma x sqrt(pi x a) x Y, where Y is a geometry factor from API 579-1 tables for a surface crack in a cylinder. For this shallow surface crack, Y is about 0.66 (read from the standard for a/t = 4/25 = 0.16 and the crack shape). K = 54 MPa x sqrt(pi x 0.004 m) x 0.66 = 54 x 0.112 x 0.66, which is approximately <strong>4.0 MPa m<sup>0.5</sup></strong>. Now convert the steel's measured toughness into the same units. The standard's relation between CTOD and the critical stress-intensity-style toughness K<sub>mat</sub> is K<sub>mat</sub> = sqrt(m x sigma<sub>y</sub> x E x delta), with m approximately 1.5, Young's modulus E = 207 000 MPa, sigma<sub>y</sub> = 350 MPa, delta = 0.15 mm = 0.00015 m. Working in consistent units gives K<sub>mat</sub> approximately <strong>128 MPa m<sup>0.5</sup></strong> (1.5 x 350 x 207 000 x 0.00015 = 16 301, and the square root of that is 127.7). This is a tough, ductile steel at 5&deg;C - good news.</p>
+<p><em>A note on this number, because you should be able to reproduce every figure here.</em> Earlier versions of this unit printed K<sub>mat</sub> = 138, which is what you get with a constraint factor of m = 1.75 rather than the m = 1.5 stated above. The figure has been corrected to follow the inputs as printed. Check which constraint factor your assessment procedure prescribes for your geometry before you rely on either: the standard governs, not this page. State the factor you used and why, every time. A calculation you cannot reproduce is not an engineering answer, and an input you cannot justify is not an assumption - it is a guess wearing a number. <strong>The fracture ratio: K<sub>r</sub> = K / K<sub>mat</sub> = 4.0 / 127.7 = 0.031.</strong> That is very low - the crack-tip push is tiny next to what the steel can take. (This is the J-integral idea in action: K<sub>r</sub> is the square-root form of comparing the applied J to the material's J<sub>mat</sub>. Because the steel has not gone plastic at the tip under this low stress, the simple K form is valid; if stress were near yield, Thandeka would use the full J-integral and the plasticity correction the standard builds into the FAD.)</p>
+<p><strong>Step 4 - work out how close the ligament is to collapse, and turn it into L<sub>r</sub>.</strong> Plastic collapse depends on the reference stress - the stress on the remaining sound ligament once you subtract the area the crack has eaten. For a 4 mm crack in a 25 mm wall, the ligament is 21 mm, so the reference stress is a little above the hoop stress. Using the API 579-1 reference-stress solution: sigma<sub>ref</sub> is approximately <strong>62 MPa</strong>. <strong>The load ratio: L<sub>r</sub> = sigma<sub>ref</sub> / sigma<sub>y</sub> = 62 / 350 = 0.18.</strong> That is well below 1 - the ligament is nowhere near yielding.</p>
+<p><strong>Step 5 - plot the single point on the FAD and read the answer.</strong> Thandeka now has her one point: (L<sub>r</sub>, K<sub>r</sub>) = (0.18, 0.031). The failure assessment line for this material starts at K<sub>r</sub> = 1 on the left and curves down to meet the L<sub>r</sub> axis near the collapse limit (around L<sub>r</sub> = 1.15 for this steel). Her point sits deep inside that line, very close to the origin - far from both the fracture boundary above and the collapse boundary to the right. <strong>The verdict: the vessel is fit for continued service at 18 bar.</strong> The simple new-build table screamed "reject" at 4 mm; the honest fracture-mechanics assessment shows a large margin. The flat table was conservative for a reason, but it was the wrong tool for an in-service decision.</p>
+<p><strong>Step 6 - quote the margins honestly, and set the re-inspection.</strong> A verdict without a margin is not an engineering answer. Thandeka reports both: fracture margin - K<sub>r</sub> is 0.031 against the line at 1.0, meaning the crack-tip push would have to rise more than thirtyfold to reach the fracture boundary; collapse margin - L<sub>r</sub> is 0.18 against approximately 1.15, a large reserve before yielding. She does not stop there. A static "fit today" is not "fit forever." She checks whether the crack could grow in service (fatigue from pressure cycles). If the line cycles pressure, she would run a crack-growth calculation to find how many cycles until the crack reaches a size that does fail the FAD, then set the re-inspection interval at a safe fraction of that life - typically inspect again before the crack could grow halfway to the critical size. Here, with steady operation, she sets a re-inspection at the next scheduled shutdown and records the flaw's exact size as the baseline to measure growth against.</p>
+<p><strong>Step 7 - write it up and own the decision.</strong> The report carries: the inputs, the stress and toughness calculations, the K<sub>r</sub> and L<sub>r</sub> values, the plotted FAD with the point shown, the margins, the re-inspection interval, and her signature as the competent person. The line keeps running. No R180 000-a-day shutdown - and a defensible, documented safety case.</p>
+<p>See the mission in it. A flat "over the limit, reject" rule sounds safe but answers nothing about whether people below that deck are actually at risk today. The honest fracture-mechanics assessment refuses that shortcut: it puts a real number on how close the crack is to running and how close the ligament is to yielding, states the margin plainly, and sets a date to look again - so the R180 000-a-day pressure never gets to override the safety of the people working under that vessel.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>What is this for, and when does it fit?</strong> A crack in a loaded part is not automatically a disaster, and it is not automatically safe. Whether it stays still or suddenly runs across the wall depends on three things: how big the crack is, how hard the part is being pulled, and how tough the steel is. A method that weighs all three together and gives a clear answer with a safety margin is called a <strong>Fitness-for-Service (FFS) assessment</strong> - a structured engineering assessment that asks: is this real, damaged piece of equipment fit to keep doing its job? It is for equipment already in service with a known flaw - not for judging a new weld on the bench. The standard recipe most plants use is <strong>API 579-1 / ASME FFS-1</strong> (the rulebook for assessing damaged pressure equipment).</p>
+<p><strong>What are the three levels of effort?</strong> API 579-1 sorts its assessments into three levels. Level 1 is a quick, conservative screening with simple charts - pass here and you can stop. Level 2 is more detailed, still using standard equations. Level 3 is the most advanced, used when Levels 1 and 2 say "fail" or do not cover your situation. It uses full <strong>fracture mechanics</strong> - and it is what this unit teaches for a crack.</p>
+<p><strong>What are the two ways the part can actually fail?</strong> When you pull on a cracked part, it can fail in two very different ways, and a good assessment checks both. <strong>Fracture</strong> is when the crack suddenly runs, fast and brittle, even though the rest of the metal is nowhere near its strength limit - cold steel and sharp cracks make this worse. <strong>Plastic collapse</strong> is when the metal simply yields and tears across the remaining ligament because there is not enough sound material left to carry the load - a strength problem, not a crack-running problem. The clever part of Level-3 FFS is that it checks both at once.</p>
+<p><strong>How hard is the crack tip being driven to grow? - the J-integral.</strong> When you load a cracked part, energy concentrates at the crack tip and tries to drive the crack forward. The <strong>J-integral (J)</strong> is a single number that measures the strength of that driving force at the tip, and - unlike older measures - it stays valid even when the steel around the tip has yielded and gone plastic. Higher load or bigger crack means higher J. Think of J as how hard the crack is being pushed - the same idea Thandeka used when she worked out K = 4.0 MPa m<sup>0.5</sup> for the Witklip crack.</p>
+<p><strong>How much pushing can this steel take before the crack runs? - fracture toughness and CTOD.</strong> Every steel has a limit to how much crack-tip driving force it can absorb before the crack runs. That limit is its <strong>fracture toughness</strong>. You can express toughness as a critical J value (J<sub>c</sub> or J<sub>mat</sub>, "the J the material can take"), or as a critical opening of the crack tip called <strong>CTOD - the Crack-Tip Opening Displacement</strong> (how far the two faces of the crack tip pull apart before it runs, measured in millimetres). CTOD and J describe the same toughness; CTOD is often what the test lab reports for structural steels, and the standard converts between them - exactly how Thandeka's measured CTOD of 0.15 mm became K<sub>mat</sub> = 128 MPa m<sup>0.5</sup>. Think of toughness as how much push the steel can survive. So the fracture check is simply: is the push (J, from your load and crack) less than what the steel can take (J<sub>mat</sub>)? With a margin.</p>
+<p><strong>Is there still enough solid metal to carry the load? - the reference stress and plastic collapse.</strong> Separately, you check the strength side: compare the load on the remaining sound ligament against the steel's yield strength. This guards against plain collapse - the sigma<sub>ref</sub> = 62 MPa Thandeka worked out against sigma<sub>y</sub> = 350 MPa.</p>
+<p><strong>How do you combine both into one answer? - the Failure Assessment Diagram (FAD).</strong> Here is the elegant bit. Instead of two separate answers, Level-3 FFS plots one point on one chart called the <strong>Failure Assessment Diagram (FAD)</strong>. The FAD has two axes. <strong>K<sub>r</sub> (the vertical axis - the fracture ratio):</strong> how close you are to fracture - it is the crack-tip push divided by the steel's toughness; K<sub>r</sub> near 1 means you are near fracture. <strong>L<sub>r</sub> (the horizontal axis - the load ratio):</strong> how close you are to plastic collapse - it is your load divided by the load that would yield the ligament; L<sub>r</sub> near 1 means you are near collapse. On the chart there is a curved line - the <strong>failure assessment line (FAL)</strong>. You work out your vessel's K<sub>r</sub> and L<sub>r</sub>, plot the single point, and read the answer directly: a point inside the line (toward the origin) is acceptable, fit for service; a point on or outside the line is not acceptable - fracture or collapse, or an interaction of the two, is predicted. Thandeka's point, (0.18, 0.031), sat deep inside the line. One picture answers both failure modes and shows you which one is closer.</p>
+<p><strong>When does Level-3 FFS fit, and when does it not?</strong> It fits when the equipment is in service with a real, sized, characterised flaw (you know its height, length and position - exactly what a good NDT characterisation gives you); when a simpler Level 1 or 2 screen has failed or does not apply, and a flat new-build table would force an unnecessary, costly shutdown; and when you have, or can get, real material toughness data (a CTOD or J test on the actual steel grade), real loads, and real temperature. It does NOT fit, and its honest limits are these: it is not a way to make a genuinely unsafe vessel look acceptable - the margins are there to be respected. Garbage in, garbage out: a wrong crack size, an optimistic toughness, or a missed load makes a confident, dangerous answer. It needs competent engineering judgement and usually a chartered/competent person to sign it - it is not a spreadsheet you run blind. If the steel is badly degraded, or the loading is complex (fatigue cycling, creep at high temperature), those mechanisms need their own assessment on top - the FAD alone is a single static snapshot. A Level-3 result that says "unfit" means unfit - repair, re-rate or replace. You do not keep re-running the numbers until you like the answer.</p>
+<p>The reference you work to: <strong>API 579-1 / ASME FFS-1, Part 9</strong> - the rules for assessing crack-like flaws, including the Level-3 FAD method, the J and CTOD basis, and the safety factors.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Attempt each task yourself before you open the reveal. Work in consistent units (MPa, metres, MPa m<sup>0.5</sup>).</p>
+<p><strong>Task 1 (warm-up - pick the right tool).</strong> An in-service vessel has a 3 mm crack-like flaw, fully sized. The new-build fabrication table rejects anything over 1 mm, so a junior writes "reject, replace the vessel." The plant faces a long, costly outage. Is the junior's reasoning sound? What should happen instead?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>The new-build table is the wrong tool for an in-service flaw - it was written to judge fresh welds, not to decide whether a real, loaded vessel will hold. The flaw exceeding the table does not prove the vessel is unsafe. The correct next step is a Fitness-for-Service assessment (try Level 1/2 screening first; go to Level 3 with fracture mechanics if those fail). Only an FFS verdict, with margins, justifies replacement.</p>
+</div>
+</details>
+<p><strong>Task 2 (compute the two ratios).</strong> A surface crack: hoop stress sigma = 90 MPa, a = 5 mm, geometry factor Y = 0.7, K<sub>mat</sub> = 120 MPa m<sup>0.5</sup>, reference stress sigma<sub>ref</sub> = 110 MPa, yield sigma<sub>y</sub> = 350 MPa. Work out K<sub>r</sub> and L<sub>r</sub>, and say roughly where the point sits.</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>K = 90 x sqrt(pi x 0.005) x 0.7 = 90 x 0.125 x 0.7, approximately 7.9 MPa m<sup>0.5</sup>. K<sub>r</sub> = 7.9 / 120, approximately <strong>0.066</strong>. L<sub>r</sub> = 110 / 350, approximately <strong>0.31</strong>. Both ratios are well below 1, so the point sits comfortably inside the FAD - acceptable, with the collapse axis being the nearer (but still large) margin. State both ratios and the margin, never just "pass."</p>
+</div>
+</details>
+<p><strong>Task 3 (read the FAD and name the closer failure mode).</strong> Two assessments. Vessel A plots at (L<sub>r</sub>, K<sub>r</sub>) = (0.25, 0.85). Vessel B plots at (L<sub>r</sub>, K<sub>r</sub>) = (1.05, 0.20). For both vessels, take the collapse cut-off as L<sub>r,max</sub> = 1.15 and the fracture limit as K<sub>r</sub> = 1.0, so you can see for yourself that both points lie just inside the failure line rather than taking it on trust. Which failure mode dominates each, and what does that tell you about how to make each one safer?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>Vessel A has a high K<sub>r</sub> and low L<sub>r</sub> - it is fracture-dominated (brittle, crack-driven); to gain margin, raise toughness (warmer operating temperature, a tougher repair weld) or reduce the crack/stress. Vessel B has a high L<sub>r</sub> and low K<sub>r</sub> - it is collapse-dominated (running out of sound ligament); to gain margin, reduce the load (lower pressure / re-rate) or restore wall thickness. Both being "just inside" means small input errors could push either out - tighten the inputs and add conservatism before relying on a thin margin.</p>
+</div>
+</details>
+<p><strong>Task 4 (defend the decision under pressure).</strong> Your Level-3 FFS gives a point at (L<sub>r</sub>, K<sub>r</sub>) = (0.9, 0.95) - just inside the line, using an optimistic toughness you took from a generic textbook table rather than a test on the real steel, and a crack size measured by a single quick scan. Your manager says "it's inside the line, sign it off, keep running." What do you say?</p>
+<details><summary>What good looks like</summary>
+<div class="reveal-content">
+<p>You do not sign it as-is. A point that close to the line leaves almost no margin, and the result rests on two soft inputs: a borrowed (possibly optimistic) toughness and a single uncertain crack measurement. Get real toughness (a CTOD/J test on the actual steel) and a confirmed, characterised crack size; re-run with those. If the point stays marginal, the honest action is to re-rate (lower pressure), repair, or replace - not to lean on a generic number. The FAD is only as trustworthy as its inputs and its margin.</p>
+</div>
+</details>
+<p><strong>Now build your own.</strong> Copy this whole sheet for the cracked part you are assessing. Fill every blank in order, top to bottom - each row is one step of the technique and each prompt tells you what to think about. Do not skip a row; an empty box is a question you have not yet answered. Work in consistent units (MPa, metres, MPa m<sup>0.5</sup>). When you reach the FAD line, plot your single point and read the verdict the way Thandeka did.</p>
+<p><strong>A - Inputs (Step 1: gather the real numbers - the sheet is only as good as these)</strong></p>
+<table>
+<tr><th>What to record</th><th>Your value</th><th>Where it comes from / how sure are you?</th></tr>
+<tr><td>Component + flaw location</td><td>__________</td><td>(drawing / inspection report)</td></tr>
+<tr><td>Wall thickness, t</td><td>__________ mm</td><td></td></tr>
+<tr><td>Inside radius, r</td><td>__________ mm</td><td></td></tr>
+<tr><td>Operating pressure, p</td><td>__________ MPa</td><td></td></tr>
+<tr><td>Minimum metal temperature</td><td>__________ &deg;C</td><td>(use the COLDEST it actually sees)</td></tr>
+<tr><td>Flaw height, a</td><td>__________ mm</td><td>(NDT - single scan or confirmed?)</td></tr>
+<tr><td>Flaw length, 2c, and position (surface / embedded)</td><td>__________ mm / ______</td><td></td></tr>
+<tr><td>Yield strength, sigma<sub>y</sub></td><td>__________ MPa</td><td>(cert / test on the real steel?)</td></tr>
+<tr><td>Tensile strength, sigma<sub>u</sub></td><td>__________ MPa</td><td></td></tr>
+<tr><td>Toughness: CTOD delta (or J<sub>mat</sub> / K<sub>mat</sub>) at min temp</td><td>__________ mm</td><td>(test on the real grade, or borrowed?)</td></tr>
+<tr><td>Is a simple Level 1/2 screen failed or N/A?</td><td>Yes / No</td><td>(if No, stop - you may not need Level 3)</td></tr>
+</table>
+<p><strong>B - Driving stress (Step 2)</strong></p>
+<table>
+<tr><th>Quantity</th><th>Formula</th><th>Your working</th><th>Result</th></tr>
+<tr><td>Hoop (primary) stress, sigma</td><td>(p x r) / t</td><td>__________</td><td>______ MPa</td></tr>
+<tr><td>Any secondary stress? (thermal / weld residual)</td><td>list and include if present</td><td>__________</td><td>______ MPa</td></tr>
+</table>
+<p><strong>C - Fracture side to K<sub>r</sub> (Step 3)</strong></p>
+<table>
+<tr><th>Quantity</th><th>Formula</th><th>Your working</th><th>Result</th></tr>
+<tr><td>Geometry factor, Y</td><td>API 579-1 table for your a/t and shape</td><td>a/t = ____ then Y = ____</td><td>______</td></tr>
+<tr><td>Crack-tip push, K</td><td>sigma x sqrt(pi x a) x Y</td><td>__________</td><td>______ MPa m<sup>0.5</sup></td></tr>
+<tr><td>Material toughness, K<sub>mat</sub></td><td>sqrt(m x sigma<sub>y</sub> x E x delta), m approximately 1.5, E approximately 207 000 MPa</td><td>__________</td><td>______ MPa m<sup>0.5</sup></td></tr>
+<tr><td><strong>Fracture ratio, K<sub>r</sub></strong></td><td>K / K<sub>mat</sub></td><td>__________</td><td><strong>______</strong></td></tr>
+<tr><td>Is sigma near yield? (if yes, use full J + plasticity)</td><td>check</td><td>__________</td><td>Yes / No</td></tr>
+</table>
+<p><strong>D - Collapse side to L<sub>r</sub> (Step 4)</strong></p>
+<table>
+<tr><th>Quantity</th><th>Formula</th><th>Your working</th><th>Result</th></tr>
+<tr><td>Remaining ligament</td><td>t - a</td><td>__________</td><td>______ mm</td></tr>
+<tr><td>Reference stress, sigma<sub>ref</sub></td><td>API 579-1 reference-stress solution</td><td>__________</td><td>______ MPa</td></tr>
+<tr><td><strong>Load ratio, L<sub>r</sub></strong></td><td>sigma<sub>ref</sub> / sigma<sub>y</sub></td><td>__________</td><td><strong>______</strong></td></tr>
+</table>
+<p><strong>E - Plot the single point and read the verdict (Step 5)</strong></p>
+<table>
+<tr><td>Your one point (L<sub>r</sub>, K<sub>r</sub>)</td><td>( ______ , ______ )</td></tr>
+<tr><td>Where the FAL meets the L<sub>r</sub> axis (collapse cut-off)</td><td>L<sub>r</sub> approximately ______</td></tr>
+<tr><td>Inside the line, or on/outside?</td><td>Inside = acceptable. On/outside = NOT acceptable</td></tr>
+<tr><td><strong>Verdict</strong></td><td>__________________________</td></tr>
+</table>
+<p><strong>F - Margins + the watch (Steps 6-7)</strong></p>
+<table>
+<tr><td>Fracture margin (K<sub>r</sub> vs 1.0)</td><td>__________</td></tr>
+<tr><td>Collapse margin (L<sub>r</sub> vs the cut-off)</td><td>__________</td></tr>
+<tr><td>Which failure mode is CLOSER?</td><td>Fracture / Collapse</td></tr>
+<tr><td>Could the crack grow? (fatigue / other) - cycles to critical</td><td>__________</td></tr>
+<tr><td>Re-inspection interval (safe fraction of that life)</td><td>__________</td></tr>
+<tr><td>Baseline flaw size recorded for next time</td><td>a = ____ mm, 2c = ____ mm</td></tr>
+<tr><td>Competent person sign-off</td><td>name / date __________</td></tr>
+</table>
+<p><strong>Two honesty checks before you sign.</strong> (1) If your point is close to the line, do your two softest inputs - crack size and toughness - actually justify that thin margin? If not, get a real CTOD/J test and a confirmed crack size and re-run once. (2) An "unfit" answer means repair, re-rate or replace - not re-run until it passes.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A Level-3 FFS is only as honest as the discipline behind it. A few traps come up again and again.</p>
+<details><summary>The traps - and how to fix them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>A real in-service crack is rejected outright as "over the limit."</strong> Cause: using the new-build fabrication flaw table to judge an in-service vessel. Fix: use an in-service Fitness-for-Service assessment (API 579-1). The new-build table is the wrong tool for a loaded, aged part.</p>
+<p>&bull; <strong>The FAD point is suspiciously deep inside the line (a huge margin).</strong> Cause: optimistic toughness (a generic table instead of a test) or a missed load (thermal, residual, secondary stress). Fix: use measured CTOD/J on the actual steel; include all primary and secondary stresses (weld residual, thermal) the standard requires.</p>
+<p>&bull; <strong>Two engineers get very different K<sub>r</sub> for the same crack.</strong> Cause: the wrong geometry factor Y, or the wrong crack idealisation (surface vs embedded, wrong a/t). Fix: re-read Y from the correct API 579-1 solution for the exact geometry and crack shape; agree the crack model first.</p>
+<p>&bull; <strong>A brittle answer in summer, a safe answer in winter - or the reverse.</strong> Cause: toughness used at the wrong temperature. Fix: use toughness at the minimum metal temperature the part actually sees (cold start-ups drive brittle fracture); never use a warm-day value for a cold case.</p>
+<p>&bull; <strong>A point sitting right on the line is called "pass."</strong> Cause: treating on-the-line as acceptable, ignoring input uncertainty. Fix: on or outside the line is NOT acceptable. Demand margin; tighten the uncertain inputs (crack size, toughness) before any decision.</p>
+<p>&bull; <strong>"Fit for service" is given, then the crack fails months later.</strong> Cause: a static assessment with no crack-growth check. Fix: a passing FAD is a snapshot. Check fatigue/other growth, find the time to reach critical size, and set a re-inspection interval at a safe fraction of that life.</p>
+<p>&bull; <strong>Using K-only when the stress is near yield.</strong> Cause: ignoring crack-tip plasticity - K stops being valid once the tip yields. Fix: use the full J-integral (or CTOD) basis and the FAD's plasticity correction; the FAD is built precisely to handle the elastic-plastic regime.</p>
+<p>&bull; <strong>Re-running the numbers repeatedly until the point falls inside.</strong> Cause: fitting the answer to the desired outcome. Fix: fix the inputs once, honestly. A Level-3 "unfit" means repair, re-rate or replace - not iterate until it passes.</p>
+</div>
+</details>
+<p>You came onto the walkway with a flat rule that screamed "reject" and a plant manager who wanted a yes or no by the time his coffee warmed up. You can leave with more than that: a real crack-tip push measured against a real toughness, a real ligament stress measured against yield, one honest point on one chart, the margins named out loud, and a re-inspection date set before anyone signs off. That is a Level-3 FFS: gather the real inputs, work out the push (J/K) and the collapse stress, turn each into a ratio, plot one point on the FAD, read the verdict, quote the margins, and set the watch - always under a competent person's sign-off, never a number you talk yourself into.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can run a Level-3 Fitness-for-Service assessment (FAD, J-integral, CTOD) now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

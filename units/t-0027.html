@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>We bought the smart sensors and we pay for a dashboard, but it warns us one sensor at a time, after the main has already burst. How do I learn the slow story across days and the story across a connected network - with only 31 labelled failures - and keep it honest after I switch it on?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>We bought the smart sensors and we pay for a dashboard, but it warns us one sensor at a time, after the main has already burst. How do I learn the slow story across days and the story across a connected network - with only 31 labelled failures - and keep it honest after I switch it on?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is 06:40 on a cold Tuesday in the control room at <strong>Meander Water</strong>, the utility that pumps drinking water to about <strong>180,000 people</strong> across a hilly town. On the big wall screen the live map glows: <strong>312 km of pipe</strong>, 4 reservoirs, 9 pump stations, and <strong>640 pressure and flow sensors</strong> blinking green.</p>
+<p>In your hand is a weekend incident report. <strong>Zone 7 burst at 02:10 on Sunday</strong> - a 300 mm main let go under a road. By the time the night crew found it, <strong>1.9 million litres</strong> had run into the storm drains and the road was closed for nine hours. The repair bill came to <strong>R420,000</strong>, and the angry calls are still coming in.</p>
+<p>Across the desk, <strong>Onthatile</strong>, the operations manager, taps the report with one finger. She is not shouting; that is almost worse. "This is the <strong>third</strong> burst this quarter," she says. "We already bought the smart sensors. We already pay for a dashboard. So why did nothing warn us?"</p>
+<p>You know the painful answer. The dashboard looks at <strong>one sensor at a time</strong> and only fires when a single reading crosses a fixed line. But a burst does not announce itself on one sensor. It builds up <strong>slowly over days</strong> as pressure drifts, and it shows up <strong>across many connected pipes at once</strong> - upstream, downstream, the whole neighbourhood of the network reacting together. Your tools cannot see a slow story told across <em>time</em>, nor a story told across a <em>network</em> of connected things. And you have a cupboard of 18 years of maintenance reports but only <strong>31 confirmed, labelled bursts</strong> in the whole dataset. Thirty-one.</p>
+<blockquote><h2>I need a dependable way to learn patterns across long stretches of time and across a connected network of assets, even with very few labelled failures - and a way to keep that method honest after I switch it on.</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> You have <strong>640 sensors</strong> reading once a minute for three years, and <strong>312&nbsp;km</strong> of pipe that forms a network — 418 junctions joined by 497 pipes, each with its own age and material. Bursts build slowly, across neighbourhoods, not at single gauges. And in eighteen years of maintenance reports there are only <strong>31 confirmed, labelled bursts</strong>. Thirty-one. Write down how you would build an early warning — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the two shapes the data actually has</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Set thresholds on each sensor and alarm when one crosses.&rdquo;</strong> This is what you have. It sees one gauge at one moment, so a slow story told across a week and across a neighbourhood arrives as a single late alarm — which is the situation you are trying to leave.</p>
+<p>&bull; <strong>&ldquo;Train a model on the 31 labelled bursts.&rdquo;</strong> Thirty-one examples will teach a model the thirty-one, confidently and uselessly. Scarce labels are a real constraint, and pretending otherwise produces something that looks trained.</p>
+<p>&bull; <strong>&ldquo;Collect more data and wait.&rdquo;</strong> You already have about a billion readings. The shortage is not data; it is labelled failures, and waiting for more means waiting for bursts.</p>
+<p>&bull; <strong>&ldquo;Buy the platform the vendor is offering.&rdquo;</strong> It will fit whichever shape they built for, and your data has two shapes at once.</p>
+<p>&bull; <strong>&ldquo;Use the biggest, newest model available.&rdquo;</strong> Size is not fit. A model with no way to represent a <em>network</em> cannot learn that a pipe&rsquo;s neighbours matter, however large it is.</p>
+<p>&bull; The choice is not about power, it is about <strong>shape</strong>. This data has two: a long <em>time</em> shape, three years of history per sensor, and a <em>network</em> shape, where what matters about a pipe includes what stands next to it. Different architectures exist because different shapes exist — one built to read long sequences, another built to spread information across a graph — and the honest move is to name the shapes first and pick the tools that match, rather than picking a tool and hoping the data suits it. The thirty-one labels are a third shape, scarcity, with its own answer: learn the ordinary behaviour from the billion unlabelled readings, and use the few labels only for what nothing else can supply. <strong>And none of it stays true on its own</strong> — a model is a claim about a world that keeps moving, so keeping it honest after you switch it on is part of building it, not a later chore.</p>
+</div>
+</details>
+<p>You do not need new mathematics. You need the right architecture for the shape of your data. Here is how to choose.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Modern AI is not one model - it is a small toolbox, and the skill is matching the tool to the <strong>shape</strong> of your problem: a <strong>Transformer</strong> for long time, a <strong>graph neural network</strong> for a connected network, <strong>self-supervised and few-shot</strong> learning for scarce labels, <strong>causal inference</strong> for honest cause, a <strong>foundation model</strong> for piles of documents, and <strong>MLOps</strong> to keep it all true over time. Watch them build an early-burst warning for Meander Water.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Match the architecture to the shape of your data</div><p class="cb-demo">At Meander Water the data has two shapes: a TIME shape (640 sensors, one reading a minute, kept three years) and a NETWORK shape (312 km of pipe as a graph of 418 nodes and 497 edges). So you choose a combined model - a Transformer to read each sensor&#039;s long history, feeding a Graph Neural Network that spreads those readings across the connected network - to output, for each node, a daily &#039;burst risk in the next 7 days&#039; from 0 to 1.</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Learn across long time, and across the network</div><p class="cb-demo">The Transformer reads each sensor&#039;s three-year history; the GNN spreads it across the 418-node graph, each edge carrying the pipe&#039;s diameter, material and age - so the model knows the Zone 7 main was 47-year-old cast iron. A burst that builds slowly over days, across a whole neighbourhood of pipes, now shows as one rising risk score instead of one late alarm on one gauge.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Learn from scarce labels without guessing</div><p class="cb-demo">With about 1.0 billion mostly-unlabelled readings (3 years x 640 sensors x 1,440 a day), self-supervised pre-training learns normal pressure to within +/- 1.8 kPa. The 31 confirmed bursts are split 24 to teach and 7 to test honestly; few-shot fine-tuning uses the 24 to shape the danger pattern. A foundation model fine-tuned on 2,140 scanned reports reads 1,910 of them correctly (89%) and flags the 230 it is unsure of for a human - it does not guess - feeding pipe facts back into the graph.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Prove the repair caused the gain</div><p class="cb-demo">Before claiming victory, you pick 8 high-risk zones: 4 get proactive valve-and-pipe work guided by the model, and 4 similar zones - the control group - do not. Over six months the 4 treated zones have 0 bursts; the 4 control zones have 3. Because the zones were similar and the period the same, the weather cannot explain the gap - the work did real work, and you can defend the spend to the board.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Test honestly, then keep it honest</div><p class="cb-demo">On the 7 held-out bursts, the model warned early before 5, with a median lead time just over 3.5 days - enough to send a crew - and honestly missed 2 (both sudden third-party digger strikes with no slow drift to detect), at about 1 false alarm per zone every 6 weeks. In operation it scores every node nightly with drift detection: when a month-4 drought shifts demand and drift crosses the threshold, the model retrains overnight and recovers - no human had to notice first.</p></div></div>
+
+<p>See what the toolbox did: it caught slow bursts days before the pipe gave way, traced them across the network, and proved its worth honestly. <strong>And see the mission in it, because this is frugal, honest engineering in the service of people, not a chase after the cleverest model. The frugality is in the first move: you read the shape of your data and pick only the tools that shape demands - time, network, scarce labels, cause, documents - and a shape you do not have is a tool you leave in the cupboard, because every model you add costs real money and real risk for no gain. The honesty is everywhere after that, and it is the same honesty this whole craft is built on, now written into machine learning. The system respects how little it truly knows - thirty-one failures - so it holds seven of them back, never letting the model see them in training, and then reports plainly that it caught five and missed two, rather than flattering itself. When it reads the old reports it flags the two hundred and thirty it is unsure of for a human instead of guessing. It refuses to claim a win the weather might have caused, and proves the repair did real work against a control group before anyone tells the board. And it watches itself for drift, because a model that quietly rots while the world changes is worse than no model - it is a stale warning light a tired control room still trusts.</strong> The aim is the 180,000 people whose water keeps flowing because a warning arrived in time and could be believed.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how to build it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>You build the system in five steps.</p>
+<ul>
+<li><strong>1. Match the architecture to the shape of your data.</strong> Time, network, scarce labels, cause, text - one tool each.</li>
+<li><strong>2. Learn across long time, and across the network.</strong> Transformer for time; graph neural network for the network.</li>
+<li><strong>3. Learn from scarce labels without guessing.</strong> Self-supervised and few-shot; a foundation model for documents.</li>
+<li><strong>4. Prove the repair caused the gain.</strong> Causal inference with a control group, not just correlation.</li>
+<li><strong>5. Test honestly, then keep it honest.</strong> Held-out failures; MLOps and drift detection.</li>
+</ul>
+<p>The ideas underneath. A <em>Transformer</em> is a pattern-learning network whose trick, <em>attention</em>, lets each moment learn which other moments to weigh - so it reads a long signal and finds the far-back clue. A <em>graph neural network (GNN)</em> learns on a <em>graph</em> of <em>nodes</em> (junctions, sensors) joined by <em>edges</em> (pipes); by <em>message passing</em> each node soaks up its neighbourhood, so a network-wide pattern emerges. <em>Self-supervised learning</em> learns "normal" from unlabelled data by predicting hidden parts of the signal (a failure is then a <em>surprise</em>); <em>few-shot learning</em> fine-tunes that to a new task from a few examples. <em>Causal inference</em> separates <em>correlation</em> from cause, simplest with a <em>control group</em>. A <em>foundation model</em> is a large pre-trained AI you <em>fine-tune</em> on your own text to read documents. And <em>MLOps</em> runs all this over time, watching for <em>drift</em> - the slow divergence of the world from the training data - and retraining before the model rots. Use this when your data has these shapes; for a short simple signal with clean labels, a plain model is cheaper and just as good.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Take an asset problem of <em>your</em> own and read the shape of its data before anyone builds a model. Which shapes do you truly have - long time, a connected network, scarce labels, a need for cause, unread documents - and which tool does each call for? Then sketch how you would learn across time and network, rescue scarce labels without guessing, prove cause against a control group, and keep the model honest after launch.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-match_shape">Step 1 - Match the architecture to the shape of your data</label><textarea id="cb-match_shape" data-key="t-0027:match_shape" placeholder="The master move: do not reach for one model - read the SHAPE of your data first, and pick a tool for each shape you actually have. Does the signal play out over long TIME? Is it a connected NETWORK? Are labels scarce? Do you need CAUSE, not just a prediction? Is there unread TEXT? Each shape has its tool; a shape you do NOT have is a tool you leave in the cupboard, because adding it costs money for no gain."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-time_and_network">Step 2 - Learn across long time, and across the network</label><textarea id="cb-time_and_network" data-key="t-0027:time_and_network" placeholder="Learn the slow story across TIME with a Transformer: its trick, attention, lets it look far back and learn WHICH past moments matter - giving heavy weight to the day a slow drift began and ignoring the boring days between. Learn the story across the NETWORK with a Graph Neural Network: by message passing, each node passes its readings to the nodes it connects to, so a quiet dip here plus an odd flow next door plus a small change two pipes over add up to one clear warning - the network-wide story a single-sensor dashboard could never see."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-scarce_labels">Step 3 - Learn from scarce labels without guessing</label><textarea id="cb-scarce_labels" data-key="t-0027:scarce_labels" placeholder="Self-supervised learning teaches the model &#039;normal&#039; from your plentiful UNLABELLED data - hide the next hour of a signal and have it predict the blank, millions of times - so a failure becomes simply a moment it finds SURPRISING. Few-shot learning then shapes the danger pattern from your handful of real failures. And a foundation model, fine-tuned on your own documents, reads the piles of old reports nobody can - flagging what it is unsure of for a human rather than guessing."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-prove_cause">Step 4 - Prove the repair caused the gain</label><textarea id="cb-prove_cause" data-key="t-0027:prove_cause" placeholder="Prove the repair CAUSED the gain, do not just notice it. Spotting that two things move together is correlation, not proof. The honest tool is a control group: compare the assets you treated against similar ones you did not, over the same period. If the treated improved MORE, the weather alone cannot explain it. This protects you from spending millions on something that only SEEMED to work."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-test_and_keep_honest">Step 5 - Test honestly, then keep it honest</label><textarea id="cb-test_and_keep_honest" data-key="t-0027:test_and_keep_honest" placeholder="Hold out real failures the model never sees, and report how many it actually caught and missed - not a flattering number. Then run MLOps: a model quietly rots as the world changes (new pipes, a drought, shifting demand), so watch each week whether today&#039;s data still resembles the training data, and retrain when it drifts. No drift detection means a control room trusting a stale warning light."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>Two disciplines separate a useful system from an expensive one. First, <strong>match the tool to the shape, and leave the rest in the cupboard</strong> - the worth of this method is not how many fashionable models it stacks but how exactly each one answers a shape your data actually has; add a graph network to truly independent machines, or a hungry Transformer to a short simple signal, and you have spent money and added risk for nothing. Second, <strong>build the honesty in, because a confident wrong model is worse than none</strong> - hold out real failures and report the misses, flag what you are unsure of instead of guessing, prove your gain against a control group rather than claiming the weather's luck, and watch for drift; a warning is only worth acting on if the people in the control room can believe it, and they can only believe what has been tested, caused, and kept current.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep your system honest.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Match the tool to the shape.</strong> Time wants a Transformer, a network wants a GNN, scarce labels want self-supervision. A shape you do not have is a tool you leave in the cupboard.</p>
+<p>&bull; <strong>Hold out, and report the misses.</strong> Never test on data the model trained on. Keep real failures back, then state plainly how many it caught and missed - not a flattering number.</p>
+<p>&bull; <strong>Flag, do not guess.</strong> When the model is unsure - an unclear report, a strange reading - it should raise its hand for a human, not invent a confident answer.</p>
+<p>&bull; <strong>Correlation is not cause.</strong> Before you claim a repair worked, prove it against a control group. Two things moving together can both be moved by a third - the weather, the season.</p>
+<p>&bull; <strong>Watch for drift, or it rots.</strong> The world changes and a model silently goes stale. Check that today's data still looks like the training data, and retrain before the warning light lies.</p>
+</div>
+</details>
+<p>You came to the control room with smart sensors, a paid-for dashboard, and a burst nobody saw coming. You can leave with a system that reads the slow drift across days and the spreading story across the network, learns from only 31 failures without overfitting them, proves its repairs against a control group, and watches itself for drift - warning early before 5 of 7 held-out bursts, and honest about the 2 it missed. <strong>Do not chase one clever model - match the architecture to the shape of your problem, and keep it honest: tested on held-out data, its impact proven by cause, and its accuracy watched for drift, so the warning comes in time and stays true.</strong> That is what modern AI is for in asset care: not a cleverer dashboard, but a warning the control room can believe, arriving in time to keep 180,000 people's water in the pipe. (Working with an AMU facilitator? Bring one asset problem and map its data shapes to the toolbox together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can match advanced AI architectures to the shape of an asset problem and keep them honest now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

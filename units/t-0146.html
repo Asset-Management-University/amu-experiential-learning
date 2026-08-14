@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The data is a bit dodgy</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The data is a bit dodgy</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and you are about to spend a great deal of money. The plan is to rank the pumps for replacement over the next three years, worst first, using the asset register's criticality and age fields. The ranking is built. The budget is waiting.</p>
+<p>And you cannot bring yourself to sign it, because of a doubt you cannot pin down. Everyone who works with the register agrees "the data is a bit dodgy". But nobody can tell you <em>how</em> dodgy, or <em>where</em>, or whether it is dodgy enough to make the ranking wrong. Is criticality filled in for every pump, or half of them? Are those install dates real, or did someone type them to fill a box? You have a strong feeling the numbers cannot be trusted and no way whatsoever to prove it - which means you also cannot prove they <em>can</em>.</p>
+<p>So you are stuck between spending millions on a ranking you suspect is built on holes, and delaying a decision you cannot justify delaying. You have a feeling. What you need is a measurement.</p>
+<blockquote><h2>Everyone says the data is dodgy and nobody can say how - so I cannot tell whether this register is good enough to make a million-rand decision on. How do I measure the quality of the data, and say exactly what to trust and what to fix?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> You are about to rank the pumps for replacement over three years — millions of rand — from the register. Four people have told you the data is dodgy and not one of them can say how. Poking at it yourself: criticality looks blank on a lot of pumps, some install dates cannot possibly be right, condition ratings look old. But you have <strong>no evidence at all</strong> that the records cannot support this decision — which means you equally have no evidence that they can. So you cannot justify spending on a ranking built on holes, and you cannot justify delaying either. Write down how you would settle it — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the question that makes this finite</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Clean the whole register first, then decide.&rdquo;</strong> A programme of unknown size against an unknown defect, to support one decision. You would be improving thousands of fields the ranking never reads, and the decision would wait a year for it.</p>
+<p>&bull; <strong>&ldquo;Proceed — it is the best data we have.&rdquo;</strong> True and not a justification. If the ranking is wrong you will have spent millions replacing the wrong pumps, and &ldquo;it was the best available&rdquo; is not an answer anybody will accept afterwards.</p>
+<p>&bull; <strong>&ldquo;Delay until we trust the data.&rdquo;</strong> Trust is not a threshold anybody can cross, so this defers indefinitely on a feeling — and meanwhile pumps that should be replaced are not being replaced.</p>
+<p>&bull; <strong>&ldquo;Ask the people who know the plant to sanity-check the ranking.&rdquo;</strong> Genuinely worth doing, and it substitutes one set of impressions for another. It also tends to confirm what people already believe about the pumps they know, and say nothing about the ones they do not.</p>
+<p>&bull; <strong>&ldquo;Get a consultant to audit the data.&rdquo;</strong> Buys somebody else's opinion of &ldquo;is this data good?&rdquo; — which, as the next paragraph shows, is not a question that has an answer.</p>
+<p>&bull; Start with the move that feels wrong and makes the work finite: <strong>quality is not a property of the records but of their fitness for a particular decision.</strong> &ldquo;Is this data good?&rdquo; is unanswerable. &ldquo;Is it good enough to rank pumps for replacement by criticality and age?&rdquo; is answerable — and it immediately narrows the assessment to three fields, because <strong>a defect in a field this decision never reads does not matter here</strong>. Then the second move: quality is not one thing but <strong>several distinct questions, and a field can pass one while failing another</strong>. Is the value there at all? Does it obey the rules it must obey — can an install date be in the future? Does it match reality, which you can only learn by checking a sample against the plant? Do related values agree with each other? Does one real pump have exactly one record? And is what is recorded current, or two years stale? Measure those on three fields and your feeling becomes a small set of numbers — which do two jobs at once: they tell you whether you can decide now, and they hand you <strong>a specific, costed repair list</strong> instead of an ambition to improve the data.</p>
+</div>
+</details>
+<p>There is a way to turn "a bit dodgy" into numbers, on one page. Here it is, for the replacement ranking.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the data-quality scorecard that turns Onalenna's unease into a decision.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Fit for WHAT decision? (data quality is fitness-for-purpose)</div><p class="cb-demo">The decision: rank the pumps for replacement over the next three years, by CRITICALITY and AGE. That single sentence decides everything about this assessment - the fields that matter are criticality, install date and condition, and a data-quality problem in a field the decision never uses does not matter here. &#039;Is the data good?&#039; is unanswerable; &#039;is the data good enough to rank pumps for replacement?&#039; is answerable. Always assess against a decision, never in the abstract.</p></div><div class="canvas-box"><div class="cb-label">2. How does each dimension measure, on the fields that matter? (the six dimensions)</div><p class="cb-demo">The six dimensions (the DAMA set), each a distinct question, measured on the fields the ranking needs. COMPLETENESS - is the field present? criticality is populated on only 40% of pumps. VALIDITY - does the value obey the rule? 15% of install dates are impossible (future dates, or before the plant existed). ACCURACY - does the value match reality? a sample check finds condition ratings often out of date. CONSISTENCY - do related values agree? some pumps&#039; install dates predate their own system. UNIQUENESS - one asset, one record? 98% (a few duplicates). TIMELINESS - is it current? condition last updated on average two years ago. Six different questions - a field can score full marks on one and zero on another.</p></div><div class="canvas-box"><div class="cb-label">3. How does it score against a target? (the scorecard)</div><p class="cb-demo">The scorecard, each dimension against a target the decision sets. Criticality completeness: target &gt;95%, actual 40% - RED. Install-date validity: target &gt;98%, actual 85% - AMBER. Condition timeliness: target &lt;1 year, actual 2 years - RED. Uniqueness: target &gt;99%, actual 98% - AMBER. The red/amber/green is not arbitrary - each target is the quality the ranking needs to be trustworthy. And the headline is already clear: the two fields the whole decision rests on, criticality and condition, are the two in the red.</p></div><div class="canvas-box"><div class="cb-label">4. Which weakness most threatens the decision? (prioritise by impact, not by chasing 100%)</div><p class="cb-demo">The trap is trying to make everything green. Prioritise instead by impact on THIS decision. Criticality is only 40% complete - so the ranking is being built on fewer than half the pumps, and it is simply wrong; this is the RED that stops the decision. Condition being stale is the next most damaging - a two-year-old rating may have flipped. The 2% duplicates barely move the ranking and can wait. The lesson: a 40%-complete criticality field wrecks the decision; a slightly stale description does not - so spend the effort where the decision is actually at risk.</p></div><div class="canvas-box"><div class="cb-label">5. What do I fix, in what order? (the remediation recommendation)</div><p class="cb-demo">The recommendation the board can act on. PRIORITY 1: populate criticality on the missing 60% of pumps - owner: reliability team, protects: the entire ranking. PRIORITY 2: refresh condition ratings older than a year - owner: maintenance, protects: the age/condition axis. PRIORITY 3: correct the invalid install dates - owner: data team. And the honest headline: the replacement ranking should NOT proceed until criticality is populated, because a ranking on 40% of the data is not a ranking, it is a guess with a spreadsheet around it. That sentence - decision waits, here is why and what unblocks it - is the whole value of the scorecard.</p></div></div>
+
+<p>Look at what happened to the doubt. "The data is a bit dodgy" became "criticality is 40% complete and condition ratings are two years old - and those are the two fields the whole ranking rests on". The scorecard did not just measure quality; it told her the decision must wait and exactly what unblocks it. And notice box 1 came first: none of this means anything until you say <em>fit for what</em>. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>"The data is not great" is not a finding you can act on. A scorecard makes it one, in five moves:</p>
+<ul>
+<li><strong>Fit for what?</strong> Data quality is <strong>fitness for purpose</strong>, not an absolute. The same register can be perfectly good for one decision and dangerously poor for another, so you assess it <em>against a decision</em> - here, ranking pumps for replacement - and that decision decides which fields and which dimensions actually matter. "Is the data good?" is unanswerable; "is it good enough to rank pumps?" is answerable.</li>
+<li><strong>How does each dimension measure?</strong> Data quality is not one number but six <strong>dimensions</strong>, each a different question. <em>Completeness</em>: is the field present? <em>Accuracy</em>: does the value match reality? <em>Consistency</em>: do related values agree? <em>Validity</em>: does the value obey the rule or format? <em>Uniqueness</em>: one real thing, one record? <em>Timeliness</em>: is it current? Two of these catch people out. Completeness is not accuracy - a field filled with wrong values is 100% complete and 0% accurate. And validity is not accuracy - a date that is a valid date can still be the wrong date. Measure each with a concrete metric on the fields that matter.</li>
+<li><strong>How does it score against a target?</strong> Build the <strong>scorecard</strong>: each dimension scored against a <em>target set by the decision</em>, not an arbitrary line. Criticality needs to be near-complete for the ranking to mean anything, so 40% is red; a description being a little stale is green enough. The target is the quality the decision actually needs.</li>
+<li><strong>Which weakness most threatens the decision?</strong> Do not chase 100% everywhere - that is neither achievable nor the point. <strong>Prioritise by impact</strong>: rank the weaknesses by how much each corrupts <em>this</em> decision. A 40%-complete criticality field wrecks the ranking; a 2% duplication rate barely moves it. Spend the effort where the decision is at risk.</li>
+<li><strong>What do I fix, in what order?</strong> The <strong>remediation recommendation</strong>: specific actions for the weak dimensions, each with an owner and the decision it protects - and an honest verdict on whether the decision can proceed yet. "Populate criticality first; the ranking waits until it is done" is worth more than any amount of measurement, because it is the measurement turned into a decision.</li>
+</ul>
+<p>One honest boundary. You <em>measure, score and prioritise</em> - you diagnose the register and decide what to fix and in what order. You are not doing the cleaning itself, and you are not structuring the register - those are separate jobs this one directs. And the target is fitness for purpose, never perfection: a register does not need to be flawless, it needs to be good enough for the decision in front of you, and the scorecard is how you prove whether it is.</p>
+<p>Does it scale? It is a medical check-up: you measure several vital signs, not just one, score each against what is healthy, and treat the one that is actually dangerous - not every number that is slightly off - and you say plainly whether the patient is fit for the operation being proposed.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A register extract is to support a decision: schedule statutory inspections of pressure vessels by their last-inspection date. The extract shows - many vessels with a blank "last inspection date"; a few dates in the future; and two vessels that appear twice under slightly different tags.</p>
+<ol>
+<li><strong>Fit for what?</strong> Which two data-quality dimensions matter most for <em>this</em> decision, and why?</li>
+<li><strong>Measure one.</strong> Write a concrete, repeatable metric for one of those dimensions (for example, how you would measure completeness of the inspection-date field).</li>
+<li><strong>Score it.</strong> Set a sensible target for that dimension given the decision, and say whether the extract is red, amber or green against it.</li>
+<li><strong>Prioritise.</strong> Of the three problems described, which is the single highest-priority fix for this decision, and why that one first?</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 4, justify your choice by its impact on the <em>inspection schedule</em>, not by which problem is easiest to fix. The blank dates make the schedule impossible; the duplicates are untidy but do not stop it. Priority follows decision-impact, not convenience.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-fit_for_what">1. Fit for WHAT decision? (data quality is fitness-for-purpose)</label><textarea id="cb-fit_for_what" data-key="t-0146:fit_for_what" placeholder="Name the decision the register must support. Data quality is not absolute - the same register can be fine for one decision and dangerous for another, and the decision decides which fields and dimensions matter."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-dimensions">2. How does each dimension measure, on the fields that matter? (the six dimensions)</label><textarea id="cb-dimensions" data-key="t-0146:dimensions" placeholder="Measure each data-quality dimension with a concrete metric on the decision-relevant fields: completeness, accuracy, consistency, validity, uniqueness, timeliness."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-scorecard">3. How does it score against a target? (the scorecard)</label><textarea id="cb-scorecard" data-key="t-0146:scorecard" placeholder="Score each dimension red/amber/green against a target set by the decision - not an arbitrary line, but the level the decision actually needs."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-prioritise">4. Which weakness most threatens the decision? (prioritise by impact, not by chasing 100%)</label><textarea id="cb-prioritise" data-key="t-0146:prioritise" placeholder="Do not try to fix everything to 100%. Rank the weaknesses by how much each corrupts the decision, and fix the one that matters most first."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-remediation">5. What do I fix, in what order? (the remediation recommendation)</label><textarea id="cb-remediation" data-key="t-0146:remediation" placeholder="Recommend specific remediation for the weak dimensions, each with an owner and the decision it protects - and be honest about whether the decision can proceed yet."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now answer "can I trust this data?" with a number and a plan instead of a shrug.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Data-quality work goes wrong when it stops being tied to a decision, in a few predictable ways.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>"Data quality is poor" with no dimension and no number.</strong> The unactionable finding, and the one that started the ache. A verdict without a dimension and a metric cannot be argued with or acted on.</p>
+<p>&bull; <strong>Chasing 100% on everything.</strong> Perfection is neither achievable nor the goal. Fitness for the decision is - so measure against a target the decision sets, not an absolute.</p>
+<p>&bull; <strong>Measuring the wrong dimensions.</strong> Scoring fields the decision never uses while missing the one it rests on is busywork. The decision decides what to measure.</p>
+<p>&bull; <strong>Confusing completeness with accuracy.</strong> A fully-populated field of wrong values scores 100% complete and 0% accurate. Present is not correct - measure both, and never let one stand in for the other.</p>
+<p>&bull; <strong>Confusing validity with accuracy.</strong> A valid date can still be the wrong date. Conforming to the rule is not the same as matching reality.</p>
+<p>&bull; <strong>Scoring against no target.</strong> Red, amber and green mean nothing without a target, and the target must come from what the decision needs - otherwise the colours are just opinion.</p>
+<p>&bull; <strong>Treating one snapshot as permanent.</strong> Data quality decays - fields go stale, new errors arrive. A scorecard is a repeated measurement, not a certificate issued once.</p>
+</div>
+</details>
+<p>Onalenna nearly spent millions on a ranking built from a field that was 40% empty, on the strength of a feeling she could neither trust nor dismiss. Now she can measure instead: name the decision, score the register across the six dimensions on the fields that matter, prioritise the weakness that most threatens the decision, and recommend exactly what to fix and whether to wait. "The data is a bit dodgy" is a shrug; a scorecard is a decision. If you are working with an AMU Facilitator, take one real register and one real decision, and score just the two dimensions that matter most - you will usually find the decision was resting on the weakest field.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can measure whether to trust your data now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

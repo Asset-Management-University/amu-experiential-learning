@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I am buying equipment and stock for demand that has not been confirmed</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>I am buying equipment and stock for demand that has not been confirmed</h1>
+
+<section class="step" id="step-0">
+<h2>Movement 1 - The Simulation</h2>
+<p>It is a Tuesday morning and you are standing in the yard behind your uncle's shop, where Tank You keeps its things. You are Muhammad. Ibraaheem is next to you, holding his phone, scrolling through a supplier's price list.</p>
+<p>The business is going well. You started with a few cylinders and your parents' car. Now you do about <strong>40 deliveries a week</strong>, all 9 kg cylinders, all booked by phone message. People like you because you are on time and you break the seal in front of them so they know the tank is full.</p>
+<p>In your hand is a printed quote. The paper is still warm from the shop printer. At the top it says <strong>"Gas Distributors SA - Quotation"</strong>. Below that:</p>
+<ul><li><strong>A second delivery van - R180 000.</strong></li><li><strong>A bulk order of 60 new cylinders - R66 000</strong> (that is R1 100 each).</li><li><strong>A small filling pump and fittings - R24 000.</strong></li></ul>
+<p>Total at the bottom, circled in Ibraaheem's blue pen: <strong>R270 000.</strong></p>
+<p>You can smell the cold diesel and rubber from the one van you already own, parked a few metres away. A pigeon walks across its bonnet.</p>
+<p>Ibraaheem is excited. "Bru, think about it," he says. "If we have two vans and double the cylinders, we can take double the orders. We have to be <em>ready</em>. When the orders come, we cannot be the guys who say 'sorry, fully booked'. That is how you lose people." He taps the quote. "We have R150 000 saved. The rest we borrow. In six months it pays for itself."</p>
+<p>It sounds right. It feels right. Being ready is what a serious business does. You imagine the second van pulling out of the yard, full, and a part of you wants to say yes right now, today, before the price goes up.</p>
+<p>But the R150 000 is everything you have both saved since the first sale. And the loan - the loan is real money you will owe every single month, whether the orders come or not.</p>
+<p>You look at the quote again. <strong>R270 000</strong> is a bet. Right now you do <strong>40 deliveries a week</strong>. Nobody has phoned to say they want more. No new customer has promised you anything. The doubling is a picture in Ibraaheem's head - a good picture, a hopeful one. But it is a picture, not an order.</p>
+<p>Ibraaheem is waiting. The supplier said the quote is good for <strong>seven days</strong>.</p>
+<p>Where do you start? What do you actually need to know before you spend money you cannot get back?</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>Movement 2 - Your Attempt</h2>
+<p>Before you read how Ibraaheem and Muhammad worked it out, stop and have a go yourself. This is the part that teaches you the most.</p>
+<p>Think it through with these questions:</p>
+<ol><li>The R270 000 buys capacity for <strong>double</strong> the orders. What proof exists, today, that double the orders are coming? List what you actually know versus what you are hoping.</li><li>The R270 000 only makes sense if the doubling is real. Right now, what would have to happen - what would you have to <em>see</em> - before you would believe the demand is real enough to spend it? Could you find that out without spending the full amount first?</li><li>Of the three things on the quote (van, cylinders, pump), which one could you get back or sell easily if you were wrong, and which one is money gone for good?</li><li>What is the smallest first step that would still let you serve more customers if the orders do start coming?</li></ol>
+<p>Write down your answer.</p>
+<p><strong>Now set your own yardstick - before you read on.</strong> Pick a purchase you are weighing up (or imagine you are Muhammad). Finish these two lines in writing, about <em>your</em> situation:</p>
+<details><summary>Show me &#9656;</summary>
+<div class="reveal-content">
+<ul><li><em>"My idea - to buy now - is fitting if I see ___ "</em> (name the real signal: how many extra orders, over how long, at what rate - a number, not a feeling).</li><li><em>"I would change my mind if ___ "</em> (name what you would have to see that would tell you the demand is not there yet).</li></ul>
+<p>Keep those two lines next to you. When you read the worked solution, you are not waiting for us to mark your answer - you are checking the worked solution against the line <em>you</em> drew. Then read on.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>Movement 3 - The Worked Solution</h2>
+<p>Ibraaheem and Muhammad did not sign the quote that day. Here is how they reasoned it out, sitting on the back step of the shop with two cups of tea going cold.</p>
+<p><strong>First, they separated what they knew from what they hoped.</strong></p>
+<p>Muhammad drew a line down the middle of a page.</p>
+<ul><li><em>What we know:</em> 40 deliveries a week. Steady. A few customers ask if we deliver on Sundays (we don't yet). Once or twice we said "fully booked, try tomorrow."</li><li><em>What we hope:</em> That if we had twice the capacity, twice the orders would come.</li></ul>
+<p>Looking at the two columns, the truth was plain. The "fully booked" moments had happened maybe <strong>twice in two months</strong> - not 40 extra orders a week. The hope column was bigger than the know column. They were about to spend R270 000 to chase the hope column.</p>
+<p><strong>Second, they named the real danger.</strong> The loan was for the part they could not pay in cash: R270 000 minus their R150 000 saved leaves <strong>R120 000 borrowed</strong>. At a typical rate over a few years, that works out to roughly <strong>R5 000 a month</strong> in repayments. That payment comes whether or not the second van is busy. If the extra orders did not arrive, an empty second van does not earn - it just sits in the yard, costing them the repayment every month, plus insurance. The money for the van and pump would be <strong>sunk</strong>: spent, and very hard to get back. You cannot return a half-used filling pump for what you paid.</p>
+<p><strong>Third - and this is the key move - they decided to make the demand prove itself before they paid for it.</strong> Ibraaheem's whole case rested on one belief about the real world: <em>the orders are there, we just can't reach them.</em> That is a claim you can check - cheaply - before you bet R270 000 on it.</p>
+<p>So before they tested anything, they wrote down their success line, plainly, so they could not move the goalposts afterwards:</p>
+<blockquote><p><strong>If the doubling is real, the second van would need to be busy almost every day. We will rent a bakkie on the days we overflow, for one month. If we hit roughly 15 or more overflow days - about three or four a week - the demand is real and a second van is justified. If overflow days are few, the demand is not there yet and we hold.</strong></p></blockquote>
+<p>That is the same shape as the two lines you wrote at the end of Movement 2: <em>fitting if I see ___; change my mind if ___.</em> They named it first, in advance, so reality - not their hope - would return the verdict.</p>
+<p>Then they ran the cheapest honest test they could find. Instead of buying capacity for orders that <em>might</em> come, they rented it by the day:</p>
+<ul><li>For <strong>four weeks</strong>, they would say "yes" to every extra order, every "fully booked" moment, every Sunday request - and meet it by <strong>hiring a bakkie and driver from a cousin for R600 a day</strong>, only on the days they were actually overflowing. No loan. No new van. No new cylinders. Just renting capacity, by the day, to see if the demand was real.</li><li>They would write down <strong>every single extra delivery</strong> the rented bakkie made.</li></ul>
+<p><strong>What reality actually said - and the surprise that changed the plan.</strong> Over four weeks, the rented bakkie was needed on only <strong>5 days</strong>, doing <strong>22 extra deliveries in total</strong> - nowhere near the 15-plus overflow days their success line called for, and nowhere near the 160-plus a second full-time van would need to stay busy. The doubling Ibraaheem had pictured was simply not there. Not yet. The real extra demand was small and patchy.</p>
+<p>But the test surfaced a second, sharper surprise - one neither of them had planned for. When they read back the notes from those 5 overflow days, the extra orders were not spread evenly at all: <strong>almost all of them landed on Sundays.</strong> It was not "double the business" hiding behind a capacity wall. It was <em>one unmet Sunday slot</em> that the existing van, off on weekends, simply never served. That changed the whole question. They had been asking "do we need a second van?" Reality re-pointed them to a much smaller, sharper question: "how do we cover Sundays?" - which a rented bakkie one day a week answers for about <strong>R600</strong>, not R270 000.</p>
+<p>It helped to put the two paths side by side, in rands:</p>
+<ul><li><em>Renting on overflow days:</em> 5 days in the month x R600 a day = <strong>R3 000 for the month</strong> - and only spent because real, paying orders justified it.</li><li><em>Owning the second van:</em> about <strong>R5 000 a month</strong> in loan repayments alone, every month, busy or not - before insurance, before the R204 000 of savings-and-loan sunk into the van and pump up front.</li></ul>
+<p>Renting cost less <em>and</em> risked less. The numbers said the same thing the "know vs hope" page had, and the same thing their success line had predicted: the demand to fill a whole second van was not there yet.</p>
+<p>So they did <strong>not</strong> buy the R270 000 package. They held their course on the big spend, and changed one thing in light of what the test taught them. Specifically they:</p>
+<ul><li>Kept renting the bakkie on overflow days - about <strong>R3 000 a month</strong>, and only when paying orders justified it - with the Sunday slot now covered deliberately, since that is where the real demand was hiding.</li><li>Bought <strong>just 12 extra cylinders for R13 200</strong> (12 x R1 100), because cylinders hold their value and can be sold on if needed - that part was a low-risk, reversible spend that fixed the real, proven pinch (running short on busy days).</li><li>Left the second van and the pump for later, with a clear rule: <strong>buy the van only when the rented bakkie is full enough, week after week, that renting costs more than owning</strong> - that is, when overflow days climb past about <strong>8 or 9 in a month</strong>, where the R600-a-day rental starts to cost more than the R5 000-a-month repayment.</li></ul>
+<p><strong>The honest trade-off.</strong> Being cautious has a cost too. On a couple of days the rented bakkie was not available and they did turn one or two customers away. Ibraaheem was right that you can lose people that way. But losing one or two customers over a month is a small, survivable cost. Owing R5 000 a month on an empty van for a year is a R60 000 mistake that could sink the whole business. They chose the small, recoverable risk over the large, unrecoverable one - and they let real orders, not a hopeful picture, decide when to grow.</p>
+<p>The lesson is not "never buy equipment." It is: <strong>a purchase made before demand is confirmed is a bet with money you cannot get back. So test the demand cheaply first, and buy capacity only when the orders are real.</strong></p>
+<blockquote><p><strong>Do this yourself.</strong> Before you commit money you cannot recover, fill in this grid for <em>your</em> purchase. The headers are the questions that matter - answer each one with a fact or a number, not a feeling. If the "Cheap test" and "Buy rule" rows are empty, you are not ready to buy yet.</p>
+<table><thead><tr><th>Question</th><th>Your answer (fact or number)</th></tr></thead><tbody><tr><td>What is the purchase, and what does it cost in full?</td><td></td></tr><tr><td>What I actually KNOW about demand today (proven, measured)</td><td></td></tr><tr><td>What I only HOPE for (expected, not yet proven)</td><td></td></tr><tr><td>Which part is recoverable (could resell near cost)?</td><td></td></tr><tr><td>Which part is SUNK (gone for good if I'm wrong)?</td><td></td></tr><tr><td>My cheap test: the smallest way to make demand prove itself first</td><td></td></tr><tr><td>What the test would have to show before I commit</td><td></td></tr><tr><td>My buy rule: "I buy in full only when ______ has happened" (a number or an event)</td><td></td></tr></tbody></table>
+<p>Side-by-side cost check - fill in both, then compare:</p>
+<table><thead><tr><th>Path</th><th>Cost per month</th><th>Money sunk up front</th><th>Risk if demand never comes</th></tr></thead><tbody><tr><td>Rent / test small</td><td></td><td></td><td></td></tr><tr><td>Buy in full now</td><td></td><td></td><td></td></tr></tbody></table>
+<p><strong>Method & Finding</strong></p>
+<ul><li><strong>The Method</strong> (the lesson - reusable): Before you spend money you cannot get back, write down - in advance - the number of real orders that would prove the demand, then rent capacity by the day to find out cheaply whether reality reaches that line.</li><li><strong>The Finding</strong> (in this story only): When Tank You actually rented and counted, the "doubling" was not there - just 22 extra deliveries on 5 days, nearly all of them on the one Sunday slot the existing van never covered.</li><li><strong>Your Check</strong> (how you will know in your world): Rent or borrow capacity for one month and count the extra paid orders it actually fills; compare that real count to the success line you wrote before you started.</li></ul></blockquote>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>Movement 3.5 - The Guided Step</h2>
+<p>Let's take one more rep together - same deep problem, but dressed up so it is harder to spot. I'll sit beside you and we'll work it with hints. Read each hint, <strong>pause and answer it in your head</strong>, then read the reveal.</p>
+<p>Here is the new situation. There is no van, no shop, no loan. It is just you.</p>
+<p>You have been thinking about changing careers - moving from delivery work into bookkeeping. You find a college offering a <strong>full bookkeeping qualification bundle: R28 000</strong>, paid up front, for all three levels at once. The page says <strong>"Save R7 000 versus paying level by level."</strong> A friend who already switched careers is excited for you: "Just do the whole thing, commit properly, be <em>ready</em> when the job comes up. Half-measures get you nowhere." You have <strong>R30 000 saved</strong>. Paying the R28 000 would clear out almost all of it. No employer has offered you a bookkeeping job. You have never actually done a bookkeeping task.</p>
+<p>It feels completely different from a gas business. But let's look closely.</p>
+<p><strong>Hint 1 - What do you notice about the "save R7 000" deal and Ibraaheem's "buy now before the price goes up"?</strong></p>
+<p><em>(Pause. Answer in your head.)</em></p>
+<details><summary>Show me &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal:</strong> Both are a pressure to commit the full amount <em>now</em> because of a discount or a deadline. Both make spending everything at once feel like the <em>clever</em> move. But a saving is only a saving if you would have bought the whole thing anyway. If you stop after level one, you did not save R7 000 - you spent R28 000 on something you only half-used.</p>
+</div>
+</details>
+<p><strong>Hint 2 - Where does the R28 000 demand-proof come from? What do you actually <em>know</em> versus <em>hope</em> here - just like Muhammad's line down the page?</strong></p>
+<p><em>(Pause. Draw the line in your head: KNOW on one side, HOPE on the other.)</em></p>
+<details><summary>Show me &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal:</strong> <em>Know:</em> you are curious about bookkeeping; you have R30 000. That is all. <em>Hope:</em> that you will enjoy it, that you will finish all three levels, that a job will come. The "demand" being bet on here is not customers - it is <strong>your own future commitment and a job that does not exist yet</strong>. The hope column is almost everything. That is the exact shape of Muhammad's problem, just with you as both the buyer <em>and</em> the unproven demand.</p>
+</div>
+</details>
+<p><strong>Hint 3 - Which part of the R28 000 is recoverable, and which is sunk? And what is your cheap test - your "rented bakkie"?</strong></p>
+<p><em>(Pause. What is the smallest, cheapest way to make the demand prove itself before you commit the R28 000?)</em></p>
+<details><summary>Show me &#9656;</summary>
+<div class="reveal-content">
+<p><strong>Reveal:</strong> Almost all of the R28 000 is <strong>sunk</strong> - most colleges do not refund a bundle once you start. So you do what Muhammad did: you rent capacity by the day instead of buying it all. Here, that means <strong>pay for level one only</strong> (or a single short course, or a free trial module) - the smallest spend that lets the real demand, which is <em>your own follow-through</em>, prove itself. If you finish level one and still want more, and a real job lead appears, <em>then</em> the bundle's discount is a true saving. Your buy rule writes itself: <strong>"I pay for the full bundle only when I have finished level one and have a real job lead - not before."</strong></p>
+</div>
+</details>
+<p><strong>The deep-structure lesson.</strong> A career bet and a business bet are the same problem wearing different clothes. Whenever you are about to spend money you cannot get back to be "ready" for demand that has not proven itself - whether the demand is customers, or your own follow-through - the move is the same: separate know from hope, find the sunk part, and design the cheapest possible test that lets the demand prove itself first. The discount, the deadline and the excited friend are not reasons to commit. Real, proven demand is.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Next &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>Movement 4 - In Your Own World</h2>
+<p>The trap Ibraaheem and Muhammad nearly fell into is everywhere. It is the urge to buy <em>capacity for hoped-for demand</em> - to be "ready" - by spending money you cannot recover, before any customer has actually said yes.</p>
+<p>Find this exact problem-type in your own world. Work through these prompts, and an AI facilitator will build the rest of the case around your real situation:</p>
+<ol><li><strong>Name your "second van."</strong> What is the big purchase you (or your workplace, your family, your project) are thinking about buying <em>to be ready</em> for demand that has not yet been confirmed? It might be a machine, extra stock, a bigger space, a new hire, a course, even a qualification. Write down what it costs.</li><li><strong>Split know from hope.</strong> Draw the line down the middle. On one side, the demand you can actually prove right now. On the other, the demand you are hoping for. Which column is bigger? Be honest.</li><li><strong>Find the sunk part.</strong> Of what you want to buy, which part is recoverable (you could sell it on for close to what you paid) and which part is money gone for good if you are wrong? The gone-for-good part is where the real risk lives.</li><li><strong>Design your cheap test.</strong> What is the smallest, cheapest way to find out whether the demand is real <em>before</em> you commit the full amount? Renting instead of buying? Pre-selling? A trial run? A waiting list? A single sample order?</li><li><strong>Set your buy rule.</strong> Finish this sentence: "I will make the full purchase only when ______ (a clear, real signal of confirmed demand) has happened." Make it a number or an event, not a feeling.</li></ol>
+<p><strong>The honest transfer:</strong> this is the same problem-type, just in your domain. The amounts, the asset and the words change. The trap does not - spending unrecoverable money on demand that has not proven itself. Test cheaply first; let real orders, not the fear of being unready, decide when you commit.</p>
+<p><strong>Close the loop this week.</strong> Don't just plan the test - run the smallest one on your Test Card, and decide in advance how you will know it worked: write your success line first (<em>"the demand is real if I see ___ over the next two weeks"</em>), then find out by the cheapest honest means and compare what reality actually did to that line. Afterwards, come back and finish this sentence in the Ubuntu feedback loop: <em>"I predicted ___, reality did ___, so I now think ___ "</em> - because the verdict on your idea comes from reality, not from us.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You&#039;ve worked through the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

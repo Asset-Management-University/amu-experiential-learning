@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The slack was all at three in the morning</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The slack was all at three in the morning</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, and it is Thursday. The migration plan for the new maintenance management system is approved, signed by everybody, and going ahead this weekend.</p>
+<p>It looks solid. <strong>Sixty-one hours of window for thirty hours of work.</strong> A rollback clause. A reconciliation step. Thirty-one hours of slack.</p>
+<p>You read it three times and cannot say what is wrong with it. So you ask a smaller question instead: <em>who is doing the eight hours of business verification?</em> The plan says "operations team". You ask which people, and the answer is six - the planners and the storesmen, because they are the only ones who can look at a work order history and say whether it is right.</p>
+<p>Then you ask when. And you work out that the only hours those six can actually be there together are Saturday morning to Saturday afternoon - and that the load will not have finished by then.</p>
+<blockquote><h2>This plan has thirty-one hours of slack and it is already two hours short. How do I build a cutover around the one moment that actually proves anything?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The cutover plan has <strong>thirty-one hours of slack</strong> and looks comfortable. Then you check the step that actually proves anything — somebody looking at the migrated records and saying whether they are right. The plan says &ldquo;operations team&rdquo;. You ask which people, and the answer is <strong>six</strong>: the planners and the storesmen, because they are the only ones who can look at a work order history and tell. Then you ask when they can all be there together, and it is Saturday morning to Saturday afternoon — and the load, which includes twelve years of history nobody understands, <strong>will not have finished by then.</strong> Thirty-one hours of slack, and two hours short. Write down how you would build this — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and which point in the plan is actually fixed</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Start the load earlier.&rdquo;</strong> The obvious fix, and it buys hours in the part of the plan that already has thirty-one of them. It also compresses the preparation, which is where the errors that verification would catch get made.</p>
+<p>&bull; <strong>&ldquo;Have somebody else do the verification.&rdquo;</strong> There is nobody else. Six people can look at a work order history and say whether it is right; anybody else would be confirming that records exist rather than that they are correct.</p>
+<p>&bull; <strong>&ldquo;Verify a sample and go live.&rdquo;</strong> Sometimes the honest compromise, and stated like this it is a decision to reduce the proof because the plan is short, which is exactly backwards — the schedule should bend to the proof.</p>
+<p>&bull; <strong>&ldquo;Pay them to come in on Sunday.&rdquo;</strong> Worth asking and it is not a plan: it depends on six people's private lives, and if one cannot come you are back here with less time.</p>
+<p>&bull; <strong>&ldquo;Add contingency — extend the window by a day.&rdquo;</strong> Adds hours the six cannot attend. More slack in the wrong place is the condition you are already in.</p>
+<p>&bull; The window is <strong>the only fixed point in this plan</strong>, and every other duration is negotiable around it — so build the cutover <strong>backwards from it</strong> rather than forwards from the start. Two things follow. <strong>Name the people who can verify</strong> rather than describing a team: a plan saying &ldquo;operations&rdquo; has identified nobody, and the real answer is nearly always a handful of individuals who can look at a record and tell, which is a scarcer resource than any technical step in the plan. And <strong>the transfer must finish early enough to leave that window intact</strong> — a constraint on everything upstream, not a hope. Which brings you to the earlier decision that determines whether any of it fits: <strong>decide what moves, what is archived, and what is abandoned, before anything else.</strong> Migrating everything feels safe and is not — it carries every ambiguity, duplicate and twelve-year-old record across at full cost into a system that will then be judged on them. <strong>History is where the cost lives</strong>: the current state of a register is bounded and knowable; twelve years of transactions is neither, and it is usually the largest volume and the least valuable.</p>
+</div>
+</details>
+<p>Here is the plan that answers it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the system and data migration plan - what moves, the field map, the shape of the risk, the cutover built backwards, and the first three weeks.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Decide what moves, what is archived, and what is abandoned</div><p class="cb-demo">THE FIRST DECISION IS NOT TECHNICAL AND IT IS THE ONE MOST OFTEN SKIPPED, BECAUSE SKIPPING IT FEELS SAFE. MIGRATE EVERYTHING, THE THINKING GOES, AND THEN NOBODY CAN COMPLAIN. What that actually does is take every ambiguity, every duplicate and every twelve-year-old record nobody understands and carry it across at full cost into a system that will now be judged on it. SO SORT EVERY CATEGORY OF DATA INTO THREE PILES BEFORE ANYTHING ELSE HAPPENS. MOVES - the data the new system needs to operate from day one: the asset register, the current work orders, the open purchase commitments, the standing plans, the spares catalogue. ARCHIVED - the data that must remain retrievable but need not be live: closed work orders older than an agreed period, superseded plans, historical readings. Archived is a real answer and it is cheap; it needs a readable format, an index and somebody who can find things in it. ABANDONED - the data that has no use, no owner and no obligation attached. Say so out loud, in writing, and have the right person agree. HISTORY IS WHERE THE COST LIVES. The current state of an asset register is a bounded, knowable thing. Twelve years of work order history is not, and it is usually the largest single volume in the migration and the least examined. AND THE RULE THAT MAKES THIS DECISION HONEST: THE DECISION BELONGS TO THE PEOPLE WHO WILL NEED THE DATA, NOT TO THE PROJECT THAT HAS TO MOVE IT. A project asked to decide what history matters will discover that less of it matters than it feared, and it will be sincerely wrong. Ask the reliability engineer what she needs to calculate a failure rate; ask the planner what he looks back at when a job goes wrong. THE CLEANING ITSELF IS A SEPARATE DISCIPLINE - profile it, clean it with a reproducible script, declare every decision, and state how the cleaning changed the answer - AND IT BELONGS BEFORE THE FINAL EXTRACT, NOT DURING THE CUTOVER WEEKEND. Plan it as its own work package with its own weeks.</p></div><div class="canvas-box"><div class="cb-label">2. Map field to field, and name every transformation</div><p class="cb-demo">NOW THE MAPPING, WHICH IS THE ARTEFACT THE WHOLE MIGRATION IS ACTUALLY BUILT ON. FOR EVERY FIELD IN THE NEW SYSTEM, NAME ITS SOURCE FIELD IN THE OLD ONE AND THE TRANSFORMATION BETWEEN THEM. Transformation is not a technicality: it is where meaning changes. A criticality rated one to five in the old system and A to D in the new one is not a rename, it is a JUDGEMENT about how five levels become four, and somebody with authority has to make it and sign it. A date stored as text becomes a date. Two free-text fields become one structured field and a note. Each of those is a decision with an owner, and each belongs in the document with a name against it. THEN RUN THE MAP IN BOTH DIRECTIONS, BECAUSE THE TWO FAILURES LIVE AT OPPOSITE ENDS. FORWARDS - every field in the new system has a source, or an explicit statement that it will start empty and how it will be populated. A required field with no source is a migration that stops at 2am while somebody invents a default value nobody agreed to. BACKWARDS - every field in the old system has a destination, or a written decision that it has none. THE FIELD WITH NO HOME IS THE DANGEROUS ONE, because it is usually the field somebody added years ago for a reason that was never documented and is still using. And its twin: THE FIELD WITH TWO HOMES, where the same fact will now live in two places in the new system and begin diverging on the first day. THE TEST OF A FINISHED MAP IS THAT SOMEBODY WHO WAS NOT IN THE PROJECT CAN READ ONE ROW AND SAY WHAT WILL HAPPEN TO THAT PIECE OF INFORMATION. If a row needs the author present to be understood, it is a note, not a map.</p></div><div class="canvas-box"><div class="cb-label">3. Choose big bang or phased by the risk you are buying, not by which is better</div><p class="cb-demo">THERE ARE TWO SHAPES AND THE ARGUMENT ABOUT WHICH IS BETTER IS THE WRONG ARGUMENT. BIG BANG puts every module, every user and every process live on a single date. It removes the need for temporary connections between old and new, and it is cheaper and simpler on paper - AND IT CONCENTRATES ALL OF THE OPERATIONAL RISK INTO A SINGLE WEEKEND CUTOVER. If the verification fails at three o&#039;clock on Sunday morning, there is no partial position to hold. PHASED rolls out by module, by department or by site, and lets each stage be validated before the next begins. ORGANISATIONS THAT PLANNED PHASED MIGRATIONS WELL SAW 50 PER CENT FEWER DISRUPTIONS. But it is not free, and the cost is specific: while the roll-out runs, TWO SYSTEMS ARE BOTH PARTLY TRUE, and somebody has to build and maintain the temporary connections that keep them consistent - ORGANISATIONS REPLACING FIVE OR MORE LEGACY SYSTEMS FACE A 30 TO 40 PER CENT INCREASE IN TEMPORARY INTEGRATION COSTS WHEN THEY CHOOSE PHASED. Those connections are throwaway work, they are written under time pressure, and they are the least tested code in the whole programme. SO STATE THE CHOICE AS WHAT IT IS: ONE CONCENTRATED EVENT, OR A LONGER PERIOD OF TWO TRUTHS. THE QUESTION IS NOT WHICH RISK IS SMALLER. IT IS WHICH RISK THIS ORGANISATION CAN ACTUALLY CARRY. An operation that can genuinely stand down for a weekend and has people who can verify in that weekend can carry a big bang. An operation that cannot stop, or whose verifiers are spread across six sites, cannot - and choosing big bang anyway because it is cheaper is not a saving, it is a decision to find out in the worst possible hour. WRITE THE CHOICE DOWN WITH ITS REASON, because it will be questioned later by people who were not in the room.</p></div><div class="canvas-box"><div class="cb-label">4. Build the cutover backwards from the verification window - and name the point of no return</div><p class="cb-demo">THIS IS THE BOX THE PLAN LIVES OR DIES IN. AT CORATHYL THE CUTOVER WINDOW IS FRIDAY 17:00 TO MONDAY 06:00 - SIXTY-ONE HOURS. THE PLANNED WORK IS THIRTY: final extract 3, transform and load 14, automated reconciliation 4, business verification 8, and the go/no-go decision 1. THIRTY-ONE HOURS OF SLACK. THAT IS WHY EVERYONE SIGNS IT. NOW LOOK AT WHERE THE SLACK IS. The eight hours of business verification are not eight hours of machine time. They need SIX NAMED PEOPLE - planners and storesmen who can look at a work order history and say whether it is right. EVEN IN A 24-HOUR OPERATION, THE SPECIFIC EXPERTS NEEDED MAY NOT BE ON EVERY SHIFT. THE PRINCIPLE IS CONSTANT: THE VERIFICATION DEPENDS ON NAMED INDIVIDUALS, AND THE PLAN MUST SCHEDULE AROUND THEIR ACTUAL AVAILABILITY. For Corathyl, they can only do it awake, in daylight, together. Saturday 08:00 to 16:00 is such a window. Sunday 08:00 to 16:00 looks like another. IT IS NOT, AND HERE IS WHY. ROLLBACK TAKES EIGHTEEN HOURS: restore the legacy system 8, re-point the interfaces 4, and have the business verify that THE LEGACY SYSTEM ITSELF is trustworthy again 6 - and that last six hours is the one nobody costs, because everyone assumes going back is free. Eighteen hours before Monday 06:00 puts THE LATEST SAFE NO-GO AT SUNDAY 12:00, which is four hours before the Sunday window would even finish. SO THERE IS EXACTLY ONE USABLE VERIFICATION WINDOW IN THE ENTIRE WEEKEND. AND THE PLAN DOES NOT REACH IT. Extract 3 plus load 14 is seventeen hours from Friday 17:00, which is SATURDAY AT 10:00 - TWO HOURS INTO THE ONLY WINDOW THERE IS. THE PLAN IS SHORT BEFORE A SINGLE THING HAS GONE WRONG, and it shows thirty-one hours of slack while being short, because THE SLACK IS ALL SITTING AT THREE O&#039;CLOCK ON SUNDAY MORNING WHERE IT IS WORTH NOTHING. NOW STRESS-TEST IT, WHICH IS WHAT SLACK IS ACTUALLY FOR. A PLAN&#039;S SLACK IS NOT FOR WHEN THINGS GO RIGHT; IT IS FOR WHEN THEY GO WRONG. IF THE SINGLE LONGEST TASK EXPERIENCES THE DOCUMENTED INDUSTRY-AVERAGE OVERRUN OF 41 PER CENT, DOES THE PLAN STILL WORK? The load finishes at 15:44, LEAVING SIXTEEN MINUTES FOR AN EIGHT-HOUR VERIFICATION. THE PLAN IS NOT ROBUST. A PLAN THAT CANNOT ABSORB AN AVERAGE DEGREE OF DIFFICULTY IS A FAILED PLAN. So build it the other way round: fix the verification window first, schedule everything backwards from it, and if the work does not fit, the window is wrong or the scope is - not the verification. AND WRITE THE GO/NO-GO CRITERIA BEFORE THE NIGHT BEGINS, in numbers, because nobody in the history of information systems has cancelled a go-live at four in the morning on criteria invented at four in the morning.</p></div><div class="canvas-box"><div class="cb-label">5. Plan the first three weeks, and decide what the old system is now for</div><p class="cb-demo">THE MIGRATION DOES NOT END AT GO-LIVE. GO-LIVE IS WHERE THE ORGANISATION STARTS FINDING OUT WHAT IT ACTUALLY MOVED. HYPERCARE IS THE ESTABLISHED NAME FOR THE DEDICATED SUPPORT PERIOD IMMEDIATELY AFTER CUTOVER, TYPICALLY PLANNED AT TWO TO THREE WEEKS, IN WHICH THE MIGRATION TEAM MANAGES AND MONITORS THE NEW SYSTEM AND WORKS THE ISSUES AS THEY SURFACE. PLAN IT AS WORK WITH NAMED PEOPLE AND HOURS, not as a promise that the team will be around. And be specific about what it is for, because THE QUESTIONS ARE NOT THE ONES THE PROJECT PREPARED FOR. Almost none of them are &#039;the system is down&#039;. They are &#039;this asset used to have a service history and now it does not&#039;, &#039;the criticality on this pump is wrong&#039;, &#039;I cannot find the job I raised on Thursday&#039;, and &#039;is this number right?&#039;. Every one of those is a DATA question, and every one needs somebody who can look at both systems and answer it - WHICH IS THE REAL REASON THE OLD SYSTEM CANNOT BE SWITCHED OFF ON THE MONDAY. STATE THE LEGACY POSITION EXPLICITLY: the old system remains available READ-ONLY, for a stated period, with a named person who may authorise switching it off, and a condition that must be met first. Read-only matters - a legacy system left writable will be written to, by someone in a hurry who preferred it, and you will have two truths again. And the condition should be something real: no unresolved data queries for a stated number of consecutive days. FINALLY, WATCH THE ONE THING THAT WILL NOT SHOW UP IN ANY REPORT. If people quietly keep a spreadsheet because they do not trust the new system, the migration has failed in the only way that matters, and it will look like a success on every dashboard you have. ASK. And when someone shows you their spreadsheet, thank them, because they have just told you exactly which part of the migration did not land.</p></div></div>
+
+<p>Box 4 is where the sixty-one hours turn out to be eight. Box 5 is where you find out what you actually moved. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A migration plan's real job is to schedule backwards from the one moment of human verification that can prove the work succeeded.</strong> Five questions:</p>
+<ul>
+<li><strong>What actually moves?</strong> <strong>Moves, archived, abandoned</strong> - decided by the people who will need the data, not by the project that has to move it. History is where the cost lives.</li>
+<li><strong>Where does every field go?</strong> <strong>The map, run in both directions.</strong> A field with no home and a field with two homes are the two ends of the same failure.</li>
+<li><strong>Which risk are we buying?</strong> <strong>One concentrated event, or a longer period of two truths.</strong> Not which is better - which this organisation can carry.</li>
+<li><strong>When can the people who can judge it actually look?</strong> <strong>Find that window, schedule backwards from it, and name the latest safe no-go.</strong></li>
+<li><strong>What happens for the three weeks after?</strong> <strong>Hypercare, the data questions, and how long the old system stays readable.</strong></li>
+</ul>
+<p><strong>The arithmetic of a plan with thirty-one hours of slack that is already two hours short.</strong> The window is Friday 17:00 to Monday 06:00 - <strong>61 hours</strong>. The planned work is <strong>30</strong>: extract 3, transform and load 14, automated reconciliation 4, business verification 8, decision 1. But the eight hours of verification need <em>six named people, awake, in daylight, together</em>. Saturday 08:00 to 16:00 is one such window. Sunday 08:00 to 16:00 looks like a second - and is not, because <strong>rollback takes 18 hours</strong>: restore the legacy system 8, re-point the interfaces 4, and have the business verify that <em>the legacy system itself</em> is trustworthy again 6 - the six hours nobody costs, because everyone assumes going back is free. That puts the <strong>latest safe no-go at Sunday 12:00</strong>, four hours before the Sunday window would even end. <em>There is exactly one usable verification window in the whole weekend.</em> And extract plus load is 17 hours from Friday 17:00, which lands at <strong>Saturday 10:00 - two hours inside it</strong>. The plan shows thirty-one hours of slack while being short, because <strong>the slack is all sitting at three o'clock on Sunday morning, where it is worth nothing.</strong></p>
+<p><strong>Then stress-test it, because that is what slack is for.</strong> A plan's slack is not for when things go right; it is for when they go wrong. Take the documented figures: <strong>64 per cent of data migrations overrun their forecast budget and 54 per cent overrun on time, with cost overruns averaging 30 per cent and time overruns averaging 41 per cent</strong>. So: if the single longest task experiences that average 41 per cent overrun, does this plan still work? The load finishes at 15:44, <strong>leaving sixteen minutes for an eight-hour verification</strong>. The plan is not robust. <em>A plan that cannot absorb an average degree of difficulty is a failed plan.</em> Notice what this is and is not - it does not predict that the load will overrun. It tests whether the plan could survive it if it did.</p>
+<p><strong>And the thing the rollback clause does not tell you.</strong> Every migration plan has one, and it reads as though the organisation could decide at any point that this is not working and go back. It cannot. <em>The moment the business starts transacting in the new system, the old one is out of date</em>, and going back means losing everything that has happened since. The rollback window does not close when somebody decides it has closed - <strong>it closes the instant the first real transaction lands.</strong> So the plan's job is to name that point of no return honestly, put every decision that must be made before it before it, and write the go/no-go criteria in numbers <em>before the night begins</em>. Nobody has ever cancelled a go-live at four in the morning on criteria invented at four in the morning.</p>
+<p>One honest boundary. You <em>build the plan and name the criteria</em>. You do not make the go/no-go call - that belongs to the business, using the criteria you gave them before the cutover started. And the cleaning belongs to its own discipline, planned as its own work package with its own weeks, finished before the final extract and never during the weekend.</p>
+<p>Does it scale? Your plan is the bridge between the old system and the new. A bridge with no scheduled expert inspection before the first load crosses is not a bridge. It is a bet.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>An email arrives from the project sponsor, with the migration plan attached.</p>
+<blockquote><p>"The team has confirmed we have 31 hours of slack for the cutover this weekend. Please give this a final review so I can sign off."</p></blockquote>
+<table>
+<tr><th>The plan</th><th>Detail</th></tr>
+<tr><td>Window</td><td>Friday 18:00 to Monday 05:00</td></tr>
+<tr><td>Final extract</td><td>4 hours</td></tr>
+<tr><td>Transform and load</td><td>16 hours</td></tr>
+<tr><td>Automated reconciliation</td><td>3 hours</td></tr>
+<tr><td>Business verification</td><td>6 hours, assigned to "the maintenance department"</td></tr>
+<tr><td>Go/no-go decision</td><td>1 hour</td></tr>
+<tr><td>Rollback</td><td>"Available throughout the window if required"</td></tr>
+<tr><td>Who can verify the data</td><td>Four planners and the storesman. All work weekdays. Two are based at the outstation, 90 minutes away</td></tr>
+<tr><td>Rollback components</td><td>Restore legacy 7 hours; re-point interfaces 5 hours; confirm the legacy system is trustworthy again - not estimated</td></tr>
+<tr><td>Go/no-go criteria</td><td>"Data verified as acceptable to the business"</td></tr>
+<tr><td>Legacy system after go-live</td><td>"Decommissioned in line with the project schedule"</td></tr>
+</table>
+<ol>
+<li><strong>Find the window.</strong> When can those five people actually verify? Show the arithmetic that says whether the plan reaches it.</li>
+<li><strong>Price the rollback honestly.</strong> Fill in the missing estimate and state the latest safe no-go.</li>
+<li><strong>Rewrite the timeline</strong> backwards from the verification window. What has to change?</li>
+<li><strong>Two clauses that are not clauses.</strong> The rollback line and the go/no-go criteria both look like commitments. Say precisely what is wrong with each.</li>
+<li><strong>Write the reply.</strong> Explain the hidden risk, present the honest timeline, and give the sponsor the point of no return.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> five things.</p>
+<p>First, the window. Friday 18:00 to Monday 05:00 is <strong>59 hours</strong> and the plan is 30, so the slack is <strong>29 hours</strong>, not 31 - the sponsor's number is two hours optimistic, which is worth mentioning and is not remotely the problem. The five verifiers work weekdays and two travel 90 minutes, so the only realistic block is <strong>Saturday, roughly 09:00 to 15:00</strong>. Extract 4 plus load 16 is 20 hours from Friday 18:00, landing at <strong>Saturday 14:00</strong> - one hour before the verifiers leave, for a six-hour task. <em>The plan does not reach its own verification.</em></p>
+<p>Second, the rollback. The missing estimate is <strong>the business re-verifying the legacy system</strong>, and leaving it out is what makes the clause look free. Allow six hours and rollback is <strong>18 hours</strong>, so the latest safe no-go is Monday 05:00 minus 18 - <strong>Sunday 11:00</strong>. Which means a Sunday verification window would finish four hours after the last moment anyone could act on its result.</p>
+<p>Third, the rewrite has to start from Saturday 09:00 and work back: verification 09:00 to 15:00 needs reconciliation done by 09:00, which needs the load done by 06:00, which - at twenty hours for extract and load - needs it to start by Friday 10:00, <em>eight hours before the window opens</em>. So something has to give, and naming which is the whole answer: start the extract earlier from a quiesced copy, cut the scope of what moves, split the load, or move the cutover to a window with two daylight verification blocks. <strong>What must not give is the verification.</strong></p>
+<p>Fourth, the two clauses. <em>"Rollback available throughout the window"</em> is not true and cannot be - it is available until the latest safe no-go, and in practice until the first real transaction lands in the new system, whichever comes first. <em>"Data verified as acceptable to the business"</em> is not a criterion, it is a sentence that will be interpreted at 3am by whoever is most tired. Criteria are numbers: record counts reconciling within a stated tolerance, a named sample checked field by field, zero unmatched open work orders, every required field populated.</p>
+<p>Fifth, the reply. It should critique the <em>plan</em>, not the team - the plan treats 59 hours as undifferentiated time, and the fix is that the five people who can verify are the constraint the schedule is built around rather than a task assigned to a department. And it should end with the sponsor's actual decision: here is the honest point of no return, and here is what you are committing to when we pass it.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-decide_what_moves">1. Decide what moves, what is archived, and what is abandoned</label><textarea id="cb-decide_what_moves" data-key="t-0197:decide_what_moves" placeholder="Not everything migrates. History is the expensive part. Get the decision made by the people who will need the data, not by the project that has to move it."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-map_field_to_field">2. Map field to field, and name every transformation</label><textarea id="cb-map_field_to_field" data-key="t-0197:map_field_to_field" placeholder="The mapping document is the contract. Every field in the new system needs a source, and every field in the old one needs a destination or an explicit decision that it has none."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-choose_the_risk_you_buy">3. Choose big bang or phased by the risk you are buying, not by which is better</label><textarea id="cb-choose_the_risk_you_buy" data-key="t-0197:choose_the_risk_you_buy" placeholder="One concentrated event, or a longer period of running two truths at once. Neither is safe. Decide which risk this organisation can actually carry."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-schedule_backwards_and_name_the_point">4. Build the cutover backwards from the verification window - and name the point of no return</label><textarea id="cb-schedule_backwards_and_name_the_point" data-key="t-0197:schedule_backwards_and_name_the_point" placeholder="Find the one window when the people who can judge the data are awake and available. Schedule backwards from it. Then work out the latest moment a rollback is still possible."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-plan_the_first_three_weeks">5. Plan the first three weeks, and decide what the old system is now for</label><textarea id="cb-plan_the_first_three_weeks" data-key="t-0197:plan_the_first_three_weeks" placeholder="Go-live is the start of the hard part. Plan hypercare, expect the questions people will actually ask, and state how long the legacy system stays readable and who may switch it off."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now plan a migration around the moment that proves it.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Migrations do not usually fail technically. They fail on a timetable nobody checked against people.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Migrating everything because deciding is hard.</strong> That carries every ambiguity and every twelve-year-old record across at full cost, into a system that will now be judged on them.</p>
+<p>&bull; <strong>Letting the project decide what history matters.</strong> A project asked that question will find that less of it matters than it feared, and it will be sincerely wrong. Ask the people who look back at it.</p>
+<p>&bull; <strong>Cleaning during the cutover.</strong> Cleaning is its own work package with its own weeks, finished before the final extract.</p>
+<p>&bull; <strong>A field with no home.</strong> Usually the one somebody added years ago for an undocumented reason and is still using.</p>
+<p>&bull; <strong>A field with two homes.</strong> The same fact in two places in the new system, diverging from the first day.</p>
+<p>&bull; <strong>A transformation with no owner.</strong> Five criticality levels becoming four is a judgement, not a rename, and somebody has to sign it.</p>
+<p>&bull; <strong>Scheduling forwards.</strong> The slack ends up at three in the morning, where it cannot be spent.</p>
+<p>&bull; <strong>Verification assigned to a department.</strong> A department cannot look at a work order history. Five named people can, and only when they are awake.</p>
+<p>&bull; <strong>Verification by the project team.</strong> They can confirm the data arrived. They cannot tell right data from wrong data, because they were never the ones using it.</p>
+<p>&bull; <strong>A rollback clause with no last safe moment, and no cost for re-verifying the old system.</strong> Going back is not free and it is not available all weekend.</p>
+<p>&bull; <strong>Go/no-go criteria written on the night.</strong> Nobody has ever cancelled a go-live at four in the morning on criteria invented at four in the morning.</p>
+<p>&bull; <strong>No hypercare.</strong> Go-live is where the organisation starts finding out what it moved, and almost every question will be a data question.</p>
+<p>&bull; <strong>A legacy system left writable, or switched off on a date rather than on a condition.</strong> Writable means two truths again; a date means somebody loses an answer they needed.</p>
+</div>
+</details>
+<p>Onalenna had a plan with thirty-one hours of slack that was already two hours short. Decide what moves, what is archived and what is abandoned, and let the people who will need the data make that call rather than the project that has to move it; map every field in both directions and give every transformation an owner, because a field with no home and a field with two are the same failure at opposite ends; choose big bang or phased by which risk the organisation can actually carry, not by which sounds safer; then find the one window in which the people who can judge the data are awake and available, build the whole cutover backwards from it, price the rollback honestly including the cost of trusting the old system again, name the latest safe no-go, and write the go/no-go criteria in numbers before the night begins; and plan the three weeks after go-live as real work, with the old system readable but not writable until a stated condition is met. <strong>The rollback window does not close when somebody decides it has. It closes the instant the first real transaction lands.</strong> Take your organisation's last system change and find out when the people who could tell right data from wrong data were actually asked to look. If the answer is after go-live, you have found the shape of the next plan.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can plan a system and data migration now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

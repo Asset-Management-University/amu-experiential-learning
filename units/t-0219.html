@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The wall of certificates</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The wall of certificates</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You walk into the utility's reception and there is a wall of framed certificates - the quality-management certificate, the environmental one, an audit pass, a run of them, polished and proud. The organisation has collected the badges. By every certificate on that wall, it is a well-run place.</p>
+<p>Then you look at the service it actually delivers, and the two do not match. The water is late, the complaints are up, and the same problems recur year after year. There are audits every cycle, and nothing gets better. The system conforms - it does what it wrote down that it would do - and it is still, honestly, mediocre.</p>
+<p>Somewhere along the way the organisation started treating the certificate as the goal, and mistook having the badges of quality for actually being good - and now it cannot understand why all the frameworks on the shelf have not made it excellent.</p>
+<blockquote><h2>We have every certificate and the service is still mediocre - so what were the frameworks even for? How do I tell the frameworks apart, and use them to actually get better rather than just to prove we conform?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The wall by reception carries every certificate going, all genuinely earned — audits passed, nothing falsified, the system doing exactly what it says it does. And a resident who rang three times last month about discoloured water was passed between two departments and never called back, which no audit would ever catch, because nothing in the documented system was breached. The service is, honestly, mediocre. The quality manager is proud of the wall. The operations manager is quietly baffled that none of it made anything better. Write down what those frameworks were actually for — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the two families on the shelf</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;The audits are not rigorous enough.&rdquo;</strong> They are rigorous about the right thing — whether you do what you wrote down. Your written system does not mention calling a resident back, so a tougher auditor would find nothing either.</p>
+<p>&bull; <strong>&ldquo;Get certified to another standard.&rdquo;</strong> Adds a badge to a wall that already has several, and asks the same binary question about a different subject. More of the thing that has not helped.</p>
+<p>&bull; <strong>&ldquo;The certificates are pointless — abandon them.&rdquo;</strong> Overcorrects. A conforming system is a <strong>floor</strong> and a floor is genuinely worth having; the mistake was expecting a floor to be a height.</p>
+<p>&bull; <strong>&ldquo;Write more detailed procedures.&rdquo;</strong> Describes what you already do in more words. If the description is mediocre, conforming to it more precisely produces more precisely documented mediocrity.</p>
+<p>&bull; <strong>&ldquo;It is a culture problem, not a framework problem.&rdquo;</strong> Possibly true and it skips the available diagnosis, which is that the wrong kind of framework has been used for the job.</p>
+<p>&bull; The confusion ends when you see that the shelf holds <strong>two families doing genuinely different jobs.</strong> One is a <strong>certifiable specification</strong>: it states what a competent system for its subject must contain, you build it, you say what you do and do what you say, and somebody external certifies that you conform. <strong>Its question is binary</strong> — do you have a working system, can you prove it, yes or no. It gives you a floor and a certificate. And <strong>conforming to your own written description is entirely compatible with that description being mediocre</strong>, which is exactly where you are. The other family is <strong>not a checklist at all</strong>: it describes what excellent looks like across the whole organisation, and you <strong>assess yourself</strong> against it to find your gaps. Its question is not whether you comply but <strong>how good you actually are</strong> — a horizon rather than a floor, a mirror rather than a certificate. Your organisation has been using the first kind for a job only the second can do, and then wondering why compliance produced no improvement. So <strong>choose the tool for the question rather than for the trophy</strong> — and be ready for the honest self-assessment to be uncomfortable in a way an audit never is, which is precisely why it moves an organisation and a certificate does not.</p>
+</div>
+</details>
+<p>Here is the map of the frameworks.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you read the shelf of improvement frameworks - seeing the two families, understanding standards and certification, understanding excellence models, placing them along a widening scope, and choosing the tool rather than the trophy.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Two families - a standard, or an excellence model</div><p class="cb-demo">AN ORGANISATION TRYING TO BE GOOD FACES A BEWILDERING SHELF OF FRAMEWORKS - QUALITY, ENVIRONMENTAL AND ASSET STANDARDS, PROCESS-IMPROVEMENT METHODS, WHOLE-ORGANISATION EXCELLENCE MODELS - AND THE MISTAKE THAT STARTS ALL THE TROUBLE IS TO GRAB ONE BECAUSE IT IS FASHIONABLE, OR TO RUN SEVERAL THAT NEVER JOIN UP. The key that ends the confusion, the single most useful idea in this unit, is to see that they fall into TWO FAMILIES that do genuinely different jobs. A MANAGEMENT-SYSTEM STANDARD (the quality standard, the environmental standard, the asset-management standard) is a CERTIFIABLE SPECIFICATION: it states what a competent system for its subject must have, you build that system, you say what you do and do what you say, and an external auditor CERTIFIES that you conform. ITS QUESTION IS BINARY: do you have a system that works, and can you prove it? Yes or no. AN EXCELLENCE MODEL IS NOT A CERTIFIABLE CHECKLIST AT ALL BUT AN ASPIRATIONAL MATURITY FRAMEWORK: it describes what world-class looks like across the WHOLE organisation - leadership, strategy, people, processes, results - and you SELF-ASSESS against it to find your gaps and drive improvement. ITS QUESTION IS OPEN AND DIRECTIONAL: how good could you be, and where are you short? These are not two versions of the same thing and they are not rivals to choose between - they answer different questions and do different jobs, and knowing which family a framework belongs to tells you immediately what it can and cannot do for you. THE SINGLE HARDEST TRUTH, HELD IN ONE LINE: A STANDARD GIVES YOU A FLOOR AND A CERTIFICATE; AN EXCELLENCE MODEL GIVES YOU A HORIZON AND A MIRROR. You need both, and one is not a substitute for the other.</p></div><div class="canvas-box"><div class="cb-label">2. The standards, and certification</div><p class="cb-demo">LOOK CLOSER AT THE FIRST FAMILY, BECAUSE IT IS WHERE THE CERTIFICATES ON THE WALL COME FROM. A MANAGEMENT-SYSTEM STANDARD IS A PUBLISHED SPECIFICATION OF WHAT A COMPETENT SYSTEM MUST INCLUDE FOR ITS SUBJECT: a QUALITY standard for making the product or service right; an ENVIRONMENTAL standard for controlling and reducing the organisation impact on the planet; an ASSET-MANAGEMENT standard for delivering value from assets across their whole life. You implement one by BUILDING THE SYSTEM IT DESCRIBES - the policies, processes, records and reviews it requires - and the discipline at its heart is a simple, demanding one: SAY WHAT YOU DO (define your processes), DO WHAT YOU SAY (actually follow them), AND BE ABLE TO SHOW IT (keep the evidence). Then comes CERTIFICATION: an independent, external auditor examines your system against the standard and, if you conform, issues a formal certificate - a statement to the outside world (a customer who cannot see inside your organisation, a regulator, a partner) that you have a system meeting the standard. THIS IS GENUINELY VALUABLE, and it is worth being clear WHY: it converts an internal reality into external, credible proof, so a customer can trust your system without having to inspect it themselves. BUT NOTICE WITH GREAT PRECISION WHAT IT VERIFIES: THAT YOU HAVE, AND FOLLOW, A DEFINED SYSTEM THAT MEETS THE STANDARD - and nothing more than that. It does not verify that the system is excellent, that your results are good, or that you are improving; it verifies conformance, which is exactly what it says and no more. (Building such a system and running the audit are their own crafts with their own techniques; the point here is what the standard and its certificate ARE, so you never ask them to prove something they cannot.)</p></div><div class="canvas-box"><div class="cb-label">3. The excellence models - and process methods</div><p class="cb-demo">THE SECOND FAMILY ANSWERS THE QUESTION A STANDARD CANNOT: NOT &#039;DO YOU CONFORM?&#039; BUT &#039;HOW GOOD COULD YOU BE?&#039; A BUSINESS EXCELLENCE MODEL IS A FRAMEWORK OF CRITERIA DESCRIBING WHAT A WORLD-CLASS ORGANISATION LOOKS LIKE ACROSS THE WHOLE OF ITSELF - typically LEADERSHIP, STRATEGY, STAKEHOLDER OR CUSTOMER FOCUS, PEOPLE, PROCESSES, and RESULTS - against which an organisation SELF-ASSESSES its own maturity, scores where it currently stands on each area, identifies its biggest gaps, and improves toward the model. It is a MIRROR held up to the entire organisation, not a checklist to pass or fail; nobody certifies you against it, because its purpose is not to declare you conforming but to show you honestly where you fall short of your potential and where to aim next. NOW A DISTINCTION THAT MATTERS AND IS OFTEN BLURRED: A BUSINESS EXCELLENCE MODEL (WHICH ASSESSES THE WHOLE ORGANISATION) IS NOT THE SAME AS A PROCESS-IMPROVEMENT METHOD (WHICH FIXES A SPECIFIC PROCESS). The structured problem-solving projects and the equipment-effectiveness programmes are process methods - powerful tools for driving the defect rate out of one production line or lifting the availability of one set of machines - but their scope is a process, not the enterprise. A business excellence model and a process method are relatives in the wider &#039;how to get better&#039; family, but AT DIFFERENT SCOPES, and you choose between them by scope: a whole-organisation stall, a sense that the enterprise itself is short of world-class, needs the excellence model; a single stubborn process bleeding defects or downtime needs the process method. Using a whole-organisation mirror to fix one machine, or a single-process tool to lift the whole enterprise, is a scope error - the right tool, pointed at the wrong size of problem.</p></div><div class="canvas-box"><div class="cb-label">4. The widening scope, and integration</div><p class="cb-demo">THE TWO FAMILIES ARE COMPLEMENTARY, NOT COMPETING - you do not choose standards OR excellence models, you use each for its job - AND THE STANDARDS THEMSELVES LINE UP ALONG A WIDENING SCOPE OF WHAT AN ORGANISATION TAKES RESPONSIBILITY FOR. QUALITY: is the product or service itself right? (the narrowest, most immediate responsibility). ENVIRONMENT: is our impact on the planet - our emissions, waste, resource use - understood and controlled? ASSET: do our assets deliver value across their WHOLE life, not just today? And widest of all, SUSTAINABILITY: can we keep doing this over the long term, balancing the needs of PEOPLE, PLANET and PROSPERITY - the viability of the whole enterprise into the future? Each band contains and extends the one before it, and a mature organisation is conscious of where on that widening scope its current attention sits and where it needs to reach next. NOW THE PRACTICAL PAYOFF, AND THE REASON THIS IS NOT JUST A TAXONOMY: BECAUSE THE MODERN MANAGEMENT-SYSTEM STANDARDS SHARE A COMMON BACKBONE - the same overall structure and the same plan-do-check-act cycle of improvement - YOU SHOULD INTEGRATE THEM INTO ONE MANAGEMENT SYSTEM, NOT RUN SEVERAL SILOED ONES. The organisation whose quality, environmental and safety programmes each demand their own separate forms, their own separate audits, and their own separate meetings, issuing contradictory instructions to the same exhausted people, has manufactured three systems where ONE INTEGRATED SYSTEM would serve better. That is not thoroughness, it is waste - duplicated effort, conflicting requirements, and a workforce buried in overlapping paperwork. Build one system on the common backbone that addresses quality, environment, asset and safety together, and the frameworks reinforce each other instead of colliding.</p></div><div class="canvas-box"><div class="cb-label">5. Choose the tool, not the trophy</div><p class="cb-demo">SO THE WHOLE SKILL COMES DOWN TO THIS, AND IT IS BOTH PRACTICAL AND A MATTER OF INTEGRITY. A FRAMEWORK IS A TOOL FOR A PURPOSE, NOT A TROPHY TO COLLECT. Ask what you actually need. If you need to PROVE to an outsider - a customer, a regulator - that you have a reliable system, you need a STANDARD and its certificate. If you need to FIND OUT where you fall short of your potential and drive genuine improvement across the organisation, you need an EXCELLENCE MODEL and its self-assessment. If you need to fix one broken process, you need a PROCESS METHOD. And whatever you adopt, INTEGRATE it with what you already run rather than bolting on another silo. NOW THE DIGNITY, WHICH MUST BE HELD ON BOTH SIDES AT ONCE. FIRST, RESPECT THE FLOOR: AN ORGANISATION WITH A CERTIFICATE HAS A DEFINED, AUDITED SYSTEM FOR ITS WORK. THAT IS A REAL ACHIEVEMENT, AND THE FOUNDATION FOR WHAT COMES NEXT. IT IS ALWAYS BETTER THAN HAVING NO SYSTEM AT ALL. Do not sneer at the basics or look down on an organisation that has reached the floor - the floor is worth reaching, and many organisations fought hard to get there. SECOND, THE HONEST LIMIT: BUT CONFORMANCE IS THE FLOOR, NOT THE CEILING. THE CERTIFICATE PROVES YOU HAVE A SYSTEM THAT MEETS A STANDARD; IT DOES NOT PROVE THAT YOU ARE GOOD. THAT IS A DIFFERENT QUESTION, AND IT REQUIRES A DIFFERENT TOOL. The failure in the reception hall full of certificates was never having the certificates - it was mistaking the certificates for the capability, and stopping there. THE CERTIFICATE PROVES YOU HAVE A CONFORMING SYSTEM, NOT THAT YOU ARE GOOD - so never mistake the badge on the wall for the thing it was meant to represent, and never stop at the floor when the whole point was to climb toward the horizon.</p></div></div>
+
+<p>Box 1 is the distinction that ends the confusion. Box 5 is the line that keeps a certificate from being mistaken for the thing itself. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>A standard gives you a floor and a certificate; an excellence model gives you a horizon and a mirror. You need both, and one is not a substitute for the other.</strong> Five questions:</p>
+<ul>
+<li><strong>Which family is it?</strong> <strong>A management-system standard, or an excellence model.</strong> One is a certifiable specification (a floor); the other an aspirational maturity model (a horizon). They do different jobs.</li>
+<li><strong>What does a standard do?</strong> <strong>It defines a competent system, and an auditor certifies you conform.</strong> Say what you do, do what you say, prove it. Its question: do you have a system that works?</li>
+<li><strong>What does an excellence model do?</strong> <strong>It describes world-class across the whole organisation, and you self-assess.</strong> Its question: how good could you be, and where are you short?</li>
+<li><strong>How do they fit together?</strong> <strong>Complementary, along a widening scope, on a common backbone.</strong> Quality, environment, asset, sustainability - integrate them, do not silo them.</li>
+<li><strong>What is the trap?</strong> <strong>The certificate proves conformance, not goodness.</strong> A framework is a tool for a purpose, not a trophy to collect.</li>
+</ul>
+<p><strong>Two families, two different jobs.</strong> An organisation trying to be good faces a bewildering shelf of frameworks - quality, environmental and asset-management standards, process-improvement methods, whole-organisation excellence models - and the mistake that starts all the trouble is to grab one because it is fashionable, or to run several that never join up. The key that ends the confusion is to see that they fall into <em>two families</em> that do genuinely different jobs. A <strong>management-system standard</strong> (the quality standard, the environmental standard, the asset-management standard) is a <em>certifiable specification</em>: it states what a competent system for its subject must have, you build that system, you say what you do and do what you say, and an external auditor <em>certifies</em> that you conform. Its question is simple and binary: <em>do you have a system that works, and can you prove it?</em> An <strong>excellence model</strong> is not a certifiable checklist at all but an <em>aspirational maturity framework</em>: it describes what world-class looks like across the <em>whole</em> organisation - leadership, strategy, people, processes, results - and you <em>self-assess</em> against it to find your gaps and drive improvement. Its question is open and directional: <em>how good could you be, and where are you short?</em> In a line: <strong>standards give you a floor and a certificate; excellence models give you a horizon and a mirror.</strong></p>
+<p><strong>The standards, and certification.</strong> Look closer at the first family, because it is where the certificates come from. A management-system standard is a published specification of what a competent system must include for its subject - a <em>quality</em> standard for making the product or service right, an <em>environmental</em> standard for controlling the organisation's impact on the planet, an <em>asset-management</em> standard for delivering value from assets across their life. You implement it by building the system it describes, and the discipline at its heart is <em>say what you do, do what you say, and be able to show it</em>. Then an independent, external auditor examines you and, if you conform, <em>certifies</em> it - a formal statement to the outside world (a customer, a regulator) that you have a system meeting the standard. This is genuinely useful: it verifies conformance to an outside party who cannot see inside your organisation. But notice exactly what it verifies - <em>that you have and follow a defined system</em> - and nothing more. (How you build such a system and how you run the audit are their own crafts, taught in their own techniques; here the point is what the standard and its certificate <em>are</em>.)</p>
+<p><strong>The excellence models - and the difference from process methods.</strong> The second family answers the question a standard cannot: not "do you conform?" but "how good could you be?" A <strong>business excellence model</strong> is a framework of criteria describing what a world-class organisation looks like <em>across the whole of itself</em> - typically leadership, strategy, stakeholder focus, people, processes, and results - against which an organisation <em>self-assesses</em> its own maturity, scores where it stands, finds its biggest gaps, and improves. It is a mirror held up to the entire organisation, not a checklist to pass. And distinguish it carefully from a <em>process-improvement method</em>: a business excellence model assesses the <em>whole organisation</em>, whereas a process method (the structured problem-solving projects, the equipment-effectiveness programmes) fixes a <em>specific process</em>. They are relatives in the wider "how to get better" family but at different scopes - one asks how good is the whole organisation, the other fixes this production line's defect rate. You choose between them by scope: a whole-organisation stall needs the excellence model; a single stubborn process needs the process method.</p>
+<p><strong>The widening scope, and integration.</strong> The two families are <em>complementary, not competing</em>, and the standards themselves line up along a <em>widening scope</em> of what an organisation takes responsibility for: <em>quality</em> (is the product or service right?), then <em>environment</em> (is our impact on the planet controlled?), then <em>asset</em> (do our assets deliver value across their whole life?), and widest of all <em>sustainability</em> (can we keep doing this - for people, planet and prosperity - over the long term?). Because the modern management-system standards share a <em>common backbone</em> - the same overall structure and the same plan-do-check-act cycle - you should <strong>integrate them into one management system, not run several siloed ones</strong> that duplicate the paperwork and contradict each other. The utility whose quality, environmental and safety programmes each demand their own forms and their own meetings has made three systems where one integrated system would serve - which is not diligence, it is waste that exhausts the people caught between them.</p>
+<p>One honest boundary, and it matters to how this lands. <strong>An organisation with a certificate has a defined, audited system for its work. That is a real achievement, and the foundation for what comes next. It is always better than having no system at all.</strong> Do not sneer at the basics or look down on an organisation that has reached the floor - the floor is worth reaching, and reaching it deserves respect. <strong>But conformance is the floor, not the ceiling. The certificate proves you have a system that meets a standard; it does not prove that you are good. That is a different question, and it requires a different tool.</strong> The failure in the reception hall is not that the utility has certificates - it is that it mistook the certificates for the capability, and stopped.</p>
+<p><strong>Choose the tool, not the trophy.</strong> So the whole skill comes down to this. <em>A framework is a tool for a purpose, not a trophy to collect.</em> Ask what you actually need: if you need to <em>prove</em> to an outsider that you have a reliable system, you need a <em>standard</em> and its certificate. If you need to <em>find out</em> where you fall short of your potential and drive genuine improvement, you need an <em>excellence model</em> and its self-assessment. If you need to fix one broken process, you need a <em>process method</em>. And whatever you adopt, integrate it with what you already run rather than bolting on another silo. <strong>The certificate proves you have a conforming system, not that you are good</strong> - so never mistake the badge on the wall for the thing it was meant to represent, and never stop at the floor when the whole point was to climb.</p>
+<p>Does it scale? A person can pass every module of a course (a standard: conformance verified, a certificate to show) and still not be a wise or capable practitioner (excellence: a different, harder question a certificate cannot answer) - and the one who frames the certificate and stops learning has confused the floor for the horizon. Meanwhile the truly capable person may hold no certificate at all. The badge and the thing are not the same, in an organisation or a life.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>You are a new manager at the utility, and Onalenna hands you four problems the organisation faces. For each, she wants to know which tool fits.</p>
+<table>
+<tr><th>#</th><th>The problem</th></tr>
+<tr><td>1</td><td>A major industrial customer will only sign a new contract if the utility can <em>prove</em> it has a reliable quality system.</td></tr>
+<tr><td>2</td><td>The board wants to reduce the utility's environmental impact but has no idea where to start.</td></tr>
+<tr><td>3</td><td>Morale is low because three separate improvement programmes - quality, environment, safety - create duplicate paperwork and conflicting instructions.</td></tr>
+<tr><td>4</td><td>Onalenna feels the utility has stalled and wants to know where it is furthest from world-class, across the whole organisation.</td></tr>
+</table>
+<ol>
+<li><strong>Name the tool.</strong> For problems 1, 2 and 4, say whether a <em>management-system standard</em> or an <em>excellence model</em> is the right first tool, and why.</li>
+<li><strong>What the certificate proves.</strong> For problem 1, state what the resulting certificate <em>will</em> and <em>will not</em> prove.</li>
+<li><strong>Why integrate.</strong> For problem 3, explain why the three systems should be integrated onto their common backbone rather than run separately.</li>
+<li><strong>Place it.</strong> For problem 2, place the concern in the widening scope of organisational responsibility - and name what lies wider than it.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the tools. Problem 1 needs a <strong>management-system standard</strong> (the quality standard) and its certificate, because the customer needs external <em>proof</em> of a reliable system - that is exactly what a certifiable standard provides. Problem 2 needs a <strong>management-system standard</strong> (the environmental standard), because "we want a system to control and reduce our impact, starting from nothing" is a call for the defined framework a standard gives. Problem 4 needs an <strong>excellence model</strong>, because "where are we furthest from world-class across the whole organisation?" is the maturity self-assessment question a standard cannot answer - it is a horizon-and-mirror problem, not a floor-and-certificate one.</p>
+<p>Second, what the certificate proves for problem 1: it <em>will</em> prove to the customer that the utility <strong>has and follows a defined quality-management system that meets the standard</strong> - real, useful, contract-winning assurance. It <em>will not</em> prove that the water is excellent, that the service is improving, or that the utility is a good organisation - <strong>conformance is not the same as excellence</strong>, and an honest answer says so.</p>
+<p>Third, why integrate (problem 3): the three programmes share a <em>common backbone</em> - the same overall structure and the same plan-do-check-act cycle - so run as one integrated management system they need one set of policies, one audit, one improvement rhythm, instead of three that duplicate the paperwork and issue conflicting instructions. Integrating removes the waste and the contradictions that are crushing morale; siloing manufactures them.</p>
+<p>Fourth, placing problem 2: environmental impact sits in the <strong>environmental</strong> band of the widening scope - beyond quality (getting the service right) and alongside asset value - and <strong>wider than it lies sustainability</strong>, the long-term viability of the utility for people, planet and prosperity together, of which controlling environmental impact is one part.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-two_families">1. Two families - a standard, or an excellence model</label><textarea id="cb-two_families" data-key="t-0219:two_families" placeholder="The shelf of improvement frameworks falls into two families doing different jobs. A management-system standard is a certifiable specification - build the system, prove you conform (a floor and a certificate; its question: do you have a system that works?). An excellence model is an aspirational maturity framework - self-assess the whole organisation against world-class (a horizon and a mirror; its question: how good could you be?)."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-standards_and_certification">2. The standards, and certification</label><textarea id="cb-standards_and_certification" data-key="t-0219:standards_and_certification" placeholder="A management-system standard is a published specification of what a competent system must include for its subject - quality, environmental, asset. You build the system, and the discipline is: say what you do, do what you say, and show it. An external auditor then certifies conformance to the outside world. Note exactly what the certificate verifies: that you have and follow a defined system - and nothing more."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-excellence_models">3. The excellence models - and process methods</label><textarea id="cb-excellence_models" data-key="t-0219:excellence_models" placeholder="An excellence model is a framework of criteria describing a world-class organisation across the whole of itself (leadership, strategy, stakeholders, people, processes, results), which you self-assess against to find your biggest gaps. Distinguish it from a process-improvement method: a business excellence model assesses the WHOLE organisation; a process method fixes a SPECIFIC process. Choose by scope."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-widening_scope_and_integration">4. The widening scope, and integration</label><textarea id="cb-widening_scope_and_integration" data-key="t-0219:widening_scope_and_integration" placeholder="The families are complementary, not competing, and the standards line up along a widening scope: quality (is the service right?), environment (is our planetary impact controlled?), asset (do assets deliver value over their life?), sustainability (can we keep going - people, planet, prosperity - long term?). Because modern standards share a common backbone, integrate them into ONE management system, not several siloed ones that duplicate and contradict."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-tool_not_trophy">5. Choose the tool, not the trophy</label><textarea id="cb-tool_not_trophy" data-key="t-0219:tool_not_trophy" placeholder="A framework is a tool for a purpose, not a trophy to collect. If you must PROVE a reliable system to an outsider, you need a standard and its certificate. If you must FIND where you fall short of your potential, you need an excellence model. If you must fix one process, a process method. An organisation with a certificate has a real achievement and a worthwhile floor - but conformance is the floor, not the ceiling; the certificate proves you conform, not that you are good."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When each problem has the right tool and the certificate is not mistaken for the capability, <strong>download or save it</strong> - it is yours. You can now read the shelf of frameworks and choose.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A framework is a tool for a purpose, not a trophy to collect. The certificate on the wall proves you have a conforming system - it does not prove you are good.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Grabbing a fashionable framework.</strong> Adopt a tool for the job it does, not because everyone is talking about it. Ask what you actually need before you choose.</p>
+<p>&bull; <strong>Confusing a standard with an excellence model.</strong> One certifies conformance (a floor); the other self-assesses maturity (a horizon). Using the wrong one answers the wrong question.</p>
+<p>&bull; <strong>Treating the certificate as proof of goodness.</strong> It proves you have and follow a defined system. Whether you are excellent is a different question, needing a different tool.</p>
+<p>&bull; <strong>Stopping at conformance.</strong> The floor is worth reaching and it is not the ceiling. A conforming system that never improves is a system slowly falling behind.</p>
+<p>&bull; <strong>Collecting trophies.</strong> A wall of certificates is not a strategy. Each framework should be earning its keep on a real purpose, or it is overhead with a frame around it.</p>
+<p>&bull; <strong>Running siloed systems.</strong> Separate quality, environmental and safety systems duplicate paperwork and contradict each other. Integrate them on their common backbone into one.</p>
+<p>&bull; <strong>Using a whole-organisation model to fix one process (or the reverse).</strong> Match the scope: an excellence model for the whole organisation, a process method for a single stubborn process.</p>
+<p>&bull; <strong>Sneering at the basics.</strong> An organisation that has reached the floor has achieved something real and deserves respect. The point is to help it climb, not to look down on it.</p>
+</div>
+</details>
+<p>The wall of certificates and the mediocre service did not match, because the organisation collected the badges and mistook them for being good. So read the shelf of frameworks by family: a management-system standard is a certifiable specification that gives you a floor and a certificate, proving you have a working system to an outside world that cannot see inside; an excellence model is an aspirational maturity framework that gives you a horizon and a mirror, showing where the whole organisation falls short of world-class; a process method fixes one stubborn process; and they widen in scope from quality to environment to asset to sustainability, sharing a common backbone that lets you integrate them into one system rather than a pile of silos. <strong>Choose the tool for the purpose, not the trophy for the wall - because the certificate proves you have a conforming system, not that you are good, and conformance is the floor the horizon is climbed from, never the ceiling.</strong> The next time someone points proudly at the certificates in reception, ask the harder question they were never meant to answer: not do we conform, but are we actually getting better?</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can read the shelf of frameworks now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nobody wrote them to be read together</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>Nobody wrote them to be read together</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Adaeze, and you now have a question. That part is done.</p>
+<p>What you have in front of you is thirty-seven papers you have actually read, out of a folder holding rather more that you have not.</p>
+<p>Paper 12 says the seasonal effect is strong and well established. Paper 26 says it was looked for and not found. Paper 31 does not mention seasons at all but measures exactly the thing you care about. Paper 4 has four hundred citations and reads like it settled the matter in 1998.</p>
+<p>Some of these feel authoritative. Some feel thin. You could not say why, and you are aware that "feels thin" is not something you can write in a dissertation.</p>
+<p>Your supervisor has asked for "a critical review, not a summary". You have read that sentence eleven times.</p>
+<blockquote><h2>I have a pile of papers that disagree with each other and no way to tell which ones to believe. How do I turn this into an argument that shows what is known, what is not, and where my question sits?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Four papers on the desk. One studied <strong>thousands</strong> of rollers and measured something slightly beside the point. One studied <strong>eleven</strong> and measured exactly the thing you care about. One has <strong>four hundred citations</strong> and reads as though it settled the matter in 1998. One is recent, narrow, and from a different commodity entirely — and calls the phenomenon by a name you had never heard, which is why you nearly missed it. Some of these feel authoritative and some feel thin, and you could not say why. Your supervisor has asked for &ldquo;a critical review, not a summary&rdquo;, and you have read that sentence eleven times. Write down how you would turn this into an argument — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what 'feels thin' is actually pointing at</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Summarise each paper in turn and note where they differ.&rdquo;</strong> That is the summary you were told not to write. A list of what each says, in the order you happened to read them, leaves the reader to do the weighing you were meant to do.</p>
+<p>&bull; <strong>&ldquo;Trust the most cited one.&rdquo;</strong> Citations record how often something was <em>referred to</em>, which may mean it settled the matter or merely that it was convenient to cite. Four hundred repetitions of an unexamined claim look identical to four hundred confirmations.</p>
+<p>&bull; <strong>&ldquo;Trust the biggest sample.&rdquo;</strong> Thousands of cases of something adjacent may bear less weight on <em>your</em> question than eleven cases of exactly the right thing. Size is one dimension of strength and not the only one.</p>
+<p>&bull; <strong>&ldquo;Trust the most recent.&rdquo;</strong> Recency is not evidence. A recent narrow study on another commodity may or may not transfer, and deciding by date is a way of not deciding.</p>
+<p>&bull; <strong>&ldquo;Leave out the ones that feel weak.&rdquo;</strong> On what basis, recorded where? Silent exclusions are the thing an examiner most reliably finds, and you cannot defend a judgement you never wrote down.</p>
+<p>&bull; Start earlier than the pile. <strong>A search is a translation</strong> — out of your vocabulary into everybody else's. Break the question into parts and, for each, write <strong>the words you would never use yourself</strong>: somebody in another country, another decade, another commodity named this thing, and <strong>if their name is not in your search, their work does not exist as far as you are concerned.</strong> The commonest reason a search finds nothing is not that nothing was written but that <strong>the field calls it something else</strong> — which you have just nearly demonstrated. Then <strong>screen in stages against stated criteria</strong>, so your exclusions can be defended and reconstructed by somebody else. Then change what you are reading for: not quality but <strong>load</strong> — what weight can this source actually bear? That is what converts <em>feels thin</em> into something statable, because it is an account of what a design can and cannot support rather than a verdict on the authors. And finally <strong>lay the disagreement out rather than smoothing it</strong>: side by side, so what is genuinely contested becomes visible, along with what everyone assumed and nobody tested. <strong>That is where your gap is</strong> — and it is why this is an argument. Nobody wrote them to be read together.</p>
+</div>
+</details>
+<p>Here is how.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the synthesis - the search you could defend, the screening that reconciles, reading for load rather than quality, the table that resolves the disagreement, and the gap written for a named reader.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Turn your question into search terms you could defend to somebody who disagreed with you</div><p class="cb-demo">&lt;strong&gt;A search is a translation, and you are translating out of your own vocabulary into everybody else&#039;s.&lt;/strong&gt; Break the question into parts. Mine - does idler-roller failure rate on incline conveyors differ by season, and is carry-back the mechanism - has four: &lt;strong&gt;the component&lt;/strong&gt; (idler roller, carrying roller, troughing idler, return idler), &lt;strong&gt;the context&lt;/strong&gt; (belt conveyor, bulk materials handling, incline conveyor), &lt;strong&gt;the outcome&lt;/strong&gt; (failure rate, service life, mean time between failures, replacement frequency), and &lt;strong&gt;the candidate mechanism&lt;/strong&gt; (carry-back, material carryover, belt cleaning, spillage). &lt;strong&gt;Write the words you would not use yourself.&lt;/strong&gt; A researcher in another country, in another decade, working on another commodity, gave this phenomenon a name - and if that name is not in your search, their paper does not exist as far as you are concerned. &lt;strong&gt;The commonest reason a literature search finds nothing is not that nothing has been written.&lt;/strong&gt; It is that the field calls it something else. &lt;strong&gt;And write the search down as you go&lt;/strong&gt;, term by term and database by database, because a search somebody else cannot repeat is not evidence about the literature; it is an anecdote about your afternoon.</p></div><div class="canvas-box"><div class="cb-label">2. Screen in stages, and record what you excluded and why - the count must reconcile</div><p class="cb-demo">&lt;strong&gt;Screen in stages and keep the books, because the credibility of everything downstream rests on this arithmetic.&lt;/strong&gt; Three databases returned &lt;strong&gt;1,240 records&lt;/strong&gt;. Removing duplicates took out &lt;strong&gt;350&lt;/strong&gt;, leaving &lt;strong&gt;890&lt;/strong&gt;. Screening titles and abstracts excluded &lt;strong&gt;712&lt;/strong&gt;, and here is the part that matters - &lt;strong&gt;itemise the reasons&lt;/strong&gt;: 402 wrong population, 208 wrong outcome, 102 not primary research. That is 712 exactly, leaving &lt;strong&gt;178&lt;/strong&gt; for full-text reading. Full text excluded &lt;strong&gt;141&lt;/strong&gt;: 63 with no extractable failure data, 51 on a different component, 27 available only as conference abstracts. &lt;strong&gt;37 studies included.&lt;/strong&gt; &lt;strong&gt;Every stage subtracts, every reason is named, and the totals reconcile&lt;/strong&gt; - 1,240 to 890 to 178 to 37. &lt;strong&gt;Why this matters more than it looks.&lt;/strong&gt; An examiner cannot check whether you read the right papers, and will not try. What they can check is whether your process was capable of finding them. &lt;strong&gt;A search that reconciles is a claim somebody can test; a search that does not is a claim they must simply believe&lt;/strong&gt;, and at this level you should not ask anybody to do that.</p></div><div class="canvas-box"><div class="cb-label">3. Read each paper for what load it can bear - not for whether it is good</div><p class="cb-demo">&lt;strong&gt;You would not put a steel section into a structure without reading its specification, and you would not conclude from that specification that the steel was bad.&lt;/strong&gt; You would work out what load it carries. &lt;strong&gt;Read papers the same way.&lt;/strong&gt; For each one, record what was actually done: the population, the period, the measurement, the analysis. Then ask the only question that matters - &lt;strong&gt;what claim of mine can this paper support, and what can it not?&lt;/strong&gt; Worked example. A study reports a strong seasonal effect on roller life; it observed &lt;strong&gt;one terminal for eleven months&lt;/strong&gt;. That is not a weak paper. It is a paper that can bear the load &#039;a seasonal effect has been observed in at least one operation&#039; and cannot bear &#039;seasonal effects are general&#039;. &lt;strong&gt;Say it in operational language, not in verdicts.&lt;/strong&gt; Not &#039;a small unreliable sample&#039; but &#039;a single site over eleven months, so it establishes existence rather than prevalence&#039;. &lt;strong&gt;Now do it to the best paper you have found&lt;/strong&gt; - the one with 400 citations that you have been treating as settled fact. It has limitations too, stated plainly in its own methods section by authors who knew exactly what they were and wrote them down. &lt;strong&gt;Every study is bounded. That is not a defect in some studies; it is the nature of all of them&lt;/strong&gt;, and noticing it is what moves you from reading the literature to working within it.</p></div><div class="canvas-box"><div class="cb-label">4. Put the disagreements side by side - and find what the papers were actually each asking</div><p class="cb-demo">&lt;strong&gt;Papers that appear to contradict each other usually answered slightly different questions, and the difference is almost always visible in their conditions.&lt;/strong&gt; Of my 37 studies, &lt;strong&gt;21 report a seasonal effect, 9 report none, and 7 did not test for one.&lt;/strong&gt; Read as a scoreboard that is 21 against 9 and you would conclude the literature is divided. &lt;strong&gt;Do not read it as a scoreboard. Tabulate it.&lt;/strong&gt; Put every study in a row and every condition in a column: climate, commodity, belt cleaner fitted, incline angle, measurement period. Now look. &lt;strong&gt;Six of the nine that found no effect operated in climates with little seasonal rainfall variation&lt;/strong&gt; - under 400 millimetres between wettest and driest quarters. &lt;strong&gt;They did not fail to find the effect. They ran in conditions where the proposed mechanism could not operate&lt;/strong&gt;, which is not a disagreement; it is a boundary condition, and it is a more useful finding than either camp on its own. &lt;strong&gt;Two of the remaining three used a different failure definition&lt;/strong&gt;, counting replacements rather than failures, which counts planned changes as failures. &lt;strong&gt;That leaves one genuine unexplained disagreement, and one is a manageable number to think hard about.&lt;/strong&gt; A table turns twelve months of confusion into one real question.</p></div><div class="canvas-box"><div class="cb-label">5. Write the gap for a named reader - as what is not yet known, never as what nobody has bothered to do</div><p class="cb-demo">&lt;strong&gt;Name the reader before you write a word.&lt;/strong&gt; Mine is an examiner who knows this field better than I do and is asking one question throughout: does this person know where their work sits. &lt;strong&gt;What must they see?&lt;/strong&gt; That I know what is established, that I know where it stops, and that my question lives precisely at that edge. &lt;strong&gt;Now write the gap, and write it as a statement about knowledge rather than about people.&lt;/strong&gt; Not &#039;nobody has studied seasonal effects on incline conveyors&#039;, which is nearly always false and is read as a claim about other researchers&#039; diligence. Instead: &lt;strong&gt;&#039;Seasonal variation in idler-roller failure has been observed in humid-tropical and temperate operations. Studies reporting no effect were conducted where seasonal rainfall variation is small, which bounds rather than contradicts the finding. Carry-back has been proposed as the mechanism but has not, in the studies located, been measured alongside failure rate at the same site.&#039;&lt;/strong&gt; &lt;strong&gt;That last clause is the gap, and notice what it does.&lt;/strong&gt; It grants everything the literature has earned, it explains the apparent conflict rather than ignoring it, and it leaves exactly one thing open - the thing I am proposing to do. &lt;strong&gt;A gap written this way cannot be dismissed by an examiner who happens to know a paper you missed&lt;/strong&gt;, because it is a claim about what has been measured together, not a claim about what exists.</p></div></div>
+
+<p>Box 3 is where the confidence comes from, and box 4 is where the pile turns into an argument. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>A critical review is <strong>not a summary of what you read. It is a reconstruction of what the field collectively knows, what bounds that knowledge, and where it stops.</strong> Five moves:</p>
+<ul>
+<li><strong>Translate the question into everybody else's vocabulary.</strong> <strong>The defensible search.</strong> Including the words you would not choose. The commonest reason a search finds nothing is that the field calls it something else.</li>
+<li><strong>Screen in stages and keep the books.</strong> <strong>The reconciling count.</strong> 1,240 to 890 to 178 to 37, with every exclusion itemised by reason. An examiner cannot check what you read; they can check whether your process could have found it.</li>
+<li><strong>Read for load, not for quality.</strong> <strong>The specification, not the verdict.</strong> A study of one site over eleven months bears "this has been observed" and does not bear "this is general". That is a spec, not a criticism.</li>
+<li><strong>Tabulate the disagreement.</strong> <strong>Conditions, not scoreboards.</strong> Twenty-one against nine looks like a divided field until you put the climate column in.</li>
+<li><strong>Write the gap as a statement about knowledge.</strong> <strong>Named reader, bounded claim.</strong> What has not been <em>measured together</em> - never what nobody has bothered to do.</li>
+</ul>
+<p><strong>The arithmetic, and why it is the spine.</strong> Three databases, <strong>1,240 records</strong>. Duplicates <strong>350</strong>, leaving <strong>890</strong>. Title and abstract screening excludes <strong>712</strong> - 402 wrong population, 208 wrong outcome, 102 not primary research - leaving <strong>178</strong>. Full-text screening excludes <strong>141</strong> - 63 no extractable failure data, 51 different component, 27 conference abstract only - leaving <strong>37 included</strong>. Every stage subtracts, every reason is named, every total reconciles. This is the difference between a review that can be interrogated and one that must be taken on trust.</p>
+<p><strong>The single most useful idea in this unit.</strong> <em>Papers that appear to contradict each other have usually answered slightly different questions.</em> Of thirty-seven studies, twenty-one found a seasonal effect and nine did not - and six of those nine ran in climates with under 400 millimetres of variation between wettest and driest quarters, where the proposed mechanism cannot operate. They did not fail to find the effect; they ran where it could not appear. Two more used a different failure definition. That leaves <strong>one</strong> genuine unexplained disagreement, and one is a number you can think hard about. The table did not resolve the conflict by choosing a side. It showed that most of the conflict was never there.</p>
+<p><strong>On reading the paper with four hundred citations.</strong> Go and find its limitations, which its own authors almost certainly stated in their methods section, plainly, because they knew exactly what they were. Every study is bounded - not some studies, all of them, including the ones that turned out to be right. Noticing this is not disrespect and it is not cleverness. It is the moment you stop being a reader of the literature and start being a participant in it, and the people who wrote those papers would recognise the shift immediately.</p>
+<p><strong>An honest boundary.</strong> This produces a defensible synthesis of what you were able to find. It does not guarantee you found everything - no search does, and reviews are superseded routinely by people who searched a term nobody had thought of. It does not settle which papers are correct; it establishes what each can support. And it does not replace your supervisor's knowledge of the field, which is precisely the thing they have and you are building.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Tendai is reviewing the literature for a study on <strong>corrosion under pipe supports</strong> in a coastal processing plant. Her problem is the opposite of Adaeze's.</p>
+<table>
+<tr><th>Item</th><th>Detail</th></tr>
+<tr><td>Her search</td><td>Three databases, her four search-term groups, no date restriction</td></tr>
+<tr><td>What it returned</td><td><strong>11 records.</strong> After duplicates and screening: <strong>4 studies</strong></td></tr>
+<tr><td>What she concluded</td><td>"This is a genuine gap - almost nobody has studied this"</td></tr>
+<tr><td>Her supervisor's response</td><td>"Show me your search terms." Nothing else</td></tr>
+<tr><td>Her terms for the phenomenon</td><td>"corrosion under pipe supports", "support corrosion", "pipe support degradation"</td></tr>
+<tr><td>What she has not tried</td><td>She has not looked at how the inspection and integrity literature names this. A colleague mentions in passing that the inspectors at her plant call it something else entirely</td></tr>
+<tr><td>Time remaining</td><td>Five weeks to submit the review chapter</td></tr>
+</table>
+<ol>
+<li><strong>Read the supervisor's response.</strong> They asked one question and said nothing else. What are they telling her, and why did they not just say it?</li>
+<li><strong>Diagnose the 11.</strong> Give the two possible explanations for a search returning almost nothing, and say how she can tell which one she is in.</li>
+<li><strong>The vocabulary test.</strong> Describe exactly what she should do next, and what evidence would show her the search was the problem rather than the field.</li>
+<li><strong>Suppose she runs it again and gets 340 records, of which 6 survive screening.</strong> She now has ten studies rather than four. Is there still a gap? Answer carefully.</li>
+<li><strong>Write the gap statement</strong> for her, in the form box 5 requires - about knowledge, not about people.</li>
+<li><strong>The honest note.</strong> What must her review say about the search itself?</li>
+</ol>
+<p>Work it before you turn over. The point of this one is that "nothing has been written" is a finding about your search before it is a finding about the world.</p>
+<details><summary>Compare your thinking - one way through</summary>
+<div class="reveal-content">
+<p><strong>1. The supervisor's question.</strong> They are telling her that a claim of "almost nothing exists" is a claim about her search first and the world second - and they asked rather than told because if they simply hand her the missing term, she learns a word. If she finds it herself, she learns the check, and she will run it for the rest of her career. It is a small kindness that looks like a brush-off.</p>
+<p><strong>2. The two explanations.</strong> Either the phenomenon genuinely has little published work, or <em>her search is not speaking the field's language</em>. The way to tell them apart: a genuinely unstudied phenomenon usually still returns adjacent work - the same component, the same mechanism, a different context. A very low return count like eleven records, especially if the results lack adjacent work, is more likely a vocabulary signal than a scarcity signal.</p>
+<p><strong>3. The vocabulary test.</strong> Go and ask the inspectors what they call it, then read the reference lists of the four papers she does have and note which terms <em>they</em> use in their own literature sections. Add the terms and re-run. <strong>The evidence that her search was the problem is a large jump in returns from a term she was not using</strong> - which is exactly what happens: the integrity and inspection literature has a standard name for this, and it was not among her three.</p>
+<p><strong>4. Is there still a gap? Yes - and it is a better one.</strong> This is the part worth slowing down for. Ten studies is not "well covered"; it is thin, and thin is a legitimate finding. But the gap has changed shape entirely. Before, she would have written "this has not been studied", which was false and would have been dismantled in the viva by anybody who knew the other term. Now she can write something true and much stronger: the phenomenon <em>is</em> recognised in the integrity literature, and the specific thing she is asking has not been examined within it. <strong>A gap you find after searching properly is defensible. A gap you find because you searched narrowly is a trap with your name on it.</strong></p>
+<p><strong>5. The gap statement.</strong> "Corrosion at pipe support interfaces is established in the inspection and integrity literature, where detection difficulty and support geometry are both recognised as contributing factors. The available studies are predominantly from temperate industrial settings; coastal marine-aerosol environments are represented in six of the located studies, none of which report time-to-detection alongside support geometry at the same installation."</p>
+<p><strong>6. The honest note.</strong> Her review must state that an initial search using operations vocabulary returned eleven records and that the term used by the integrity literature was added subsequently. That is not an embarrassing confession. It is a reviewer telling the reader how the evidence base was assembled - and it quietly demonstrates the exact competence the chapter is being assessed for.</p>
+</div>
+</details>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Watch for the traps &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The method is sound. A few traps catch almost everyone applying it for the first time. Glance through these before you trust your own draft.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Reading a low return count as a finding before checking the vocabulary.</strong> A search that returns almost nothing is usually a translation problem, not a scarcity finding. Test the words before you claim the gap.</p>
+<p>&bull; <strong>Reading a paper for a verdict instead of what it can bear.</strong> Say what a study establishes and what it does not, in operational language - not &quot;weak&quot; or &quot;strong&quot;.</p>
+<p>&bull; <strong>Reading disagreement as a scoreboard.</strong> Twenty-one against nine looks divided until the conditions are tabulated. Most apparent disagreement is a boundary condition once the table exists.</p>
+<p>&bull; <strong>Skipping the reconciling count.</strong> A search whose exclusions are not itemised and counted is a claim nobody can check, however careful the reading behind it was.</p>
+</div>
+</details>
+<hr>
+<p><strong>What you can do now that you could not before.</strong> Build a search somebody else could repeat and audit. Screen in stages with counts that reconcile. Read a paper for the load it can bear rather than for a verdict on its authors. Resolve an apparent contradiction by tabulating conditions. And write a gap that survives an examiner who knows a paper you missed.</p>
+<p>Adaeze's thirty-seven papers were never in conflict. Twelve months of confusion resolved into one real disagreement and a boundary condition - and the boundary condition turned out to be the most interesting thing in the chapter.</p>
+<p><strong>None of those thirty-seven authors wrote for each other, and none of them wrote for you.</strong> They wrote for their own question, in their own decade, with their own constraints. Putting them in the same room is your work, and it is work - which is why it felt like a pile of bricks. It was.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You've worked the whole problem.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

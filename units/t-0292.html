@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I cannot afford a full spare for everything - so how many units do I buy, when the job only needs most of them running?</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>I cannot afford a full spare for everything - so how many units do I buy, when the job only needs most of them running?</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>It is four in the morning on a contract broiler farm outside Greytown, and you are standing at the end of House 2 listening to three fans where there should be four.</p>
+<p>The house holds <strong>22,000 birds</strong>. Four extraction fans move the heat out. On an ordinary day three of them would be enough - the house needs about three-quarters of its designed airflow to hold temperature - but this is late January, and by eleven o'clock it will be thirty-four degrees. You have until then.</p>
+<p>The fan that stopped is the third one this summer. Each time you have got away with it: Sipho, your brother-in-law, who fitted them, has come out and cleared it in a couple of hours. You know that one day he will not be reachable, or it will be two fans, and the house will go over temperature with the whole flock inside it. That is not a maintenance problem - it is the farm's entire income, because the placement contract is the farm's entire income.</p>
+<p>So you have two quotes on the bonnet of the bakkie.</p>
+<p>One is for a <strong>second big fan</strong>, sized to carry the whole house on its own if everything else stops: <strong>R95,000</strong>, and it needs a new opening cut in the gable and its own starter. It is the answer that feels like an answer. A proper spare.</p>
+<p>The other is Sipho's, written in pencil on the back of a delivery note: <strong>one more of the small fans you already have, R14,000</strong>, into the space that is already there.</p>
+<p>You cannot see how the cheap one could possibly be the better buy. It is a seventh of the price, it is the same fan that has already stopped three times this summer, and it cannot carry the house alone. And yet Sipho, who is not given to talking nonsense about equipment, says it is the one he would fit. You have no way to decide between them except which quote frightens you less, and you are about to spend money you do not have on the more frightening one.</p>
+<blockquote><h2>The job does not need every fan - it needs most of them. So how many do I buy, and how would I know that a fifth small fan beats a second big one?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> R95,000 against R14,000, four fans of which three must run, a flock of 22,000 and a January morning coming. Write down which quote you would sign and why - your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the five answers, and what each one does with "three of the four"</summary>
+<div class="reveal-content">
+<p>&bull; <strong>"Buy the big fan - a spare should be able to carry the job alone."</strong> The instinct almost everybody has, and it is buying a full duplicate for a job that never asked for one. It is also the answer that is easiest to defend afterwards, which is part of why it gets bought.</p>
+<p>&bull; <strong>"Fix the reliability of the fans you have - service them properly."</strong> Right and worth doing, and it does not answer the question in front of you: even well-serviced fans stop, and the house still needs three of them at eleven o'clock.</p>
+<p>&bull; <strong>"Buy the cheap fan because it is cheap."</strong> It may well be the right answer and this is not a reason - it is the same reasoning as the first bullet with the sign flipped, and it will not survive the first bad morning.</p>
+<p>&bull; <strong>"Put in an alarm and a standby generator."</strong> Both good ideas addressing different failures - being told about a problem is not the same as having the airflow. Neither one makes the third fan run.</p>
+<p>&bull; <strong>"Ask Sipho - he knows the fans."</strong> Sensible, and he has already told you, and you cannot follow advice you cannot check. On something that costs a flock if it is wrong, "he said so" is not enough for either of you.</p>
+<p>&bull; What the first five miss is the shape of the actual requirement. This house does not need <em>all</em> its fans and it does not need <em>one</em> fan that can do everything - <strong>it needs at least three of however many you have.</strong> That "at least three of" is the whole design question, and it has an arithmetic: adding one more ordinary unit to a group does not just add its own reliability, it adds <em>every new way the group can still be good enough</em>. Which is why the cheap fan can beat the expensive one, and why you can prove it before you sign either quote.</p>
+</div>
+</details>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>Here is the method run start to finish on House 2, with the numbers off the two quotes and the maintenance book.</p>
+<p><strong>Step 1 - State the requirement as "at least k of n", and be honest about k.</strong> Not "the fans must work" but: <em>on a hot day the house needs at least <strong>3</strong> of its <strong>4</strong> fans running</em>. Mpumi Sibiya checks the k rather than assuming it - the airflow table from the shed supplier says three fans hold the house to thirty-four degrees outside, and four are specified for the design day of thirty-eight. So k is 3 on the day that matters, and the question is what n should be.</p>
+<p><strong>Step 2 - Put one reliability figure on one unit, for the period that matters.</strong> The period is <strong>a hot day</strong> - the thing you are trying to survive. The maintenance book shows the four fans stopping between them about 12 times over the last three summers, across roughly 150 hot days: that is about 3 stops per fan in 150 days, so a single fan gets through a hot day about 147 times in 150. <strong>R = 0.92</strong> per fan per hot day, and its chance of stopping is 0.08. One figure, one unit, one period - and it is the same fan in both quotes, which is what makes the comparison fair.</p>
+<p><strong>Step 3 - Count the ways the group is still good enough, and add them up.</strong> With four fans needing three, there are exactly two ways to be all right: all four run, or exactly one stops. All four: 0.92 x 0.92 x 0.92 x 0.92 = 0.7164. Exactly one stops - and here is the step people get wrong - there are <strong>four different fans that could be the one that stops</strong>, so it is 4 x (0.92 x 0.92 x 0.92 x 0.08) = 4 x 0.0623 = 0.2492. Add them: <strong>0.9656</strong>. Today's house gets through a hot day about 96.6 times in 100, which is <strong>one bad day in 29</strong> - and in a summer with fifty hot days, that is not a comfortable place to be standing at four in the morning.</p>
+<p><strong>Step 4 - Redo the count for each option you are being asked to pay for.</strong></p>
+<p><em>Sipho's quote - a fifth small fan, still needing three.</em> Now there are three ways to be all right: all five run (0.92<sup>5</sup> = 0.6591), exactly one stops (5 ways: 5 x 0.92<sup>4</sup> x 0.08 = 0.2866), or exactly two stop (there are 10 ways for two of five to be the ones: 10 x 0.92<sup>3</sup> x 0.08 x 0.08 = 0.0498). Total <strong>0.9955</strong> - <strong>one bad day in 221</strong>.</p>
+<p><em>The R95,000 quote - a second big fan that can carry the house alone.</em> The house is fine if the big fan runs, or if it stops but three of the original four still run. Being generous to the expensive option and giving the big fan the same 0.92: it fails 0.08 of the time, and in those cases the old group carries the house 0.9656 of the time. So 0.92 + (0.08 x 0.9656) = <strong>0.9972</strong>... and Mpumi checks that against the honest version, because the big fan needs a new gable opening and its own starter, neither of which exists yet, and a brand-new installation in its first summer is not a 0.92. At 0.85 for the first season it comes to 0.85 + (0.15 x 0.9656) = 0.9948 - <strong>slightly worse than the fifth small fan, for nearly seven times the money.</strong></p>
+<table>
+<tr><th>Option</th><th>Cost</th><th>Chance the house holds on a hot day</th><th>Roughly</th></tr>
+<tr><td>Today - 4 fans, need 3</td><td>-</td><td>0.9656</td><td>one bad day in 29</td></tr>
+<tr><td><strong>Fifth small fan</strong></td><td><strong>R14,000</strong></td><td><strong>0.9955</strong></td><td><strong>one bad day in 221</strong></td></tr>
+<tr><td>Second big fan (first season)</td><td>R95,000</td><td>0.9948</td><td>one bad day in 194</td></tr>
+<tr><td>Sixth small fan as well</td><td>R28,000</td><td>0.9995</td><td>one bad day in 1,857</td></tr>
+</table>
+<p><strong>Step 5 - Say what the arithmetic does not cover, before you sign.</strong> Two things, and Mpumi writes them on the quote. First, all of this assumes the fans fail <em>independently</em> - and they do not, if they share a supply. All five would be on the same distribution board and one tripped breaker takes the lot, which no amount of extra fans repairs; the R6,000 of separate protection matters more than the sixth fan does. Second, the count says nothing about the <em>consequence</em>: a bad day here is a house of 22,000 birds, so even one day in 221 is a number to look at squarely rather than a number to be pleased with. He fits the fifth fan and the separate protection, keeps the sixth-fan figure on the page for next year, and does not spend R95,000 - and he can show his brother-in-law exactly why the pencil quote was right.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Show me how it works &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Five moves, and the third is the one that is easy to get wrong.</p>
+<ul>
+<li><strong>1. State the requirement as "at least k of n"</strong>, and check k against something real rather than assuming it.</li>
+<li><strong>2. Put one reliability figure on one unit</strong>, for the period you are trying to survive.</li>
+<li><strong>3. Count every way the group is still good enough</strong> - all up, one down, two down - remembering how many different units could be the ones that are down.</li>
+<li><strong>4. Redo the count for each option you are being asked to buy</strong>, on the same period, and put the costs beside the answers.</li>
+<li><strong>5. Say what the count assumes</strong> - independence - and what it does not know: the consequence.</li>
+</ul>
+<p>What you have built is a <strong>partial redundancy</strong>, and its formal name is <strong>k-out-of-n</strong>: a group of <em>n</em> units where the job needs at least <em>k</em> of them. It is worth seeing that the two familiar cases are just its ends. Where <em>k</em> equals <em>n</em>, every unit is needed and the group is <em>in series</em> - one stops, everything stops, which is your fan house on a thirty-eight degree design day. Where <em>k</em> is 1, any single unit carries the job and the group is <em>in parallel</em> - the classic full spare, which is what the R95,000 quote was really buying. Everything in between is where most real plant lives, and it is the part that gets designed by instinct because it does not have an obvious picture: pumps in a station, boreholes on a scheme, generators on a bus, staff on a shift, lines in a call centre.</p>
+<p>The reason a cheap extra unit does so much is worth stating plainly, because it is the counter-intuitive part and it is not about the unit's own reliability. <strong>Adding a unit adds every new way the group can still be good enough.</strong> Going from four fans to five did not add one more chance of success - it added ten new arrangements in which two fans are down and the house still holds, and each of those was worth nothing before because two down out of four was a failure. That is why the arithmetic rewards <em>more, ordinary</em> units over <em>fewer, heroic</em> ones whenever the requirement is "most of them" rather than "all" or "any one".</p>
+<p>Where it fits: any duty carried by several like units where the job needs some but not all of them. Three limits, and the first is the one that voids the whole calculation. It assumes the units <strong>fail independently</strong> - a shared breaker, a shared fuel tank, a shared control card or a single technician means the real answer is nearer the reliability of that shared thing than to anything computed here, and the fix is to find the shared cause rather than to buy more units. It assumes every unit has the same reliability, which is a fair simplification for identical units of similar age and a poor one for a group where one is fifteen years older. And it prices the <em>chance</em>, never the <em>consequence</em>: one bad day in 221 is arithmetic, and whether that is acceptable depends on what happens on the bad day, which is a judgement a person makes and signs.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Do each task before reading its feedback, with a pencil. The counting is the skill.</p>
+<p><strong>Task 1 - Two of three (the commonest case there is).</strong> A water scheme has three identical borehole pumps and needs at least two running to meet the town's daily demand. Each pump gets through a day with R = 0.90. Compute the chance the scheme meets demand on a given day.</p>
+<details><summary>Try it yourself, then check what good looks like</summary>
+<div class="reveal-content">
+<p>Two ways to be all right. All three: 0.90 x 0.90 x 0.90 = <strong>0.729</strong>. Exactly one down - and there are <strong>3</strong> pumps that could be the one: 3 x (0.90 x 0.90 x 0.10) = 3 x 0.081 = <strong>0.243</strong>. Total = <strong>0.972</strong>. The single commonest mistake is writing 0.081 and forgetting there are three ways for one pump to be the one that is down; the answer then comes out at 0.81 and understates the scheme badly. Good answers show both terms and say how many ways each one happens.</p>
+</div>
+</details>
+<p><strong>Task 2 - The same units, a harsher requirement.</strong> The town grows and now needs <em>all three</em> pumps to meet demand. Same pumps, same R = 0.90. Compute the new figure, and say in one sentence what changed.</p>
+<details><summary>Try it yourself, then check what good looks like</summary>
+<div class="reveal-content">
+<p>Now only one arrangement is good enough - all three up: 0.90<sup>3</sup> = <strong>0.729</strong>. It fell from 0.972 to 0.729 without a single pump changing, because k went from 2 to 3 and the group became a series. Good answers name that: <strong>the requirement moved, not the equipment</strong> - which is exactly what happens to a plant as its duty creeps up, and it is why a scheme that was comfortable for years can become fragile with nothing having failed.</p>
+</div>
+</details>
+<p><strong>Task 3 - Buy the fourth pump, or the bigger one?</strong> The scheme needs two of three (back to R = 0.90 each) and has budget for one of: (a) a fourth identical pump, so it needs two of four; or (b) replacing one existing pump with a rebuilt unit at R = 0.97, still needing two of three. Compute both and say which you buy. (For (b), the three pumps no longer have the same R - count the arrangements by hand.)</p>
+<details><summary>Try it yourself, then check what good looks like</summary>
+<div class="reveal-content">
+<p>(a) Two of four: all four up = 0.6561; exactly one down, 4 ways = 4 x (0.9<sup>3</sup> x 0.1) = 0.2916; exactly two down, 6 ways = 6 x (0.9<sup>2</sup> x 0.1<sup>2</sup>) = 0.0486. Total = <strong>0.9963</strong>. (b) Pumps at 0.97, 0.90, 0.90. All three up = 0.7857; exactly one down = (0.03 x 0.9 x 0.9) + (0.97 x 0.1 x 0.9) + (0.97 x 0.9 x 0.1) = 0.0243 + 0.0873 + 0.0873 = 0.1989. Total = <strong>0.9846</strong>. <strong>Buy the fourth pump</strong> - 0.9963 against 0.9846, and it is the same lesson as the fans: an extra ordinary unit adds whole new arrangements, where a better single unit only improves the arrangements you already had. Note also that (b) had to be counted term by term because the units differ, which is worth doing once by hand so the shortcut for identical units never becomes a mystery.</p>
+</div>
+</details>
+<p><strong>Now take a group of your own</strong> - pumps, fans, generators, vehicles, tellers, boreholes, nurses on a night shift - where the job needs some but not all of them, and run the five steps.</p>
+<p><strong>Step 1.</strong> Write the requirement as "at least ___ of ___", and say where the k came from: a design table, a demand figure, a duty roster. If nobody can tell you the k, that is your first finding.</p>
+<p><strong>Step 2.</strong> One reliability figure for one unit, over the period you are trying to survive: a hot day, a shift, a peak hour, a delivery round. Take it from your own records - failures over attempts.</p>
+<p><strong>Step 3.</strong> List every arrangement that is still good enough (all up; exactly one down; exactly two down; as far as your k allows), count how many different units could be the ones that are down in each, and add them up.</p>
+<p><strong>Step 4.</strong> Redo it for each thing you might buy - one more ordinary unit, a better unit, a big spare - on the same period, and write the cost next to each answer.</p>
+<p><strong>Step 5.</strong> Before you sign: what do all these units share - a board, a tank, a supplier, one person who knows how to start them? Write that down, price fixing it, and compare that price with the next unit. Then say what a bad day actually costs, and decide whether the number you have reached is one you are willing to sign against.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>A few lines keep the count honest.</p>
+<details><summary>The traps - and how to stay true</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Forgetting how many ways a unit can be the one that is down.</strong> This is the mistake, and it is always in the same direction - it understates the group. For two of three there are three different single failures, not one. Count the arrangements, then add.</p>
+<p>&bull; <strong>The k assumed rather than checked.</strong> "Most of them" is not a number. Get k from a design table, a demand figure or a duty roster, and write down where it came from - because a k that is quietly wrong makes every figure after it wrong too.</p>
+<p>&bull; <strong>The k that moved while nobody was watching.</strong> Duty creeps up and a two-of-three becomes a three-of-three with no equipment having changed and no notice given. Re-check k whenever demand grows, and treat that as a real change to the plant.</p>
+<p>&bull; <strong>Units that are not independent.</strong> A shared breaker, tank, control card, supplier or single trained person makes the honest answer nearer that shared thing's reliability than anything you computed. Find it before you buy more units - and if it is cheap to separate, that is almost always the first money.</p>
+<p>&bull; <strong>One reliability figure spread over units that are not alike.</strong> A fifteen-year-old unit beside a new one does not have the new one's number. Either count the arrangements term by term, or use the worst unit's figure and say that you did.</p>
+<p>&bull; <strong>A full spare bought because it feels like a proper answer.</strong> Buying one unit that can carry everything is the right answer only where k is 1. Where the job needs most of them, more ordinary units usually beat one heroic one, and cost a fraction.</p>
+<p>&bull; <strong>Chance mistaken for consequence.</strong> One bad day in 221 is arithmetic. Whether that is acceptable depends on what the bad day costs, and no formula decides it - a person does, and signs.</p>
+</div>
+</details>
+<p>You stood at the end of House 2 at four in the morning with two quotes and no way to choose between them except which one frightened you less. You can decide it on a page now: three of four today is one bad day in 29; a fifth ordinary fan at R14,000 makes it one in 221; a second big fan at R95,000 makes it one in 194 in its first season, for nearly seven times the money - and the R6,000 of separate protection matters more than either, because five fans on one breaker are one fan wearing a disguise. <strong>Where the job needs most of the units rather than all or any one, an extra ordinary unit buys every new arrangement that is still good enough - which is why the cheap answer so often beats the impressive one.</strong> And the last line on the page is not arithmetic: a bad day here is a house of 22,000 birds, so one in 221 is a number to look at squarely and decide about, not a number to be pleased with. (Working with an AMU facilitator? Bring one group of units and count its arrangements together.)</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can work out how many units to buy when the job needs most of them, and prove it before you sign.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

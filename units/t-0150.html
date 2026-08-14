@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The truth walked out when the blame walked in</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The truth walked out when the blame walked in</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You are Onalenna, asset manager at Corathyl Water Treatment Works, and you are facilitating the root cause workshop after a failure that plainly involved a person. A step was missed, and a treatment batch went wrong. Everyone in the room knows which operator was on shift.</p>
+<p>And you watch the workshop turn into a trial. The moment the focus lands on the missed step, the operator goes silent and frightened. His supervisor gets defensive and protective. Fingers drift, quietly, toward the control room. And the workshop grinds to the destination these things always reach: <em>operator error - retrain the operator.</em> Written down. Closed.</p>
+<p>You know two things at once, and both are bad. The first: this fixes nothing. The procedure that let the step be missed is untouched, there is still no check that would have caught it, and the next operator - set up exactly the same way - will miss it too. The second, and worse: you have just taught everyone in that room that the safe thing to do next time is to say less. You got a culprit and lost the cause. The truth walked out of the room the moment the blame walked in.</p>
+<blockquote><h2>My RCA workshop turned into a search for someone to blame, and the instant it did, people stopped telling the truth and we landed on a "cause" that fixes nothing. How do I facilitate so the human contributions come out as system problems - safely enough that people actually speak?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> Halfway through, somebody asked who had signed the check sheet. It was a fair question — a person genuinely did miss a step. And the room changed. The operator's account got careful. The fitter who had started to say something about the procedure stopped and looked at the table. You closed with &ldquo;operator error&rdquo;, which identifies somebody and changes nothing about the confusing procedure or the missed check that made it likely. You did not set out to blame anyone. But you got a culprit and lost the cause — and you have just taught eight people that saying less is safer. Write down how you would run this room — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what you actually spent</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Be gentler — do not let it get personal.&rdquo;</strong> A tone, not a method, and tone will not survive the moment a specific action lands in the middle of the chain. Everybody in that room can feel where an inquiry is heading regardless of how kindly it is asked.</p>
+<p>&bull; <strong>&ldquo;Do not discuss what people did — stick to the equipment.&rdquo;</strong> Overcorrects into uselessness. Human actions are genuinely in the chain, and a review that cannot look at them cannot find why the step was easy to miss.</p>
+<p>&bull; <strong>&ldquo;Interview people separately so nobody is embarrassed.&rdquo;</strong> Helps a little and loses the thing a room is for — the fitter's observation only becomes useful next to the operator's account, and in private each person still does not know whether they are being investigated.</p>
+<p>&bull; <strong>&ldquo;Accept it — somebody did miss the step. That is the cause.&rdquo;</strong> It is where a blame investigation stops and where a useful one starts. Somebody missing a step is the thing to be explained, not the explanation.</p>
+<p>&bull; <strong>&ldquo;Promise no consequences for anybody.&rdquo;</strong> Well meant and not yours to promise, and a promise you cannot keep will be discovered — after which nobody will believe the next one. Accountability is not abolished here; it is <em>located elsewhere</em>.</p>
+<p>&bull; Look at what you actually spent. The immediate loss is the answer — with a name identified, the inquiry stopped at the point it should have begun, so whatever made that mistake likely is still in place and waiting for the next person. The larger loss is <strong>every future investigation</strong>, because the lesson just taught is that saying less is safer, and an organisation whose people say less goes progressively blind to its own hazards. The frame that prevents it: <strong>human error is a symptom, not a cause</strong> — when somebody errs, ask what about the procedure, the training, the design or the pressure made that error likely. And running the room that way is <strong>a learnable skill rather than a temperament</strong>, whose first move is explicit: say the purpose and the protection out loud at the start, including plainly that this is not a disciplinary process and is separate from one. People will not assume it — and <strong>the most important fact in the room is usually held by the person with most to lose by saying it</strong>. None of this is softness. It is the only arrangement that produces the information you came for.</p>
+</div>
+</details>
+<p>There is a way to run this room, and it is a facilitation skill you can learn. Here it is, on one page.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is the facilitation guide - how to keep the workshop a search for <em>why</em>, not <em>who</em>.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Why does blame cost me the truth? (the principle that sets everything)</div><p class="cb-demo">The whole technique rests on one hard fact: the moment people fear blame, they stop telling the truth - they go quiet, they cover, they stop reporting - and then the organisation goes blind to its own hazards. So a blame-free workshop is not soft; it is the only way to get the information you actually need. And the frame that makes it possible: HUMAN ERROR IS A SYMPTOM, NOT A CAUSE. When someone errs, the real question is what about the system - the procedure, the training, the design, the pressure - made that error likely. &#039;Operator error&#039; is where a blame investigation stops; it is where a good one starts.</p></div><div class="canvas-box"><div class="cb-label">2. How do I open the room so people can speak? (establish psychological safety)</div><p class="cb-demo">Say it at the start, plainly, because people will not assume it: &#039;We are here to understand WHY this happened so we can stop it happening again - not to decide who to blame. Nothing said here is being used to discipline anyone; that is a separate process, and it is not what this room is for. I need your honest account, especially if it is uncomfortable.&#039; Establishing that psychological safety explicitly, up front, is what lets the operator who missed the step - and the quiet person who saw something - actually speak. Without it, the most important fact in the room stays in the head of the most frightened person.</p></div><div class="canvas-box"><div class="cb-label">3. How do I ask so I get conditions, not confessions? (ask HOW, not WHO)</div><p class="cb-demo">The core move, from Dekker&#039;s local rationality: see it through their eyes, at the time, without hindsight. So you ask &#039;what made that the reasonable thing to do at that moment?&#039; - which explains - not &#039;why did you do that?&#039; - which accuses. And you keep steering the room onto CONDITIONS, not persons: &#039;what about the procedure, the training, the layout, the workload made this step easy to miss?&#039; The operator missed a confirmation step - so the question is not why he missed it, but why the procedure let it be missed, why there was no check, why the shift was under time pressure. Ask how and what; never who.</p></div><div class="canvas-box"><div class="cb-label">4. How do I turn a human contribution into a system fix? (surface the human factors as system issues)</div><p class="cb-demo">The workshop&#039;s output: each human-factor contribution traced to the condition behind it. The step was missed -&gt; because the procedure buries it in a wall of text with no confirmation check (fix the procedure, add the check). The operator was rushing -&gt; because the shift was short-staffed against an unrealistic schedule (fix the staffing/schedule). Nobody caught it -&gt; because there is no independent verification of that step (add one). Now the fixes are systemic and will protect the NEXT operator too - which &#039;retrain the operator&#039; never would. The person&#039;s action was the doorway; the system conditions are what you actually repair.</p></div><div class="canvas-box"><div class="cb-label">5. Where does legitimate accountability sit - and whose job is it? (just culture, not accountability-free)</div><p class="cb-demo">Blame-free does NOT mean accountability-free, and pretending otherwise would be dishonest. Just Culture distinguishes three behaviours: honest ERROR (an unintentional slip - console the person, fix the system); AT-RISK behaviour (a shortcut whose risk was not appreciated, often normalised drift - coach, and fix the conditions that made the shortcut normal); and genuinely RECKLESS disregard of a known serious risk (rare - where sanction may apply). But here is the boundary the facilitator must hold: that judgement is SEPARATE FROM and AFTER the cause analysis, and it is made by others, not by you in this workshop. Your job is the cause, not the culprit. Accountability, done right, comes from involving people in building a better system - not from blaming them for the old one.</p></div></div>
+
+<p>Notice that box 1 is a hard-nosed argument, not a soft one: blame is not avoided to be kind, it is avoided because it destroys the information you need. And notice box 5 is honest - blame-free is not accountability-free - so this is not a way to let anyone off; it is a way to find the truth first, and judge second, and never in the same room. Let us name the moves.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p>Facilitating a blame-free RCA is a skill with a spine of five moves, each a question:</p>
+<ul>
+<li><strong>Why does blame cost me the truth?</strong> Because the moment people fear blame, they conceal - they go quiet, they stop reporting - and the organisation goes blind to its own hazards. So a blame-free workshop is not soft; it is the only way to get the information you need. And the frame that makes it possible: <strong>human error is a symptom, not a cause</strong>. When someone errs, the real question is what about the system made that error likely. "Operator error" is where a blame investigation <em>stops</em>; it is where a good one <em>starts</em>.</li>
+<li><strong>How do I open the room so people can speak?</strong> Establish <strong>psychological safety</strong>, out loud, at the start - because nobody will assume it. "We are here to understand why, not to decide who to blame. Nothing said here is used to discipline anyone - that is separate. I need your honest account, especially the uncomfortable parts." That opening is what lets the frightened operator, and the quiet person who saw something, actually speak.</li>
+<li><strong>How do I ask so I get conditions, not confessions?</strong> Use <strong>local rationality</strong> (Dekker): see it through their eyes, at the time, without hindsight. Ask "what made that the reasonable thing to do at that moment?" - which explains - not "why did you do that?" - which accuses. And keep steering onto <em>conditions</em>: what about the procedure, the training, the layout, the workload made this easy to get wrong? Ask <em>how</em> and <em>what</em>; never <em>who</em>.</li>
+<li><strong>How do I turn a human contribution into a system fix?</strong> Trace each human-factor contribution to the <strong>condition</strong> behind it. The step was missed because the procedure buries it with no confirmation check; the operator rushed because the shift was short-staffed; nobody caught it because there is no independent verification. Now the fixes are systemic, and they protect the <em>next</em> operator too - which "retrain the operator" never would.</li>
+<li><strong>Where does legitimate accountability sit - and whose job is it?</strong> <strong>Just Culture</strong> is honest that blame-free is not accountability-free. It distinguishes honest <em>error</em> (console, fix the system), <em>at-risk</em> behaviour (coach, fix the conditions that made the shortcut normal), and genuinely <em>reckless</em> disregard of a known serious risk (rare, where sanction may apply). But that judgement is <em>separate from and after</em> the cause analysis, and it is made by others - not by you, in this room. Your job is the cause, not the culprit.</li>
+</ul>
+<p>One honest boundary. You are the <em>facilitator</em> - neutral, drawing out the truth, keeping the room on conditions rather than persons. You are not the judge and not the disciplinary authority. Blame-free is not accountability-free, but the analysis of cause is deliberately separated from any question of discipline, which is decided later and by others. And "human error" is where the investigation <em>starts</em>, never where it ends.</p>
+<p>Does it scale? An aviation safety investigation is deliberately protected from blame - its findings kept apart from any prosecution - precisely so that everyone tells the whole truth; the moment such an investigation becomes a courtroom, the truth it needs disappears, and so does the safety it was meant to buy.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>A scenario for your workshop: a technician reset a tripped protection device to get a pump running again, without carrying out the check the procedure requires before a reset. Weeks later, that protection failed to operate when it was genuinely needed. The technician is in the room, and he is anxious.</p>
+<ol>
+<li><strong>Open it.</strong> Write one opening line that establishes psychological safety for this workshop.</li>
+<li><strong>Rewrite the question.</strong> Turn the blaming question "why didn't you do the check?" into a local-rationality question that would actually explain the reset.</li>
+<li><strong>Find the system.</strong> Name one systemic condition the workshop should surface behind the technician's action - something that made skipping the check the reasonable-feeling thing to do.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> in step 2, if your rewritten question still contains the word "you" as the subject of the problem, try again - "what made the reset seem right at the time, given the pressure to restore the pump?" opens the door; "why did you skip it?" slams it. The grammar is not cosmetic; it decides whether he tells you the truth.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-why_blame_destroys">1. Why does blame cost me the truth? (the principle that sets everything)</label><textarea id="cb-why_blame_destroys" data-key="t-0150:why_blame_destroys" placeholder="Start from why this matters: blame makes people conceal, and then you never find the real cause. The workshop&#039;s job is to learn, and learning needs safety. Human error is a symptom, not a verdict."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-open_safety">2. How do I open the room so people can speak? (establish psychological safety)</label><textarea id="cb-open_safety" data-key="t-0150:open_safety" placeholder="Open the workshop by making it safe out loud: this is about learning, not judging; the cause analysis is separated from any question of discipline; every account is protected."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-ask_how">3. How do I ask so I get conditions, not confessions? (ask HOW, not WHO)</label><textarea id="cb-ask_how" data-key="t-0150:ask_how" placeholder="Use local rationality: ask what made the action reasonable at the time, and what about the system made the error likely - never &#039;why did you do that?&#039;, which judges and shuts people down."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-surface_system">4. How do I turn a human contribution into a system fix? (surface the human factors as system issues)</label><textarea id="cb-surface_system" data-key="t-0150:surface_system" placeholder="Trace each human-factor contribution to its systemic condition, so the fixes land on the system - where they actually prevent recurrence - not on the person."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-just_culture">5. Where does legitimate accountability sit - and whose job is it? (just culture, not accountability-free)</label><textarea id="cb-just_culture" data-key="t-0150:just_culture" placeholder="Be honest that blame-free is not accountability-free: distinguish honest error, at-risk drift, and genuine recklessness - but that judgement is made after, by others, not by the facilitator in the room."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When it reads true, <strong>download or save it</strong> - it is yours. You can now run a room after a human-involved failure and come out with the truth and a system fix, instead of a scapegoat and a recurrence.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Blame-free facilitation fails in a handful of ways, and each one lets the blame - or the hindsight - back into the room.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Landing on "operator error, retrain".</strong> The blame terminus that fixes nothing. Human error is the doorway to the investigation, not its conclusion - always ask what made the error likely.</p>
+<p>&bull; <strong>Asking "why did you" questions.</strong> They judge, and they shut people down. Ask what made the action reasonable at the time, and what about the conditions made it likely - how and what, not who.</p>
+<p>&bull; <strong>Hindsight bias.</strong> Condemning a decision that looked reasonable in the moment using knowledge the person did not have. Judge the action by what was knowable then, through their eyes, not yours now.</p>
+<p>&bull; <strong>Mixing cause with discipline.</strong> If the room believes the analysis feeds a punishment, it will go silent. Separate the two explicitly - the workshop finds why; any accountability question is elsewhere and later.</p>
+<p>&bull; <strong>Treating blame-free as no accountability.</strong> It is not. Honest error, at-risk drift and genuine recklessness are handled differently - but that judgement is a separate process, not the facilitator's job in the workshop.</p>
+<p>&bull; <strong>The facilitator taking sides.</strong> The moment you become the judge, you stop being the person the room can be honest with. Stay neutral; your loyalty is to the truth and the fix.</p>
+<p>&bull; <strong>Stopping at the human action.</strong> The person's action is where you begin digging, not where you stop. If the workshop ends at "he missed the step", it has found a symptom and called it a cause.</p>
+</div>
+</details>
+<p>Onalenna's workshop found a culprit and lost the cause, and taught a roomful of people to say less. Now she can run it the other way: make the room safe out loud, ask what made the action reasonable rather than why the person did it, trace every human contribution to the system condition behind it, and keep the question of accountability separate, later, and someone else's. Blame ends an investigation with a name; a blame-free one ends it with a fix - and only the second one stops the failure coming back. If you are working with an AMU Facilitator, take one real human-involved failure and rewrite its blaming questions into ones people could actually answer.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can find the cause without hunting a culprit now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The depth of the conversation</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The depth of the conversation</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>You engaged your stakeholders. You sent the memo. You held the meeting. You called it consultation. And it went worse than if you had said nothing at all.</p>
+<p>The powerful party you merely informed blocked you late, when it was expensive to stop. The affected community you did not think to include organised against you. And the people you "consulted" on a decision that was already locked can see exactly what happened - you asked, you listened to none of it, you changed nothing - and now they trust nothing you say. You treated everyone the same, at the wrong depth, and you offered a conversation you never intended to have.</p>
+<blockquote><h2>I engaged everyone - so why did it breed resistance and mistrust instead of buy-in? How deeply should I involve each stakeholder, and which conversations must be real?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> You engaged everybody. The valve supplier sat through two workshops about a decision that affects him barely at all, and has stopped returning calls. And the outstation crew — whose shifts the change actually rewrites — were consulted three weeks after the roster was signed off. One of them said to you afterwards, without any anger, that they were asked, nothing they said was used, and nothing changed. He was right. Now the safety briefing you gave last week is being repeated back to you with a shrug. Write down how deeply you should involve each party — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and what the level you offer actually is</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Engage even more next time.&rdquo;</strong> More of what produced this. The supplier does not want more involvement and the crew do not want a longer version of being asked after the fact.</p>
+<p>&bull; <strong>&ldquo;Consult earlier.&rdquo;</strong> Half the answer and the important half — and applied uniformly it still drags the supplier into workshops he has no stake in, and treats a decision that genuinely was fixed as though it were open.</p>
+<p>&bull; <strong>&ldquo;Stop consulting on locked decisions — just announce them.&rdquo;</strong> Honest and better than the pretence, and it gives up something real where the decision genuinely is open and the crew know things you do not.</p>
+<p>&bull; <strong>&ldquo;Explain that their input was considered but could not be used.&rdquo;</strong> It was not considered — the roster was signed. Saying otherwise now compounds the original problem, and they can already see exactly what happened.</p>
+<p>&bull; <strong>&ldquo;They are being oversensitive.&rdquo;</strong> He was not angry, and he was accurate. The shrug at your safety briefing is what it cost, and it will be there next time too.</p>
+<p>&bull; Un-learn the idea that engagement is <strong>a volume dial you turn up for everyone.</strong> Treating a low-stake party as a co-owner wastes their time; treating a deeply affected group as a distant supplier breeds exactly the resistance you were trying to avoid. <strong>The craft is not to engage more but to engage each party at the right depth.</strong> And depth is not settled by what is useful to you: <strong>the depth of conversation somebody is owed is proportional to the stake they hold in the outcome</strong> — the greater the impact on them, the deeper it must be — because this is a matter of respect for the people whose work and lives the decision touches before it is a tool for getting a decision through. So the question is never only how to get this through, but <strong>what depth each person here deserves, and whether you can keep the promise you are about to make.</strong> That is the discipline the whole thing rests on: <strong>the level you offer is a promise.</strong> Asking for views on something already decided is not a lesser consultation — it is a promise broken in public, and it costs more than never asking, which is precisely why your safety briefing now gets a shrug.</p>
+</div>
+</details>
+<p>There is no single best depth of engagement - more is not always better, and the level you offer is a promise. Let us learn to choose it.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you compare the strategies for engaging stakeholders and choose the right one - reading the spectrum of engagement depth, placing each stakeholder, and matching the depth of the conversation to what they hold and what they are owed.</p>
+<p>One thing to hold from the start, because it decides everything else. Engagement is not only a tool for project success. It is a matter of respect for the people whose lives, work, and world the decision touches. So the question is never just "how do I get this through?" but "what depth of conversation does each person here deserve, and can I keep the promise I am about to make?"</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. No single best depth - more is not always better</div><p class="cb-demo">The first thing to un-learn is that engagement is a VOLUME DIAL you turn up for everyone. It is not. Engaging a low-stake supplier as if they were a co-owner wastes everyone&#039;s time; engaging a deeply affected community as if they were a distant supplier breeds exactly the resistance you were trying to avoid. THE CRAFT IS NOT &#039;ENGAGE MORE&#039; BUT &#039;ENGAGE EACH PARTY AT THE RIGHT DEPTH&#039;. And the depth is not only a question of what is useful to you: THE DEPTH OF ENGAGEMENT A PERSON IS OWED IS PROPORTIONAL TO THE STAKE THEY HOLD IN THE OUTCOME. THE GREATER THE IMPACT ON THEM, THE DEEPER THE CONVERSATION MUST BE. Engagement is a matter of respect before it is a tool for getting a decision through.</p></div><div class="canvas-box"><div class="cb-label">2. The spectrum - from inform to empower</div><p class="cb-demo">The strategies form a LADDER OF INCREASING STAKEHOLDER INFLUENCE, and it is worth naming each rung honestly. INFORM: one-way - you tell them what is happening; fast and clear, but gathers no input and builds no ownership. CONSULT: you ask and they respond, but you still make the decision; input, but shallow ownership, and only if the ask is genuine. INVOLVE: a real two-way exchange in which the stakeholders are part of the process and their concerns visibly shape it, though you hold the final decision. COLLABORATE: joint problem-solving and shared decision-making - you decide together; deep buy-in and better decisions, but slow, and you give up sole control. EMPOWER: you delegate the decision itself on a defined matter - maximum ownership, but you must be able to live with what they decide. EACH STEP UP BUYS MORE LEGITIMACY, BUY-IN AND INFORMATION; EACH COSTS MORE TIME, CONTROL, AND A GENUINE SHARING OF INFLUENCE. There is no free depth.</p></div><div class="canvas-box"><div class="cb-label">3. Place each stakeholder - power, interest, impact</div><p class="cb-demo">You choose the depth for a given party by reading THREE things. Their POWER over the matter - can they stop it, fund it, veto it, or make it work? Their INTEREST OR STAKE - how much do they care, and how ready are they to engage? And the IMPACT OF THE DECISION ON THEM - how much does it touch their work, their safety, their lives? A low-power, low-interest party may need only informing. A high-power, high-interest KEY PLAYER needs involving, collaborating or empowering, or they will use their power against you late. And a LOW-POWER BUT DEEPLY AFFECTED PARTY - the community downstream, the crew whose daily work changes - is OWED A REAL VOICE BY THE IMPACT ALONE, even though they cannot veto anything. ENGAGEMENT IS NOT ONLY A TOOL FOR PROJECT SUCCESS. IT IS A MATTER OF RESPECT FOR THE PEOPLE WHOSE LIVES, WORK, AND WORLD THE DECISION TOUCHES.</p></div><div class="canvas-box"><div class="cb-label">4. Choose the depth - and keep the promise</div><p class="cb-demo">Here is the line that separates honest engagement from its poisonous imitation: ONLY EVER OFFER THE LEVEL OF INFLUENCE YOU CAN GENUINELY HONOUR. HONESTY ABOUT THE LEVEL OF INFLUENCE ON OFFER IS THE FOUNDATION OF TRUST. NEVER OFFER A CONSULTATION YOU DO NOT INTEND TO HONOUR. If a decision is already made - fixed by a safety regulation, a legal duty, a hard constraint - you may INFORM (&#039;this part is not open for change, and here is why&#039;), and people can respect that. What you may not do is stage a CONSULTATION on it: ask for views you will ignore, run the meeting, and change nothing. THIS IS SHAM CONSULTATION, and it is the most corrosive move in the whole craft. People see it instantly. It converts every future engagement into theatre, because they now assume every ask is fake. A REAL INFORM IS MORE RESPECTFUL THAN A FAKE CONSULT.</p></div><div class="canvas-box"><div class="cb-label">5. Differentiate and sequence - and record it</div><p class="cb-demo">A seasoned engagement plan almost never sits at one level. It DIFFERENTIATES: COLLABORATE with the party who will make or break the work and holds the know-how, genuinely INVOLVE the deeply-affected-but-less-powerful, CONSULT the powerful-but-distant honestly, INFORM the low-stake. And it SEQUENCES: you can start by informing and deepen to involving as a party&#039;s stake grows or trust builds - ENGAGEMENT CAN CLIMB THE LADDER OVER TIME. And it keeps a simple RECORD of who is being engaged at what depth, so promises are visible and kept and no one is quietly dropped. Match the depth of the conversation to what each stakeholder holds and is owed - and keep every promise you make.</p></div></div>
+
+<p>Box 2 is the spectrum you choose from. Box 3 is how you place each stakeholder. Box 4 is the choice - and the promise. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>The level of engagement you offer is a promise. A consultation you ignore is a lie.</strong> Choose the right depth of engagement for each stakeholder, and never promise a level of influence you do not intend to give. Five questions:</p>
+<ul>
+<li><strong>Is there a best depth of engagement?</strong> <strong>No - more is not always better.</strong> The right depth depends on the stakeholder and the decision; engaging everyone deeply wastes time and trust as surely as engaging no one.</li>
+<li><strong>What are my choices?</strong> <strong>The spectrum: inform, consult, involve, collaborate, empower.</strong> Each step up buys more buy-in and better information and costs more time and a real handing-over of influence.</li>
+<li><strong>How do I place each stakeholder?</strong> <strong>Power, interest, and impact.</strong> How much power they hold over the matter, how much stake or interest they have in it, and how deeply the decision touches their lives.</li>
+<li><strong>How do I choose the depth?</strong> <strong>Match it - and keep the promise.</strong> Offer only the level of influence you can genuinely honour; if the matter is fixed, inform honestly - do not stage a consultation you will ignore.</li>
+<li><strong>What does the mature version look like?</strong> <strong>Differentiate and sequence.</strong> Different depths for different parties, deepening over time where it earns its keep, and a record of who is engaged how.</li>
+</ul>
+<p><strong>No single best depth - more is not always better.</strong> The first thing to un-learn is that engagement is a volume dial you turn up for everyone. It is not. Engaging a low-stake supplier as if they were a co-owner wastes everyone's time; engaging a deeply affected community as if they were a distant supplier breeds exactly the resistance you were trying to avoid. The craft is not "engage more" but "engage each party at the right depth". And the depth is not only a question of what is useful to you: <strong>the depth of engagement a person is owed is proportional to the stake they hold in the outcome. The greater the impact on them, the deeper the conversation must be.</strong></p>
+<p><strong>The spectrum - from inform to empower.</strong> The strategies form a ladder of increasing stakeholder influence, and it is worth naming each rung honestly. <em>Inform:</em> one-way - you tell them what is happening. Fast and clear, but it gathers no input and builds no ownership. <em>Consult:</em> you ask, and they respond, but you still make the decision. It gathers input, but only shallow ownership - and only if the ask is genuine. <em>Involve:</em> a real two-way exchange in which the stakeholders are part of the process and their concerns visibly shape it, though you still hold the final decision. <em>Collaborate:</em> joint problem-solving and shared decision-making - you decide together. Deep buy-in and better decisions, but slow, and you give up sole control. <em>Empower:</em> you delegate the decision itself on a defined matter - maximum ownership, but you must be able to live with what they decide. Each step up the ladder buys more legitimacy, more buy-in, and more of the information only they hold; each step costs more time, more control, and a genuine sharing of influence. There is no free depth.</p>
+<p><strong>Place each stakeholder - power, interest, impact.</strong> You choose the depth for a given party by reading three things. Their <em>power</em> over the matter - can they stop it, fund it, veto it, or make it work? Their <em>interest or stake</em> - how much do they care, and how ready are they to engage? And the <em>impact of the decision on them</em> - how much does it touch their work, their safety, their lives? A low-power, low-interest party may need only informing. A high-power, high-interest key player needs involving, collaborating, or empowering, or they will use their power against you late. And a low-power but deeply affected party - the community downstream, the crew whose daily work changes - is owed a real voice by the impact alone, even though they cannot veto anything. <strong>Engagement is not only a tool for project success. It is a matter of respect for the people whose lives, work, and world the decision touches.</strong></p>
+<p><strong>Choose the depth - and keep the promise.</strong> Here is the line that separates honest engagement from its poisonous imitation: only ever offer the level of influence you can genuinely honour. <strong>Honesty about the level of influence on offer is the foundation of trust. Never offer a consultation you do not intend to honour.</strong> If a decision is already made - fixed by a safety regulation, a legal duty, a hard constraint - you may <em>inform</em> ("this part is not open for change, and here is why"), and people can respect that. What you may not do is stage a <em>consultation</em> on it: ask for views you will ignore, run the meeting, and change nothing. This is sham consultation, and it is the most corrosive move in the whole craft. People see it instantly. It converts every future engagement into theatre, because they now assume every ask is fake. A real inform is more respectful than a fake consult.</p>
+<p><strong>The mature version is to differentiate and sequence.</strong> A seasoned engagement plan almost never sits at one level. It <em>differentiates</em>: collaborate with the party who will make or break the work and holds the know-how, genuinely involve the deeply-affected-but-less-powerful, consult the powerful-but-distant honestly, inform the low-stake. And it <em>sequences</em>: you can start by informing and deepen to involving as a party's stake grows or trust builds - engagement can climb the ladder over time. And it keeps a simple record of who is being engaged at what depth, so promises are visible and kept and no one is quietly dropped.</p>
+<p>Does it scale? This is how you handle any decision that touches other people - a team reorganisation, a change at home, a community project. Ask not "how do I get everyone on board?" but "who is affected, how much, and how much say can I honestly give each of them?" - then match the depth of the conversation to the stake, and never offer a voice you will not listen to. People forgive a hard decision honestly explained far sooner than they forgive being asked and ignored.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Onalenna is planning a change at Corathyl that touches three very different parties. Your job is to choose a different engagement depth for each - proving the craft is matching the depth, not engaging everyone the same.</p>
+<p><strong>Party A - the client's finance manager.</strong> Holds real power (can approve or withhold the funding) but little day-to-day interest in how the plant runs; wants to know it is under control and on budget.</p>
+<p><strong>Party B - the allotment growers downstream.</strong> Have almost no formal power over the decision, but the change affects the water they depend on every day. Deeply affected; easily overlooked.</p>
+<p><strong>Party C - a chemical-dosing limit fixed by a safety regulation.</strong> This element is not open to change - the law sets it, and it is non-negotiable for safety.</p>
+<ol>
+<li><strong>Place each party.</strong> For A, B and C, name the power, the interest/stake, and the impact on them.</li>
+<li><strong>Choose a depth and justify it.</strong> Pick a rung on the spectrum for each and say why.</li>
+<li><strong>Name the inform-not-consult.</strong> Identify the one where you must inform honestly rather than stage a consultation, and say why a fake consult there would be worse than a plain inform.</li>
+<li><strong>Spot the failure.</strong> Describe what goes wrong if you engage all three at the same depth - either all merely informed, or all "consulted".</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the placements: <em>A</em> is high-power, low-interest, low personal impact. <em>B</em> is low-power, high-stake, high impact - the classic overlooked party. <em>C</em> is not a person to engage at all on the substance; it is a fixed constraint.</p>
+<p>Second, the depths: <em>A</em> - <strong>consult</strong> honestly (keep them satisfied: bring them the plan, ask their view on cost and risk, and mean it) - deep involvement would waste a busy manager's time and they do not want it. <em>B</em> - <strong>involve</strong> genuinely: they cannot veto, but the impact on their daily lives means they are owed a real voice that visibly shapes the plan; anything less breeds justified resistance. (Collaborate is defensible if you can truly share the decision; inform alone is not, given the impact.)</p>
+<p>Third, the inform-not-consult: <em>C</em> - <strong>inform</strong> honestly. "This dosing limit is set by safety regulation and cannot change; here is why." Staging a consultation on a legally fixed limit would be a lie - you would be asking for views you cannot act on, and when nothing changed, people would conclude every other consultation was theatre too. A plain, honest inform respects them; a fake consult insults them.</p>
+<p>Fourth, the failure: if you engage all three the same, you fail both ways. Inform everyone, and B mobilises against you (ignored despite being deeply affected) and A blocks you late (never properly asked). "Consult" everyone, and you waste A's time, you stage a fake consult on C that poisons your credibility, and unless B's involvement is real, they see through it too. Engaging everyone at one depth is the original mistake dressed as diligence.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-no_single_best_depth">1. No single best depth - more is not always better</label><textarea id="cb-no_single_best_depth" data-key="t-0243:no_single_best_depth" placeholder="Engagement is not a volume dial you turn up for everyone. Engaging a low-stake supplier as if they co-own the decision wastes everyone&#039;s time; engaging a deeply affected community as if they were a distant supplier breeds the resistance you were trying to avoid. The craft is not &#039;engage more&#039; but &#039;engage each party at the RIGHT depth&#039;. And the depth is not only about what is useful to you: a person is owed depth in proportion to the stake they hold."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-the_spectrum">2. The spectrum - from inform to empower</label><textarea id="cb-the_spectrum" data-key="t-0243:the_spectrum" placeholder="The strategies form a ladder of rising stakeholder influence. INFORM: one-way, you tell them (fast, but no input, no ownership). CONSULT: you ask, they respond, you still decide (input, shallow ownership - only if genuine). INVOLVE: real two-way, their concerns visibly shape it, you hold the decision. COLLABORATE: shared decision-making, you decide together (deep buy-in, but slow, shared control). EMPOWER: you delegate the decision on a defined matter (maximum ownership; you must live with the result). Each step up buys buy-in and information; each costs time and a real handing-over of influence."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-place_the_stakeholder">3. Place each stakeholder - power, interest, impact</label><textarea id="cb-place_the_stakeholder" data-key="t-0243:place_the_stakeholder" placeholder="Choose the depth for each party by reading three things. POWER over the matter - can they stop it, fund it, veto it, or make it work? INTEREST or stake - how much do they care and how ready are they to engage? IMPACT of the decision on them - how much does it touch their work, safety, lives? Low-power, low-interest may need only informing. A high-power, high-interest key player needs the deeper levels or they use their power against you late. A low-power but deeply affected party is owed a real voice by the impact alone."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-choose_and_keep_the_promise">4. Choose the depth - and keep the promise</label><textarea id="cb-choose_and_keep_the_promise" data-key="t-0243:choose_and_keep_the_promise" placeholder="Only ever offer the level of influence you can genuinely honour. If a decision is already made - fixed by a safety regulation, a legal duty, a hard constraint - you may INFORM (&#039;this is not open for change, and here is why&#039;), and people can respect that. What you may NOT do is stage a CONSULTATION on it: ask for views you will ignore and change nothing. That is sham consultation, the most corrosive move in the craft - people see it instantly and it turns every future engagement into theatre. A real inform is more respectful than a fake consult."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-differentiate_and_sequence">5. Differentiate and sequence - and record it</label><textarea id="cb-differentiate_and_sequence" data-key="t-0243:differentiate_and_sequence" placeholder="A seasoned engagement plan almost never sits at one level. It DIFFERENTIATES: collaborate with the party who will make or break the work and holds the know-how, genuinely involve the deeply-affected-but-less-powerful, consult the powerful-but-distant honestly, inform the low-stake. And it SEQUENCES: start by informing and deepen to involving as a party&#039;s stake grows or trust builds - engagement can climb the ladder over time. Keep a simple record of who is engaged at what depth, so promises stay visible and kept and no one is quietly dropped."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you can place each stakeholder and choose a depth you can honestly keep - deep where it is owed, honest where it is fixed - <strong>save it</strong>. You can now match the conversation to the stakeholder, and keep every promise you make.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>The level of engagement you offer is a promise, and a consultation you ignore is a lie - so match the depth of the conversation to what each stakeholder holds and is owed, and never offer a voice you will not listen to.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Engaging everyone the same.</strong> One depth for all parties fails at both ends. Differentiate: match the depth to each stakeholder's power, stake and the impact on them.</p>
+<p>&bull; <strong>Believing more is always better.</strong> Deep engagement with a low-stake party wastes time and goodwill. Depth is a choice, not a virtue to maximise.</p>
+<p>&bull; <strong>Sham consultation.</strong> Asking for views on a decision already made is the most corrosive move in the craft. If it is fixed, inform honestly - a real inform beats a fake consult every time.</p>
+<p>&bull; <strong>Ignoring the affected-but-powerless.</strong> A party with no veto but a deep stake is owed a real voice by the impact alone. Overlook them and you earn justified, organised resistance.</p>
+<p>&bull; <strong>Over-empowering what you cannot let go.</strong> Do not delegate a decision you will have to overrule. Only offer empower or collaborate where you can genuinely live with the outcome.</p>
+<p>&bull; <strong>Promising a depth you cannot keep.</strong> The level you offer is a promise. If you cannot honour "involve", offer "consult" honestly rather than fake the deeper level.</p>
+<p>&bull; <strong>Treating stakeholders only as risks.</strong> People are owed a voice proportional to how the decision touches their lives, not merely managed for the project's benefit. Engagement is respect before it is tactics.</p>
+<p>&bull; <strong>Not recording who is engaged how.</strong> Undocumented promises get quietly dropped. Keep a simple record of each party's engagement depth so the promises stay visible and kept.</p>
+</div>
+</details>
+<p>You engaged everyone and it went badly because you engaged them all the same and promised more than you meant. Now you can choose. Place each stakeholder by power, stake and impact; pick a depth on the spectrum you can honestly keep - collaborate where the work will be made or broken, involve where people are deeply affected, consult where you truly want the view, inform where the matter is fixed; and never, ever stage a consultation you will ignore. <strong>The level of engagement you offer is a promise - so match the depth of the conversation to what each stakeholder holds and is owed, and keep every promise you make.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can choose a stakeholder-engagement strategy now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>

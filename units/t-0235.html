@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The stage you are in</title>
+<style>
+/* --- AMU BRAND FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&family=Poppins:ital,wght@0,400;1,400&family=Roboto:wght@400&display=swap');
+
+        /* --- AMU BRAND PALETTE & CORE STYLES --- */
+        :root {
+            --amu-navy: #0A2F5C;
+            --amu-white: #FFFFFF;
+            --amu-slate: #5D7290;
+            --amu-sky: #D9E6F2;
+            --amu-charcoal: #2F2F2F;
+            --amu-highlight-bg: #D9E6F2; /* Lighter sky for highlights */
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font: 17px/1.65 'Open Sans', sans-serif;
+            color: var(--amu-charcoal);
+            background: var(--amu-white);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .wrap {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 16px 20px 72px;
+        }
+
+        /* --- AMU READER TEMPLATE: HEADER & FOOTER --- */
+        .amu-header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 12px 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .amu-header .header-content {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amu-wordmark .wordmark-main {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .amu-wordmark .wordmark-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+        #amu-progress {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .amu-footer {
+            background: var(--amu-sky);
+            color: var(--amu-slate);
+            padding: 16px 20px;
+            text-align: center;
+            font: 14px 'Roboto', sans-serif;
+        }
+
+        /* --- AMU TYPOGRAPHY & BASE ELEMENTS --- */
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--amu-navy);
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 26px;
+            line-height: 1.25;
+            margin: .5em 0 .5em;
+        }
+        h2 {
+            font-size: 21px;
+            margin: .2em 0 .5em;
+        }
+        p, ul, ol, blockquote {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+        strong {
+            font-weight: 600;
+            color: var(--amu-navy);
+        }
+        blockquote {
+            border-left: 4px solid var(--amu-slate);
+            margin: 1.5em 0;
+            padding: .1em 0 .1em 20px;
+            color: var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+        }
+        blockquote h2 { /* Keep heading inside quote styled as heading */
+             font-family: 'Montserrat', sans-serif;
+             font-style: normal;
+             color: var(--amu-navy);
+             margin: .1em 0;
+             font-size: 20px;
+        }
+        blockquote strong { /* Strong inside quote remains navy */
+            color: var(--amu-navy);
+            font-style: normal;
+        }
+
+        /* --- CARE NOTE (F-035, 2026-08-09): a unit whose material is heavy opens with a note of
+           care and a real route to support. It must NOT read as a decorative quotation - a learner
+           who mistakes it for one may skip it, defeating its whole purpose (Mission Guardian
+           finding, this batch). Plain upright text on the sky ground, gently set apart. The note's
+           single canonical home is the unit's free-material.md, carrying class="care-note"; the
+           renderer refuses to build a unit that has a content-warning file and no such note. --- */
+        blockquote.care-note {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 14px 18px;
+            color: var(--amu-charcoal);
+            font-family: 'Poppins', sans-serif;
+            font-style: normal;
+        }
+        blockquote.care-note p:last-child { margin-bottom: 0; }
+
+        /* --- INTERLUDE (W-26, 2026-08-01): a short atmospheric bridge between two units in a
+           module's sequence, marking a setting/register/persona crossing. Deliberately quieter
+           than a unit page - no card, no gate, no worked solution - just the AMU shell either
+           side of a slower, italic passage the learner is meant to pause on. --- */
+        .interlude {
+            max-width: 620px;
+            margin: 3em auto;
+            padding: 1.6em 0;
+            border-top: 1px solid var(--amu-sky);
+            border-bottom: 1px solid var(--amu-sky);
+        }
+        .interlude-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--amu-slate);
+            margin: 0 0 1em;
+        }
+        .interlude p {
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            color: var(--amu-charcoal);
+            line-height: 1.75;
+        }
+
+        /* --- CORE BEHAVIOUR (UNCHANGED) --- */
+        .step {
+            animation: fade .25s ease;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--amu-sky);
+        }
+        .btn {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            transition: filter 0.2s;
+        }
+        .btn:hover {
+            filter: brightness(1.15);
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--amu-navy);
+        }
+        .btn.ghost:hover {
+            background: var(--amu-highlight-bg);
+            filter: none;
+        }
+        .done {
+            color: var(--amu-slate);
+            font: 14px/1.4 'Roboto', sans-serif;
+        }
+
+        /* --- FEATURE STYLES (RE-BRANDED) --- */
+
+        /* Learner Goal Input (M1) */
+        .goal-setter {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .goal-setter label {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .goal-setter .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--amu-white);
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 4px 12px;
+            max-width: 220px;
+        }
+        .goal-setter .currency-symbol {
+            font-family: 'Roboto', sans-serif;
+            color: var(--amu-slate);
+            font-size: 16px;
+            padding-right: 6px;
+        }
+        .goal-setter input[type="number"] {
+            border: none;
+            background: transparent;
+            font: 600 18px/1.4 'Roboto', sans-serif;
+            color: var(--amu-charcoal);
+            padding: 8px 0;
+            width: 100%;
+            -moz-appearance: textfield;
+        }
+        .goal-setter input[type="number"]::-webkit-outer-spin-button,
+        .goal-setter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Bank Statement Card (M2, M3) */
+        .bank-statement {
+            max-width: 540px;
+            margin: 1.5em auto;
+            border: 1px solid var(--amu-slate);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .09);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .bank-statement .header {
+            background: var(--amu-navy);
+            color: var(--amu-white);
+            padding: 15px 18px;
+        }
+        .bank-statement .header .account-name {
+            font-size: 12px;
+            opacity: .85;
+            letter-spacing: .03em;
+        }
+        .bank-statement .header .balance-label {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 10px;
+        }
+        .bank-statement .header .balance-amount {
+            font-size: 27px;
+            font-weight: 600;
+            letter-spacing: -.01em;
+        }
+        .bank-statement .header .balance-cents {
+            font-size: 18px;
+            opacity: .8;
+        }
+        .bank-statement .body {
+            background: var(--amu-white);
+        }
+        .bank-statement .section-header {
+            padding: 9px 16px;
+            font-size: 11px;
+            color: var(--amu-slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: var(--amu-sky);
+        }
+        .bank-statement .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 10px 16px;
+            border-top: 1px solid var(--amu-sky);
+            transition: background-color 0.5s ease-in-out; /* For highlighter */
+        }
+        .bank-statement .transaction.highlight {
+            background-color: var(--amu-highlight-bg);
+        }
+        .bank-statement .transaction .desc {
+            color: var(--amu-charcoal);
+        }
+        .bank-statement .transaction .date {
+            color: var(--amu-slate);
+            display: inline-block;
+            width: 26px;
+        }
+        .bank-statement .transaction .amount {
+            font-variant-numeric: tabular-nums;
+            color: var(--amu-charcoal);
+            white-space: nowrap;
+        }
+        .bank-statement .money-in {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--amu-sky);
+            background: var(--amu-highlight-bg);
+        }
+        .bank-statement .money-in .desc {
+            color: var(--amu-navy);
+        }
+        .bank-statement .money-in .amount {
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Yardstick & Scratchpad (M2) */
+        .yardstick-prompt, .scratchpad {
+            margin: 1.5em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .yardstick-prompt label, .scratchpad label {
+            font: 600 16px/1.3 'Open Sans', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .yardstick-prompt textarea, .scratchpad textarea {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font: 16px/1.6 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            resize: vertical;
+        }
+        .yardstick-prompt textarea { min-height: 80px; }
+        .scratchpad textarea { min-height: 120px; }
+        .yardstick-prompt textarea:focus, .scratchpad textarea:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* Hint Widget (M2) */
+        .hintbox {
+            margin: 1.4em 0;
+        }
+        .hintbtn {
+            font: 600 15px/1.3 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            color: var(--amu-navy);
+            border: 1.5px solid var(--amu-navy);
+            border-radius: 999px;
+            padding: 11px 18px;
+            cursor: pointer;
+        }
+        .hintbtn:hover {
+            background: var(--amu-highlight-bg);
+        }
+        .hint {
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 2px 16px;
+            margin: 10px 0;
+            font: 16px/1.6 'Open Sans', sans-serif;
+        }
+
+        /* Gated Reveals (M3.5) */
+        details {
+            margin: 1em 0;
+            background: var(--amu-sky);
+            border: 1px solid var(--amu-sky);
+            border-radius: 10px;
+            padding: 4px 18px;
+        }
+        details[open] {
+            padding-bottom: 12px;
+        }
+        summary {
+            cursor: pointer;
+            color: var(--amu-navy);
+            font-weight: 600;
+            font-family: 'Open Sans', sans-serif;
+            padding: 12px 0;
+            transition: filter 0.2s;
+        }
+        summary::marker {
+            color: var(--amu-navy);
+        }
+        summary:hover {
+            filter: brightness(1.15);
+        }
+        .reveal-content {
+            font-family: 'Open Sans', sans-serif;
+            border-top: 1px solid var(--amu-slate);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* Recalled Goal (M4) */
+        .recalled-goal-box {
+            background: var(--amu-sky);
+            border-left: 4px solid var(--amu-navy);
+            padding: 12px 20px;
+            margin: 1.5em 0;
+            font-family: 'Open Sans', sans-serif;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* --- Receipt / Slip Pile (M3.5) — classes, no inline styles (brand-lint) --- */
+        .slip-pile {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        .slip {
+            background: var(--amu-white);
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            flex-basis: 220px;
+        }
+        .slip.printed {
+            border: 1px dashed var(--amu-slate);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .slip.handwritten {
+            border: 1px solid var(--amu-slate);
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .slip .slip-source {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .slip .slip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .slip .slip-item { flex-grow: 1; text-align: left; }
+        .slip .slip-amount { font-weight: 600; }
+        .slip:nth-child(2n) { transform: rotate(1.5deg); }
+        .slip:nth-child(3n) { transform: rotate(-2deg); }
+        .slip:nth-child(4n) { transform: rotate(1.1deg); }
+        .slip:nth-child(5n) { transform: rotate(-1.2deg); }
+        .slip:nth-child(7n) { transform: rotate(2.2deg); }
+
+        /* Highlighter reveal (M3) — utility classes replacing inline styles */
+        .m3-reveal-btn { margin-bottom: 1.5em; }
+        .m3-statement-slot { margin-top: 1em; }
+
+        /* --- Money-facts pile (M2, net-worth units): mixed cards the learner sorts --- */
+        .factpile { display: flex; flex-direction: column; gap: 10px; margin: 1.5em auto; max-width: 540px; }
+        .fact { background: var(--amu-white); border: 1px solid var(--amu-sky); border-left: 4px solid var(--amu-slate); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .fact .fact-form { font: 600 11px/1.2 'Roboto', sans-serif; color: var(--amu-slate); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .fact .fact-line { font: 15px/1.45 'Open Sans', sans-serif; color: var(--amu-charcoal); }
+
+        /* --- Net-worth worked solution (M3): own, owe, and the result --- */
+        .networth { margin: 1.5em 0; }
+        .nw-col { border: 1px solid var(--amu-sky); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+        .nw-col .nw-head { font: 600 13px/1.2 'Open Sans', sans-serif; color: var(--amu-navy); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+        .nw-col ul { list-style: none; margin: 0 0 8px; padding: 0; }
+        .nw-col li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--amu-sky); font-family: 'Roboto', sans-serif; font-size: 15px; }
+        .nw-col .nw-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .nw-col .nw-sub { text-align: right; font-family: 'Roboto', sans-serif; color: var(--amu-slate); }
+        .nw-result { background: var(--amu-navy); color: var(--amu-white); border-radius: 10px; padding: 14px 18px; text-align: center; font: 600 18px/1.45 'Roboto', sans-serif; }
+        .nw-result strong { color: var(--amu-white); }
+
+        /* Goal-setter optional text field (e.g. naming an asset) */
+        .goal-setter .goal-text {
+            width: 100%;
+            border: 1px solid var(--amu-slate);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: 16px/1.5 'Open Sans', sans-serif;
+            background: var(--amu-white);
+            margin-bottom: 14px;
+        }
+        .goal-setter .goal-text:focus {
+            outline: 2px solid var(--amu-navy);
+            outline-offset: 2px;
+            border-color: var(--amu-navy);
+        }
+
+        /* --- Feedback / Ubuntu give-back loop (end of every unit) --- */
+        .amu-feedback { margin: 2.5em 0 0; padding: 20px; background: var(--amu-sky); border-radius: 12px; }
+        .amu-feedback h3 { margin: 0 0 2px; font-family: 'Montserrat', sans-serif; color: var(--amu-navy); font-weight: 400; font-size: 19px; }
+        .amu-feedback .fb-ethos { font-family: 'Poppins', sans-serif; font-style: italic; color: var(--amu-slate); margin: 0 0 16px; }
+        .amu-feedback .fb-channel { margin-bottom: 14px; }
+        .amu-feedback .fb-channel label { display: block; font: 600 15px/1.4 'Open Sans', sans-serif; color: var(--amu-charcoal); margin-bottom: 6px; }
+        .amu-feedback textarea { width: 100%; min-height: 60px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 10px 12px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; }
+        .amu-feedback textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .amu-feedback .fb-privacy { font: 13px/1.5 'Roboto', sans-serif; color: var(--amu-slate); margin: 4px 0 14px; }
+        .amu-feedback .fb-thanks { font: 600 16px/1.5 'Open Sans', sans-serif; color: var(--amu-navy); margin: 0; }
+
+        /* cCanvas - the Technique fill-in tool (display + interactive); brand-lint-safe (classes only) */
+        .canvas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+        .canvas-box { border: 1px solid var(--amu-slate); border-radius: 10px; padding: 12px 14px; background: var(--amu-white); display: flex; flex-direction: column; }
+        .canvas-box .cb-label { font: 600 14px/1.35 'Montserrat', sans-serif; color: var(--amu-navy); margin-bottom: 8px; }
+        .canvas-box .cb-demo { font: 15px/1.55 'Open Sans', sans-serif; color: var(--amu-charcoal); margin: 0; }
+        .canvas-display .canvas-box { border-left: 3px solid var(--amu-navy); }
+        .canvas-box textarea { width: 100%; min-height: 84px; border: 1px solid var(--amu-slate); border-radius: 8px; padding: 9px 11px; font: 15px/1.5 'Open Sans', sans-serif; background: var(--amu-white); resize: vertical; flex: 1; }
+        .canvas-box textarea:focus { outline: 2px solid var(--amu-navy); outline-offset: 2px; border-color: var(--amu-navy); }
+        .canvas-actions { margin: 6px 0 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .canvas-saved { font: 13px/1.4 'Roboto', sans-serif; color: var(--amu-slate); }
+        .canvas-privacy { font: 13px/1.45 'Roboto', sans-serif; color: var(--amu-slate); margin: 2px 0 0; flex-basis: 100%; }
+        @media print {
+          .amu-header, .amu-footer, #amu-progress, .nav, .hintbox, .amu-feedback, .yardstick-prompt, .scratchpad, .canvas-actions { display: none !important; }
+          .step[hidden] { display: none !important; }
+          .canvas { grid-template-columns: repeat(2, 1fr); }
+          .canvas-box { break-inside: avoid; }
+          /* Print as a proud artefact, not a worksheet: textareas render as plain text */
+          .canvas-box textarea { border: none; background: none; padding: 0; margin: 0; min-height: 0; resize: none; color: var(--amu-charcoal); font-family: 'Open Sans', sans-serif; }
+          .canvas-box textarea:focus { outline: none; }
+        }
+
+</style>
+</head>
+<body>
+<header class="amu-header"><div class="header-content"><div class="amu-wordmark"><span class="wordmark-main">AMU</span><span class="wordmark-sub">Asset Management University</span></div><span id="amu-progress">Step 1 of 5</span></div></header>
+
+<main class="wrap">
+<h1>The stage you are in</h1>
+
+<section class="step" id="step-0">
+<h2>T1: The Ache</h2>
+<p>Your business is alive because of you. Customers are happy, money is coming in, the work is good. By every outside measure it is working - and yet you are drowning. Every decision, every problem, every customer runs through you; you cannot take a day off without it all quietly stopping; and the harder you push to grow, the more the whole thing strains at the seams.</p>
+<p>Here is why. You are trying to grow a business that has no shape beyond you - and the work that got you here is not the work that will get you to the next stage. What you need is not more effort. It is to know exactly where your business is, so you can do the one thing that stage actually requires.</p>
+<blockquote><h2>My business works, but everything runs through me, I cannot step away, and pushing harder to grow only strains it more. Where is my business actually, and what should I be doing?</h2></blockquote>
+<p><strong>Before you read on, decide.</strong> The business works. Customers are happy, the money comes in, and you are good at what you do. You are also the only person who can quote a job, the only one who knows which suppliers to trust, and the only one who can settle a customer when something goes wrong. You have not had a full week off in <strong>two years</strong>, and when your daughter was ill you worked from the hospital car park. Last quarter you pushed hard for growth — took on more work, tried to hire — and everything strained: quality slipped, you worked later, and you pulled back. The harder you push, the more it strains. Write down what you would do — your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare — the five answers, and the two markers that place you</summary>
+<div class="reveal-content">
+<p>&bull; <strong>&ldquo;Work harder and push through it.&rdquo;</strong> You have just run that experiment and it strained the whole thing. <strong>Effort applied to the wrong stage's work tightens the constraint</strong> rather than releasing it, because the constraint <em>is</em> you.</p>
+<p>&bull; <strong>&ldquo;Hire somebody to take the load.&rdquo;</strong> You tried, and notice why it did not stick: there is nothing for a new person to step into. Everything they would need — how you quote, which suppliers, what good looks like — exists only in your head.</p>
+<p>&bull; <strong>&ldquo;Get more customers — growth solves everything.&rdquo;</strong> More demand through a channel that is already at its limit. Every additional customer arrives at the same single point, which is the thing already breaking.</p>
+<p>&bull; <strong>&ldquo;Buy a system — software will sort it out.&rdquo;</strong> A tool can hold a process and cannot invent one. Software over an undefined way of working digitises the dependency on you.</p>
+<p>&bull; <strong>&ldquo;Accept it — this is what running your own business is.&rdquo;</strong> Widely believed, and it is the belief that keeps a business at one person's size forever, including on the days you cannot be there.</p>
+<p>&bull; The diagnosis is not effort: <strong>the work that got you here is not the work that gets you to the next stage.</strong> Businesses move through three stages, and they are not about size or age but about <strong>two things you can read today</strong> — whether the revenue is consistent, and what you actually spend your time on. Those two markers place you, and the point is not a label: <strong>each stage has one job, and knowing yours gives you permission to stop doing everything and do the thing that matters now.</strong> In the first, income is unpredictable and the founder does absolutely everything — not a failure, the beginning — and the single job is to find a <strong>repeatable</strong> way to win and serve a customer, not to grow or hire or build systems. In the second, income is steadier and <strong>the founder becomes the constraint</strong>; the job is to build the shape, so the thing can run without one person holding every thread. Only in the third is growing the work. <strong>Almost every growth problem is a founder doing the wrong stage's job</strong> — and yours is the second stage's job being skipped while you attempt the third's.</p>
+</div>
+</details>
+<p>There are three stages, and each has a different job. Let us find yours.</p>
+<div class="nav"><span></span><button type="button" class="btn" onclick="amuNext()">Show me &#9656;</button></div>
+</section>
+
+<section class="step" id="step-1" hidden>
+<h2>T2: The Tool in Action</h2>
+<p>This is how you find out which stage your business is in - survival, stability, or scale - and do the one job that stage requires, instead of the wrong stage's work.</p>
+
+<div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">1. Three stages, three jobs - placed by two markers</div><p class="cb-demo">A business grows through THREE STAGES, and they are not about size or age but about TWO SIMPLE THINGS you can read today: IS THE REVENUE CONSISTENT? and WHAT IS THE FOUNDER ACTUALLY DOING? Those two markers place you. And the point of placing yourself is NOT a label - it is that EACH STAGE HAS ONE CLEAR JOB, and KNOWING YOUR STAGE GIVES YOU PERMISSION TO STOP DOING EVERYTHING AND START DOING THE ONE THING THAT MATTERS NOW. The three stages are Survival, Stability and Scale, and almost every growth problem you will ever have is really a founder doing the wrong stage&#039;s work - so the whole technique is to name your stage honestly and do its job, not the exciting next stage&#039;s job and not the last stage&#039;s.</p></div><div class="canvas-box"><div class="cb-label">2. Stage one - Survival: reach consistent income</div><p class="cb-demo">STAGE ONE, SURVIVAL: the revenue is UNPREDICTABLE - a good month, then a lean one - and the founder does ABSOLUTELY EVERYTHING: sells, delivers, invoices, fixes, cleans up. This is where every business starts, and IT IS NOT A FAILURE; IT IS THE BEGINNING. The one job of this stage is singular and clear: REACH CONSISTENT INCOME by finding a REPEATABLE way to win and serve a customer. NOT to grow big, NOT to hire, NOT to build systems - just to find the repeatable sale that turns the lean months into steady ones. EVERYTHING ELSE IS A DISTRACTION UNTIL THE INCOME IS CONSISTENT. A founder in survival who spends time on org charts, branding polish or hiring plans is doing the wrong stage&#039;s work; the only question that matters here is how to make the next sale, and the one after that, reliably.</p></div><div class="canvas-box"><div class="cb-label">3. Stage two - Stability: document and delegate</div><p class="cb-demo">STAGE TWO, STABILITY: the revenue is now steady and reliable - and a NEW, QUIETER PROBLEM has appeared: YOU ARE THE BOTTLENECK. Every job, every decision, every customer still runs through you; the business is really A DEMANDING JOB THAT YOU HAPPEN TO OWN, and it cannot grow beyond your own two hands and finite hours. The job of this stage is to DOCUMENT AND DELEGATE - to get the work out of your head and onto paper so someone else can do it to your standard. And hear this clearly: IF YOU ARE THE BOTTLENECK, IT IS BECAUSE YOU DO GOOD WORK AND PEOPLE TRUST YOU. THE BUSINESS IS ALIVE BECAUSE OF YOU. BUT A BUSINESS THAT DEPENDS ON ONE PERSON CANNOT GROW, AND IT CANNOT GIVE THAT PERSON A REST. THE JOB NOW IS NOT TO WORK HARDER, BUT TO BUILD A SYSTEM THAT CAN DO YOUR GOOD WORK EVEN WHEN YOU ARE NOT THERE. THIS IS HOW YOU BUILD SOMETHING THAT LASTS. (The how of documenting and delegating is its own craft - that is where the systemisation work begins.)</p></div><div class="canvas-box"><div class="cb-label">4. Stage three - Scale: work on the business, not only in it</div><p class="cb-demo">STAGE THREE, SCALE: the systems are documented and OTHER PEOPLE DO THE WORK RELIABLY, so the founder steps OUT of doing and INTO directing - working ON the business (its strategy, its growth, its direction) rather than only IN it (delivering the day-to-day). The DEFINING TEST of this stage is simple: GROWTH NO LONGER REQUIRES MORE OF THE FOUNDER&#039;S HOURS, because the business can add customers without adding you. This is a GENUINELY DIFFERENT KIND OF WORK - less doing, more building and deciding - and it ONLY BECOMES POSSIBLE ONCE THE DOCUMENTING-AND-DELEGATING OF STABILITY HAS ACTUALLY BEEN DONE. You cannot skip stability and leap to scale; the work of getting out of the bottleneck is exactly what makes scale possible, which is why the order of the stages cannot be cheated.</p></div><div class="canvas-box"><div class="cb-label">5. Diagnose, do the right job, and choose</div><p class="cb-demo">Place yourself PLAINLY: inconsistent revenue and you-do-everything is SURVIVAL; consistent revenue but everything-still-runs-through-you is STABILITY; documented systems and you-work-on-not-in is SCALE. Then do THAT stage&#039;s job - because the TWO CLASSIC WAYS BUSINESSES COME TO GRIEF are both a founder doing the wrong stage&#039;s work. THE FIRST MISTAKE IS TRYING TO SCALE BEFORE YOU ARE STABLE: pouring on marketing and taking on more while the business still runs entirely through you and has no repeatable system - YOU DO NOT SCALE A BUSINESS, YOU SCALE THE CHAOS, AND IT BREAKS (how good businesses collapse from too much success, not too little). THE SECOND MISTAKE IS STAYING THE BOTTLENECK FOREVER: never documenting, never delegating, so you remain the central processor of everything - you have not built a business, you have built yourself THE MOST DEMANDING JOB YOU WILL EVER HAVE. And then choose, deliberately: THE GOAL IS TO CHOOSE YOUR STAGE DELIBERATELY, NOT TO BE TRAPPED IN ONE BY ACCIDENT. A STABLE BUSINESS THAT GIVES YOU THE LIFE YOU WANT IS A SUCCESS. IT IS NOT A FAILURE TO SCALE. Not every founder wants the work of scale, and choosing a stable business on purpose is wisdom, not a lack of ambition.</p></div></div>
+
+<p>Boxes 2 to 4 are the three stages and their jobs. Box 5 is how you place yourself and avoid the two great mistakes. Let us name the ideas.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Walk me through it &#9656;</button></div>
+</section>
+
+<section class="step" id="step-2" hidden>
+<h2>T3: The Blueprint</h2>
+<p><strong>Almost every growth problem is a founder doing the wrong stage's work - so name your stage, do its job, and choose your destination.</strong> Five questions:</p>
+<ul>
+<li><strong>How many stages, and how do I tell them apart?</strong> <strong>Three - read by two markers.</strong> Is the revenue consistent, and what is the founder doing? Those two answers place you.</li>
+<li><strong>Stage one?</strong> <strong>Survival.</strong> Inconsistent revenue, founder does everything. The one job: reach consistent income through a repeatable sale.</li>
+<li><strong>Stage two?</strong> <strong>Stability.</strong> Consistent revenue, but the founder is the bottleneck. The job: document and delegate - get the work out of your head and hands.</li>
+<li><strong>Stage three?</strong> <strong>Scale.</strong> Systems documented, others do the work, founder works on the business not only in it. Growth no longer needs more of your hours.</li>
+<li><strong>So what do I do?</strong> <strong>Do your stage's job - and choose.</strong> Avoid the two mistakes; and decide deliberately whether you even want to scale, because staying stable is a real success.</li>
+</ul>
+<p><strong>Three stages, three jobs - placed by two honest markers.</strong> A business grows through three stages, and they are not about size or age but about two simple things you can read today: <em>is the revenue consistent?</em> and <em>what is the founder actually doing?</em> Those two markers place you, and the point of placing yourself is not a label - it is that each stage has one clear job, and knowing your stage gives you permission to stop doing everything and start doing the one thing that matters now.</p>
+<p><strong>Stage one - Survival: reach consistent income.</strong> In survival, the revenue is unpredictable - a good month, then a lean one - and the founder does absolutely everything: sells, delivers, invoices, fixes, cleans up. This is where every business starts, and it is not a failure; it is the beginning. The one job of this stage is singular and clear: <strong>reach consistent income</strong> by finding a repeatable way to win and serve a customer. Not to grow big, not to hire, not to build systems - just to find the repeatable sale that turns the lean months into steady ones. Everything else is a distraction until the income is consistent.</p>
+<p><strong>Stage two - Stability: document and delegate.</strong> Now the revenue is steady and reliable - and a new, quieter problem has appeared: <em>you are the bottleneck</em>. Every job, every decision, every customer still runs through you; the business is really a demanding job that you happen to own, and it cannot grow beyond your own two hands and finite hours. The job of this stage is to <strong>document and delegate</strong> - to get the work out of your head and onto paper so someone else can do it to your standard. And this is the moment to hear something clearly: <strong>if you are the bottleneck, it is because you do good work and people trust you. The business is alive because of you. But a business that depends on one person cannot grow, and it cannot give that person a rest. The job now is not to work harder, but to build a system that can do your good work even when you are not there. This is how you build something that lasts.</strong> (The how of documenting and delegating is its own craft - that is where the systemisation work begins.)</p>
+<p><strong>Stage three - Scale: work on the business, not only in it.</strong> In scale, the systems are documented and other people do the work reliably, so the founder steps out of doing and into <em>directing</em> - working <strong>on</strong> the business (its strategy, its growth, its direction) rather than only <strong>in</strong> it (delivering the day-to-day). The defining test of this stage is simple: growth no longer requires more of the founder's hours, because the business can add customers without adding you. This is a genuinely different kind of work, and it only becomes possible once the documenting-and-delegating of stability has actually been done.</p>
+<p><strong>Diagnose honestly, do the right job, and avoid the two great mistakes.</strong> Place yourself plainly: inconsistent revenue and you-do-everything is <em>survival</em>; consistent revenue but everything-still-runs-through-you is <em>stability</em>; documented systems and you-work-on-not-in is <em>scale</em>. Then do <em>that</em> stage's job - because the two classic ways businesses come to grief are both a founder doing the wrong stage's work. <strong>The first mistake is trying to scale before you are stable</strong>: pouring on marketing and taking on more work while the business still runs entirely through you and has no repeatable system - you do not scale a business, you scale the <em>chaos</em>, and it breaks. That is how good businesses collapse from too much success, not too little. <strong>The second mistake is staying the bottleneck forever</strong>: never documenting, never delegating, so you remain the central processor of everything - and you have not built a business, you have built yourself the most demanding job you will ever have, one that cannot grow and cannot run without you. And then the choice that must be made deliberately, not by drift: <strong>the goal is to choose your stage deliberately, not to be trapped in one by accident. A stable business that gives you the life you want is a success. It is not a failure to scale.</strong> Not every founder wants teams and systems and the work of scale; a stable business that pays you well and gives you a life you love is a genuine success, and choosing it on purpose is wisdom, not a lack of ambition.</p>
+<p>Does it scale? This is how any effort matures - a project, a team, a career, a cause. Read where you honestly are by a couple of plain markers, resist the pull to do the exciting next-stage work before the current stage's job is done, and know that the founder's - or the leader's - long-run task is usually to build something that can run without them. The most common reason things break is not too little effort but effort aimed at the wrong stage; name the stage, do its job, and you stop straining against a problem that was never the real one.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Now my turn &#9656;</button></div>
+</section>
+
+<section class="step" id="step-3" hidden>
+<h2>T4: Your Turn</h2>
+<p>Here is your situation. A founder runs a small cleaning-services business. She has clawed her way to a consistent <strong>R40,000 a month</strong> in regular contracts - the income is now steady and reliable. But she still personally does or checks every clean, writes every quote, handles every complaint, and works every hour; she has not had a proper week off in two years, and when she was ill last month, income dropped. She is thinking of spending on advertising to "grow".</p>
+<ol>
+<li><strong>Diagnose the stage.</strong> Using the two markers (revenue consistency, founder's role), which stage is she in?</li>
+<li><strong>Name the one job.</strong> What is the single most important job for her now, and what transition does it set up?</li>
+<li><strong>Spot the risk.</strong> Which of the two classic mistakes is she at risk of making, and why?</li>
+<li><strong>Scale or stay?</strong> Should she aim to scale, or deliberately choose to stay a stable business? Justify either - both can be right.</li>
+</ol>
+<p><strong>The test of a real answer:</strong> four things.</p>
+<p>First, the stage: <strong>Stability</strong> - the revenue is consistent (the survival job is done), but everything still runs through her, which is the signature of the bottleneck.</p>
+<p>Second, the one job: <strong>document and delegate</strong> - write down how a clean is done to her standard, and get someone else doing it reliably - which is the transition that makes either scaling or a real rest possible. Working harder is not the job; building the system is.</p>
+<p>Third, the risk: the <strong>scale-before-stable mistake</strong> - spending on advertising to grow while she is still the bottleneck would win her more work than she can personally deliver, and she would scale the chaos and break. She must fix the bottleneck <em>before</em> she pours on demand.</p>
+<p>Fourth, scale or stay: either is legitimate. A strong answer might have her <em>delegate and stay stable</em> (build a small reliable team so she can take a proper week off and keep a good living she runs herself) <em>or</em> <em>delegate and then scale</em> (systemise so the business grows without her hours) - but in <em>both</em> the immediate job is the same: get out of the bottleneck. The mark of a real answer is that it treats staying stable as a genuine, respectable choice, not a consolation prize.</p>
+
+<div class="canvas-interactive"><div class="canvas" role="group" aria-label="Your own canvas to fill in"><div class="canvas-box"><label class="cb-label" for="cb-three_stages_three_jobs">1. Three stages, three jobs - placed by two markers</label><textarea id="cb-three_stages_three_jobs" data-key="t-0235:three_stages_three_jobs" placeholder="A business grows through three stages - and they are not about size or age but about two things you can read today: is the revenue consistent, and what is the founder actually doing? Those two markers place you. The point of placing yourself is not a label; it is that each stage has one clear job, and knowing your stage gives you permission to stop doing everything and start doing the one thing that matters now."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-survival">2. Stage one - Survival: reach consistent income</label><textarea id="cb-survival" data-key="t-0235:survival" placeholder="In survival, revenue is unpredictable - a good month, then a lean one - and the founder does everything: sells, delivers, invoices, fixes. This is where every business starts, and it is not a failure - it is the beginning. The one job: reach consistent income by finding a repeatable way to win and serve a customer. Not to grow big, not to hire, not to build systems - just the repeatable sale that turns lean months into steady ones. Everything else is a distraction until the income is consistent."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-stability">3. Stage two - Stability: document and delegate</label><textarea id="cb-stability" data-key="t-0235:stability" placeholder="Now the revenue is steady - and a quieter problem appears: you are the bottleneck. Every job, decision and customer still runs through you; the business is a demanding job you own, and it cannot grow beyond your own hours. The job: document and delegate - get the work out of your head and onto paper so someone else can do it to your standard. If you are the bottleneck, it is because you do good work and people trust you; the job now is not to work harder, but to build a system that does your good work even when you are not there."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-scale">4. Stage three - Scale: work on the business, not only in it</label><textarea id="cb-scale" data-key="t-0235:scale" placeholder="In scale, the systems are documented and other people do the work reliably, so the founder steps out of doing and into directing - working ON the business (strategy, growth, direction) rather than only IN it (the day-to-day). The defining test: growth no longer requires more of the founder&#039;s hours, because the business can add customers without adding you. This is a genuinely different kind of work, and it only becomes possible once the documenting-and-delegating of stability has actually been done."></textarea></div><div class="canvas-box"><label class="cb-label" for="cb-diagnose_and_act">5. Diagnose, do the right job, and choose</label><textarea id="cb-diagnose_and_act" data-key="t-0235:diagnose_and_act" placeholder="Place yourself plainly: inconsistent revenue + you-do-everything = survival; consistent revenue + everything-runs-through-you = stability; documented systems + you-work-on-not-in = scale. Then do THAT stage&#039;s job, and avoid the two mistakes: scaling before stable (you scale the chaos and it breaks) and staying the bottleneck forever (a job, not a business). And choose deliberately: a stable business that gives you the life you want is a success. It is not a failure to scale."></textarea></div></div><div class="canvas-actions"><button type="button" class="btn" onclick="amuDownloadCanvas(this)">Download my canvas</button><button type="button" class="btn ghost" onclick="amuPrintCanvas()">Print / Save as PDF</button><span class="canvas-saved" aria-live="polite">Your answers save in this browser as you type</span><p class="canvas-privacy">Saved in this browser, on this device - if others use this device, they may see it. For a private copy you keep, use <strong>Download my canvas</strong>.</p></div></div>
+
+<p>When you can name your stage from the two markers and say the one job it requires - and you have chosen your destination on purpose - <strong>save it</strong> - it is yours. You now know exactly what to work on next.</p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><button type="button" class="btn" onclick="amuNext()">Last thing &#9656;</button></div>
+</section>
+
+<section class="step" id="step-4" hidden>
+<h2>T5: The Guardrails</h2>
+<p>Almost every growth problem is a founder doing the wrong stage's work. Name your stage. Do its job. Choose your destination.</p>
+<details><summary>The common traps - and how to dodge them</summary>
+<div class="reveal-content">
+<p>&bull; <strong>Not knowing your stage.</strong> Without the diagnosis, every effort is a guess. Read the two markers - revenue consistency and the founder's role - and place yourself honestly.</p>
+<p>&bull; <strong>Scaling before you are stable.</strong> Pouring on demand while the business still runs through you scales the chaos and breaks it. Fix the bottleneck first, then grow.</p>
+<p>&bull; <strong>Staying the bottleneck forever.</strong> If nothing is documented or delegated, you built a job, not a business - one that cannot grow or run without you. Get the work out of your hands.</p>
+<p>&bull; <strong>Assuming you must scale.</strong> Scale is a choice, not a destiny. A stable business that gives you the life you want is a success in its own right.</p>
+<p>&bull; <strong>Blaming yourself for being the bottleneck.</strong> It is the result of doing good work people trust, not a flaw. The fix is a system, not working harder or feeling guilty.</p>
+<p>&bull; <strong>Confusing busy with growing.</strong> Being run off your feet is not progress. Progress is doing the one job your current stage actually requires.</p>
+<p>&bull; <strong>Chasing size before consistent income.</strong> In survival, the only job is the repeatable sale. Do not hire or build systems for an income you do not yet have.</p>
+<p>&bull; <strong>Documenting nothing.</strong> A business that lives only in your head cannot be delegated, sold, or rested from. Write down how the good work is done.</p>
+</div>
+</details>
+<p>Your business was working and still drowning you, because you were pouring effort into the wrong stage's job. Now you can place it by two plain markers - is the revenue consistent, and what are you doing? - and read off the one job that matters: in survival, find the repeatable sale that makes the income steady; in stability, document and delegate so the business no longer lives only in your hands; in scale, work on the business rather than only in it. Avoid the two great mistakes - scaling the chaos before you are stable, and staying the bottleneck forever - and choose your destination deliberately, free to build a stable business you love just as much as one you grow. <strong>Almost every growth problem is a founder doing the wrong stage's work - so name your stage, do its job, and knowing where you truly are will give you permission to stop doing everything and start doing the one thing that matters now.</strong></p>
+<div class="nav"><button type="button" class="btn ghost" onclick="amuBack()">&#9666; Back</button><span class="done">&#10003; You can find your stage and its one job now.</span></div>
+<section class="amu-feedback" aria-labelledby="fb-heading"><h3 id="fb-heading">Help the next person</h3><p class="fb-ethos">Knowledge flows outward, wisdom flows back.</p><div class="fb-channel"><label for="fb-unclear">Was anything unclear or confusing?</label><textarea id="fb-unclear" placeholder="e.g. I got a bit lost where we sorted the money."></textarea></div><div class="fb-channel"><label for="fb-example">Can you picture a clearer example?</label><textarea id="fb-example" placeholder="e.g. This would make more sense if..."></textarea></div><div class="fb-channel"><label for="fb-story">Did you try this in your own life? Tell us what happened.</label><textarea id="fb-story" placeholder="e.g. I tried it on my own money - I expected one thing, then..."></textarea></div><p class="fb-privacy">Your feedback is a gift. Sharing is your choice, and we always protect your privacy.</p><button type="button" class="btn" onclick="shareFeedback(this)">Share feedback</button></section>
+</section>
+</main>
+
+<footer class="amu-footer">Asset Management University - Develop Capability. You can.</footer>
+
+<script>
+// --- CORE INTERACTIVITY SCRIPT (UNCHANGED) ---
+
+        const TOTAL_STEPS = 5;
+        let currentStep = 0;
+
+        // --- State Management ---
+        let learnerGoalAmount = 1500; // Default value
+
+        /**
+         * Main function to control which step is visible.
+         */
+        function amuStep(n) {
+            const steps = document.querySelectorAll(".step");
+            steps.forEach((step, i) => {
+                step.hidden = (i !== n);
+            });
+            currentStep = n;
+
+            document.getElementById("amu-progress").textContent = `Step ${n + 1} of ${TOTAL_STEPS}`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (n === 4) { // When we reach Movement 4
+                updateRecalledGoal();
+            }
+        }
+
+        function amuNext() {
+            if (currentStep < TOTAL_STEPS - 1) {
+                amuStep(currentStep + 1);
+            }
+        }
+
+        function amuBack() {
+            if (currentStep > 0) {
+                amuStep(currentStep - 1);
+            }
+        }
+
+        /**
+         * Reveals hints one by one.
+         */
+        function amuHint(btn) {
+            const box = btn.closest(".hintbox");
+            const hints = box.querySelectorAll(".hint");
+            let shownCount = 0;
+
+            for (let i = 0; i < hints.length; i++) {
+                if (!hints[i].hidden) {
+                    shownCount++;
+                }
+            }
+
+            if (shownCount < hints.length) {
+                const hintToReveal = hints[shownCount];
+                hintToReveal.hidden = false;
+                hintToReveal.setAttribute('tabindex', '-1');
+                hintToReveal.focus();
+            }
+
+            const nextHintIndex = shownCount + 1;
+            const nextLabel = box.getAttribute(`data-label-${nextHintIndex}`);
+
+            if (nextHintIndex < hints.length && nextLabel) {
+                btn.textContent = nextLabel;
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        // --- FEATURE-SPECIFIC FUNCTIONS (UNCHANGED) ---
+
+        function updateLearnerGoal() {
+            const goalInput = document.getElementById('learner-goal-amount');
+            const value = parseInt(goalInput.value, 10);
+            if (!isNaN(value) && value > 0) {
+                learnerGoalAmount = value;
+            } else {
+                learnerGoalAmount = 1500; // Reset to default if input is invalid
+            }
+        }
+
+        function updateRecalledGoal() {
+            const goalAmountEl = document.getElementById('recalled-goal-amount');
+            if (goalAmountEl) {
+                goalAmountEl.textContent = learnerGoalAmount.toLocaleString('en-ZA', {
+                    style: 'currency',
+                    currency: 'ZAR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+        }
+
+        function highlightFoodItems() {
+            const src = document.getElementById('bank-statement');
+            const slot = document.getElementById('m3-statement-slot');
+            if (!src || !slot) return;
+            slot.innerHTML = '';
+            const clone = src.cloneNode(true);
+            clone.removeAttribute('id');
+            slot.appendChild(clone);
+            clone.querySelectorAll('.transaction').forEach(i => i.classList.remove('highlight'));
+            clone.querySelectorAll('.transaction[data-category="food"]').forEach(i => i.classList.add('highlight'));
+            slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            amuStep(0);
+            amuCanvasInit();
+        });
+
+        // cCanvas (Technique tool): persist the learner's input on this device + let them save/print their canvas.
+        function amuCanvasInit(){
+            var boxes = document.querySelectorAll('.canvas-interactive textarea[data-key]');
+            boxes.forEach(function(t){
+                var key = t.getAttribute('data-key');
+                try { var saved = localStorage.getItem(key); if (saved !== null) t.value = saved; } catch(e){}
+                t.addEventListener('input', function(){
+                    try { localStorage.setItem(key, t.value); } catch(e){}
+                    var wrap = t.closest('.canvas-interactive');
+                    if (wrap){ var s = wrap.querySelector('.canvas-saved'); if (s && s.textContent !== 'Saved in this browser') s.textContent = 'Saved in this browser'; }
+                });
+            });
+        }
+        function amuPrintCanvas(){ window.print(); }
+        // Download the filled canvas as a portable, private .txt the learner truly owns (survives cleared cache / device change).
+        function amuDownloadCanvas(btn){
+            var wrap = btn.closest('.canvas-interactive');
+            if (!wrap) return;
+            var title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'My canvas';
+            var lines = [title, ''];
+            wrap.querySelectorAll('.canvas-box').forEach(function(box){
+                var label = box.querySelector('.cb-label');
+                var ta = box.querySelector('textarea');
+                lines.push((label ? label.textContent : '').trim());
+                lines.push((ta && ta.value ? ta.value : '').trim());
+                lines.push('');
+            });
+            var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'my-canvas.txt';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function shareFeedback(btn){
+            const sec = btn.closest(".amu-feedback");
+            if (sec) sec.innerHTML = '<p class="fb-thanks">Thank you. We are grateful for your thoughts.</p>';
+        }
+
+</script>
+</body>
+</html>
