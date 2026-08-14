@@ -2,9 +2,15 @@
 
 **Asset Management University — Develop Capability. You can.**
 
-This repository holds AMU's published experiential learning journeys: qualifications assembled from
-felt **Business Problems**, not topics to be covered. Every course page presents an ordered journey —
-a felt problem opens it, each unit earns the next, and a capstone has the learner do the whole thing.
+This repository holds AMU's published experiential learning journeys. They are published for
+transparency, so the curriculum can be seen as it is.
+
+Each journey is a sequence of simulated Business Problems, not a list of topics to be covered. A
+real-world problem opens the journey, each unit builds the capability for the next, and a capstone
+requires the learner to apply the full capability.
+
+These journeys represent the curriculum as it stands. They are not a claim of accreditation; AMU's
+formal accreditation status is declared on its platform.
 
 ## What is here
 
@@ -14,14 +20,8 @@ a felt problem opens it, each unit earns the next, and a capstone has the learne
 | `qcto/physical-asset-practitioner/` | Occupational Certificate: Physical Asset Practitioner (QCTO 333911, NQF 6) — 11 course journey pages |
 
 Each page is generated from AMU's governed assembly manifests. Steps marked *callback* revisit
-capability taught earlier in the journey. Where AMU does not teach something a qualification claims,
-the course page says so — boundaries are declared, never covered over.
-
-## Honesty
-
-These journeys are the spine of the curriculum as it stands, published so it can be seen as it is.
-AMU's accreditation status is stated on its platform; nothing in this repository is a claim of
-accreditation.
+capability developed earlier. We declare our boundaries: where AMU does not teach something a
+qualification requires, the course page says so.
 
 ## Licence
 
