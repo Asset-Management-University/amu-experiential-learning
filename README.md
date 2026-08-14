@@ -18,6 +18,7 @@ formal accreditation status is declared on its platform.
 |---|---|
 | `qcto/physical-asset-manager/` | Occupational Certificate: Physical Asset Manager (QCTO 121903, NQF 7) — 13 course journey pages |
 | `qcto/physical-asset-practitioner/` | Occupational Certificate: Physical Asset Practitioner (QCTO 333911, NQF 6) — 11 course journey pages |
+| `curricula/architects-journey.html` | The Architect's Journey — a curriculum for young people, carrying the Financial Freedom Builder and Business Builder streams |
 
 Each page is generated from AMU's governed assembly manifests. Steps marked *callback* revisit
 capability developed earlier. We declare our boundaries: where AMU does not teach something a
