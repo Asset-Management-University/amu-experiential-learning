@@ -26,6 +26,12 @@ Each page is generated from AMU's governed assembly manifests. Steps marked *cal
 capability developed earlier. We declare our boundaries: where AMU does not teach something a
 qualification requires, the course page says so.
 
+## Contributing to the storyline
+
+Many Business Problems in this library share one continuous story. If you would like to write for
+it, start with [The Tank-You Storyline Contributor’s Guide](STORYLINE.md) — the world, the
+people, the shape of the story, and the rules that keep the canon whole.
+
 ## Licence
 
 Apache 2.0 — see [LICENSE](LICENSE).
