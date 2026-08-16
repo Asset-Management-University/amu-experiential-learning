@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Map of Business Problems — AMU Experiential Learning</title>
+<meta name="amu-document-id" content="EL-PUBLIC-GRAPH">
+<meta name="amu-generated" content="2026-08-15">
+<meta name="amu-visibility" content="public">
+<meta name="amu-source" content="Derived from the governed corpus per the Mission Guardian ruling of 2026-08-15">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F2F2F;background:#FFFFFF}
+.page-header{background:#0A2F5C;color:#FFFFFF;padding:36px 40px 28px}
+.page-header .logo-text{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.75;margin-bottom:12px}
+.page-header h1{font-family:'Montserrat',sans-serif;font-size:26px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.page-header .subtitle{font-size:15px;opacity:.85}
+.content{max-width:1200px;margin:0 auto;padding:28px 24px}
+.legend{display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:13px;color:#5D7290;margin-bottom:10px}
+.legend .sw{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px}
+.legend .ln{display:inline-block;width:22px;height:0;border-top:2px solid #5D7290;vertical-align:3px;margin-right:6px}
+.legend .ln.rel{border-top-style:dashed}
+#stage{width:100%;height:72vh;border:1px solid #D9E6F2;border-radius:8px;background:#fff;cursor:grab;touch-action:none}
+#stage:active{cursor:grabbing}
+.hint{font-size:13px;color:#5D7290;margin-top:8px}
+#tip{position:fixed;pointer-events:none;background:#0A2F5C;color:#fff;font-size:13px;padding:6px 10px;border-radius:4px;max-width:320px;display:none;z-index:5;line-height:1.4}
+.amu-doc-footer{background-color:#D9E6F2;font-size:13px;color:#2F2F2F;text-align:center;padding:14px 40px;margin-top:40px}
+</style>
+</head>
+<body>
+<header class="page-header">
+  <div class="logo-text">Asset Management University</div>
+  <h1>The Map of Business Problems</h1>
+  <div class="subtitle">This map shows how the Business Problems in our library connect. It is the architecture of capability.</div>
+</header>
+<div class="content">
+<p>Each point is a Business Problem you can solve. A solid line shows that one problem builds toward another. A dashed line shows that two problems are related.</p>
+<div class="legend">
+  <span><span class="sw" style="background:#0A2F5C"></span>Business Problem</span>
+  <span><span class="sw" style="background:#5D7290"></span>Technique</span>
+  <span><span class="ln"></span>builds toward</span>
+  <span><span class="ln rel"></span>related</span>
+  <span id="count"></span>
+</div>
+<canvas id="stage"></canvas>
+<p class="hint">You can pan, zoom, and select any point to open that problem and begin. The data for this map is published openly at <a href="public-graph.json">public-graph.json</a>.</p>
+</div>
+<div id="tip"></div>
+<footer class="amu-doc-footer">You can. &nbsp;|&nbsp; assetmanagementuniversity.org &nbsp;&middot;&nbsp; Asset Management University NPC &mdash; South Africa</footer>
+<script>
+(async function(){
+  const res = await fetch('public-graph.json');
+  const g = await res.json();
+  document.getElementById('count').textContent = g.nodes.length + ' problems · ' + g.edges.length + ' connections';
+  const canvas = document.getElementById('stage');
+  const tip = document.getElementById('tip');
+  const ctx = canvas.getContext('2d');
+  const DPR = window.devicePixelRatio || 1;
+  function fit(){ canvas.width = canvas.clientWidth * DPR; canvas.height = canvas.clientHeight * DPR; }
+  fit(); window.addEventListener('resize', () => { fit(); draw(); });
+
+  const N = g.nodes.map((n, i) => ({ ...n, x: Math.cos(i * 2.4) * (40 + i * 1.1), y: Math.sin(i * 2.4) * (40 + i * 1.1), vx: 0, vy: 0 }));
+  const byId = Object.fromEntries(N.map(n => [n.id, n]));
+  const E = g.edges.filter(e => byId[e.from] && byId[e.to]);
+  const deg = {}; E.forEach(e => { deg[e.from] = (deg[e.from]||0)+1; deg[e.to] = (deg[e.to]||0)+1; });
+
+  // simple force layout, settled up-front
+  for (let it = 0; it < 260; it++) {
+    const k = it < 60 ? 1 : 0.6;
+    for (let a = 0; a < N.length; a++) for (let b = a + 1; b < N.length; b++) {
+      const p = N[a], q = N[b];
+      let dx = p.x - q.x, dy = p.y - q.y;
+      let d2 = dx * dx + dy * dy || 1;
+      if (d2 < 90000) { const f = 420 * k / d2; p.vx += dx * f; p.vy += dy * f; q.vx -= dx * f; q.vy -= dy * f; }
+    }
+    E.forEach(e => {
+      const p = byId[e.from], q = byId[e.to];
+      const dx = q.x - p.x, dy = q.y - p.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
+      const f = (d - 46) * 0.012 * k;
+      p.vx += dx / d * f; p.vy += dy / d * f; q.vx -= dx / d * f; q.vy -= dy / d * f;
+    });
+    N.forEach(n => { n.vx -= n.x * 0.0016; n.vy -= n.y * 0.0016; n.x += n.vx; n.y += n.vy; n.vx *= 0.82; n.vy *= 0.82; });
+  }
+
+  let scale = 1, ox = 0, oy = 0;
+  function fitView(){
+    const xs = N.map(n => n.x), ys = N.map(n => n.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+    const w = canvas.width, h = canvas.height;
+    scale = Math.min(w / (maxX - minX + 120), h / (maxY - minY + 120));
+    ox = w / 2 - (minX + maxX) / 2 * scale; oy = h / 2 - (minY + maxY) / 2 * scale;
+  }
+  fitView();
+
+  function draw(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.lineWidth = 1 * DPR * Math.max(scale * 0.5, 0.5);
+    E.forEach(e => {
+      const p = byId[e.from], q = byId[e.to];
+      ctx.strokeStyle = 'rgba(93,114,144,0.45)';
+      ctx.setLineDash(e.kind === 'related' ? [4 * DPR, 4 * DPR] : []);
+      ctx.beginPath(); ctx.moveTo(p.x * scale + ox, p.y * scale + oy); ctx.lineTo(q.x * scale + ox, q.y * scale + oy); ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    N.forEach(n => {
+      const r = (3 + Math.min(deg[n.id] || 0, 6)) * DPR * Math.max(scale * 0.45, 0.55);
+      ctx.fillStyle = n.type === 'business-problem' ? '#0A2F5C' : '#5D7290';
+      ctx.beginPath(); ctx.arc(n.x * scale + ox, n.y * scale + oy, r, 0, 7); ctx.fill();
+    });
+  }
+  draw();
+
+  function pick(mx, my){
+    let best = null, bd = 14 * DPR;
+    N.forEach(n => {
+      const dx = n.x * scale + ox - mx, dy = n.y * scale + oy - my;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < bd) { bd = d; best = n; }
+    });
+    return best;
+  }
+  let dragging = false, moved = false, lx = 0, ly = 0;
+  canvas.addEventListener('pointerdown', e => { dragging = true; moved = false; lx = e.clientX; ly = e.clientY; });
+  window.addEventListener('pointerup', () => { dragging = false; });
+  canvas.addEventListener('pointermove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * DPR, my = (e.clientY - rect.top) * DPR;
+    if (dragging) {
+      if (Math.abs(e.clientX - lx) + Math.abs(e.clientY - ly) > 2) moved = true;
+      ox += (e.clientX - lx) * DPR; oy += (e.clientY - ly) * DPR; lx = e.clientX; ly = e.clientY; draw(); tip.style.display = 'none'; return;
+    }
+    const n = pick(mx, my);
+    if (n) { tip.textContent = n.label; tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY + 12) + 'px'; tip.style.display = 'block'; canvas.style.cursor = 'pointer'; }
+    else { tip.style.display = 'none'; canvas.style.cursor = 'grab'; }
+  });
+  canvas.addEventListener('click', e => {
+    if (moved) return;
+    const rect = canvas.getBoundingClientRect();
+    const n = pick((e.clientX - rect.left) * DPR, (e.clientY - rect.top) * DPR);
+    if (n) window.open('../units/' + n.id + '.html', '_blank', 'noopener');
+  });
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * DPR, my = (e.clientY - rect.top) * DPR;
+    const f = e.deltaY < 0 ? 1.15 : 0.87;
+    ox = mx - (mx - ox) * f; oy = my - (my - oy) * f; scale *= f; draw();
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>
