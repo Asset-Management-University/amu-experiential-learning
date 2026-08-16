@@ -40,7 +40,7 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
 <div class="legend">
   <span><span class="sw" style="background:#0A2F5C"></span>Business Problem</span>
   <span><span class="sw" style="background:#5D7290"></span>Technique</span>
-  <span><span class="ln"></span>builds toward</span>
+  <span><span class="ln" style="border-top-color:#0A2F5C"></span>builds toward</span>
   <span><span class="ln rel"></span>related</span>
   <span id="count"></span>
 </div>
@@ -78,7 +78,7 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
     E.forEach(e => {
       const p = byId[e.from], q = byId[e.to];
       const dx = q.x - p.x, dy = q.y - p.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
-      const f = (d - 46) * 0.012 * k;
+      const f = (d - 40) * 0.02 * k;
       p.vx += dx / d * f; p.vy += dy / d * f; q.vx -= dx / d * f; q.vy -= dy / d * f;
     });
     N.forEach(n => { n.vx -= n.x * 0.0016; n.vy -= n.y * 0.0016; n.x += n.vx; n.y += n.vy; n.vx *= 0.82; n.vy *= 0.82; });
@@ -96,13 +96,17 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
 
   function draw(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.lineWidth = 1 * DPR * Math.max(scale * 0.5, 0.5);
-    E.forEach(e => {
-      const p = byId[e.from], q = byId[e.to];
-      ctx.strokeStyle = 'rgba(93,114,144,0.45)';
-      ctx.setLineDash(e.kind === 'related' ? [4 * DPR, 4 * DPR] : []);
-      ctx.beginPath(); ctx.moveTo(p.x * scale + ox, p.y * scale + oy); ctx.lineTo(q.x * scale + ox, q.y * scale + oy); ctx.stroke();
-    });
+    ctx.lineWidth = Math.max(1.6 * DPR * scale, 1.2 * DPR);
+    const drawEdges = (kind, style, dash) => {
+      ctx.strokeStyle = style; ctx.setLineDash(dash);
+      E.forEach(e => {
+        if (e.kind !== kind) return;
+        const p = byId[e.from], q = byId[e.to];
+        ctx.beginPath(); ctx.moveTo(p.x * scale + ox, p.y * scale + oy); ctx.lineTo(q.x * scale + ox, q.y * scale + oy); ctx.stroke();
+      });
+    };
+    drawEdges('related', 'rgba(93,114,144,0.75)', [5 * DPR, 5 * DPR]);
+    drawEdges('builds-toward', 'rgba(10,47,92,0.85)', []);
     ctx.setLineDash([]);
     N.forEach(n => {
       const r = (3 + Math.min(deg[n.id] || 0, 6)) * DPR * Math.max(scale * 0.45, 0.55);
