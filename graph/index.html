@@ -36,12 +36,14 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
   <div class="subtitle">This map shows how the Business Problems in our library connect. It is the architecture of capability.</div>
 </header>
 <div class="content">
-<p>Each point is a Business Problem you can solve. A solid line shows that one problem builds toward another. A dashed line shows that two problems are related.</p>
+<p>Each point is a Business Problem you can solve, or a GFMAM artefact a problem develops. A solid navy line shows that one problem builds toward another; a dashed line shows two related problems; a light line joins a problem to the artefact it develops.</p>
 <div class="legend">
   <span><span class="sw" style="background:#0A2F5C"></span>Business Problem</span>
   <span><span class="sw" style="background:#5D7290"></span>Technique</span>
+  <span><span class="sw" style="background:#D9E6F2;border:2px solid #5D7290"></span>GFMAM artefact</span>
   <span><span class="ln" style="border-top-color:#0A2F5C"></span>builds toward</span>
   <span><span class="ln rel"></span>related</span>
+  <span><span class="ln" style="border-top-color:#9DB2CB"></span>develops</span>
   <span id="count"></span>
 </div>
 <canvas id="stage"></canvas>
@@ -53,7 +55,8 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
 (async function(){
   const res = await fetch('public-graph.json');
   const g = await res.json();
-  document.getElementById('count').textContent = g.nodes.length + ' problems · ' + g.edges.length + ' connections';
+  const un = g.nodes.filter(n => n.type !== 'artefact').length, an = g.nodes.length - un;
+  document.getElementById('count').textContent = un + ' problems · ' + an + ' artefacts · ' + g.edges.length + ' connections';
   const canvas = document.getElementById('stage');
   const tip = document.getElementById('tip');
   const ctx = canvas.getContext('2d');
@@ -105,13 +108,20 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
         ctx.beginPath(); ctx.moveTo(p.x * scale + ox, p.y * scale + oy); ctx.lineTo(q.x * scale + ox, q.y * scale + oy); ctx.stroke();
       });
     };
+    drawEdges('develops', 'rgba(157,178,203,0.55)', []);
     drawEdges('related', 'rgba(93,114,144,0.75)', [5 * DPR, 5 * DPR]);
     drawEdges('builds-toward', 'rgba(10,47,92,0.85)', []);
     ctx.setLineDash([]);
     N.forEach(n => {
       const r = (3 + Math.min(deg[n.id] || 0, 6)) * DPR * Math.max(scale * 0.45, 0.55);
-      ctx.fillStyle = n.type === 'business-problem' ? '#0A2F5C' : '#5D7290';
-      ctx.beginPath(); ctx.arc(n.x * scale + ox, n.y * scale + oy, r, 0, 7); ctx.fill();
+      const X = n.x * scale + ox, Y = n.y * scale + oy;
+      if (n.type === 'artefact') {
+        ctx.fillStyle = '#D9E6F2'; ctx.strokeStyle = '#5D7290'; ctx.lineWidth = 1.2 * DPR;
+        ctx.beginPath(); ctx.rect(X - r, Y - r, 2 * r, 2 * r); ctx.fill(); ctx.stroke();
+      } else {
+        ctx.fillStyle = n.type === 'business-problem' ? '#0A2F5C' : '#5D7290';
+        ctx.beginPath(); ctx.arc(X, Y, r, 0, 7); ctx.fill();
+      }
     });
   }
   draw();
@@ -143,7 +153,9 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
     if (moved) return;
     const rect = canvas.getBoundingClientRect();
     const n = pick((e.clientX - rect.left) * DPR, (e.clientY - rect.top) * DPR);
-    if (n) window.open('../units/' + n.id + '.html', '_blank', 'noopener');
+    if (!n) return;
+    if (n.type === 'artefact') { const m = n.id.split(':')[1]; window.open('../gfmam/gfmam-3' + m.replace('.', '') + '.html', '_blank', 'noopener'); return; }
+    window.open('../units/' + n.id + '.html', '_blank', 'noopener');
   });
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
