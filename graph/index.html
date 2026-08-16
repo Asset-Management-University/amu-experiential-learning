@@ -108,7 +108,7 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
         ctx.beginPath(); ctx.moveTo(p.x * scale + ox, p.y * scale + oy); ctx.lineTo(q.x * scale + ox, q.y * scale + oy); ctx.stroke();
       });
     };
-    drawEdges('develops', 'rgba(157,178,203,0.55)', []);
+    drawEdges('develops', 'rgba(157,178,203,0.7)', []);
     drawEdges('related', 'rgba(93,114,144,0.75)', [5 * DPR, 5 * DPR]);
     drawEdges('builds-toward', 'rgba(10,47,92,0.85)', []);
     ctx.setLineDash([]);
@@ -135,6 +135,22 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
     });
     return best;
   }
+  let hovered = null;
+  function drawHighlight(){
+    if (!hovered) return;
+    const mine = E.filter(e => e.from === hovered.id || e.to === hovered.id);
+    ctx.lineWidth = Math.max(2.4 * DPR * scale, 2 * DPR);
+    ctx.setLineDash([]);
+    mine.forEach(e => {
+      const p = byId[e.from], q = byId[e.to];
+      ctx.strokeStyle = e.kind === 'develops' ? 'rgba(93,114,144,0.95)' : 'rgba(10,47,92,0.95)';
+      ctx.beginPath(); ctx.moveTo(p.x * scale + ox, p.y * scale + oy); ctx.lineTo(q.x * scale + ox, q.y * scale + oy); ctx.stroke();
+      const o = e.from === hovered.id ? q : p;
+      const r2 = 5 * DPR * Math.max(scale * 0.45, 0.7);
+      ctx.fillStyle = '#0A2F5C';
+      ctx.beginPath(); ctx.arc(o.x * scale + ox, o.y * scale + oy, r2, 0, 7); ctx.fill();
+    });
+  }
   let dragging = false, moved = false, lx = 0, ly = 0;
   canvas.addEventListener('pointerdown', e => { dragging = true; moved = false; lx = e.clientX; ly = e.clientY; });
   window.addEventListener('pointerup', () => { dragging = false; });
@@ -146,6 +162,7 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
       ox += (e.clientX - lx) * DPR; oy += (e.clientY - ly) * DPR; lx = e.clientX; ly = e.clientY; draw(); tip.style.display = 'none'; return;
     }
     const n = pick(mx, my);
+    if (n !== hovered) { hovered = n; draw(); drawHighlight(); }
     if (n) { tip.textContent = n.label; tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY + 12) + 'px'; tip.style.display = 'block'; canvas.style.cursor = 'pointer'; }
     else { tip.style.display = 'none'; canvas.style.cursor = 'grab'; }
   });
