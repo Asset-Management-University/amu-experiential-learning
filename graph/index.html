@@ -25,7 +25,7 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
 #stage{width:100%;height:72vh;border:1px solid #D9E6F2;border-radius:8px;background:#fff;cursor:grab;touch-action:none}
 #stage:active{cursor:grabbing}
 .hint{font-size:13px;color:#5D7290;margin-top:8px}
-#tip{position:fixed;pointer-events:none;background:#0A2F5C;color:#fff;font-size:13px;padding:6px 10px;border-radius:4px;max-width:320px;display:none;z-index:5;line-height:1.4}
+#tip{position:fixed;pointer-events:none;background:#0A2F5C;color:#fff;font-size:13px;padding:6px 10px;border-radius:4px;max-width:420px;display:none;z-index:5;line-height:1.4}
 .amu-doc-footer{background-color:#D9E6F2;font-size:13px;color:#2F2F2F;text-align:center;padding:14px 40px;margin-top:40px}
 </style>
 </head>
@@ -47,7 +47,7 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
   <span id="count"></span>
 </div>
 <canvas id="stage"></canvas>
-<p class="hint">You can pan, zoom, and select any point to open that problem and begin. The data for this map is published openly at <a href="public-graph.json">public-graph.json</a>.</p>
+<p class="hint">You can pan, zoom, and select any point to open that problem and begin. Rest on a line to read why two problems connect. The data for this map is published openly at <a href="public-graph.json">public-graph.json</a>.</p>
 </div>
 <div id="tip"></div>
 <footer class="amu-doc-footer">You can. &nbsp;|&nbsp; assetmanagementuniversity.org &nbsp;&middot;&nbsp; Asset Management University NPC &mdash; South Africa</footer>
@@ -126,8 +126,22 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
   }
   draw();
 
+  function pickEdge(mx, my){
+    let best = null, bd = 6 * DPR;
+    E.forEach(e => {
+      const p = byId[e.from], q = byId[e.to];
+      const x1 = p.x * scale + ox, y1 = p.y * scale + oy, x2 = q.x * scale + ox, y2 = q.y * scale + oy;
+      const dx = x2 - x1, dy = y2 - y1, len2 = dx * dx + dy * dy || 1;
+      let t = ((mx - x1) * dx + (my - y1) * dy) / len2;
+      t = Math.max(0, Math.min(1, t));
+      const px = x1 + t * dx, py = y1 + t * dy;
+      const d = Math.hypot(mx - px, my - py);
+      if (d < bd) { bd = d; best = e; }
+    });
+    return best;
+  }
   function pick(mx, my){
-    let best = null, bd = 14 * DPR;
+    let best = null, bd = 9 * DPR;
     N.forEach(n => {
       const dx = n.x * scale + ox - mx, dy = n.y * scale + oy - my;
       const d = Math.sqrt(dx * dx + dy * dy);
@@ -164,7 +178,14 @@ body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F
     const n = pick(mx, my);
     if (n !== hovered) { hovered = n; draw(); drawHighlight(); }
     if (n) { tip.textContent = n.label; tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY + 12) + 'px'; tip.style.display = 'block'; canvas.style.cursor = 'pointer'; }
-    else { tip.style.display = 'none'; canvas.style.cursor = 'grab'; }
+    else {
+      const ed = pickEdge(mx, my);
+      if (ed && ed.why) {
+        const a = byId[ed.from], b = byId[ed.to];
+        tip.textContent = a.label + ' → ' + b.label + ' — ' + ed.why;
+        tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY + 12) + 'px'; tip.style.display = 'block'; canvas.style.cursor = 'default';
+      } else { tip.style.display = 'none'; canvas.style.cursor = 'grab'; }
+    }
   });
   canvas.addEventListener('click', e => {
     if (moved) return;
