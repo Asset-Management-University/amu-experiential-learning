@@ -15,20 +15,25 @@
 body{font-family:'Open Sans',sans-serif;font-size:16px;line-height:1.7;color:#2F2F2F;background:#FFFFFF}
 .page-header{background:#0A2F5C;color:#FFFFFF;padding:36px 40px 28px}
 .page-header .logo-text{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.75;margin-bottom:12px}
-.page-header h1{font-family:'Montserrat',sans-serif;font-size:26px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.page-header h1{font-family:'Montserrat',sans-serif;font-size:26px;font-weight:400;line-height:1.25;margin-bottom:8px}
 .page-header .subtitle{font-size:15px;opacity:.85}
 .content{max-width:1200px;margin:0 auto;padding:28px 24px}
 .lenses{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
 .lenses button{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;padding:8px 14px;border:1px solid #5D7290;border-radius:20px;background:#fff;color:#0A2F5C;cursor:pointer}
 .lenses button[aria-pressed="true"]{background:#0A2F5C;color:#fff;border-color:#0A2F5C}
-.lens-desc{font-size:13px;color:#5D7290;margin-bottom:12px;min-height:1.4em}
-.legend{display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:13px;color:#5D7290;margin-bottom:10px}
+.lens-desc{font-size:13px;color:#0A2F5C;margin-bottom:12px;min-height:1.4em}
+.legend{display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:13px;color:#0A2F5C;margin-bottom:10px}
 .legend .sw{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px}
 .legend .ln{display:inline-block;width:22px;height:0;border-top:2px solid #5D7290;vertical-align:3px;margin-right:6px}
 .legend .ln.rel{border-top-style:dashed}
 #stage{width:100%;height:72vh;border:1px solid #D9E6F2;border-radius:8px;background:#fff;cursor:grab;touch-action:none}
 #stage:active{cursor:grabbing}
-.hint{font-size:13px;color:#5D7290;margin-top:8px}
+.hint{font-size:13px;color:#0A2F5C;margin-top:8px}
+#stage:focus{outline:2px solid #0A2F5C;outline-offset:2px}
+#stage:focus:not(:focus-visible){outline:none}
+.lenses button[disabled]{opacity:.55;cursor:progress}
+#loader{font-size:13px;color:#0A2F5C;margin:0 0 8px;min-height:1.2em}
+#failure{border-left:3px solid #0A2F5C;background:#D9E6F2;padding:12px 16px;margin:12px 0}
 #tip{position:fixed;pointer-events:none;background:#0A2F5C;color:#fff;font-size:13px;padding:6px 10px;border-radius:4px;max-width:420px;display:none;z-index:5;line-height:1.4}
 .amu-doc-footer{background-color:#D9E6F2;font-size:13px;color:#2F2F2F;text-align:center;padding:14px 40px;margin-top:40px}
 </style>
@@ -50,6 +55,7 @@ A solid navy line shows that one Business Problem builds toward another; a dashe
   <button id="lens-pam" aria-pressed="false">QCTO Physical Asset Manager</button>
 </div>
 <p class="lens-desc" id="lensDesc"></p>
+<p id="loader" role="status" aria-live="polite"></p>
 <div class="legend">
   <span><span class="sw" style="background:#0A2F5C"></span>Business Problem</span>
   <span><span class="sw" style="background:#5D7290"></span>Technique</span>
@@ -59,8 +65,8 @@ A solid navy line shows that one Business Problem builds toward another; a dashe
   <span><span class="ln" style="border-top-color:#9DB2CB"></span>develops</span>
   <span id="count"></span>
 </div>
-<canvas id="stage"></canvas>
-<p class="hint">You can pan, zoom, and select any circle to open that Business Problem and begin. Selecting a square opens
+<canvas id="stage" tabindex="0" role="img" aria-label="Interactive map of Business Problems and the framework you have chosen. Use the arrow keys to move the map, plus and minus to zoom, and Home to fit it to the screen."></canvas>
+<p class="hint">You can pan, zoom, and select any circle to open that Business Problem and begin. With a keyboard: focus the map, then use the arrow keys to move it, plus and minus to zoom, and Home to fit it. Selecting a square opens
 the framework element's journey page. Rest on a line to read why two Business Problems connect. The data for this map is
 published openly: <a href="public-graph.json">public-graph.json</a>, <a href="lens-gfmam.json">lens-gfmam.json</a>,
 <a href="lens-qcto-pap.json">lens-qcto-pap.json</a>, <a href="lens-qcto-pam.json">lens-qcto-pam.json</a>.</p>
@@ -69,8 +75,31 @@ published openly: <a href="public-graph.json">public-graph.json</a>, <a href="le
 <footer class="amu-doc-footer">You can. &nbsp;|&nbsp; assetmanagementuniversity.org &nbsp;&middot;&nbsp; Asset Management University NPC &mdash; South Africa</footer>
 <script>
 (async function(){
-  const res = await fetch('public-graph.json');
-  const g = await res.json();
+  const loader = document.getElementById('loader');
+  const say = (m) => { if (loader) loader.textContent = m; };
+  // Finding 3 (Guardian code review 2026-08-17): a failed fetch must say so on the page, not leave
+  // a blank canvas and a console message only the author will ever read.
+  const getJson = async (file) => {
+    const r = await fetch(file);
+    if (!r.ok) throw new Error(file + ' returned HTTP ' + r.status);
+    return r.json();
+  };
+  const failPage = (error) => {
+    const content = document.querySelector('.content');
+    if (content) {
+      const box = document.createElement('div');
+      box.id = 'failure';
+      box.innerHTML = '<strong>The map could not be loaded.</strong><br>Its data did not arrive. Please refresh the page; if it keeps failing, the data is published openly and can be read directly: <a href="public-graph.json">public-graph.json</a>.';
+      content.prepend(box);
+    }
+    say('');
+    console.error('The Map of Business Problems failed to load:', error);
+  };
+  let g;
+  try {
+    say('Loading the map...');
+    g = await getJson('public-graph.json');
+  } catch (error) { failPage(error); return; }
   const canvas = document.getElementById('stage');
   const tip = document.getElementById('tip');
   const ctx = canvas.getContext('2d');
@@ -86,40 +115,72 @@ published openly: <a href="public-graph.json">public-graph.json</a>, <a href="le
     gfmam: {
       label: 'GFMAM artefact',
       desc: 'The GFMAM Asset Management Landscape, an international industry body of knowledge. Each square is a Landscape artefact a published Business Problem develops.',
-      load: async () => { const r = await fetch('lens-gfmam.json'); const d = await r.json(); return { nodes: d.nodes, edges: d.edges }; },
+      load: async () => { const d = await getJson('lens-gfmam.json'); return { nodes: d.nodes, edges: d.edges }; },
     },
     pap: {
       label: 'PAP outcome',
       desc: 'The outcomes of the Occupational Certificate: Physical Asset Practitioner (QCTO 333911), a registered South African qualification. Each square is an outcome a published Business Problem develops.',
-      load: async () => { const r = await fetch('lens-qcto-pap.json'); const d = await r.json(); return { nodes: d.nodes, edges: d.edges }; },
+      load: async () => { const d = await getJson('lens-qcto-pap.json'); return { nodes: d.nodes, edges: d.edges }; },
     },
     pam: {
       label: 'PAM outcome',
       desc: 'The outcomes of the Occupational Certificate: Physical Asset Manager (QCTO 121903, NQF 8), a registered South African qualification. Each square is an outcome a published Business Problem develops.',
-      load: async () => { const r = await fetch('lens-qcto-pam.json'); const d = await r.json(); return { nodes: d.nodes, edges: d.edges }; },
+      load: async () => { const d = await getJson('lens-qcto-pam.json'); return { nodes: d.nodes, edges: d.edges }; },
     },
   };
 
   let N = [], E = [], byId = {}, deg = {};
   let scale = 1, ox = 0, oy = 0, hovered = null;
 
-  function layout(){
-    for (let it = 0; it < 260; it++) {
-      const k = it < 60 ? 1 : 0.6;
-      for (let a = 0; a < N.length; a++) for (let b = a + 1; b < N.length; b++) {
-        const p = N[a], q = N[b];
-        let dx = p.x - q.x, dy = p.y - q.y;
-        let d2 = dx * dx + dy * dy || 1;
-        if (d2 < 90000) { const f = 420 * k / d2; p.vx += dx * f; p.vy += dy * f; q.vx -= dx * f; q.vy -= dy * f; }
+  // Finding 4: the layout physics named, so it can be read and tuned.
+  const LAYOUT = {
+    ITERATIONS: 260,
+    WARM_ITERATIONS: 60,
+    COOL_FACTOR: 0.6,
+    REPULSION: 420,
+    REPULSION_RANGE_SQ: 90000,
+    SPRING_LENGTH: 40,
+    SPRING_STIFFNESS: 0.02,
+    CENTRING: 0.0016,
+    DAMPING: 0.82,
+    PER_FRAME: 10,
+  };
+  function layoutStep(it){
+    const k = it < LAYOUT.WARM_ITERATIONS ? 1 : LAYOUT.COOL_FACTOR;
+    for (let a = 0; a < N.length; a++) for (let b = a + 1; b < N.length; b++) {
+      const p = N[a], q = N[b];
+      const dx = p.x - q.x, dy = p.y - q.y;
+      const d2 = dx * dx + dy * dy || 1;
+      if (d2 < LAYOUT.REPULSION_RANGE_SQ) {
+        const f = LAYOUT.REPULSION * k / d2;
+        p.vx += dx * f; p.vy += dy * f; q.vx -= dx * f; q.vy -= dy * f;
       }
-      E.forEach(e => {
-        const p = byId[e.from], q = byId[e.to];
-        const dx = q.x - p.x, dy = q.y - p.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
-        const f = (d - 40) * 0.02 * k;
-        p.vx += dx / d * f; p.vy += dy / d * f; q.vx -= dx / d * f; q.vy -= dy / d * f;
-      });
-      N.forEach(n => { n.vx -= n.x * 0.0016; n.vy -= n.y * 0.0016; n.x += n.vx; n.y += n.vy; n.vx *= 0.82; n.vy *= 0.82; });
     }
+    E.forEach(e => {
+      const p = byId[e.from], q = byId[e.to];
+      const dx = q.x - p.x, dy = q.y - p.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
+      const f = (d - LAYOUT.SPRING_LENGTH) * LAYOUT.SPRING_STIFFNESS * k;
+      p.vx += dx / d * f; p.vy += dy / d * f; q.vx -= dx / d * f; q.vy -= dy / d * f;
+    });
+    N.forEach(n => {
+      n.vx -= n.x * LAYOUT.CENTRING; n.vy -= n.y * LAYOUT.CENTRING;
+      n.x += n.vx; n.y += n.vy;
+      n.vx *= LAYOUT.DAMPING; n.vy *= LAYOUT.DAMPING;
+    });
+  }
+  // Finding 1 (UI freeze): the pairwise settle runs across animation frames instead of blocking the
+  // main thread for seconds. The page stays answerable and the map visibly settles.
+  function layoutAsync(){
+    return new Promise(resolve => {
+      let it = 0;
+      const step = () => {
+        for (let i = 0; i < LAYOUT.PER_FRAME && it < LAYOUT.ITERATIONS; i++, it++) layoutStep(it);
+        say('Arranging the map... ' + Math.round(it / LAYOUT.ITERATIONS * 100) + '%');
+        if (it < LAYOUT.ITERATIONS) requestAnimationFrame(step);
+        else resolve();
+      };
+      requestAnimationFrame(step);
+    });
   }
 
   function fitView(){
@@ -131,25 +192,43 @@ published openly: <a href="public-graph.json">public-graph.json</a>, <a href="le
     ox = w / 2 - (minX + maxX) / 2 * scale; oy = h / 2 - (minY + maxY) / 2 * scale;
   }
 
+  // Finding 1 (race condition): one lens loads at a time. Two overlapping switches could otherwise
+  // interleave their writes to N/E and render one framework's squares against another's edges.
+  let switching = false;
+  const lensButtons = () => Array.from(document.querySelectorAll('.lenses button'));
   async function setLens(key){
-    for (const k of Object.keys(LENSES)) {
-      const b = document.getElementById('lens-' + k);
-      if (b) b.setAttribute('aria-pressed', String(k === key));
+    if (switching) return;
+    switching = true;
+    lensButtons().forEach(b => { b.disabled = true; });
+    try {
+      for (const k of Object.keys(LENSES)) {
+        const b = document.getElementById('lens-' + k);
+        if (b) b.setAttribute('aria-pressed', String(k === key));
+      }
+      const lens = LENSES[key];
+      document.getElementById('lensDesc').textContent = lens.desc;
+      document.getElementById('sqLabel').textContent = lens.label;
+      say('Loading ' + lens.label + 's...');
+      const { nodes: lensNodes, edges: lensEdges } = await lens.load();
+      const nodes = baseNodes.concat(lensNodes);
+      const edges = baseEdges.concat(lensEdges);
+      N = nodes.map((n, i) => ({ ...n, x: Math.cos(i * 2.4) * (40 + i * 1.1), y: Math.sin(i * 2.4) * (40 + i * 1.1), vx: 0, vy: 0 }));
+      byId = Object.fromEntries(N.map(n => [n.id, n]));
+      E = edges.filter(e => byId[e.from] && byId[e.to]);
+      deg = {}; E.forEach(e => { deg[e.from] = (deg[e.from]||0)+1; deg[e.to] = (deg[e.to]||0)+1; });
+      const un = baseNodes.length, sq = lensNodes.length;
+      document.getElementById('count').textContent = un + ' problems · ' + sq + ' ' + lens.label.toLowerCase() + 's · ' + E.length + ' connections';
+      hovered = null;
+      await layoutAsync();
+      fitView(); draw();
+      say('');
+    } catch (error) {
+      say('That framework could not be loaded. The others still work - please try again.');
+      console.error('A lens failed to load: ' + key, error);
+    } finally {
+      switching = false;
+      lensButtons().forEach(b => { b.disabled = false; });
     }
-    const lens = LENSES[key];
-    document.getElementById('lensDesc').textContent = lens.desc;
-    document.getElementById('sqLabel').textContent = lens.label;
-    const { nodes: lensNodes, edges: lensEdges } = await lens.load();
-    const nodes = baseNodes.concat(lensNodes);
-    const edges = baseEdges.concat(lensEdges);
-    N = nodes.map((n, i) => ({ ...n, x: Math.cos(i * 2.4) * (40 + i * 1.1), y: Math.sin(i * 2.4) * (40 + i * 1.1), vx: 0, vy: 0 }));
-    byId = Object.fromEntries(N.map(n => [n.id, n]));
-    E = edges.filter(e => byId[e.from] && byId[e.to]);
-    deg = {}; E.forEach(e => { deg[e.from] = (deg[e.from]||0)+1; deg[e.to] = (deg[e.to]||0)+1; });
-    const un = baseNodes.length, sq = lensNodes.length;
-    document.getElementById('count').textContent = un + ' problems · ' + sq + ' ' + lens.label.toLowerCase() + 's · ' + E.length + ' connections';
-    hovered = null;
-    layout(); fitView(); draw();
   }
   document.getElementById('lens-gfmam').addEventListener('click', () => setLens('gfmam'));
   document.getElementById('lens-pap').addEventListener('click', () => setLens('pap'));
@@ -254,6 +333,23 @@ published openly: <a href="public-graph.json">public-graph.json</a>, <a href="le
     if (n.type === 'outcome') { if (n.page) window.open(n.page, '_blank', 'noopener'); return; }
     if (n.type === 'artefact') { const m = n.id.split(':')[1]; window.open('../gfmam/gfmam-3' + m.replace('.', '') + '.html', '_blank', 'noopener'); return; }
     window.open('../units/' + n.id + '.html', '_blank', 'noopener');
+  });
+  // Finding 2.3: the map is operable from the keyboard, not the mouse alone.
+  function zoomAt(cx, cy, f){ ox = cx - (cx - ox) * f; oy = cy - (cy - oy) * f; scale *= f; }
+  canvas.addEventListener('keydown', e => {
+    const pan = 60 * DPR;
+    let handled = true;
+    switch (e.key) {
+      case 'ArrowUp': oy += pan; break;
+      case 'ArrowDown': oy -= pan; break;
+      case 'ArrowLeft': ox += pan; break;
+      case 'ArrowRight': ox -= pan; break;
+      case '+': case '=': zoomAt(canvas.width / 2, canvas.height / 2, 1.15); break;
+      case '-': case '_': zoomAt(canvas.width / 2, canvas.height / 2, 0.87); break;
+      case 'Home': fitView(); break;
+      default: handled = false;
+    }
+    if (handled) { e.preventDefault(); draw(); tip.style.display = 'none'; }
   });
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
