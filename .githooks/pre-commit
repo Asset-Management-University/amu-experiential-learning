@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# AMU-GRAPH-HOOK
+# pre-commit — amu-experiential-learning: the public map is GENERATED, never hand-written.
+#
+# graph/public-graph.json and graph/lens-*.json are produced by
+# business-problems/tools/sync-public-knowledge.mjs, which applies the publication ruling of
+# 2026-08-15 (unit nodes carry label and type only; no confidence metadata; no realms or
+# communities; never the changelog; never the canon ledger; only published units).
+#
+# A hand edit here silently breaks the link between what the corpus says and what a learner
+# sees — the precise drift this hook exists to prevent. So a staged change to a generated file
+# is verified by REGENERATING and comparing, not trusted.
+#
+# If the sibling repo is absent the hook says so and allows the commit: refusing on a check it
+# could not run would be a gate pretending to knowledge it does not have.
+set -uo pipefail
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+cd "$ROOT" || exit 0
+
+git diff --cached --name-only --diff-filter=ACMR | grep -qE '^graph/(public-graph|lens-).*\.json$' || exit 0
+
+SYNC="$ROOT/../business-problems/tools/sync-public-knowledge.mjs"
+if [ ! -f "$SYNC" ]; then
+  echo "note: graph/ artefacts are generated, but the sibling business-problems repo is not" >&2
+  echo "      present, so this commit could not be verified against its source. Allowing." >&2
+  exit 0
+fi
+command -v node >/dev/null 2>&1 || exit 0
+
+OUT="$(cd "$ROOT/../business-problems" && node tools/sync-public-knowledge.mjs --check 2>&1)"
+if printf '%s' "$OUT" | grep -q 'OUT OF SYNC'; then
+  echo "$OUT" >&2
+  echo "" >&2
+  echo "graph/ is generated from the corpus graph and is currently OUT OF SYNC with it." >&2
+  echo "Do not hand-edit these files. Regenerate, then commit:" >&2
+  echo "" >&2
+  echo "  cd ../business-problems && node tools/sync-public-knowledge.mjs" >&2
+  exit 1
+fi
+exit 0
