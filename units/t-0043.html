@@ -27,6 +27,14 @@
             margin: 0;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            /* j8wfkFKWpTtbSleY11fn (2026-08-24): a long unbroken token - a chained method call, a
+               shell command with no spaces - does not widen the element that holds it (its CSS
+               box keeps the width its container gives it), but the overflowing text still inflates
+               the page's scrollable area, so the whole page slides sideways even though no element
+               measures wide. Ordinary prose is unaffected (its spaces already give the browser a
+               break opportunity); this only engages for the one word that has none. */
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         .wrap {
             max-width: 740px;
@@ -90,6 +98,38 @@
         p, ul, ol, blockquote {
             margin-top: 0;
             margin-bottom: 1em;
+        }
+
+        /* --- TABLES (j8wfkFKWpTtbSleY11fn, 2026-08-24): a wide table (5-6 columns) authored in
+           free-material.md renders wider than an entry-level phone viewport and, with no wrapper,
+           the whole page slides sideways under the reader's thumb - the class of defect the
+           traversal-aware browser check (F-206, batch 129) found in 17 units. The wrapper pattern
+           already used elsewhere in the AMU codebase (amu-platform's /organisation and, since this
+           fix, /transparency) is a scrollable ancestor around the table; this shell has no per-unit
+           markup to add that div to, and hand-editing every free-material.md would duplicate a fix
+           523 times over one authored unit at a time (GP-05). Making the table element ITSELF the
+           scroll container achieves the same reachability without touching a single authored file:
+           table stays a block box, keeps its native layout inside, and scrolls its own overflow
+           rather than the page scrolling (ADR-044 mobile-first). Applies globally to every unit. */
+        table {
+            display: block;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-collapse: collapse;
+            margin: 1em 0;
+            font: 15px/1.5 'Open Sans', sans-serif;
+        }
+        th, td {
+            border: 1px solid var(--amu-sky);
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: var(--amu-sky);
+            color: var(--amu-navy);
+            font-weight: 600;
         }
         strong {
             font-weight: 600;
@@ -575,15 +615,15 @@
 <p><em>"The old bakkie broke down again on Saturday. That is the third time. Muhammad thinks we should sell it. I think it is fine. Just tell me - which vehicle is actually costing us the most?"</em></p>
 <p>The printout is 487 rows long. Each row is one job: a date, which vehicle, what broke, and the rand cost. Some costs are blank. Some dates are typed three different ways. One row says "R 3 200", another "3200.00", another just "see invoice". Ibraaheem is standing there waiting, and there is a delivery run leaving in forty minutes. You reach for the obvious move - open the spreadsheet, scroll, and add the numbers up by eye, vehicle by vehicle. But you did exactly that last month on a smaller list and got it wrong: you double-counted a row, missed three blanks, and the figure you gave Ibraaheem was off by nearly R5,000. He noticed. You felt small.</p>
 <blockquote><h2>Which vehicle is actually costing us the most - and how do I get an answer I can trust, and repeat next month, instead of guessing off a messy page and getting it wrong?</h2></blockquote>
-<p><strong>Before you read on, decide.</strong> You need to know which vehicle is costing the most. The data is a messy export: blank rows, the same vehicle written three ways, duplicated lines. You did this by hand last month on a shorter list — double-counted a row, missed three blanks, and gave Ibraaheem a figure that was out by nearly <strong>R5,000</strong>. He noticed. And you will have to do it again next month, and the month after. Write down how you would get an answer you can trust — your own answer, not a shortlist to choose from.</p>
-<details><summary>Now compare — the five answers, and what &ldquo;doing it more carefully&rdquo; cannot fix</summary>
+<p><strong>Before you read on, decide.</strong> You need to know which vehicle is costing the most. The data is a messy export: blank rows, the same vehicle written three ways, duplicated lines. You did this by hand last month on a shorter list - double-counted a row, missed three blanks, and gave Ibraaheem a figure that was out by nearly <strong>R5,000</strong>. He noticed. And you will have to do it again next month, and the month after. Write down how you would get an answer you can trust - your own answer, not a shortlist to choose from.</p>
+<details><summary>Now compare - the five answers, and what &ldquo;doing it more carefully&rdquo; cannot fix</summary>
 <div class="reveal-content">
 <p>&bull; <strong>&ldquo;Be more careful this time. Check it twice.&rdquo;</strong> The answer that already failed, offered again with more effort behind it. And it does not survive next month, when the list is longer and you are busier.</p>
 <p>&bull; <strong>&ldquo;Get somebody to check my figures.&rdquo;</strong> Two people who can each make a mistake, on a list neither of them can hold in their head. It also costs somebody else&rsquo;s morning, every month, for ever.</p>
-<p>&bull; <strong>&ldquo;Tidy the spreadsheet properly first, then total it.&rdquo;</strong> The right instinct — cleaning is genuinely most of the work — and done by hand it is undone the moment next month&rsquo;s export arrives with the same three spellings.</p>
+<p>&bull; <strong>&ldquo;Tidy the spreadsheet properly first, then total it.&rdquo;</strong> The right instinct - cleaning is genuinely most of the work - and done by hand it is undone the moment next month&rsquo;s export arrives with the same three spellings.</p>
 <p>&bull; <strong>&ldquo;Buy a system that reports this automatically.&rdquo;</strong> It will report from whatever it is given, and what you are being given is the mess. The cleaning does not disappear; it moves somewhere you can no longer see it.</p>
-<p>&bull; <strong>&ldquo;Only count the big vehicles — near enough for a decision.&rdquo;</strong> That answers a smaller question quickly, and it cannot be defended when Ibraaheem asks why one is missing.</p>
-<p>&bull; The problem is not your care; it is that the work is being done <em>by hand at all</em>. Write the cleaning and the totalling down as steps a machine performs — the same steps, in the same order, every time — and three things change at once. The answer becomes <strong>repeatable</strong>: next month is one button, not a morning. It becomes <strong>checkable</strong>, because the steps are written down and somebody can read what you actually did rather than trusting the total. And when a rule turns out to be wrong — the fourth spelling of a registration nobody had seen — you fix it once, in the open, and every future month inherits the fix. <strong>Keeping a record of what changed and why is part of the answer, not admin</strong>: it is the difference between a number you can defend and a number you can only assert.</p>
+<p>&bull; <strong>&ldquo;Only count the big vehicles - near enough for a decision.&rdquo;</strong> That answers a smaller question quickly, and it cannot be defended when Ibraaheem asks why one is missing.</p>
+<p>&bull; The problem is not your care; it is that the work is being done <em>by hand at all</em>. Write the cleaning and the totalling down as steps a machine performs - the same steps, in the same order, every time - and three things change at once. The answer becomes <strong>repeatable</strong>: next month is one button, not a morning. It becomes <strong>checkable</strong>, because the steps are written down and somebody can read what you actually did rather than trusting the total. And when a rule turns out to be wrong - the fourth spelling of a registration nobody had seen - you fix it once, in the open, and every future month inherits the fix. <strong>Keeping a record of what changed and why is part of the answer, not admin</strong>: it is the difference between a number you can defend and a number you can only assert.</p>
 </div>
 </details>
 <p>You do not need a better guess. You need a reliable, repeatable way to read a messy asset dataset, clean it, total the cost per vehicle, and show it in a chart - so that next month, and the month after, you press one button and trust the number. Here is how.</p>
@@ -592,7 +632,7 @@
 
 <section class="step" id="step-1" hidden>
 <h2>T2: The Tool in Action</h2>
-<p>A spreadsheet is fine for ten rows and dangerous for five hundred: scrolling and eyeballing does not scale, and it cannot be checked. What you need is a small set of free tools that read the data the same way every time and keep a record of every change - <strong>Python</strong> (plain-English instructions the computer runs in order), <strong>pandas</strong> (a Python add-on built for tables), <strong>matplotlib</strong> (for the chart), and <strong>Git</strong> (a logbook that snapshots your work). Watch them answer Ibraaheem's question on the real Tank You log.</p>
+<p>Reading by eye is fine for ten rows and does not survive five hundred: scrolling and totalling by hand cannot be repeated and cannot be checked, whatever you are scrolling through. What you need is a small set of free tools that read the data the same way every time and keep a record of every change - <strong>Python</strong> (plain-English instructions the computer runs in order), <strong>pandas</strong> (a Python add-on built for tables), <strong>matplotlib</strong> (for the chart), and <strong>Git</strong> (a logbook that snapshots your work). Watch them answer Ibraaheem's question on the real Tank You log.</p>
 
 <div class="canvas canvas-display" role="group" aria-label="A worked example, filled in"><div class="canvas-box"><div class="cb-label">Step 1 - Set up a version-controlled workspace</div><p class="cb-demo">mkdir tank-you-analysis and cd into it; python -m venv .venv, then activate it (your terminal line now starts with (.venv)); pip install pandas matplotlib lands them inside the toolbox, not all over the machine; git init; a .gitignore holding one line, .venv/; git add .gitignore and git commit -m &#039;Start project&#039;. The toolbox is clean and the logbook is open.</p></div><div class="canvas-box"><div class="cb-label">Step 2 - Read the data</div><p class="cb-demo">In analyse.py: import pandas as pd; orders = pd.read_csv(&#039;work_orders_2026.csv&#039;); print(orders.shape). Run it - it prints (487, 4): 487 repair jobs, 4 columns (date, asset, fault, cost_rand). git commit -m &#039;Read the work-order CSV&#039;.</p></div><div class="canvas-box"><div class="cb-label">Step 3 - Look, then clean (the clipboard, not the gut - in code)</div><p class="cb-demo">orders[&#039;cost_rand&#039;].isna().sum() prints 31 blanks; by eye the column is text - &#039;R 3 200&#039;, &#039;3200.00&#039;, &#039;see invoice&#039;. Strip &#039;R&#039; and spaces, then pd.to_numeric(..., errors=&#039;coerce&#039;) turns &#039;see invoice&#039; into a blank - now 34 (31 + 3). Drop them: priced = orders.dropna(subset=[&#039;cost_clean&#039;]) leaves (453, 5) rows (487 - 34 = 453). The 34 is honest and you can defend it. git commit -m &#039;Clean the cost column, drop 34 rows with no cost&#039;.</p></div><div class="canvas-box"><div class="cb-label">Step 4 - Answer the question</div><p class="cb-demo">priced.groupby(&#039;asset&#039;)[&#039;cost_clean&#039;].sum().sort_values(ascending=False) prints: bakkie_old R48,920; bakkie_new R21,340; truck R18,075. There it is - the old bakkie has cost R48,920 in repairs this year, more than the newer two put together. Muhammad was right: the numbers, not the sentiment about the family bakkie, say its repair bill now outruns what a newer vehicle would cost to run.</p></div><div class="canvas-box"><div class="cb-label">Step 5 - Chart it and commit (reproducible: one button next month)</div><p class="cb-demo">import matplotlib.pyplot as plt; by_asset.plot(kind=&#039;bar&#039;); plt.title(&#039;Tank You - repair cost per asset, 2026&#039;); plt.ylabel(&#039;Cost (rand)&#039;); plt.tight_layout(); plt.savefig(&#039;cost_per_asset.png&#039;). Then git add analyse.py cost_per_asset.png and git commit -m &#039;Chart cost per asset&#039;. Next month you change one thing - the file - and press one button.</p></div></div>
 
